@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AUX Code & Break Portal - Enterprise WFM</title>
+  <link rel="stylesheet" href="portal.css" />
+</head>
+<body>
+  <div class="portal-container">
+    <header class="portal-header">
+      <div class="logo-area">
+        <span class="icon">🏢</span>
+        <div>
+          <h2>Contact Center WFM Portal</h2>
+          <p>Auxiliary Mode & Break Management Gateway</p>
+        </div>
+      </div>
+      <div id="auth-badge" class="auth-badge guest">
+        <span class="dot"></span> <span id="auth-status-text">Not Authenticated</span>
+      </div>
+    </header>
+
+    <!-- SECTION 1: AUTHENTICATION -->
+    <section id="auth-section" class="card">
+      <div class="card-header">
+        <span class="step-num">1</span>
+        <h3>Agent Authentication (SSO / LDAP)</h3>
+      </div>
+      <div class="card-body">
+        <p class="subtitle">Enter your enterprise agent credentials to access AUX authorization.</p>
+        <div class="form-grid">
+          <div class="form-group" style="grid-column: span 2; background: rgba(37, 99, 235, 0.1); padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(37, 99, 235, 0.3);">
+            <label style="color: #93c5fd; font-weight: 700; font-size: 12px;">👤 Switch Agent User Persona (Pre-Configured Scenarios):</label>
+            <select id="preset-agent-select" style="margin-top: 6px; background: #0f172a; font-weight: 600; color: #f8fafc; border: 1px solid #3b82f6;">
+              <option value="AGT-8842">Alex Morgan (AGT-8842) • Tier-2 Tech • Clean Adherence 96% (Auto-Approve)</option>
+              <option value="AGT-4092">Jordan Miller (AGT-4092) • Billing • 4 Tea Breaks Taken (Triggers Tea Pattern Reject)</option>
+              <option value="AGT-9102">Samantha Vance (AGT-9102) • Customer Care • +25m Lunch Overage (Triggers Lunch Reject)</option>
+              <option value="AGT-7740">David Chen (AGT-7740) • Inbound • Rate Limit Spammer (Triggers Frequency Reject)</option>
+              <option value="AGT-6512">Rachel Green (AGT-6512) • Retention • Medical Exemption (Urgent Override)</option>
+              <option value="AGT-8819">Marcus Brody (AGT-8819) • Trainee • Coaching / QA Review</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Agent ID / Employee Code</label>
+            <input type="text" id="agent-id" value="AGT-8842" placeholder="e.g. AGT-8842" />
+          </div>
+          <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="agent-name" value="Alex Morgan" placeholder="e.g. Alex Morgan" />
+          </div>
+          <div class="form-group">
+            <label>Campaign / Queue</label>
+            <select id="agent-queue">
+              <option value="Tier-2 Tech Support">Tier-2 Tech Support (ACD-04)</option>
+              <option value="Customer Billing & Retention">Customer Billing & Retention (ACD-02)</option>
+              <option value="Emergency Inbound">Emergency Inbound (ACD-01)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>SSO Security Token / Passcode</label>
+            <input type="password" id="agent-token" value="••••••••••••" placeholder="Enter secure token" />
+          </div>
+        </div>
+        <div class="auth-actions">
+          <button id="btn-authenticate" class="btn btn-primary">Authenticate & Continue</button>
+          <span id="auth-msg" class="inline-msg"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: AUX CODE & DURATION SELECTION -->
+    <section id="break-section" class="card disabled">
+      <div class="card-header">
+        <span class="step-num">2</span>
+        <h3>Auxiliary Break Request Parameters</h3>
+      </div>
+      <div class="card-body">
+        <!-- Live ACD & Staffing Live Gauge inside Portal -->
+        <div class="wfm-gauge-banner">
+          <div class="gauge-item">
+            <span class="gauge-label">Live ACD Queue:</span>
+            <span class="gauge-val" id="portal-live-calls">18 Waiting</span>
+          </div>
+          <div class="gauge-item">
+            <span class="gauge-label">Logged-in Staff:</span>
+            <span class="gauge-val" id="portal-live-staff">24 / 30 Agents</span>
+          </div>
+          <div class="gauge-item">
+            <span class="gauge-label">WFM Forecast SLA:</span>
+            <span class="gauge-val highlight" id="portal-live-sla">84.2% (Target: 80%)</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="section-label">Select AUX Code Category</label>
+          <div class="aux-grid">
+            <label class="aux-option">
+              <input type="radio" name="aux-code" value="AUX-1: Scheduled Lunch" checked />
+              <div class="aux-card">
+                <span class="aux-icon">🥪</span>
+                <strong>AUX-1: Lunch</strong>
+                <small>Official 30-45m scheduled lunch meal</small>
+              </div>
+            </label>
+            <label class="aux-option">
+              <input type="radio" name="aux-code" value="AUX-2: Short Break / Tea" />
+              <div class="aux-card">
+                <span class="aux-icon">☕</span>
+                <strong>AUX-2: Tea / Coffee</strong>
+                <small>Quick 10-15m standard rest break</small>
+              </div>
+            </label>
+            <label class="aux-option">
+              <input type="radio" name="aux-code" value="AUX-3: Meeting / 1-on-1" />
+              <div class="aux-card">
+                <span class="aux-icon">👥</span>
+                <strong>AUX-3: Meeting</strong>
+                <small>Team huddle or supervisor 1:1</small>
+              </div>
+            </label>
+            <label class="aux-option">
+              <input type="radio" name="aux-code" value="AUX-4: Training / Coaching" />
+              <div class="aux-card">
+                <span class="aux-icon">🎓</span>
+                <strong>AUX-4: Training</strong>
+                <small>LMS or QA coaching session</small>
+              </div>
+            </label>
+            <label class="aux-option">
+              <input type="radio" name="aux-code" value="AUX-5: Technical / VPN Issue" />
+              <div class="aux-card">
+                <span class="aux-icon">💻</span>
+                <strong>AUX-5: System Issue</strong>
+                <small>VPN, VDI, or softphone outage</small>
+              </div>
+            </label>
+            <label class="aux-option">
+              <input type="radio" name="aux-code" value="AUX-6: Bio / Emergency" />
+              <div class="aux-card">
+                <span class="aux-icon">🚰</span>
+                <strong>AUX-6: Personal/Bio</strong>
+                <small>Immediate urgent 5-10m break</small>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="section-label">Duration</label>
+          <div class="duration-pills">
+            <button type="button" class="pill" data-minutes="10">10 Mins</button>
+            <button type="button" class="pill active" data-minutes="15">15 Mins</button>
+            <button type="button" class="pill" data-minutes="30">30 Mins</button>
+            <button type="button" class="pill" data-minutes="45">45 Mins</button>
+            <button type="button" class="pill" data-minutes="60">60 Mins</button>
+            <div class="custom-duration">
+              <input type="number" id="custom-minutes" placeholder="Custom" min="1" max="120" />
+              <span>mins</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- MORE OPTIONS -->
+        <div class="more-options-box">
+          <h4>Advanced Break Options & WFM Handover</h4>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Designated Backup Agent ID (Optional)</label>
+              <input type="text" id="backup-agent" placeholder="e.g. AGT-9102 (Sara Jenkins)" />
+            </div>
+            <div class="form-group">
+              <label>Urgency Level / Exemption</label>
+              <select id="urgency-level">
+                <option value="Normal">Normal Request (Subject to ACD queue)</option>
+                <option value="Adherence-Scheduled">Scheduled Roster Interval</option>
+                <option value="Urgent-Medical">Urgent / Medical Exemption</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Reason & Handover Notes for Supervisor</label>
+            <textarea id="break-notes" rows="2" placeholder="Detail any calls in wrap-up or handover notes..."></textarea>
+          </div>
+        </div>
+
+        <div class="submit-actions">
+          <button id="btn-submit-break" class="btn btn-success btn-large">
+            <span>🚀</span> Submit AUX Mode Request to WFM Engine
+          </button>
+          <button id="btn-cancel" class="btn btn-secondary" onclick="window.close()">Cancel</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: DECISION RESULT MODAL / OVERLAY -->
+    <div id="decision-overlay" class="decision-overlay hidden">
+      <div class="decision-box">
+        <div id="decision-icon" class="status-big-icon">⏳</div>
+        <h3 id="decision-title">Evaluating ACD & Behavioral Forecast...</h3>
+        <p id="decision-desc">Cross-checking ACD arrival forecast, queue depth, and agent adherence patterns...</p>
+        
+        <div id="decision-metrics" class="decision-metrics">
+          <!-- Filled dynamically -->
+        </div>
+
+        <div class="decision-actions">
+          <button id="btn-sync-chatbot" class="btn btn-primary">Sync to Desktop Chatbot & Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="portal.js"></script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+{
+  "name": "aux-chatbot",
+  "version": "0.1.0",
+  "description": "AI‑powered auxiliary mode portal desktop widget",
+  "main": "main.js",
+  "scripts": {
+    "dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
+    "build": "vite build && electron-builder",
+    "start": "electron ."
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.0.0",
+    "concurrently": "^8.2.0",
+    "electron": "^30.0.0",
+    "electron-builder": "^24.6.0",
+    "wait-on": "^7.2.0",
+    "vite": "^5.2.0"
+  }
+}

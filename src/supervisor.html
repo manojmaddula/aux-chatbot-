@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Supervisor Command Center - WFM & Auxiliary Operations</title>
+  <link rel="stylesheet" href="supervisor.css" />
+</head>
+<body>
+  <div class="sup-container">
+    
+    <!-- HEADER -->
+    <header class="sup-header">
+      <div class="header-left">
+        <span class="sup-badge">SUPERVISOR PORTAL</span>
+        <h2>WFM Auxiliary & Schedule Adherence Command Center</h2>
+        <p>Live ACD queue forecasting, break dispatch tracking, agent adherence alerts, and emergency broadcasting</p>
+      </div>
+      <div class="header-right">
+        <div class="sup-profile">
+          <span class="sup-avatar">👩‍💼</span>
+          <div>
+            <strong>Sarah Jenkins (SUP-014)</strong>
+            <span>Operations Supervisor • Tier-2 Queue</span>
+          </div>
+        </div>
+        <a href="/widget.html" target="_blank" class="btn btn-outline-light">Open Agent Widget</a>
+        <a href="/portal.html" target="_blank" class="btn btn-primary">Open Break Portal</a>
+      </div>
+    </header>
+
+    <!-- LIVE METRICS KPI ROW -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <span class="kpi-title">Active Staffing</span>
+        <div class="kpi-val" id="kpi-staff">24 / 30</div>
+        <span class="kpi-sub text-ok">✓ Erlang-C buffer healthy (+4)</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-title">Current Inbound Queue</span>
+        <div class="kpi-val" id="kpi-queue">18 Calls</div>
+        <span class="kpi-sub text-muted">Avg wait time: 34s</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-title">Projected SLA</span>
+        <div class="kpi-val highlight" id="kpi-sla">85.4%</div>
+        <span class="kpi-sub text-ok">Target SLA: 80.0%</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-title">Agents in AUX Mode</span>
+        <div class="kpi-val" id="kpi-aux">4 Agents</div>
+        <span class="kpi-sub text-muted">2 Tea, 1 Lunch, 1 Training</span>
+      </div>
+      <div class="kpi-card alert-card">
+        <span class="kpi-title">Break Overdue Alerts</span>
+        <div class="kpi-val text-danger" id="kpi-overdue">0</div>
+        <span class="kpi-sub text-danger" id="kpi-overdue-sub">No adherence overage</span>
+      </div>
+    </section>
+
+    <!-- MAIN TWO-COLUMN DASHBOARD -->
+    <div class="dashboard-layout">
+
+      <!-- LEFT COLUMN: BREAK REQUESTS TRACKING QUEUE -->
+      <div class="col-main">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h3>📋 Dispatched Break Requests & Audit Queue</h3>
+              <p>Every break submitted from the Web Portal is automatically evaluated and tracked here in real-time.</p>
+            </div>
+            <div class="header-actions">
+              <button id="btn-refresh-queue" class="btn btn-sm btn-secondary">🔄 Refresh</button>
+              <button id="btn-clear-queue" class="btn btn-sm btn-outline">Clear History</button>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Time</th>
+                  <th>Request ID</th>
+                  <th>Agent</th>
+                  <th>AUX Type</th>
+                  <th>Duration</th>
+                  <th>WFM Decision</th>
+                  <th>Forecasting / Behavioral Reasoning</th>
+                  <th>Supervisor Action</th>
+                </tr>
+              </thead>
+              <tbody id="queue-table-body">
+                <!-- Dynamically filled -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- AGENT ADHERENCE & LIVE STATUS WALLBOARD -->
+        <div class="card" style="margin-top: 20px;">
+          <div class="card-header">
+            <div>
+              <h3>👥 Shift Adherence & Agent Telemetry Wallboard</h3>
+              <p>Monitors real-time phone states, break timers, and behavioral adherence scores.</p>
+            </div>
+            <span class="badge-live">● LIVE TELEMETRY</span>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Agent ID</th>
+                  <th>Agent Name</th>
+                  <th>Queue</th>
+                  <th>Current Telephony State</th>
+                  <th>Break Remaining</th>
+                  <th>Adherence</th>
+                  <th>Tea Breaks</th>
+                  <th>Lunch Variance</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="agent-wallboard-body">
+                <!-- Dynamically filled -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: EMERGENCY BROADCAST STATION & CONTROLS -->
+      <div class="col-side">
+        <!-- EMERGENCY BROADCAST DISPATCHER -->
+        <div class="card broadcast-box">
+          <div class="card-header">
+            <h3>📢 Broadcast Emergency Notification</h3>
+          </div>
+          <div class="card-body">
+            <p class="subtitle">Broadcast live alerts immediately to all active agent desktop chatbot widgets.</p>
+
+            <div class="quick-broadcast-buttons">
+              <button class="btn btn-emergency" id="btn-bc-storm">
+                <span>🌪️</span> Tornado / Storm Warning
+              </button>
+              <button class="btn btn-emergency sev1" id="btn-bc-outage">
+                <span>⚡</span> SEV-1 System Outage
+              </button>
+              <button class="btn btn-emergency traffic" id="btn-bc-monday">
+                <span>📈</span> Monday Peak Traffic Mode
+              </button>
+            </div>
+
+            <hr class="divider" />
+
+            <div class="form-group">
+              <label>Custom Broadcast Message:</label>
+              <textarea id="custom-bc-text" rows="3" placeholder="Type custom operational announcement for all agents..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>Severity Level:</label>
+              <select id="custom-bc-severity">
+                <option value="CRITICAL">Critical Emergency (Red Ticker)</option>
+                <option value="WARNING">Operational Warning (Amber Banner)</option>
+                <option value="INFO">Informational (Blue)</option>
+              </select>
+            </div>
+            <button id="btn-send-custom-bc" class="btn btn-primary btn-block">
+              🚀 Dispatch Broadcast to All Agents
+            </button>
+            <div id="bc-status-msg" class="bc-status-msg"></div>
+          </div>
+        </div>
+
+        <!-- SUPERVISOR BEHAVIORAL POLICY CONFIG -->
+        <div class="card policy-box" style="margin-top: 20px;">
+          <div class="card-header">
+            <h3>⚙️ AI WFM Policy Rules</h3>
+          </div>
+          <div class="card-body policy-list">
+            <div class="policy-item">
+              <div>
+                <strong>Auto-Reject Tea Break Pattern</strong>
+                <p>Rejects if agent takes $\ge 3$ short breaks in a single shift.</p>
+              </div>
+              <span class="policy-status active">ACTIVE</span>
+            </div>
+            <div class="policy-item">
+              <div>
+                <strong>Chronic Lunch Overage Threshold</strong>
+                <p>Flagged if prior lunch exceeded scheduled time by $\ge 15$ mins.</p>
+              </div>
+              <span class="policy-status active">ACTIVE</span>
+            </div>
+            <div class="policy-item">
+              <div>
+                <strong>Request Frequency Rate Limiter</strong>
+                <p>Throttle activated after 3 requests in 30 minutes.</p>
+              </div>
+              <span class="policy-status active">ACTIVE</span>
+            </div>
+            <div class="policy-item">
+              <div>
+                <strong>Automated Overdue Voice Bot Call</strong>
+                <p>Triggers immediate voice bot call when break duration is exceeded.</p>
+              </div>
+              <span class="policy-status active">ACTIVE</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="supervisor.js"></script>
+</body>
+</html>
