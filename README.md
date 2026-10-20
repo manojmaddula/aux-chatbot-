@@ -92,6 +92,32 @@ An enterprise-grade desktop chatbot widget for contact center agents that stream
 - Real-time suggested context-aware responses with one-click **"Copy to Chat"**.
 - One-click **"Generate Instant Call Summary (ACW)"** to produce CRM-ready notes (Intent, Action, Disposition Code, Sentiment).
 
+### 9. Storm & Tornado IVR Deflection Engine (1,000 calls/min Auto-Trigger)
+- Real-time inbound traffic velocity monitor.
+- When call volume reaches or exceeds **1,000 calls per minute**, from call 1,001+ callers automatically receive the field outage voice announcement:
+  > *"Thank you for the call, we are having so many outages out field workers are on the route, thank you for your patience"*
+- When call volume falls below **1,000 calls per minute**, the deflection system **automatically disables** and normal queue routing resumes.
+- Includes speech synthesis audio preview and interactive slider simulation controls.
+
+### 10. Agent QA Scorecard, Tone Detection & Mandatory Training Workflow
+- **Speech Tone Classification**: Detects Good/Empathetic, Neutral, Bad/Confused, and Rudely/Impatient tones in real-time.
+- **Pre-defined Evaluation Formulas**:
+  $$\text{Overall QA Score} = (25\% \times \text{Security PIN}) + (20\% \times \text{Details Captured}) + (25\% \times \text{Tone Index}) + (30\% \times \text{Query Resolution})$$
+- **Post-Call Customer IVR Ratings**: Integrated 1 to 5-star customer survey feedback.
+- **Supervisor 1-Click Mandatory Coaching**: Immediate training module assignment for non-compliant or rude agents, automatically switching their status to `AUX: TRAINING`.
+- **CSV Audit Export**: Instant export of adherence, QA, and IVR satisfaction reports.
+
+---
+
+## 🤖 Assistant Branding & Name Candidates
+
+| Name | Gender / Vibe | Full Form (Backronym) | Tagline |
+| :--- | :--- | :--- | :--- |
+| **REMI** | Neutral / Cute | **R**eal-time **E**mpathy, **M**ode & **I**nteraction | *"Little copilot. Big heart."* |
+| **ARIA** | Professional | **A**dherence, **R**esolution & **I**nteraction **A**ssistant | *"Harmonizing Breaks, Calls & Quality."* |
+| **MAX** | Male / Sleek | **M**ode, **A**dherence & **EX**cellence Engine | *"Maximum focus. Effortless adherence."* |
+| **MIA** | Female / Sweet | **M**ode, **I**nteraction & **A**dherence Assistant | *"Never miss a beat."* |
+
 ---
 
 ## Quick Start & Running
