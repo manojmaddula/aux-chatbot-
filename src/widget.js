@@ -12,7 +12,15 @@ const AGENT_PROFILES = {
     lunchClass: 'text-ok',
     freqCount: '1 / 3',
     freqClass: 'text-ok',
-    avatar: '🧑‍💻'
+    avatar: '🧑‍💻',
+    verifStatus: '✓ Verified',
+    verifClass: 'text-ok',
+    detailsStatus: '✓ Retrieved',
+    detailsClass: 'text-ok',
+    toneStatus: 'Good / Empathetic',
+    toneClass: 'text-ok',
+    ivrStars: '★★★★★ 5.0 / 5.0',
+    ivrFeedback: 'Customer Response: "Agent Alex was empathetic, restored my promotional discount and resolved inquiry immediately."'
   },
   'AGT-4092': {
     id: 'AGT-4092',
@@ -25,7 +33,15 @@ const AGENT_PROFILES = {
     lunchClass: 'text-ok',
     freqCount: '2 / 3',
     freqClass: 'text-ok',
-    avatar: '👨‍💼'
+    avatar: '👨‍💼',
+    verifStatus: '✓ Verified',
+    verifClass: 'text-ok',
+    detailsStatus: '✓ Retrieved',
+    detailsClass: 'text-ok',
+    toneStatus: 'Rudely / Impatient',
+    toneClass: 'text-danger',
+    ivrStars: '★☆☆☆☆ 1.0 / 5.0 (Rude)',
+    ivrFeedback: 'Customer Response: "Agent cut me off repeatedly and spoke in an aggressive, impatient tone. Did not listen."'
   },
   'AGT-9102': {
     id: 'AGT-9102',
@@ -38,7 +54,15 @@ const AGENT_PROFILES = {
     lunchClass: 'text-danger',
     freqCount: '1 / 3',
     freqClass: 'text-ok',
-    avatar: '👩‍💼'
+    avatar: '👩‍💼',
+    verifStatus: '✗ Missed PIN',
+    verifClass: 'text-danger',
+    detailsStatus: '✗ Incomplete',
+    detailsClass: 'text-danger',
+    toneStatus: 'Bad / Confused',
+    toneClass: 'text-danger',
+    ivrStars: '★★☆☆☆ 2.0 / 5.0',
+    ivrFeedback: 'Customer Response: "Agent seemed lost, failed to verify my security PIN, and could not resolve my billing surcharge."'
   },
   'AGT-7740': {
     id: 'AGT-7740',
@@ -51,7 +75,15 @@ const AGENT_PROFILES = {
     lunchClass: 'text-ok',
     freqCount: '3 / 3',
     freqClass: 'text-danger',
-    avatar: '👨‍💻'
+    avatar: '👨‍💻',
+    verifStatus: '✓ Verified',
+    verifClass: 'text-ok',
+    detailsStatus: '✓ Retrieved',
+    detailsClass: 'text-ok',
+    toneStatus: 'Neutral / Direct',
+    toneClass: 'text-ok',
+    ivrStars: '★★★☆☆ 3.5 / 5.0',
+    ivrFeedback: 'Customer Response: "Fast and functional, answered question straightforwardly."'
   },
   'AGT-6512': {
     id: 'AGT-6512',
@@ -64,7 +96,15 @@ const AGENT_PROFILES = {
     lunchClass: 'text-ok',
     freqCount: '1 / 3',
     freqClass: 'text-ok',
-    avatar: '👩‍🔬'
+    avatar: '👩‍🔬',
+    verifStatus: '✓ Verified',
+    verifClass: 'text-ok',
+    detailsStatus: '✓ Retrieved',
+    detailsClass: 'text-ok',
+    toneStatus: 'Good / Empathetic',
+    toneClass: 'text-ok',
+    ivrStars: '★★★★★ 5.0 / 5.0',
+    ivrFeedback: 'Customer Response: "Excellent service! Very friendly and solved my retention query in minutes."'
   },
   'AGT-8819': {
     id: 'AGT-8819',
@@ -77,7 +117,15 @@ const AGENT_PROFILES = {
     lunchClass: 'text-ok',
     freqCount: '1 / 3',
     freqClass: 'text-ok',
-    avatar: '🧑‍🎓'
+    avatar: '🧑‍🎓',
+    verifStatus: '✓ Verified',
+    verifClass: 'text-ok',
+    detailsStatus: '✗ Incomplete History',
+    detailsClass: 'text-warn',
+    toneStatus: 'Neutral / Hesitant',
+    toneClass: 'text-ok',
+    ivrStars: '★★★★☆ 4.0 / 5.0',
+    ivrFeedback: 'Customer Response: "Helpful agent, took a little time to look up details but solved the issue."'
   }
 };
 
@@ -202,6 +250,20 @@ try {
       showNotification('Policy Update', 'Supervisor updated break thresholds and rate limits.');
     } else if (data.type === 'IVR_DEFLECTION_UPDATE') {
       handleIvrDeflectionUpdate(data.payload);
+    } else if (data.type === 'MANDATORY_TRAINING_ASSIGNED') {
+      const banner = document.getElementById('training-assigned-banner');
+      const titleEl = document.getElementById('training-banner-title');
+      const descEl = document.getElementById('training-banner-desc');
+      if (banner) {
+        if (!data.payload.targetAgentId || data.payload.targetAgentId === agentState.id || data.payload.targetAgentId === 'ALL') {
+          banner.classList.remove('hidden');
+          if (titleEl) titleEl.textContent = `🎓 Mandatory Coaching Assigned: ${data.payload.moduleName || 'Training'}`;
+          if (descEl) descEl.textContent = `Reason: ${data.payload.reason}. Schedule: ${data.payload.scheduleMode}. Notes: ${data.payload.notes || 'Please complete ASAP.'}`;
+          playWarningChime();
+          addSupervisorLog('TRAINING_ASSIGNED', `Supervisor assigned ${data.payload.moduleName} due to: ${data.payload.reason}`);
+          showNotification('Mandatory Coaching Assigned', `${data.payload.moduleName} scheduled by supervisor.`);
+        }
+      }
     }
   };
 } catch (e) {
@@ -243,7 +305,37 @@ function switchWidgetAgent(agentKey) {
     bFreq.className = `m-val ${profile.freqClass}`;
   }
 
+  // Update Live QA Coaching Badges & Post-Call Rating
+  const vBadge = document.getElementById('agent-verif-badge');
+  const dBadge = document.getElementById('agent-details-badge');
+  const tBadge = document.getElementById('agent-tone-badge');
+  const ivrStars = document.getElementById('acw-ivr-stars');
+  const ivrFeedback = document.getElementById('acw-ivr-feedback');
+
+  if (vBadge) {
+    vBadge.textContent = profile.verifStatus || '✓ Verified';
+    vBadge.className = `qa-coach-val ${profile.verifClass || 'text-ok'}`;
+  }
+  if (dBadge) {
+    dBadge.textContent = profile.detailsStatus || '✓ Retrieved';
+    dBadge.className = `qa-coach-val ${profile.detailsClass || 'text-ok'}`;
+  }
+  if (tBadge) {
+    tBadge.textContent = profile.toneStatus || 'Good / Empathetic';
+    tBadge.className = `qa-coach-val ${profile.toneClass || 'text-ok'}`;
+  }
+  if (ivrStars && profile.ivrStars) ivrStars.textContent = profile.ivrStars;
+  if (ivrFeedback && profile.ivrFeedback) ivrFeedback.textContent = profile.ivrFeedback;
+
   addSupervisorLog('AGENT_SWITCH', `Active persona switched to ${profile.name} (${profile.id}).`);
+}
+
+const btnAckTraining = document.getElementById('btn-ack-training');
+if (btnAckTraining) {
+  btnAckTraining.addEventListener('click', () => {
+    const banner = document.getElementById('training-assigned-banner');
+    if (banner) banner.classList.add('hidden');
+  });
 }
 
 if (widgetAgentSelect) {

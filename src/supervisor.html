@@ -75,6 +75,9 @@
       <button class="sup-tab-btn" data-tab="stab-reports">
         <span>📊</span> Agent Reports & Analytics
       </button>
+      <button class="sup-tab-btn" data-tab="stab-qa">
+        <span>🎓</span> QA, Customer Tone & Coaching (<span id="sup-qa-badge" style="color:#f87171; font-weight:800;">2 Flagged</span>)
+      </button>
       <button class="sup-tab-btn" data-tab="stab-limits">
         <span>⚙️</span> Agent Limits & Policy Setup
       </button>
@@ -333,6 +336,8 @@
               <option value="violations">3. Break Violations & Overage Audit Report</option>
               <option value="frequency">4. Request Frequency & Throttling Report</option>
               <option value="acw">5. NICE CXone ACW Handle Time Report</option>
+              <option value="qa_scorecard">6. Customer Interaction Tone, Empathy & QA Scorecard</option>
+              <option value="ivr_csat">7. Post-Call IVR Customer Rating & Query Resolution Audit</option>
             </select>
             <button id="btn-export-csv" class="btn btn-success btn-sm">
               📥 Export to CSV
@@ -357,7 +362,141 @@
       </div>
     </section>
 
-    <!-- TAB 5: AGENT LIMITS & WFM POLICY SETUP -->
+    <!-- TAB 5: AGENT QA, CUSTOMER TONE & COACHING -->
+    <section id="stab-qa" class="sup-tab-pane">
+      
+      <!-- QA KPI ROW -->
+      <div class="kpi-grid" style="margin-bottom: 20px;">
+        <div class="kpi-card">
+          <span class="kpi-title">Average IVR Customer Rating</span>
+          <div class="kpi-val highlight" id="qa-avg-csat">★ 4.1 / 5.0</div>
+          <span class="kpi-sub text-ok">Post-call IVR Survey aggregate</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-title">Positive / Empathetic Tone</span>
+          <div class="kpi-val text-ok" id="qa-pos-tone">66.7%</div>
+          <span class="kpi-sub text-ok">4 of 6 Agents Empathetic</span>
+        </div>
+        <div class="kpi-card alert-card">
+          <span class="kpi-title">Rude / Hostile Tone Flags</span>
+          <div class="kpi-val text-danger" id="qa-rude-flags">2 Calls</div>
+          <span class="kpi-sub text-danger">Immediate coaching needed</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-title">Query Resolution (FCR)</span>
+          <div class="kpi-val" id="qa-fcr-rate">83.3%</div>
+          <span class="kpi-sub text-ok">Target: &ge; 80.0%</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-title">Security Verification Rate</span>
+          <div class="kpi-val highlight" id="qa-verif-rate">83.3%</div>
+          <span class="kpi-sub text-muted">PIN / 2FA Compliance</span>
+        </div>
+      </div>
+
+      <!-- QA FORMULAS EXPLAINER BANNER -->
+      <div class="card" style="margin-bottom: 20px; border-left: 4px solid #3b82f6;">
+        <div class="card-header" style="background: rgba(37,99,235,0.06);">
+          <div>
+            <h4 style="color:#93c5fd; font-size:13px;">📐 Automated Evaluation Formulas & Compliance Matrix</h4>
+            <p style="font-size:11px; color:#cbd5e1; margin-top:2px;">
+              Overall QA Score = <strong>(25% &times; Security Verification)</strong> + <strong>(20% &times; Customer Account Discovery)</strong> + <strong>(25% &times; Empathy & Tone Index)</strong> + <strong>(30% &times; Query Resolution Outcome)</strong>
+            </p>
+          </div>
+          <button id="btn-export-qa-csv" class="btn btn-sm btn-success">📥 Export QA Report to CSV</button>
+        </div>
+      </div>
+
+      <!-- AGENT QA SCORECARD TABLE -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h3>🎙️ Agent Interaction Quality & Customer Sentiment Scorecard</h3>
+            <p>Monitors how agents speak with customers (Good, Neutral, Bad, Rudely), customer query resolution, security verification, and post-call IVR star ratings.</p>
+          </div>
+          <div class="header-actions">
+            <button id="btn-refresh-qa" class="btn btn-sm btn-secondary">🔄 Refresh QA</button>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Agent ID & Name</th>
+                <th>Contact ID</th>
+                <th>Interaction Tone</th>
+                <th>Security Verification</th>
+                <th>Cust Details Retrieved</th>
+                <th>Query Resolved?</th>
+                <th>Post-Call IVR CSAT</th>
+                <th>Weighted QA Score</th>
+                <th>Supervisor Action</th>
+              </tr>
+            </thead>
+            <tbody id="qa-scorecard-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TRAINING ASSIGNMENT MODAL -->
+      <div id="training-modal-overlay" class="decision-overlay hidden">
+        <div class="decision-box" style="text-align:left; max-width:550px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h3 style="color:#93c5fd; font-size:16px;">🎓 Assign Extra Training & Coaching Module</h3>
+            <button id="btn-close-training-modal" class="btn-xs btn-outline" style="font-size:14px;">✕</button>
+          </div>
+          <p style="font-size:11px; color:#94a3b8; margin-bottom:14px;">
+            Assign mandatory coaching to correct tone infractions, failed verification, or unresolved customer queries. This updates the agent's WFM calendar to <strong>AUX-4: Training / Coaching</strong>.
+          </p>
+
+          <div class="form-group">
+            <label>Agent Name & ID:</label>
+            <input type="text" id="train-agent-name" readonly style="background:#090d16; color:#38bdf8; font-weight:700;" />
+          </div>
+
+          <div class="form-group">
+            <label>Detected Coaching Reason:</label>
+            <input type="text" id="train-flag-reason" readonly style="background:#090d16; color:#ef4444; font-weight:700;" />
+          </div>
+
+          <div class="form-group">
+            <label>Select Training / Coaching Curriculum:</label>
+            <select id="train-module-select">
+              <option value="MOD-101">Module 101: Professional De-Escalation & Tone Mastery (45m)</option>
+              <option value="MOD-102">Module 102: Customer Security & Identity Verification Protocols (30m)</option>
+              <option value="MOD-103">Module 103: First Contact Query Resolution & Billing Diagnostics (60m)</option>
+              <option value="MOD-104">Module 104: Empathetic Listening & Professional Etiquette (30m)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Scheduling Mode:</label>
+            <select id="train-schedule-mode">
+              <option value="IMMEDIATE">Immediate AUX-4 Interval (Pull from Queue Now)</option>
+              <option value="NEXT_SHIFT">Scheduled at Start of Next Shift (Tomorrow 09:00 AM)</option>
+              <option value="OFFLINE">Self-Paced LMS Assignment (Complete by End of Week)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Supervisor Coaching Notes / Feedback:</label>
+            <textarea id="train-notes" rows="2" placeholder="e.g. Please review section 4 on remaining patient during billing disputes..."></textarea>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+            <button id="btn-cancel-training" class="btn btn-secondary">Cancel</button>
+            <button id="btn-confirm-training" class="btn btn-primary">
+              🚀 Dispatch Mandatory Training to Agent
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- TAB 6: AGENT LIMITS & WFM POLICY SETUP -->
     <section id="stab-limits" class="sup-tab-pane">
       <div class="card" style="max-width: 900px; margin: 0 auto;">
         <div class="card-header">

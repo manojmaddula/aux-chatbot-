@@ -46,6 +46,16 @@
       <button id="btn-dismiss-broadcast" class="btn-ticker-dismiss" title="Acknowledge & Dismiss">✕</button>
     </div>
 
+    <!-- MANDATORY SUPERVISOR TRAINING ASSIGNED BANNER -->
+    <div id="training-assigned-banner" class="training-assigned-banner hidden">
+      <span style="font-size:18px;">🎓</span>
+      <div>
+        <strong id="training-banner-title" style="color:#93c5fd; display:block;">Mandatory Coaching Assigned by Supervisor</strong>
+        <p id="training-banner-desc" style="color:#e2e8f0; font-size:10px; margin-top:2px;">Module 101: De-escalation & Tone Mastery scheduled for immediate AUX-4 interval.</p>
+      </div>
+      <button id="btn-ack-training" class="btn-xs btn-outline" style="white-space:nowrap; margin-left:6px;">Acknowledge</button>
+    </div>
+
     <!-- HIGH VOLUME MODE PROACTIVE ALERT -->
     <div id="high-traffic-banner" class="high-traffic-banner hidden">
       <div class="traffic-content">
@@ -124,13 +134,40 @@
         </div>
       </div>
 
+      <!-- Real-Time Interaction Quality & Verification Coach -->
+      <div class="qa-live-coach-bar">
+        <div class="qa-coach-item">
+          <span class="qa-coach-label">Security PIN:</span>
+          <span class="qa-coach-val text-ok" id="agent-verif-badge">✓ Verified</span>
+        </div>
+        <div class="qa-coach-item">
+          <span class="qa-coach-label">Account Info:</span>
+          <span class="qa-coach-val text-ok" id="agent-details-badge">✓ Retrieved</span>
+        </div>
+        <div class="qa-coach-item">
+          <span class="qa-coach-label">Speech Tone:</span>
+          <span class="qa-coach-val text-ok" id="agent-tone-badge">Good / Empathetic</span>
+        </div>
+      </div>
+
       <!-- ACW Wrap-Up Card (Displayed when call ends) -->
       <div id="acw-card" class="acw-card hidden">
         <div class="acw-header">
           <span class="acw-title">⏳ After Call Work (ACW) Mode</span>
           <span id="acw-timer" class="acw-timer">00:45</span>
         </div>
-        <p class="acw-desc">Complete wrap-up, select CXone disposition code, and generate AI call summary.</p>
+        <p class="acw-desc">Complete wrap-up, review IVR customer survey, and generate AI call summary.</p>
+
+        <!-- Post-Call IVR Customer Rating Box -->
+        <div class="ivr-rating-box">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:10px; font-weight:700; color:#94a3b8; text-transform:uppercase;">Post-Call IVR Survey Rating:</span>
+            <span id="acw-ivr-stars" style="font-size:13px; font-weight:800; color:#fbbf24;">★★★★★ 5.0 / 5.0</span>
+          </div>
+          <small id="acw-ivr-feedback" style="color:#cbd5e1; font-size:10px; display:block; margin-top:2px;">
+            Customer Response: "Agent Alex was empathetic, restored my promotional discount and resolved inquiry immediately."
+          </small>
+        </div>
         
         <div class="acw-form-group">
           <label>NICE CXone Disposition Code:</label>

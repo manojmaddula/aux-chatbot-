@@ -63,6 +63,9 @@ supTabBtns.forEach(btn => {
     if (target === 'stab-reports') {
       loadReport(document.getElementById('report-type-select').value);
     }
+    if (target === 'stab-qa') {
+      renderQAScorecard();
+    }
   });
 });
 
@@ -376,6 +379,32 @@ const reportsData = {
       ['AGT-6512', 'Rachel Green', '26 calls', '22 seconds', '31 seconds', '0 calls', '<span class="status-tag approved">EXCELLENT</span>'],
       ['AGT-8819', 'Marcus Brody', '12 calls', '49 seconds', '72 seconds', '5 calls', '<span class="status-tag rejected">TRAINING NEEDED</span>']
     ]
+  },
+  qa_scorecard: {
+    title: 'Customer Interaction Tone, Empathy & QA Scorecard',
+    summary: '<strong>Empathetic Tone:</strong> 66.7% | <strong>Rude / Hostile Alerts:</strong> 2 Calls (Immediate Training Required) | <strong>Average QA Score:</strong> 73.3%',
+    headers: ['Agent ID', 'Name', 'Contact ID', 'Speech Tone', 'Verification (25%)', 'Account Details (20%)', 'Query Resolved (30%)', 'Weighted QA %', 'QA Status'],
+    rows: [
+      ['AGT-8842', 'Alex Morgan', '#90421', '<span class="status-tag approved">Good / Empathetic</span>', 'Passed (25%)', 'Captured (20%)', 'Resolved (30%)', '96.0%', '<span class="status-tag approved">PASSED</span>'],
+      ['AGT-4092', 'Jordan Miller', '#90425', '<span class="status-tag rejected">Rudely / Hostile</span>', 'Passed (25%)', 'Captured (20%)', 'Unresolved (0%)', '48.0%', '<span class="status-tag rejected">EXTRA TRAINING</span>'],
+      ['AGT-9102', 'Samantha Vance', '#90429', '<span class="status-tag rejected">Bad / Confused</span>', 'Failed (0%)', 'Missing (0%)', 'Unresolved (0%)', '32.0%', '<span class="status-tag rejected">EXTRA TRAINING</span>'],
+      ['AGT-7740', 'David Chen', '#90432', '<span class="status-tag approved">Neutral / Direct</span>', 'Passed (25%)', 'Captured (20%)', 'Resolved (30%)', '85.0%', '<span class="status-tag approved">PASSED</span>'],
+      ['AGT-6512', 'Rachel Green', '#90438', '<span class="status-tag approved">Good / Empathetic</span>', 'Passed (25%)', 'Captured (20%)', 'Resolved (30%)', '98.0%', '<span class="status-tag approved">PASSED</span>'],
+      ['AGT-8819', 'Marcus Brody', '#90441', '<span class="status-tag aux">Neutral / Trainee</span>', 'Passed (25%)', 'Missing (0%)', 'Resolved (30%)', '81.0%', '<span class="status-tag aux">COACHING</span>']
+    ]
+  },
+  ivr_csat: {
+    title: 'Post-Call IVR Customer Rating & Query Resolution Audit',
+    summary: '<strong>Average IVR Rating:</strong> 4.1 / 5.0 Stars | <strong>First Contact Resolution:</strong> 83.3% | <strong>Low CSAT Alerts (&le;2★):</strong> 2 Calls',
+    headers: ['Agent ID', 'Name', 'Contact ID', 'IVR Star Rating', 'Customer Feedback Extract', 'First Contact Resolved', 'Action Triggered'],
+    rows: [
+      ['AGT-8842', 'Alex Morgan', '#90421', '★★★★★ 5.0', 'Empathetic, restored promotional discount immediately.', '<span class="status-tag approved">YES</span>', '<span class="status-tag approved">None</span>'],
+      ['AGT-4092', 'Jordan Miller', '#90425', '★☆☆☆☆ 1.0', 'Cut me off repeatedly, aggressive tone, unresolved billing.', '<span class="status-tag rejected">NO</span>', '<span class="status-tag rejected">Mandatory De-escalation</span>'],
+      ['AGT-9102', 'Samantha Vance', '#90429', '★★☆☆☆ 2.0', 'Seemed confused, failed security PIN check, fee unhandled.', '<span class="status-tag rejected">NO</span>', '<span class="status-tag rejected">Security & Query Training</span>'],
+      ['AGT-7740', 'David Chen', '#90432', '★★★☆☆ 3.5', 'Fast and direct response to inquiry.', '<span class="status-tag approved">YES</span>', '<span class="status-tag approved">None</span>'],
+      ['AGT-6512', 'Rachel Green', '#90438', '★★★★★ 5.0', 'Solved retention discount in minutes with great kindness.', '<span class="status-tag approved">YES</span>', '<span class="status-tag approved">None</span>'],
+      ['AGT-8819', 'Marcus Brody', '#90441', '★★★★☆ 4.0', 'Helpful trainee, slightly slow looking up details.', '<span class="status-tag approved">YES</span>', '<span class="status-tag aux">Skill Refinement</span>']
+    ]
   }
 };
 
@@ -427,7 +456,293 @@ document.getElementById('btn-export-csv').addEventListener('click', () => {
 });
 
 // ==========================================
-// TAB 5: AGENT LIMITS & POLICY SETUP
+// TAB 5: AGENT QA, CUSTOMER TONE & COACHING
+// ==========================================
+
+const qaScorecardData = [
+  {
+    agentId: 'AGT-8842',
+    name: 'Alex Morgan',
+    contactId: '#90421',
+    tone: 'Good / Empathetic',
+    securityVerified: true,
+    detailsRetrieved: true,
+    queryResolved: true,
+    ivrStars: 5.0,
+    qaScore: 96,
+    recommendedModule: 'MOD-104',
+    flagReason: 'None (Top Performer)',
+    trainingAssigned: false
+  },
+  {
+    agentId: 'AGT-4092',
+    name: 'Jordan Miller',
+    contactId: '#90425',
+    tone: 'Rudely / Impatient',
+    securityVerified: true,
+    detailsRetrieved: true,
+    queryResolved: false,
+    ivrStars: 1.0,
+    qaScore: 48,
+    recommendedModule: 'MOD-101',
+    flagReason: 'Rude speech tone to customer + Unresolved dispute',
+    trainingAssigned: false
+  },
+  {
+    agentId: 'AGT-9102',
+    name: 'Samantha Vance',
+    contactId: '#90429',
+    tone: 'Bad / Confused',
+    securityVerified: false,
+    detailsRetrieved: false,
+    queryResolved: false,
+    ivrStars: 2.0,
+    qaScore: 32,
+    recommendedModule: 'MOD-102',
+    flagReason: 'Missed customer security PIN verification + Unresolved inquiry',
+    trainingAssigned: false
+  },
+  {
+    agentId: 'AGT-7740',
+    name: 'David Chen',
+    contactId: '#90432',
+    tone: 'Neutral / Direct',
+    securityVerified: true,
+    detailsRetrieved: true,
+    queryResolved: true,
+    ivrStars: 3.5,
+    qaScore: 85,
+    recommendedModule: 'MOD-104',
+    flagReason: 'None (Acceptable SLA)',
+    trainingAssigned: false
+  },
+  {
+    agentId: 'AGT-6512',
+    name: 'Rachel Green',
+    contactId: '#90438',
+    tone: 'Good / Empathetic',
+    securityVerified: true,
+    detailsRetrieved: true,
+    queryResolved: true,
+    ivrStars: 5.0,
+    qaScore: 98,
+    recommendedModule: 'MOD-104',
+    flagReason: 'None (Exemplary Retention)',
+    trainingAssigned: false
+  },
+  {
+    agentId: 'AGT-8819',
+    name: 'Marcus Brody',
+    contactId: '#90441',
+    tone: 'Neutral / Trainee',
+    securityVerified: true,
+    detailsRetrieved: false,
+    queryResolved: true,
+    ivrStars: 4.0,
+    qaScore: 81,
+    recommendedModule: 'MOD-103',
+    flagReason: 'Incomplete account details lookup',
+    trainingAssigned: false
+  }
+];
+
+function renderQAScorecard() {
+  const tbody = document.getElementById('qa-scorecard-body');
+  if (!tbody) return;
+
+  tbody.innerHTML = qaScorecardData.map(item => {
+    const isRudeOrBad = item.tone.includes('Rudely') || item.tone.includes('Bad');
+    const isFailed = item.qaScore < 70 || isRudeOrBad || !item.queryResolved;
+    
+    let toneBadgeClass = 'approved';
+    if (item.tone.includes('Rudely') || item.tone.includes('Bad')) toneBadgeClass = 'rejected';
+    else if (item.tone.includes('Neutral')) toneBadgeClass = 'aux';
+
+    const verifBadge = item.securityVerified 
+      ? `<span class="status-tag approved">✓ Passed (25%)</span>`
+      : `<span class="status-tag rejected">✗ Failed (0%)</span>`;
+
+    const detailsBadge = item.detailsRetrieved
+      ? `<span class="status-tag approved">✓ Captured (20%)</span>`
+      : `<span class="status-tag rejected">✗ Missing (0%)</span>`;
+
+    const resBadge = item.queryResolved
+      ? `<span class="status-tag approved">✓ Resolved (30%)</span>`
+      : `<span class="status-tag rejected">✗ Unresolved (0%)</span>`;
+
+    let scoreBadgeClass = 'approved';
+    if (item.qaScore < 60) scoreBadgeClass = 'rejected';
+    else if (item.qaScore < 85) scoreBadgeClass = 'aux';
+
+    let actionBtn = '';
+    if (item.trainingAssigned) {
+      actionBtn = `<span class="status-tag aux" style="padding:4px 8px;">🎓 Training Dispatched</span>`;
+    } else if (isFailed) {
+      actionBtn = `<button class="btn btn-sm btn-danger" onclick="openAssignTrainingModal('${item.agentId}', '${item.name}', '${item.flagReason}', '${item.recommendedModule}')">🎓 Assign Extra Training</button>`;
+    } else {
+      actionBtn = `<button class="btn btn-sm btn-outline" onclick="openAssignTrainingModal('${item.agentId}', '${item.name}', 'Routine Skill Refinement', 'MOD-104')">Optional Coaching</button>`;
+    }
+
+    return `
+      <tr>
+        <td>
+          <div style="font-weight:600; color:#fff;">${item.name}</div>
+          <small style="color:#9ca3af; font-family:monospace;">${item.agentId}</small>
+        </td>
+        <td style="font-family:monospace; color:#38bdf8;">${item.contactId}</td>
+        <td><span class="status-tag ${toneBadgeClass}">${item.tone}</span></td>
+        <td>${verifBadge}</td>
+        <td>${detailsBadge}</td>
+        <td>${resBadge}</td>
+        <td><strong style="color:#fbbf24;">★ ${item.ivrStars.toFixed(1)}</strong> / 5.0</td>
+        <td><span class="status-tag ${scoreBadgeClass}">${item.qaScore}%</span></td>
+        <td>${actionBtn}</td>
+      </tr>
+    `;
+  }).join('');
+
+  // Update summary KPIs
+  const avgCsatEl = document.getElementById('qa-avg-csat');
+  const posToneEl = document.getElementById('qa-pos-tone');
+  const rudeFlagsEl = document.getElementById('qa-rude-flags');
+  const fcrRateEl = document.getElementById('qa-fcr-rate');
+  const verifRateEl = document.getElementById('qa-verif-rate');
+
+  if (avgCsatEl) {
+    const avg = qaScorecardData.reduce((acc, curr) => acc + curr.ivrStars, 0) / qaScorecardData.length;
+    avgCsatEl.textContent = `★ ${avg.toFixed(1)} / 5.0`;
+  }
+  if (posToneEl) {
+    const posCount = qaScorecardData.filter(i => i.tone.includes('Good') || i.tone.includes('Empathetic')).length;
+    const pct = ((posCount / qaScorecardData.length) * 100).toFixed(1);
+    posToneEl.textContent = `${pct}%`;
+  }
+  if (rudeFlagsEl) {
+    const rudeCount = qaScorecardData.filter(i => i.tone.includes('Rudely') || i.tone.includes('Bad')).length;
+    rudeFlagsEl.textContent = `${rudeCount} Calls`;
+  }
+  if (fcrRateEl) {
+    const resCount = qaScorecardData.filter(i => i.queryResolved).length;
+    const pct = ((resCount / qaScorecardData.length) * 100).toFixed(1);
+    fcrRateEl.textContent = `${pct}%`;
+  }
+  if (verifRateEl) {
+    const verifCount = qaScorecardData.filter(i => i.securityVerified).length;
+    const pct = ((verifCount / qaScorecardData.length) * 100).toFixed(1);
+    verifRateEl.textContent = `${pct}%`;
+  }
+}
+
+let currentTrainingAgent = null;
+
+window.openAssignTrainingModal = function(agentId, name, reason, defaultModule = 'MOD-101') {
+  currentTrainingAgent = { agentId, name, reason };
+  const overlay = document.getElementById('training-modal-overlay');
+  const agentInput = document.getElementById('train-agent-name');
+  const reasonInput = document.getElementById('train-flag-reason');
+  const moduleSelect = document.getElementById('train-module-select');
+  const notesArea = document.getElementById('train-notes');
+
+  if (agentInput) agentInput.value = `${name} (${agentId})`;
+  if (reasonInput) reasonInput.value = reason;
+  if (moduleSelect) moduleSelect.value = defaultModule;
+  if (notesArea) notesArea.value = `Supervisor assignment: Immediate coaching required regarding ${reason}.`;
+  if (overlay) overlay.classList.remove('hidden');
+};
+
+window.closeAssignTrainingModal = function() {
+  const overlay = document.getElementById('training-modal-overlay');
+  if (overlay) overlay.classList.add('hidden');
+  currentTrainingAgent = null;
+};
+
+const btnCloseModal = document.getElementById('btn-close-training-modal');
+if (btnCloseModal) btnCloseModal.addEventListener('click', window.closeAssignTrainingModal);
+
+const btnCancelTraining = document.getElementById('btn-cancel-training');
+if (btnCancelTraining) btnCancelTraining.addEventListener('click', window.closeAssignTrainingModal);
+
+const btnConfirmTraining = document.getElementById('btn-confirm-training');
+if (btnConfirmTraining) {
+  btnConfirmTraining.addEventListener('click', () => {
+    if (!currentTrainingAgent) return;
+    const modSelect = document.getElementById('train-module-select');
+    const schedSelect = document.getElementById('train-schedule-mode');
+    const notesArea = document.getElementById('train-notes');
+
+    const payload = {
+      targetAgentId: currentTrainingAgent.agentId,
+      agentName: currentTrainingAgent.name,
+      moduleId: modSelect ? modSelect.value : 'MOD-101',
+      moduleName: modSelect ? modSelect.options[modSelect.selectedIndex].text : 'Module 101: Professional De-Escalation',
+      scheduleMode: schedSelect ? schedSelect.value : 'IMMEDIATE',
+      reason: currentTrainingAgent.reason,
+      notes: notesArea ? notesArea.value : '',
+      timestamp: new Date().toISOString()
+    };
+
+    // Broadcast to agent widgets via wfm_aux_channel
+    if (bc) {
+      bc.postMessage({
+        type: 'MANDATORY_TRAINING_ASSIGNED',
+        payload: payload
+      });
+    }
+
+    // Update wallboard status for this agent
+    updateAgentState(currentTrainingAgent.agentId, 'AUX: TRAINING', '45:00');
+
+    // Mark in QA scorecard
+    const qaAgent = qaScorecardData.find(a => a.agentId === currentTrainingAgent.agentId);
+    if (qaAgent) {
+      qaAgent.trainingAssigned = true;
+      renderQAScorecard();
+    }
+
+    alert(`✓ Mandatory Coaching Module Assigned!\n\nAgent: ${currentTrainingAgent.name} (${currentTrainingAgent.agentId})\nModule: ${payload.moduleName}\nMode: ${payload.scheduleMode}\n\nAgent status switched to AUX: TRAINING in NICE CXone.`);
+    window.closeAssignTrainingModal();
+  });
+}
+
+// QA CSV Export
+const btnExportQaCsv = document.getElementById('btn-export-qa-csv');
+if (btnExportQaCsv) {
+  btnExportQaCsv.addEventListener('click', () => {
+    let csvContent = 'data:text/csv;charset=utf-8,';
+    const headers = ['Agent ID', 'Agent Name', 'Contact ID', 'Speech Tone', 'Security Verification (25%)', 'Details Retrieved (20%)', 'Query Resolved (30%)', 'Post-Call IVR Rating', 'Weighted QA Score %', 'Coaching Status'];
+    csvContent += headers.join(',') + '\r\n';
+
+    qaScorecardData.forEach(item => {
+      const row = [
+        `"${item.agentId}"`,
+        `"${item.name}"`,
+        `"${item.contactId}"`,
+        `"${item.tone}"`,
+        `"${item.securityVerified ? 'Passed (25%)' : 'Failed (0%)'}"`,
+        `"${item.detailsRetrieved ? 'Captured (20%)' : 'Incomplete (0%)'}"`,
+        `"${item.queryResolved ? 'Resolved (30%)' : 'Unresolved (0%)'}"`,
+        `"${item.ivrStars} / 5.0"`,
+        `"${item.qaScore}%"`,
+        `"${item.trainingAssigned ? 'MANDATORY TRAINING ASSIGNED' : item.flagReason}"`
+      ];
+      csvContent += row.join(',') + '\r\n';
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `AGENT_QA_AND_TONE_REPORT_${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  });
+}
+
+const btnRefreshQa = document.getElementById('btn-refresh-qa');
+if (btnRefreshQa) btnRefreshQa.addEventListener('click', renderQAScorecard);
+
+// ==========================================
+// TAB 6: AGENT LIMITS & POLICY SETUP
 // ==========================================
 
 document.getElementById('btn-save-policies').addEventListener('click', () => {
@@ -456,7 +771,7 @@ document.getElementById('btn-save-policies').addEventListener('click', () => {
 });
 
 // ==========================================
-// TAB 6: NICE CXONE DIAGNOSTICS
+// TAB 7: NICE CXONE DIAGNOSTICS
 // ==========================================
 
 document.getElementById('btn-test-cxone').addEventListener('click', () => {
@@ -468,6 +783,7 @@ document.getElementById('btn-test-cxone').addEventListener('click', () => {
 fetchQueue();
 renderWallboard();
 renderActiveBroadcasts();
+renderQAScorecard();
 loadReport('adherence');
 setInterval(fetchQueue, 3000);
 
