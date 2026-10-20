@@ -87,6 +87,28 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // API ROUTE: NICE CXone ACW Submit
+  if (pathname === '/api/cxone/acw-submit' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true, message: 'ACW disposition logged to NICE CXone.' }));
+    });
+    return;
+  }
+
+  // API ROUTE: Broadcast Alert
+  if (pathname === '/api/broadcast' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true, message: 'Broadcast dispatched to all agent widgets.' }));
+    });
+    return;
+  }
+
   // Serve static files from /src
   let filePath = path.join(PUBLIC_DIR, pathname === '/' ? 'widget.html' : pathname);
 

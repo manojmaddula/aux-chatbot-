@@ -3,25 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Supervisor Command Center - WFM & Auxiliary Operations</title>
+  <title>NICE CXone Supervisor Command Center & WFM Operations</title>
   <link rel="stylesheet" href="supervisor.css" />
 </head>
 <body>
   <div class="sup-container">
     
-    <!-- HEADER -->
+    <!-- TOP HEADER -->
     <header class="sup-header">
       <div class="header-left">
-        <span class="sup-badge">SUPERVISOR PORTAL</span>
-        <h2>WFM Auxiliary & Schedule Adherence Command Center</h2>
-        <p>Live ACD queue forecasting, break dispatch tracking, agent adherence alerts, and emergency broadcasting</p>
+        <div class="header-badge-row">
+          <span class="sup-badge">SUPERVISOR COMMAND CENTER</span>
+          <span class="cxone-cluster-badge">● NICE CXone: US-East Cluster (AWS 104) CONNECTED</span>
+        </div>
+        <h2>NICE CXone WFM Operations & Auxiliary Administration</h2>
+        <p>Live floor wallboard, Erlang-C break queue evaluation, multi-type reporting suite, policy limit administration, and emergency broadcasting</p>
       </div>
       <div class="header-right">
         <div class="sup-profile">
           <span class="sup-avatar">👩‍💼</span>
           <div>
             <strong>Sarah Jenkins (SUP-014)</strong>
-            <span>Operations Supervisor • Tier-2 Queue</span>
+            <span>Floor Operations Supervisor • All Queues</span>
           </div>
         </div>
         <a href="/widget.html" target="_blank" class="btn btn-outline-light">Open Agent Widget</a>
@@ -34,12 +37,12 @@
       <div class="kpi-card">
         <span class="kpi-title">Active Staffing</span>
         <div class="kpi-val" id="kpi-staff">24 / 30</div>
-        <span class="kpi-sub text-ok">✓ Erlang-C buffer healthy (+4)</span>
+        <span class="kpi-sub text-ok">✓ Erlang-C surplus (+4)</span>
       </div>
       <div class="kpi-card">
-        <span class="kpi-title">Current Inbound Queue</span>
+        <span class="kpi-title">CXone ACD Queue</span>
         <div class="kpi-val" id="kpi-queue">18 Calls</div>
-        <span class="kpi-sub text-muted">Avg wait time: 34s</span>
+        <span class="kpi-sub text-muted">Avg wait: 34s</span>
       </div>
       <div class="kpi-card">
         <span class="kpi-title">Projected SLA</span>
@@ -47,168 +50,357 @@
         <span class="kpi-sub text-ok">Target SLA: 80.0%</span>
       </div>
       <div class="kpi-card">
-        <span class="kpi-title">Agents in AUX Mode</span>
+        <span class="kpi-title">Agents in AUX</span>
         <div class="kpi-val" id="kpi-aux">4 Agents</div>
         <span class="kpi-sub text-muted">2 Tea, 1 Lunch, 1 Training</span>
       </div>
       <div class="kpi-card alert-card">
-        <span class="kpi-title">Break Overdue Alerts</span>
+        <span class="kpi-title">Adherence Overdue</span>
         <div class="kpi-val text-danger" id="kpi-overdue">0</div>
-        <span class="kpi-sub text-danger" id="kpi-overdue-sub">No adherence overage</span>
+        <span class="kpi-sub text-danger" id="kpi-overdue-sub">No active overages</span>
       </div>
     </section>
 
-    <!-- MAIN TWO-COLUMN DASHBOARD -->
-    <div class="dashboard-layout">
+    <!-- SUPERVISOR MAIN NAVIGATION TABS -->
+    <nav class="sup-tabs">
+      <button class="sup-tab-btn active" data-tab="stab-wallboard">
+        <span>👥</span> Floor Wallboard & Telemetry
+      </button>
+      <button class="sup-tab-btn" data-tab="stab-queue">
+        <span>📋</span> Break Requests Queue (<span id="sup-queue-badge">0</span>)
+      </button>
+      <button class="sup-tab-btn" data-tab="stab-alerts">
+        <span>📢</span> Alert & Broadcast Setup
+      </button>
+      <button class="sup-tab-btn" data-tab="stab-reports">
+        <span>📊</span> Agent Reports & Analytics
+      </button>
+      <button class="sup-tab-btn" data-tab="stab-limits">
+        <span>⚙️</span> Agent Limits & Policy Setup
+      </button>
+      <button class="sup-tab-btn" data-tab="stab-cxone">
+        <span>☁️</span> NICE CXone Integration
+      </button>
+    </nav>
 
-      <!-- LEFT COLUMN: BREAK REQUESTS TRACKING QUEUE -->
-      <div class="col-main">
-        <div class="card">
-          <div class="card-header">
-            <div>
-              <h3>📋 Dispatched Break Requests & Audit Queue</h3>
-              <p>Every break submitted from the Web Portal is automatically evaluated and tracked here in real-time.</p>
-            </div>
-            <div class="header-actions">
-              <button id="btn-refresh-queue" class="btn btn-sm btn-secondary">🔄 Refresh</button>
-              <button id="btn-clear-queue" class="btn btn-sm btn-outline">Clear History</button>
-            </div>
+    <!-- TAB 1: FLOOR WALLBOARD & TELEMETRY -->
+    <section id="stab-wallboard" class="sup-tab-pane active">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h3>Shift Telemetry & Remote Agent Administration</h3>
+            <p>Live status synchronized with NICE CXone MAX CTI state engine. Supervisors can remotely recall or reassign agents.</p>
           </div>
-          <div class="table-responsive">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Time</th>
-                  <th>Request ID</th>
-                  <th>Agent</th>
-                  <th>AUX Type</th>
-                  <th>Duration</th>
-                  <th>WFM Decision</th>
-                  <th>Forecasting / Behavioral Reasoning</th>
-                  <th>Supervisor Action</th>
-                </tr>
-              </thead>
-              <tbody id="queue-table-body">
-                <!-- Dynamically filled -->
-              </tbody>
-            </table>
+          <div class="header-actions">
+            <button id="btn-refresh-wallboard" class="btn btn-sm btn-secondary">🔄 Refresh</button>
           </div>
         </div>
-
-        <!-- AGENT ADHERENCE & LIVE STATUS WALLBOARD -->
-        <div class="card" style="margin-top: 20px;">
-          <div class="card-header">
-            <div>
-              <h3>👥 Shift Adherence & Agent Telemetry Wallboard</h3>
-              <p>Monitors real-time phone states, break timers, and behavioral adherence scores.</p>
-            </div>
-            <span class="badge-live">● LIVE TELEMETRY</span>
-          </div>
-          <div class="table-responsive">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Agent ID</th>
-                  <th>Agent Name</th>
-                  <th>Queue</th>
-                  <th>Current Telephony State</th>
-                  <th>Break Remaining</th>
-                  <th>Adherence</th>
-                  <th>Tea Breaks</th>
-                  <th>Lunch Variance</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody id="agent-wallboard-body">
-                <!-- Dynamically filled -->
-              </tbody>
-            </table>
-          </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Agent ID</th>
+                <th>Agent Name</th>
+                <th>Assigned Skill / Queue</th>
+                <th>NICE CXone State</th>
+                <th>Break / ACW Remaining</th>
+                <th>Schedule Adherence</th>
+                <th>Tea Breaks Today</th>
+                <th>Lunch Variance</th>
+                <th>Supervisor Actions</th>
+              </tr>
+            </thead>
+            <tbody id="agent-wallboard-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
         </div>
       </div>
+    </section>
 
-      <!-- RIGHT COLUMN: EMERGENCY BROADCAST STATION & CONTROLS -->
-      <div class="col-side">
-        <!-- EMERGENCY BROADCAST DISPATCHER -->
-        <div class="card broadcast-box">
+    <!-- TAB 2: BREAK REQUESTS QUEUE & FORECASTING -->
+    <section id="stab-queue" class="sup-tab-pane">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h3>Dispatched Break Requests Audit & Approval Queue</h3>
+            <p>Evaluates incoming Erlang-C staffing requirements against agent requests. Supervisors can grant manual overrides.</p>
+          </div>
+          <div class="header-actions">
+            <button id="btn-refresh-queue" class="btn btn-sm btn-secondary">🔄 Refresh</button>
+            <button id="btn-clear-queue" class="btn btn-sm btn-outline">Clear History</button>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Request ID</th>
+                <th>Agent</th>
+                <th>AUX Code</th>
+                <th>Duration</th>
+                <th>WFM Decision</th>
+                <th>Reasoning / Erlang-C Telemetry</th>
+                <th>Supervisor Actions</th>
+              </tr>
+            </thead>
+            <tbody id="queue-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: ALERT & BROADCAST SETUP (SUPERVISOR CONTROLS) -->
+    <section id="stab-alerts" class="sup-tab-pane">
+      <div class="dashboard-layout">
+        <!-- Broadcast Setup Form -->
+        <div class="card">
           <div class="card-header">
-            <h3>📢 Broadcast Emergency Notification</h3>
+            <h3>📢 Create & Dispatch Floor Advisory / Alert</h3>
+            <p>Dispatched notifications are broadcasted immediately to all agent desktop widgets.</p>
           </div>
           <div class="card-body">
-            <p class="subtitle">Broadcast live alerts immediately to all active agent desktop chatbot widgets.</p>
-
-            <div class="quick-broadcast-buttons">
-              <button class="btn btn-emergency" id="btn-bc-storm">
-                <span>🌪️</span> Tornado / Storm Warning
-              </button>
-              <button class="btn btn-emergency sev1" id="btn-bc-outage">
-                <span>⚡</span> SEV-1 System Outage
-              </button>
-              <button class="btn btn-emergency traffic" id="btn-bc-monday">
-                <span>📈</span> Monday Peak Traffic Mode
-              </button>
+            
+            <div class="form-group">
+              <label>Preset Operational Alerts (One-Click Dispatch):</label>
+              <div class="quick-broadcast-grid">
+                <button class="btn btn-emergency" id="btn-bc-storm">
+                  <span>🌪️</span> Tornado / Storm Alert (Proactive Mode)
+                </button>
+                <button class="btn btn-emergency sev1" id="btn-bc-outage">
+                  <span>⚡</span> SEV-1 System / CRM Outage
+                </button>
+                <button class="btn btn-emergency traffic" id="btn-bc-monday">
+                  <span>📈</span> Monday Peak High Call Volume Mode
+                </button>
+                <button class="btn btn-emergency cxone-maint" id="btn-bc-cxone">
+                  <span>☁️</span> NICE CXone Maintenance Notice
+                </button>
+              </div>
             </div>
 
             <hr class="divider" />
 
-            <div class="form-group">
-              <label>Custom Broadcast Message:</label>
-              <textarea id="custom-bc-text" rows="3" placeholder="Type custom operational announcement for all agents..."></textarea>
+            <h4>Custom Broadcast Configuration</h4>
+            <div class="form-grid" style="margin-top: 10px;">
+              <div class="form-group">
+                <label>Advisory Title:</label>
+                <input type="text" id="custom-bc-title" placeholder="e.g. High Queue on Billing Skill #104" />
+              </div>
+              <div class="form-group">
+                <label>Severity Level:</label>
+                <select id="custom-bc-severity">
+                  <option value="CRITICAL">Critical Emergency (Red Ticker + Chime)</option>
+                  <option value="WARNING">Operational Warning (Amber Banner)</option>
+                  <option value="INFO">Informational Advisory (Blue)</option>
+                </select>
+              </div>
             </div>
             <div class="form-group">
-              <label>Severity Level:</label>
-              <select id="custom-bc-severity">
-                <option value="CRITICAL">Critical Emergency (Red Ticker)</option>
-                <option value="WARNING">Operational Warning (Amber Banner)</option>
-                <option value="INFO">Informational (Blue)</option>
+              <label>Broadcast Message Body:</label>
+              <textarea id="custom-bc-text" rows="3" placeholder="Provide instructions for agents (e.g. restrict non-essential AUX, expedite ACW wrap-up)..."></textarea>
+            </div>
+            <div class="form-group">
+              <label>Target Audience:</label>
+              <select id="custom-bc-target">
+                <option value="ALL">All Logged-in Agents (All Skills)</option>
+                <option value="Tier-2 Tech Support">Tier-2 Tech Support Skill Only</option>
+                <option value="Billing & Retention">Billing & Retention Skill Only</option>
+                <option value="Emergency Inbound">Emergency Inbound Skill Only</option>
               </select>
             </div>
             <button id="btn-send-custom-bc" class="btn btn-primary btn-block">
-              🚀 Dispatch Broadcast to All Agents
+              🚀 Dispatch Broadcast to Agent Widgets
             </button>
             <div id="bc-status-msg" class="bc-status-msg"></div>
           </div>
         </div>
 
-        <!-- SUPERVISOR BEHAVIORAL POLICY CONFIG -->
-        <div class="card policy-box" style="margin-top: 20px;">
+        <!-- Active Broadcast History -->
+        <div class="card">
           <div class="card-header">
-            <h3>⚙️ AI WFM Policy Rules</h3>
+            <h3>Active Broadcasts & Advisories</h3>
+            <span class="badge-live">LIVE ACTIVE</span>
           </div>
-          <div class="card-body policy-list">
-            <div class="policy-item">
-              <div>
-                <strong>Auto-Reject Tea Break Pattern</strong>
-                <p>Rejects if agent takes $\ge 3$ short breaks in a single shift.</p>
-              </div>
-              <span class="policy-status active">ACTIVE</span>
-            </div>
-            <div class="policy-item">
-              <div>
-                <strong>Chronic Lunch Overage Threshold</strong>
-                <p>Flagged if prior lunch exceeded scheduled time by $\ge 15$ mins.</p>
-              </div>
-              <span class="policy-status active">ACTIVE</span>
-            </div>
-            <div class="policy-item">
-              <div>
-                <strong>Request Frequency Rate Limiter</strong>
-                <p>Throttle activated after 3 requests in 30 minutes.</p>
-              </div>
-              <span class="policy-status active">ACTIVE</span>
-            </div>
-            <div class="policy-item">
-              <div>
-                <strong>Automated Overdue Voice Bot Call</strong>
-                <p>Triggers immediate voice bot call when break duration is exceeded.</p>
-              </div>
-              <span class="policy-status active">ACTIVE</span>
+          <div class="card-body">
+            <div id="sup-active-broadcasts-list" class="broadcasts-admin-list">
+              <!-- Filled dynamically -->
             </div>
           </div>
         </div>
       </div>
+    </section>
 
-    </div>
+    <!-- TAB 4: AGENT REPORTS & ANALYTICS -->
+    <section id="stab-reports" class="sup-tab-pane">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h3>📊 Comprehensive Supervisor WFM & Adherence Reports</h3>
+            <p>Audit reports across schedule adherence, AUX distributions, overage violations, and ACW performance.</p>
+          </div>
+          <div class="header-actions">
+            <select id="report-type-select" class="report-select">
+              <option value="adherence">1. Schedule Adherence Audit Report</option>
+              <option value="aux_dist">2. AUX Code Time Distribution Report</option>
+              <option value="violations">3. Break Violations & Overage Audit Report</option>
+              <option value="frequency">4. Request Frequency & Throttling Report</option>
+              <option value="acw">5. NICE CXone ACW Handle Time Report</option>
+            </select>
+            <button id="btn-export-csv" class="btn btn-success btn-sm">
+              📥 Export to CSV
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="report-summary-bar" id="report-summary-bar">
+            <!-- Dynamic KPI summary for the selected report -->
+          </div>
+          <div class="table-responsive">
+            <table class="data-table" id="report-table">
+              <thead id="report-table-head">
+                <!-- Dynamic header -->
+              </thead>
+              <tbody id="report-table-body">
+                <!-- Dynamic body -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: AGENT LIMITS & WFM POLICY SETUP -->
+    <section id="stab-limits" class="sup-tab-pane">
+      <div class="card" style="max-width: 900px; margin: 0 auto;">
+        <div class="card-header">
+          <div>
+            <h3>⚙️ WFM Operational Limits & Autonomous Guardrail Setup</h3>
+            <p>Configure autonomous AI evaluation thresholds. Updated limits are automatically pushed to all agent widgets.</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <form id="policy-form">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Max Discretionary Tea Breaks (per 8-hr shift):</label>
+                <input type="number" id="limit-max-tea" min="1" max="5" value="2" />
+                <small class="text-muted">Exceeding this automatically flags behavioral tea break overage rejection.</small>
+              </div>
+              <div class="form-group">
+                <label>Lunch Variance Overage Limit (minutes):</label>
+                <input type="number" id="limit-lunch-variance" min="5" max="45" value="15" />
+                <small class="text-muted">Agents exceeding this on prior shifts are barred from self-service lunch grants.</small>
+              </div>
+              <div class="form-group">
+                <label>Break Request Frequency Limit (in 30 mins):</label>
+                <input type="number" id="limit-req-freq" min="1" max="10" value="3" />
+                <small class="text-muted">Maximum break requests before 15-minute throttle lock activates.</small>
+              </div>
+              <div class="form-group">
+                <label>Target Schedule Adherence Threshold (%):</label>
+                <input type="number" id="limit-target-adh" min="70" max="99" value="90" />
+                <small class="text-muted">Adherence below this percentage triggers supervisory flag.</small>
+              </div>
+              <div class="form-group">
+                <label>NICE CXone Target ACW Duration (seconds):</label>
+                <input type="number" id="limit-acw-sec" min="15" max="180" value="45" />
+                <small class="text-muted">After Call Work timer ceiling before escalation.</small>
+              </div>
+              <div class="form-group">
+                <label>Automated Voice Bot Call Grace Period (seconds):</label>
+                <input type="number" id="limit-bot-grace" min="0" max="60" value="10" />
+                <small class="text-muted">Seconds overdue before voice bot call places call to agent.</small>
+              </div>
+            </div>
+
+            <div style="margin-top: 20px;">
+              <button type="button" id="btn-save-policies" class="btn btn-primary btn-large">
+                💾 Save & Push Policy Limits to All Agent Dashboards
+              </button>
+              <div id="policy-save-msg" class="bc-status-msg"></div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 6: NICE CXONE INTEGRATION GATEWAY -->
+    <section id="stab-cxone" class="sup-tab-pane">
+      <div class="dashboard-layout">
+        <div class="card">
+          <div class="card-header">
+            <h3>☁️ NICE CXone CTI & Workforce Management Connectivity</h3>
+            <span class="badge-live">HEALTHY</span>
+          </div>
+          <div class="card-body">
+            <div class="cxone-spec-grid">
+              <div class="spec-row">
+                <span>CXone Tenant ID:</span>
+                <strong>ENT-NICE-CXONE-9941</strong>
+              </div>
+              <div class="spec-row">
+                <span>ACD Media Cluster:</span>
+                <strong>na1.niceincontact.com (US-East AWS 104)</strong>
+              </div>
+              <div class="spec-row">
+                <span>CTI WebSocket Stream:</span>
+                <strong class="text-ok">wss://na1.niceincontact.com/cti/v2 [ACTIVE]</strong>
+              </div>
+              <div class="spec-row">
+                <span>WebRTC Audio Gateway:</span>
+                <strong class="text-ok">Jitter: 0.8ms • Loss: 0.0% [OPTIMAL]</strong>
+              </div>
+              <div class="spec-row">
+                <span>WFM Erlang-C Telemetry:</span>
+                <strong>Interval: 15-min Rolling Window</strong>
+              </div>
+            </div>
+            
+            <div style="margin-top: 20px;">
+              <button id="btn-test-cxone" class="btn btn-secondary">
+                ⚡ Test NICE CXone API Handshake & CTI Heartbeat
+              </button>
+              <pre id="cxone-test-console" class="diag-console" style="margin-top: 10px; height: 90px;">NICE CXone Telemetry link ready...</pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>NICE CXone Skill Mappings</h3>
+          </div>
+          <div class="card-body">
+            <div class="policy-list">
+              <div class="policy-item">
+                <div>
+                  <strong>Skill #104: Tier-2 Tech Support</strong>
+                  <p>Inbound Voice • Service Level Target: 80% in 20s</p>
+                </div>
+                <span class="policy-status active">ACTIVE</span>
+              </div>
+              <div class="policy-item">
+                <div>
+                  <strong>Skill #102: Customer Billing & Retention</strong>
+                  <p>Inbound Voice & Chat • SLA Target: 85% in 30s</p>
+                </div>
+                <span class="policy-status active">ACTIVE</span>
+              </div>
+              <div class="policy-item">
+                <div>
+                  <strong>Skill #101: Emergency Inbound</strong>
+                  <p>Priority Priority Routing • SLA Target: 95% in 10s</p>
+                </div>
+                <span class="policy-status active">ACTIVE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
   </div>
 

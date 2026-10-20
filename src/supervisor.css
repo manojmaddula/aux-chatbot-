@@ -394,3 +394,141 @@ textarea:focus, select:focus {
   background: rgba(16, 185, 129, 0.2);
   color: #34d399;
 }
+
+
+/* ========================================= */
+/* SUPERVISOR TABS & NAVIGATION */
+/* ========================================= */
+.header-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.cxone-cluster-badge {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.sup-tabs {
+  display: flex;
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  margin-bottom: 20px;
+  overflow-x: auto;
+}
+
+.sup-tab-btn {
+  flex: 1;
+  padding: 14px 16px;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.sup-tab-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.sup-tab-btn.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  background: rgba(37, 99, 235, 0.08);
+}
+
+.sup-tab-pane {
+  display: none;
+}
+.sup-tab-pane.active {
+  display: block;
+}
+
+/* QUICK BROADCAST GRID */
+.quick-broadcast-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.btn-emergency.cxone-maint {
+  background: #14532d;
+  border-color: #16a34a;
+  color: #dcfce7;
+}
+.btn-emergency.cxone-maint:hover {
+  background: #15803d;
+}
+
+.broadcasts-admin-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+/* REPORTS & ANALYTICS STYLING */
+.report-select {
+  background: #090d16;
+  color: #fff;
+  border: 1px solid var(--border);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.report-summary-bar {
+  background: rgba(37, 99, 235, 0.1);
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #e2e8f0;
+  margin-bottom: 16px;
+}
+
+/* NICE CXONE SPEC GRID */
+.cxone-spec-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #090d16;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.spec-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 8px;
+}
+.spec-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.spec-row span {
+  color: var(--text-muted);
+}
