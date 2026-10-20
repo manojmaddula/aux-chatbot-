@@ -155,6 +155,90 @@
 
     <!-- TAB 3: ALERT & BROADCAST SETUP (SUPERVISOR CONTROLS) -->
     <section id="stab-alerts" class="sup-tab-pane">
+
+      <!-- STORM OUTAGE & IVR AUTO-DEFLECTION ENGINE (1000 CALLS/MIN THRESHOLD) -->
+      <div class="card deflection-card" style="margin-bottom: 20px;">
+        <div class="card-header">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:24px;">🌪️</span>
+            <div>
+              <h3>Storm / Disaster IVR Auto-Deflection Engine</h3>
+              <p>Monitors live incoming call arrivals during storm/tornado outages. When traffic reaches 1,000 calls/min, from call 1001 onwards, callers receive an automated voice announcement. Automatically disables when traffic drops below 1,000/min.</p>
+            </div>
+          </div>
+          <span id="deflection-status-badge" class="badge-deflection inactive">STANDBY (&lt;1,000 calls/min)</span>
+        </div>
+        <div class="card-body">
+          <div class="deflection-grid">
+            <div class="deflection-stat-box">
+              <span class="d-label">Live Incoming Arrival Rate:</span>
+              <div class="d-val" id="deflection-rate-display">420 calls / min</div>
+              <span class="d-sub text-ok" id="deflection-rate-sub">Under 1,000 threshold (Standard ACD routing)</span>
+            </div>
+            <div class="deflection-stat-box">
+              <span class="d-label">Deflection Threshold:</span>
+              <div class="d-val highlight">1,000 calls / min</div>
+              <span class="d-sub text-muted">Triggers on call 1,001+</span>
+            </div>
+            <div class="deflection-stat-box">
+              <span class="d-label">Storm Outage Mode:</span>
+              <div class="d-val text-warning" id="deflection-mode-display">INACTIVE</div>
+              <button id="btn-toggle-storm-mode" class="btn btn-xs btn-outline" style="margin-top:4px;">Toggle Storm Mode</button>
+            </div>
+            <div class="deflection-stat-box">
+              <span class="d-label">Deflected Callers Greeted:</span>
+              <div class="d-val text-ok" id="deflection-count-display">0 calls</div>
+              <span class="d-sub text-muted">Protected human queue</span>
+            </div>
+          </div>
+
+          <!-- Announcement Script Box & Caller Audio Test -->
+          <div class="announcement-preview-box">
+            <div class="ann-header">
+              <span style="font-weight:700; color:#93c5fd; font-size:11px;">📢 Automated Caller Voice Announcement (Call 1001+):</span>
+              <button id="btn-test-announcement-audio" class="btn btn-sm btn-accent">
+                🔊 Listen to Voice Announcement (Audio Test)
+              </button>
+            </div>
+            <p class="ann-script" id="ann-script-text">
+              "Thank you for the call, we are having so many outages out field workers are on the route, thank you for your patience"
+            </p>
+          </div>
+
+          <!-- Surge Traffic Simulation Controls -->
+          <div class="surge-sim-controls">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <strong style="color:#e2e8f0; font-size:12px;">⚡ Live Inbound Call Surge Simulation:</strong>
+              <span id="slider-val-label" style="font-family:monospace; font-size:13px; color:#38bdf8; font-weight:700;">420 calls / min</span>
+            </div>
+            <input type="range" id="surge-slider" min="100" max="2000" step="20" value="420" style="width:100%; cursor:pointer;" />
+            
+            <div class="sim-quick-btns" style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;">
+              <button class="btn btn-sm btn-secondary" onclick="simulateTraffic(450, false)">
+                🟢 Normal Traffic (450/min)
+              </button>
+              <button class="btn btn-sm btn-warning" onclick="simulateTraffic(920, true)">
+                🟡 Storm Approaching (920/min)
+              </button>
+              <button class="btn btn-sm btn-danger" onclick="simulateTraffic(1280, true)">
+                🔴 Disaster Surge (1,280/min &gt; 1,000) &rarr; Trigger Deflection
+              </button>
+              <button class="btn btn-sm btn-success" onclick="simulateTraffic(740, true)">
+                🟢 Surge Normalized (740/min &lt; 1,000) &rarr; Auto-Disable
+              </button>
+            </div>
+          </div>
+
+          <!-- Real-time Deflection History Event Log -->
+          <div style="margin-top:14px;">
+            <strong style="color:#94a3b8; font-size:11px; text-transform:uppercase;">IVR Deflection System Event Log:</strong>
+            <div id="deflection-log-list" class="deflection-log-list">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="dashboard-layout">
         <!-- Broadcast Setup Form -->
         <div class="card">

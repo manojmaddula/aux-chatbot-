@@ -1202,3 +1202,42 @@ body {
 .policy-row-agent strong {
   color: #38bdf8;
 }
+
+
+/* ========================================= */
+/* STORM OUTAGE DEFLECTION BANNER (AGENT) */
+/* ========================================= */
+.storm-deflection-banner {
+  background: linear-gradient(90deg, #78350f, #451a03);
+  border-bottom: 2px solid #f59e0b;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  animation: slide-down 0.3s ease;
+}
+
+.storm-deflection-banner.hidden { display: none; }
+
+.storm-deflection-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.storm-icon {
+  font-size: 18px;
+}
+
+.storm-deflection-content strong {
+  color: #fbbf24;
+  display: block;
+  font-size: 11px;
+}
+
+.storm-deflection-content p {
+  color: #fde68a;
+  font-size: 10px;
+  line-height: 1.3;
+}

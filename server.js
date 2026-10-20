@@ -21,6 +21,23 @@ const supervisorQueue = [
   }
 ];
 
+// Disaster Outage & IVR Auto-Deflection Engine (1,000 calls/min Threshold)
+const ivrDeflectionState = {
+  stormOutageMode: false,
+  callVolumeRatePerMin: 420,
+  thresholdLimitPerMin: 1000,
+  isDeflectionActive: false,
+  deflectedCallsCount: 0,
+  announcementText: "Thank you for the call, we are having so many outages out field workers are on the route, thank you for your patience",
+  historyLog: [
+    {
+      timestamp: new Date().toISOString(),
+      event: 'MONITORING_STANDBY',
+      details: 'IVR Outage Deflection Engine standing by (1,000 calls/min threshold configured).'
+    }
+  ]
+};
+
 const agentRequestLog = new Map(); // agentId -> array of timestamps
 
 const MIME_TYPES = {
@@ -105,6 +122,63 @@ const server = http.createServer((req, res) => {
     req.on('end', () => {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: true, message: 'Broadcast dispatched to all agent widgets.' }));
+    });
+    return;
+  }
+
+  // API ROUTE: Get IVR Deflection Status
+  if (pathname === '/api/cxone/ivr-deflection' && req.method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(ivrDeflectionState));
+    return;
+  }
+
+  // API ROUTE: Update / Simulate IVR Call Volume & Storm Outage Mode
+  if (pathname === '/api/cxone/ivr-deflection' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        
+        if (typeof payload.stormOutageMode === 'boolean') {
+          ivrDeflectionState.stormOutageMode = payload.stormOutageMode;
+        }
+        if (typeof payload.callVolumeRatePerMin === 'number') {
+          ivrDeflectionState.callVolumeRatePerMin = payload.callVolumeRatePerMin;
+        }
+        if (typeof payload.thresholdLimitPerMin === 'number') {
+          ivrDeflectionState.thresholdLimitPerMin = payload.thresholdLimitPerMin;
+        }
+
+        const wasActive = ivrDeflectionState.isDeflectionActive;
+        const nowActive = ivrDeflectionState.stormOutageMode && (ivrDeflectionState.callVolumeRatePerMin > ivrDeflectionState.thresholdLimitPerMin);
+        ivrDeflectionState.isDeflectionActive = nowActive;
+
+        if (!wasActive && nowActive) {
+          // Surge threshold reached (1001 call onwards)
+          const excess = ivrDeflectionState.callVolumeRatePerMin - ivrDeflectionState.thresholdLimitPerMin;
+          ivrDeflectionState.deflectedCallsCount += excess;
+          ivrDeflectionState.historyLog.unshift({
+            timestamp: new Date().toISOString(),
+            event: 'DEFLECTION_ACTIVATED',
+            details: `Threshold exceeded (${ivrDeflectionState.callVolumeRatePerMin} calls/min > ${ivrDeflectionState.thresholdLimitPerMin}). Call 1001+ greeted with automated field outage announcement.`
+          });
+        } else if (wasActive && !nowActive) {
+          // Normalized below threshold
+          ivrDeflectionState.historyLog.unshift({
+            timestamp: new Date().toISOString(),
+            event: 'DEFLECTION_AUTO_DISABLED',
+            details: `Call volume normalized (${ivrDeflectionState.callVolumeRatePerMin} calls/min <= ${ivrDeflectionState.thresholdLimitPerMin}). Voice announcement automatically DISABLED. Standard ACD queue routing restored.`
+          });
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(ivrDeflectionState));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: e.message }));
+      }
     });
     return;
   }

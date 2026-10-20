@@ -532,3 +532,120 @@ textarea:focus, select:focus {
 .spec-row span {
   color: var(--text-muted);
 }
+
+
+/* ========================================= */
+/* STORM OUTAGE & IVR DEFLECTION STYLING */
+/* ========================================= */
+.deflection-card {
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.05), rgba(15, 23, 42, 0.9));
+}
+
+.badge-deflection {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+.badge-deflection.active {
+  background: rgba(239, 68, 68, 0.25);
+  color: #ef4444;
+  border: 1px solid #ef4444;
+  animation: pulse-red 1s infinite alternate;
+}
+.badge-deflection.inactive {
+  background: rgba(16, 185, 129, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.deflection-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.deflection-stat-box {
+  background: #090d16;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.d-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.d-val {
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.d-sub {
+  font-size: 10px;
+}
+
+.announcement-preview-box {
+  background: #090d16;
+  border: 1px dashed rgba(59, 130, 246, 0.4);
+  border-radius: 8px;
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+.ann-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.ann-script {
+  font-size: 13px;
+  color: #f1f5f9;
+  font-style: italic;
+  line-height: 1.5;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 10px 14px;
+  border-left: 3px solid #3b82f6;
+  border-radius: 4px;
+}
+
+.surge-sim-controls {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.deflection-log-list {
+  background: #000;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px;
+  margin-top: 6px;
+  max-height: 110px;
+  overflow-y: auto;
+  font-family: monospace;
+  font-size: 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.d-log-item {
+  color: #cbd5e1;
+  line-height: 1.4;
+}
+.d-log-item.active { color: #f87171; font-weight: 700; }
+.d-log-item.disabled { color: #34d399; font-weight: 700; }

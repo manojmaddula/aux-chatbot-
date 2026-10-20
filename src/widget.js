@@ -200,6 +200,8 @@ try {
       // Supervisor changed policies
       addSupervisorLog('POLICY', 'WFM operational policy thresholds updated by supervisor.');
       showNotification('Policy Update', 'Supervisor updated break thresholds and rate limits.');
+    } else if (data.type === 'IVR_DEFLECTION_UPDATE') {
+      handleIvrDeflectionUpdate(data.payload);
     }
   };
 } catch (e) {
@@ -803,3 +805,70 @@ setInterval(() => {
 
 // Initialize advisories
 renderAdvisories();
+
+
+// ==========================================
+// STORM OUTAGE & IVR DEFLECTION LISTENER
+// ==========================================
+
+const stormDeflectionBanner = document.getElementById('storm-deflection-banner');
+const agentSurgeRateEl = document.getElementById('agent-surge-rate');
+const btnAgentListenAnn = document.getElementById('btn-agent-listen-ann');
+
+let lastDeflectionState = false;
+
+function handleIvrDeflectionUpdate(deflectionData) {
+  if (!stormDeflectionBanner) return;
+
+  if (deflectionData.isDeflectionActive) {
+    stormDeflectionBanner.classList.remove('hidden');
+    if (agentSurgeRateEl) agentSurgeRateEl.textContent = deflectionData.callVolumeRatePerMin;
+
+    if (!lastDeflectionState) {
+      playWarningChime();
+      showNotification('Outage Deflection Active', `Surge traffic (${deflectionData.callVolumeRatePerMin} calls/min > 1,000 threshold). Automated voice announcement active for callers 1001+ to protect human queue.`);
+      addSupervisorLog('DEFLECTION', `Storm Outage Deflection Active (>1,000 calls/min). Callers 1001+ greeted with field outage announcement.`);
+    }
+    lastDeflectionState = true;
+  } else {
+    stormDeflectionBanner.classList.add('hidden');
+    if (lastDeflectionState) {
+      showNotification('Deflection Disabled', `Call volume normalized (<1,000 calls/min). Standard queue routing automatically resumed.`);
+      addSupervisorLog('NORMAL_QUEUE', `Call volume normalized (<1,000 calls/min). Automated voice announcement disabled.`);
+    }
+    lastDeflectionState = false;
+  }
+}
+
+if (btnAgentListenAnn) {
+  btnAgentListenAnn.addEventListener('click', () => {
+    const text = "Thank you for the call, we are having so many outages out field workers are on the route, thank you for your patience";
+    btnAgentListenAnn.textContent = '🔊 Playing...';
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.95;
+      utterance.onend = () => {
+        btnAgentListenAnn.textContent = '🔊 Hear IVR';
+      };
+      window.speechSynthesis.speak(utterance);
+    } else {
+      alert(text);
+      btnAgentListenAnn.textContent = '🔊 Hear IVR';
+    }
+  });
+}
+
+// Periodic check
+async function pollAgentDeflection() {
+  try {
+    const res = await fetch('/api/cxone/ivr-deflection');
+    if (res.ok) {
+      const data = await res.json();
+      handleIvrDeflectionUpdate(data);
+    }
+  } catch (e) {}
+}
+
+pollAgentDeflection();
+setInterval(pollAgentDeflection, 4000);

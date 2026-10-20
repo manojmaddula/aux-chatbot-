@@ -470,3 +470,162 @@ renderWallboard();
 renderActiveBroadcasts();
 loadReport('adherence');
 setInterval(fetchQueue, 3000);
+
+
+// ==========================================
+// STORM OUTAGE & IVR DEFLECTION CONTROLLER
+// ==========================================
+
+let ivrState = {
+  stormOutageMode: false,
+  callVolumeRatePerMin: 420,
+  thresholdLimitPerMin: 1000,
+  isDeflectionActive: false,
+  deflectedCallsCount: 0,
+  announcementText: "Thank you for the call, we are having so many outages out field workers are on the route, thank you for your patience",
+  historyLog: []
+};
+
+async function fetchIvrDeflection() {
+  try {
+    const res = await fetch('/api/cxone/ivr-deflection');
+    if (res.ok) {
+      ivrState = await res.json();
+      renderIvrDeflectionUI();
+    }
+  } catch (e) {
+    console.warn('IVR deflection fetch error:', e);
+  }
+}
+
+function renderIvrDeflectionUI() {
+  const badge = document.getElementById('deflection-status-badge');
+  const rateDisplay = document.getElementById('deflection-rate-display');
+  const rateSub = document.getElementById('deflection-rate-sub');
+  const modeDisplay = document.getElementById('deflection-mode-display');
+  const countDisplay = document.getElementById('deflection-count-display');
+  const logList = document.getElementById('deflection-log-list');
+  const slider = document.getElementById('surge-slider');
+  const sliderLabel = document.getElementById('slider-val-label');
+
+  if (!badge) return;
+
+  if (slider) slider.value = ivrState.callVolumeRatePerMin;
+  if (sliderLabel) sliderLabel.textContent = `${ivrState.callVolumeRatePerMin} calls / min`;
+
+  rateDisplay.textContent = `${ivrState.callVolumeRatePerMin} calls / min`;
+  countDisplay.textContent = `${ivrState.deflectedCallsCount.toLocaleString()} calls`;
+
+  if (ivrState.stormOutageMode) {
+    modeDisplay.textContent = 'ACTIVE (STORM)';
+    modeDisplay.className = 'd-val text-danger';
+  } else {
+    modeDisplay.textContent = 'STANDBY';
+    modeDisplay.className = 'd-val text-warning';
+  }
+
+  if (ivrState.isDeflectionActive) {
+    badge.className = 'badge-deflection active';
+    badge.textContent = `🔴 AUTO-DEFLECTION ACTIVE (>1,000 calls/min)`;
+    rateSub.textContent = `Call 1,001+ receiving field outage voice announcement!`;
+    rateSub.className = 'd-sub text-danger';
+  } else {
+    badge.className = 'badge-deflection inactive';
+    badge.textContent = `🟢 STANDBY (<1,000 calls/min)`;
+    rateSub.textContent = `Under 1,000 threshold (Standard ACD routing)`;
+    rateSub.className = 'd-sub text-ok';
+  }
+
+  // Render logs
+  if (logList && ivrState.historyLog) {
+    logList.innerHTML = ivrState.historyLog.slice(0, 8).map(log => {
+      const timeStr = new Date(log.timestamp).toLocaleTimeString();
+      let logClass = '';
+      if (log.event === 'DEFLECTION_ACTIVATED') logClass = 'active';
+      if (log.event === 'DEFLECTION_AUTO_DISABLED') logClass = 'disabled';
+      return `<div class="d-log-item ${logClass}">[${timeStr}] <strong>${log.event}:</strong> ${log.details}</div>`;
+    }).join('');
+  }
+}
+
+async function updateIvrDeflection(payload) {
+  try {
+    const res = await fetch('/api/cxone/ivr-deflection', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      ivrState = await res.json();
+      renderIvrDeflectionUI();
+
+      // Broadcast to agent widgets
+      if (bc) {
+        bc.postMessage({
+          type: 'IVR_DEFLECTION_UPDATE',
+          payload: ivrState
+        });
+      }
+    }
+  } catch (e) {
+    console.warn(e);
+  }
+}
+
+window.simulateTraffic = function(rate, stormMode) {
+  updateIvrDeflection({
+    callVolumeRatePerMin: rate,
+    stormOutageMode: stormMode
+  });
+};
+
+const surgeSlider = document.getElementById('surge-slider');
+if (surgeSlider) {
+  surgeSlider.addEventListener('input', (e) => {
+    const val = parseInt(e.target.value, 10);
+    document.getElementById('slider-val-label').textContent = `${val} calls / min`;
+  });
+  surgeSlider.addEventListener('change', (e) => {
+    const val = parseInt(e.target.value, 10);
+    updateIvrDeflection({
+      callVolumeRatePerMin: val,
+      stormOutageMode: val > 800 ? true : ivrState.stormOutageMode
+    });
+  });
+}
+
+const btnToggleStorm = document.getElementById('btn-toggle-storm-mode');
+if (btnToggleStorm) {
+  btnToggleStorm.addEventListener('click', () => {
+    updateIvrDeflection({
+      stormOutageMode: !ivrState.stormOutageMode
+    });
+  });
+}
+
+// Caller Audio Test
+const btnTestAnnouncementAudio = document.getElementById('btn-test-announcement-audio');
+if (btnTestAnnouncementAudio) {
+  btnTestAnnouncementAudio.addEventListener('click', () => {
+    const text = ivrState.announcementText || "Thank you for the call, we are having so many outages out field workers are on the route, thank you for your patience";
+    btnTestAnnouncementAudio.textContent = '🔊 Playing Announcement...';
+    
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 0.95;
+      utterance.pitch = 1.0;
+      utterance.onend = () => {
+        btnTestAnnouncementAudio.textContent = '🔊 Listen to Voice Announcement (Audio Test)';
+      };
+      window.speechSynthesis.speak(utterance);
+    } else {
+      alert(`IVR Announcement: "${text}"`);
+      btnTestAnnouncementAudio.textContent = '🔊 Listen to Voice Announcement (Audio Test)';
+    }
+  });
+}
+
+// Poll IVR deflection
+fetchIvrDeflection();
+setInterval(fetchIvrDeflection, 4000);

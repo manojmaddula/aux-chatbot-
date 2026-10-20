@@ -58,6 +58,18 @@
       <span class="traffic-tag">PEAK LOAD</span>
     </div>
 
+    <!-- STORM IVR AUTO-DEFLECTION ACTIVE BANNER (>1,000 CALLS/MIN) -->
+    <div id="storm-deflection-banner" class="storm-deflection-banner hidden">
+      <div class="storm-deflection-content">
+        <span class="storm-icon">🌪️</span>
+        <div>
+          <strong>Outage IVR Deflection Active (<span id="agent-surge-rate">1,240</span> calls/min &gt; 1,000)</strong>
+          <p>Callers 1,001+ hearing field outage announcement. Auto-disables when volume drops &lt; 1,000/min.</p>
+        </div>
+      </div>
+      <button id="btn-agent-listen-ann" class="btn-xs btn-outline" style="white-space:nowrap; margin-left:6px;" title="Listen to what callers hear">🔊 Hear IVR</button>
+    </div>
+
     <!-- ACTIVE BREAK COUNTDOWN & 2-MIN WARNING CARD -->
     <div id="break-active-card" class="break-active-card hidden">
       <div class="break-card-header">
