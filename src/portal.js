@@ -66,6 +66,72 @@ const AGENT_PERSONAS = {
     auxDefault: 'AUX-4: Training / Coaching',
     urgency: 'Adherence-Scheduled',
     note: 'New hire trainee in coaching interval.'
+  },
+  'AGT-3310': {
+    id: 'AGT-3310',
+    name: 'Chloe Bennett',
+    queue: 'General Customer Service',
+    adherenceScore: 94.2,
+    recentBreaksToday: 1,
+    lunchOverageHistoryMinutes: 0,
+    auxDefault: 'AUX-1: Scheduled Lunch',
+    urgency: 'Normal',
+    note: 'Senior Customer Service Lead. High adherence and fast wrap-up.'
+  },
+  'AGT-5521': {
+    id: 'AGT-5521',
+    name: 'Lucas Wright',
+    queue: 'Customer Billing & Retention',
+    adherenceScore: 88.5,
+    recentBreaksToday: 2,
+    lunchOverageHistoryMinutes: 0,
+    auxDefault: 'AUX-2: Short Break / Tea',
+    urgency: 'Normal',
+    note: 'Billing specialist with 24s average handle time.'
+  },
+  'AGT-7703': {
+    id: 'AGT-7703',
+    name: 'Maya Patel',
+    queue: 'General Customer Service',
+    adherenceScore: 97.0,
+    recentBreaksToday: 1,
+    lunchOverageHistoryMinutes: 0,
+    auxDefault: 'AUX-3: Shift Meeting',
+    urgency: 'Normal',
+    note: 'VIP customer onboarding care specialist. Exemplary 5.0 CSAT.'
+  },
+  'AGT-4491': {
+    id: 'AGT-4491',
+    name: 'Carlos Mendez',
+    queue: 'Tier-2 Tech Support',
+    adherenceScore: 85.0,
+    recentBreaksToday: 2,
+    lunchOverageHistoryMinutes: 6,
+    auxDefault: 'AUX-5: Technical / VPN Issue',
+    urgency: 'High-Queue',
+    note: 'Hardware & VPN infrastructure diagnostic specialist.'
+  },
+  'AGT-6628': {
+    id: 'AGT-6628',
+    name: 'Olivia Taylor',
+    queue: 'Emergency Inbound',
+    adherenceScore: 99.5,
+    recentBreaksToday: 1,
+    lunchOverageHistoryMinutes: 0,
+    auxDefault: 'AUX-1: Scheduled Lunch',
+    urgency: 'Normal',
+    note: 'Disaster recovery and emergency telephony routing specialist.'
+  },
+  'AGT-2219': {
+    id: 'AGT-2219',
+    name: "Liam O'Connor",
+    queue: 'General Customer Service',
+    adherenceScore: 76.5,
+    recentBreaksToday: 3,
+    lunchOverageHistoryMinutes: 14,
+    auxDefault: 'AUX-4: Training / Coaching',
+    urgency: 'Adherence-Scheduled',
+    note: 'Customer Care trainee flagged for de-escalation coaching.'
   }
 };
 

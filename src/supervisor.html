@@ -21,12 +21,22 @@
       </div>
       <div class="header-right">
         <div class="sup-profile">
-          <span class="sup-avatar">👩‍💼</span>
+          <span class="sup-avatar" id="sup-avatar-icon">👩‍💼</span>
           <div>
-            <strong>Sarah Jenkins (SUP-014)</strong>
-            <span>Floor Operations Supervisor • All Queues</span>
+            <label style="font-size:10px; color:#93c5fd; font-weight:700; text-transform:uppercase; display:block;">Active Supervisor:</label>
+            <select id="supervisor-select" class="supervisor-dropdown" title="Switch active supervisor account">
+              <option value="SUP-014">Sarah Jenkins (SUP-014) • Floor Lead & WFM Operations</option>
+              <option value="SUP-021">Michael Chang (SUP-021) • Billing Operations Manager</option>
+              <option value="SUP-035">Elena Rostova (SUP-035) • QA & Compliance Director</option>
+              <option value="SUP-042">David Sterling (SUP-042) • Emergency Inbound Director</option>
+              <option value="SUP-059">Priya Sharma (SUP-059) • Intraday WFM Architect</option>
+            </select>
+            <span id="sup-role-subtext" style="font-size:11px; color:#9ca3af; display:block; margin-top:2px;">Floor Lead • All Queues & WFM</span>
           </div>
         </div>
+        <button id="btn-open-sup-bot-header" class="btn btn-sm btn-accent" style="display:flex; align-items:center; gap:6px;">
+          <span>🤖</span> Ask Supervisor Bot
+        </button>
         <a href="/widget.html" target="_blank" class="btn btn-outline-light">Open Agent Widget</a>
         <a href="/portal.html" target="_blank" class="btn btn-primary">Open Break Portal</a>
       </div>
@@ -824,5 +834,50 @@
   </div>
 
   <script src="supervisor.js"></script>
+
+  <!-- FLOATING SUPERVISOR AI COPILOT LAUNCHER -->
+  <button id="btn-toggle-sup-bot" class="sup-bot-float-btn" title="Open Supervisor AI Copilot">
+    <span class="bot-icon">🤖</span>
+    <span>Supervisor AI Copilot</span>
+    <span class="bot-status-pulse"></span>
+  </button>
+
+  <!-- SUPERVISOR AI COPILOT DRAWER / MODAL -->
+  <div id="sup-bot-drawer" class="sup-bot-drawer hidden">
+    <div class="sup-bot-header">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:22px;">🤖</span>
+        <div>
+          <strong style="color:#93c5fd; font-size:14px; display:block;">REMI for Supervisors</strong>
+          <small style="color:#cbd5e1; font-size:10px;">Autonomous Floor Operations & WFM Intelligence Copilot</small>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <button id="btn-sup-voice-briefing" class="btn-xs btn-outline" title="Listen to AI Floor Status Briefing">🔊 Voice Briefing</button>
+        <button id="btn-close-sup-bot" class="btn-xs btn-outline">✕</button>
+      </div>
+    </div>
+
+    <!-- QUICK COMMAND CHIPS -->
+    <div class="sup-bot-chips">
+      <button class="sup-chip" data-cmd="floor_summary">📊 Floor Health Check</button>
+      <button class="sup-chip" data-cmd="check_rebalance">⚡ Intraday Queue Imbalance</button>
+      <button class="sup-chip" data-cmd="flagged_qa">🎓 Flagged QA Agents</button>
+      <button class="sup-chip" data-cmd="bot_recall">📞 Overdue Bot Recall</button>
+      <button class="sup-chip" data-cmd="outage_alert">🌪️ Tornado / Disaster Alert</button>
+    </div>
+
+    <!-- CHAT MESSAGES STREAM -->
+    <div id="sup-bot-messages" class="sup-bot-messages">
+      <!-- Populated dynamically -->
+    </div>
+
+    <!-- CHAT INPUT -->
+    <div class="sup-bot-input-row">
+      <input type="text" id="sup-bot-input" placeholder="Ask Supervisor Copilot (e.g. who is in AUX, rebalance billing, recall Jordan)..." />
+      <button id="btn-send-sup-bot" class="btn btn-sm btn-primary">➤</button>
+    </div>
+  </div>
+
 </body>
 </html>

@@ -4,11 +4,62 @@
 let activeAgents = [
   { id: 'AGT-8842', name: 'Alex Morgan', queue: 'Tier-2 Tech Support', state: 'AVAILABLE', breakLeft: '-', adherence: '96.4%', teaCount: 1, lunchVar: '0m' },
   { id: 'AGT-4092', name: 'Jordan Miller', queue: 'Customer Billing & Retention', state: 'AVAILABLE', breakLeft: '-', adherence: '78.5%', teaCount: 4, lunchVar: '0m' },
-  { id: 'AGT-9102', name: 'Samantha Vance', queue: 'Customer Billing & Retention', state: 'WORKING (IN CALL)', breakLeft: '-', adherence: '71.2%', teaCount: 1, lunchVar: '+25m' },
+  { id: 'AGT-9102', name: 'Samantha Vance', queue: 'General Customer Service', state: 'WORKING (IN CALL)', breakLeft: '-', adherence: '71.2%', teaCount: 1, lunchVar: '+25m' },
   { id: 'AGT-7740', name: 'David Chen', queue: 'Emergency Inbound', state: 'AUX: TEA BREAK', breakLeft: '08:42', adherence: '82.0%', teaCount: 2, lunchVar: '0m' },
-  { id: 'AGT-6512', name: 'Rachel Green', queue: 'Customer Billing & Retention', state: 'AVAILABLE', breakLeft: '-', adherence: '98.2%', teaCount: 1, lunchVar: '0m' },
-  { id: 'AGT-8819', name: 'Marcus Brody', queue: 'Emergency Inbound', state: 'WORKING (IN CALL)', breakLeft: '-', adherence: '91.0%', teaCount: 1, lunchVar: '+2m' }
+  { id: 'AGT-6512', name: 'Rachel Green', queue: 'General Customer Service', state: 'AVAILABLE', breakLeft: '-', adherence: '98.2%', teaCount: 1, lunchVar: '0m' },
+  { id: 'AGT-8819', name: 'Marcus Brody', queue: 'General Customer Service', state: 'WORKING (IN CALL)', breakLeft: '-', adherence: '91.0%', teaCount: 1, lunchVar: '+2m' },
+  { id: 'AGT-3310', name: 'Chloe Bennett', queue: 'General Customer Service', state: 'AVAILABLE', breakLeft: '-', adherence: '94.2%', teaCount: 1, lunchVar: '0m' },
+  { id: 'AGT-5521', name: 'Lucas Wright', queue: 'Customer Billing & Retention', state: 'WORKING (IN CALL)', breakLeft: '-', adherence: '88.5%', teaCount: 2, lunchVar: '0m' },
+  { id: 'AGT-7703', name: 'Maya Patel', queue: 'General Customer Service', state: 'AVAILABLE', breakLeft: '-', adherence: '97.0%', teaCount: 1, lunchVar: '0m' },
+  { id: 'AGT-4491', name: 'Carlos Mendez', queue: 'Tier-2 Tech Support', state: 'AVAILABLE', breakLeft: '-', adherence: '85.0%', teaCount: 2, lunchVar: '+6m' },
+  { id: 'AGT-6628', name: 'Olivia Taylor', queue: 'Emergency Inbound', state: 'AVAILABLE', breakLeft: '-', adherence: '99.5%', teaCount: 1, lunchVar: '0m' },
+  { id: 'AGT-2219', name: "Liam O'Connor", queue: 'General Customer Service', state: 'AUX: TRAINING', breakLeft: '22:15', adherence: '76.5%', teaCount: 3, lunchVar: '+14m' }
 ];
+
+// Supervisor Accounts
+const SUPERVISOR_PROFILES = {
+  'SUP-014': {
+    id: 'SUP-014',
+    name: 'Sarah Jenkins',
+    role: 'Floor Lead & WFM Operations',
+    subtext: 'Floor Operations Supervisor • All Queues',
+    avatar: '👩‍💼',
+    greeting: 'Hello Sarah Jenkins! 12 shift agents are online. Floor adherence is at 89.2%. How can I assist floor management today?'
+  },
+  'SUP-021': {
+    id: 'SUP-021',
+    name: 'Michael Chang',
+    role: 'Billing & Retention Manager',
+    subtext: 'Operations Manager • Billing & Retention',
+    avatar: '👨‍💼',
+    greeting: 'Welcome Michael Chang! Currently tracking Customer Billing & Retention queues and monitoring dispute resolution.'
+  },
+  'SUP-035': {
+    id: 'SUP-035',
+    name: 'Elena Rostova',
+    role: 'QA & Compliance Director',
+    subtext: 'Quality Assurance & Speech Tone Lead',
+    avatar: '👩‍🔬',
+    greeting: 'Hello Elena Rostova! 3 calls currently flagged for non-compliant tone or missed PIN verification. Coaching curriculum is ready.'
+  },
+  'SUP-042': {
+    id: 'SUP-042',
+    name: 'David Sterling',
+    role: 'Emergency Inbound Director',
+    subtext: 'Emergency Dispatch & Regional Outage Lead',
+    avatar: '👨‍✈️',
+    greeting: 'Greetings David Sterling! Emergency queue SLA is at 98.0%. IVR Outage Auto-Deflection stands ready at 1,000 calls/min.'
+  },
+  'SUP-059': {
+    id: 'SUP-059',
+    name: 'Priya Sharma',
+    role: 'Intraday WFM Scheduling Architect',
+    subtext: 'WFM Scheduling & Erlang-C Balancing Lead',
+    avatar: '👩‍💻',
+    greeting: 'Welcome Priya Sharma! Erlang-C staffing surplus (+4). Dynamic Cross-Skilling rebalancing is ready for intraday surges.'
+  }
+};
+let currentSupervisor = SUPERVISOR_PROFILES['SUP-014'];
 
 // Supervisor Configured Policy Limits
 let policyLimits = {
@@ -463,90 +514,18 @@ document.getElementById('btn-export-csv').addEventListener('click', () => {
 // ==========================================
 
 const qaScorecardData = [
-  {
-    agentId: 'AGT-8842',
-    name: 'Alex Morgan',
-    contactId: '#90421',
-    tone: 'Good / Empathetic',
-    securityVerified: true,
-    detailsRetrieved: true,
-    queryResolved: true,
-    ivrStars: 5.0,
-    qaScore: 96,
-    recommendedModule: 'MOD-104',
-    flagReason: 'None (Top Performer)',
-    trainingAssigned: false
-  },
-  {
-    agentId: 'AGT-4092',
-    name: 'Jordan Miller',
-    contactId: '#90425',
-    tone: 'Rudely / Impatient',
-    securityVerified: true,
-    detailsRetrieved: true,
-    queryResolved: false,
-    ivrStars: 1.0,
-    qaScore: 48,
-    recommendedModule: 'MOD-101',
-    flagReason: 'Rude speech tone to customer + Unresolved dispute',
-    trainingAssigned: false
-  },
-  {
-    agentId: 'AGT-9102',
-    name: 'Samantha Vance',
-    contactId: '#90429',
-    tone: 'Bad / Confused',
-    securityVerified: false,
-    detailsRetrieved: false,
-    queryResolved: false,
-    ivrStars: 2.0,
-    qaScore: 32,
-    recommendedModule: 'MOD-102',
-    flagReason: 'Missed customer security PIN verification + Unresolved inquiry',
-    trainingAssigned: false
-  },
-  {
-    agentId: 'AGT-7740',
-    name: 'David Chen',
-    contactId: '#90432',
-    tone: 'Neutral / Direct',
-    securityVerified: true,
-    detailsRetrieved: true,
-    queryResolved: true,
-    ivrStars: 3.5,
-    qaScore: 85,
-    recommendedModule: 'MOD-104',
-    flagReason: 'None (Acceptable SLA)',
-    trainingAssigned: false
-  },
-  {
-    agentId: 'AGT-6512',
-    name: 'Rachel Green',
-    contactId: '#90438',
-    tone: 'Good / Empathetic',
-    securityVerified: true,
-    detailsRetrieved: true,
-    queryResolved: true,
-    ivrStars: 5.0,
-    qaScore: 98,
-    recommendedModule: 'MOD-104',
-    flagReason: 'None (Exemplary Retention)',
-    trainingAssigned: false
-  },
-  {
-    agentId: 'AGT-8819',
-    name: 'Marcus Brody',
-    contactId: '#90441',
-    tone: 'Neutral / Trainee',
-    securityVerified: true,
-    detailsRetrieved: false,
-    queryResolved: true,
-    ivrStars: 4.0,
-    qaScore: 81,
-    recommendedModule: 'MOD-103',
-    flagReason: 'Incomplete account details lookup',
-    trainingAssigned: false
-  }
+  { agentId: 'AGT-8842', name: 'Alex Morgan', contactId: '#90421', tone: 'Good / Empathetic', securityVerified: true, detailsRetrieved: true, queryResolved: true, ivrStars: 5.0, qaScore: 96, recommendedModule: 'MOD-104', flagReason: 'None (Top Performer)', trainingAssigned: false },
+  { agentId: 'AGT-4092', name: 'Jordan Miller', contactId: '#90425', tone: 'Rudely / Impatient', securityVerified: true, detailsRetrieved: true, queryResolved: false, ivrStars: 1.0, qaScore: 48, recommendedModule: 'MOD-101', flagReason: 'Rude speech tone to customer + Unresolved dispute', trainingAssigned: false },
+  { agentId: 'AGT-9102', name: 'Samantha Vance', contactId: '#90429', tone: 'Bad / Confused', securityVerified: false, detailsRetrieved: false, queryResolved: false, ivrStars: 2.0, qaScore: 32, recommendedModule: 'MOD-102', flagReason: 'Missed customer security PIN verification + Unresolved inquiry', trainingAssigned: false },
+  { agentId: 'AGT-7740', name: 'David Chen', contactId: '#90432', tone: 'Neutral / Direct', securityVerified: true, detailsRetrieved: true, queryResolved: true, ivrStars: 3.5, qaScore: 85, recommendedModule: 'MOD-104', flagReason: 'None (Acceptable SLA)', trainingAssigned: false },
+  { agentId: 'AGT-6512', name: 'Rachel Green', contactId: '#90438', tone: 'Good / Empathetic', securityVerified: true, detailsRetrieved: true, queryResolved: true, ivrStars: 5.0, qaScore: 98, recommendedModule: 'MOD-104', flagReason: 'None (Exemplary Retention)', trainingAssigned: false },
+  { agentId: 'AGT-8819', name: 'Marcus Brody', contactId: '#90441', tone: 'Neutral / Trainee', securityVerified: true, detailsRetrieved: false, queryResolved: true, ivrStars: 4.0, qaScore: 81, recommendedModule: 'MOD-103', flagReason: 'Incomplete account details lookup', trainingAssigned: false },
+  { agentId: 'AGT-3310', name: 'Chloe Bennett', contactId: '#90445', tone: 'Good / Empathetic', securityVerified: true, detailsRetrieved: true, queryResolved: true, ivrStars: 4.8, qaScore: 95, recommendedModule: 'MOD-104', flagReason: 'None (Senior Lead)', trainingAssigned: false },
+  { agentId: 'AGT-5521', name: 'Lucas Wright', contactId: '#90449', tone: 'Good / Professional', securityVerified: true, detailsRetrieved: true, queryResolved: true, ivrStars: 4.6, qaScore: 92, recommendedModule: 'MOD-104', flagReason: 'None (Fast Wrap-up)', trainingAssigned: false },
+  { agentId: 'AGT-7703', name: 'Maya Patel', contactId: '#90453', tone: 'Good / Empathetic', securityVerified: true, detailsRetrieved: true, queryResolved: true, ivrStars: 5.0, qaScore: 99, recommendedModule: 'MOD-104', flagReason: 'None (VIP Care)', trainingAssigned: false },
+  { agentId: 'AGT-4491', name: 'Carlos Mendez', contactId: '#90458', tone: 'Neutral / Direct', securityVerified: true, detailsRetrieved: true, queryResolved: true, ivrStars: 3.8, qaScore: 84, recommendedModule: 'MOD-104', flagReason: 'None (Hardware Specialist)', trainingAssigned: false },
+  { agentId: 'AGT-6628', name: 'Olivia Taylor', contactId: '#90462', tone: 'Good / Calm', securityVerified: true, detailsRetrieved: true, queryResolved: true, ivrStars: 5.0, qaScore: 100, recommendedModule: 'MOD-104', flagReason: 'None (Disaster Dispatch Lead)', trainingAssigned: false },
+  { agentId: 'AGT-2219', name: "Liam O'Connor", contactId: '#90468', tone: 'Bad / Hesitant', securityVerified: false, detailsRetrieved: false, queryResolved: false, ivrStars: 2.5, qaScore: 36, recommendedModule: 'MOD-103', flagReason: 'Failed resolution + Missing account history', trainingAssigned: false }
 ];
 
 function renderQAScorecard() {
@@ -1184,3 +1163,185 @@ document.getElementById('btn-toggle-autoflex')?.addEventListener('click', () => 
 // Initialize WFM Queue Balance polling
 fetchQueueBalance();
 setInterval(fetchQueueBalance, 4000);
+
+
+// ==========================================
+// SUPERVISOR PROFILES & AI COPILOT BOT
+// ==========================================
+
+const supSelect = document.getElementById('supervisor-select');
+if (supSelect) {
+  supSelect.addEventListener('change', (e) => {
+    const prof = SUPERVISOR_PROFILES[e.target.value] || SUPERVISOR_PROFILES['SUP-014'];
+    currentSupervisor = prof;
+    const avatarEl = document.getElementById('sup-avatar-icon');
+    const roleEl = document.getElementById('sup-role-subtext');
+    if (avatarEl) avatarEl.textContent = prof.avatar;
+    if (roleEl) roleEl.textContent = prof.subtext;
+
+    addSupBotMessage('bot', prof.greeting);
+  });
+}
+
+// Supervisor Bot Drawer Toggle
+const supBotDrawer = document.getElementById('sup-bot-drawer');
+const btnToggleSupBot = document.getElementById('btn-toggle-sup-bot');
+const btnOpenSupBotHeader = document.getElementById('btn-open-sup-bot-header');
+const btnCloseSupBot = document.getElementById('btn-close-sup-bot');
+
+function openSupBot() {
+  if (supBotDrawer) supBotDrawer.classList.remove('hidden');
+}
+
+function closeSupBot() {
+  if (supBotDrawer) supBotDrawer.classList.add('hidden');
+}
+
+if (btnToggleSupBot) btnToggleSupBot.addEventListener('click', () => {
+  if (supBotDrawer.classList.contains('hidden')) openSupBot();
+  else closeSupBot();
+});
+if (btnOpenSupBotHeader) btnOpenSupBotHeader.addEventListener('click', openSupBot);
+if (btnCloseSupBot) btnCloseSupBot.addEventListener('click', closeSupBot);
+
+// Bot Messages Stream
+const supBotMessages = document.getElementById('sup-bot-messages');
+const supBotInput = document.getElementById('sup-bot-input');
+const btnSendSupBot = document.getElementById('btn-send-sup-bot');
+
+function addSupBotMessage(sender, text, htmlContent = '') {
+  if (!supBotMessages) return;
+  const msgDiv = document.createElement('div');
+  msgDiv.className = 'sup-bot-msg ' + sender;
+  if (htmlContent) {
+    msgDiv.innerHTML = htmlContent;
+  } else {
+    msgDiv.textContent = text;
+  }
+  supBotMessages.appendChild(msgDiv);
+  supBotMessages.scrollTop = supBotMessages.scrollHeight;
+}
+
+// Initial Greeting
+if (supBotMessages) {
+  addSupBotMessage('bot', '👋 Welcome ' + currentSupervisor.name + '! I am REMI, your Autonomous Supervisor Copilot. I can run floor audits, detect queue surges, trigger cross-skilling rebalances, and recall overdue agents. How can I assist you?');
+}
+
+// Quick Chip Handlers
+document.querySelectorAll('.sup-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const cmd = chip.getAttribute('data-cmd');
+    executeSupBotCommand(cmd);
+  });
+});
+
+function executeSupBotCommand(cmd) {
+  if (cmd === 'floor_summary') {
+    addSupBotMessage('user', 'Run Floor Health Check');
+    const total = activeAgents.length;
+    const inCalls = activeAgents.filter(a => a.state.includes('WORKING')).length;
+    const inAux = activeAgents.filter(a => a.state.includes('AUX')).length;
+    const avail = activeAgents.filter(a => a.state === 'AVAILABLE').length;
+    const adhAvg = (activeAgents.reduce((acc, a) => acc + parseFloat(a.adherence), 0) / total).toFixed(1);
+
+    const html = '<strong>📊 Shift Floor Telemetry Audit:</strong><br/>' +
+      '• <strong>Active Staffing:</strong> ' + total + ' Logged-In Agents<br/>' +
+      '• <strong>States:</strong> ' + avail + ' Available | ' + inCalls + ' In Call | ' + inAux + ' in AUX<br/>' +
+      '• <strong>Fleet Adherence:</strong> ' + adhAvg + '% (Target: >=90%)<br/>' +
+      '• <strong>Erlang-C Buffer:</strong> +4 Surplus Staffing<br/>' +
+      '• <strong>SLA Status:</strong> Optimal across 3 of 4 ACD queues.';
+    setTimeout(() => addSupBotMessage('bot', '', html), 400);
+  }
+  else if (cmd === 'check_rebalance') {
+    addSupBotMessage('user', 'Check Intraday Queue Imbalance');
+    const b = wfmRebalanceData.queues.billing;
+    const cs = wfmRebalanceData.queues.customerService;
+    let html = '<strong>⚡ Intraday Queue Imbalance Telemetry:</strong><br/>' +
+      '• <strong>Customer Billing:</strong> ' + b.callsWaiting + ' Waiting | ASA ' + b.avgWaitSeconds + 's | SLA ' + b.currentSla + '%<br/>' +
+      '• <strong>General Customer Service:</strong> ' + cs.callsWaiting + ' Waiting | ' + cs.assignedAgents + ' Agents Logged-in (' + cs.occupancyPct + '% Occ)<br/><br/>';
+    
+    if (wfmRebalanceData.isSurgeActive && !wfmRebalanceData.isRebalanced) {
+      html += '<span style="color:#f87171; font-weight:700;">⚠️ Surge Detected! WFM recommends cross-skilling 3 CS agents to Billing.</span><br/>' +
+        '<button class="btn btn-xs btn-primary" onclick="postQueueBalance(\'TRIGGER_REBALANCE\'); addSupBotMessage(\'bot\', \'Executed WFM Rebalance: 3 CS agents flexed to Billing!\');" style="margin-top:6px;">🔄 Execute Rebalance Now</button>';
+    } else if (wfmRebalanceData.isRebalanced) {
+      html += '<span style="color:#38bdf8; font-weight:700;">✓ Dynamic Flex Active: 3 CS Agents flexed to Billing.</span>';
+    } else {
+      html += '<span style="color:#34d399; font-weight:700;">✓ Queues Balanced: Normal operating levels.</span>';
+    }
+    setTimeout(() => addSupBotMessage('bot', '', html), 400);
+  }
+  else if (cmd === 'flagged_qa') {
+    addSupBotMessage('user', 'Show Flagged QA Agents');
+    const flagged = qaScorecardData.filter(a => a.qaScore < 70 || a.tone.includes('Rudely') || a.tone.includes('Bad'));
+    let html = '<strong>🎓 Flagged Agents Requiring Extra Coaching (' + flagged.length + '):</strong><br/>';
+    flagged.forEach(f => {
+      html += '• <strong>' + f.name + ' (' + f.agentId + '):</strong> ' + f.tone + ' | QA ' + f.qaScore + '%<br/>' +
+        '&nbsp;&nbsp;&nbsp;Reason: ' + f.flagReason + '<br/>';
+    });
+    html += '<button class="btn btn-xs btn-danger" onclick="openAssignTrainingModal(\'AGT-4092\', \'Jordan Miller\', \'Rude speech tone to customer\', \'MOD-101\')" style="margin-top:6px;">🎓 Coach Jordan Miller</button> ' +
+      '<button class="btn btn-xs btn-danger" onclick="openAssignTrainingModal(\'AGT-9102\', \'Samantha Vance\', \'Missed security PIN verification\', \'MOD-102\')" style="margin-top:6px;">🎓 Coach Samantha Vance</button>';
+    setTimeout(() => addSupBotMessage('bot', '', html), 400);
+  }
+  else if (cmd === 'bot_recall') {
+    addSupBotMessage('user', 'Automated Bot Recall');
+    const targetAgent = activeAgents.find(a => a.state.includes('AUX')) || activeAgents[0];
+    recallAgent(targetAgent.id, targetAgent.name);
+    setTimeout(() => addSupBotMessage('bot', '📞 Dispatched automated voice bot recall to ' + targetAgent.name + ' (' + targetAgent.id + '). Their workstation will chime and read instructions.'), 400);
+  }
+  else if (cmd === 'outage_alert') {
+    addSupBotMessage('user', 'Broadcast Tornado / Outage Alert');
+    dispatchSupervisorBroadcast('CRITICAL', 'TORNADO & SEVERE STORM WARNING', 'Severe weather warning in effect. Protect queue SLAs and prepare for high call arrivals.');
+    setTimeout(() => addSupBotMessage('bot', '🌪️ Emergency floor broadcast dispatched immediately to all 12 agent desktop widgets!'), 400);
+  }
+}
+
+// User Text Input in Bot
+function sendUserBotMessage() {
+  const text = supBotInput ? supBotInput.value.trim() : '';
+  if (!text) return;
+  addSupBotMessage('user', text);
+  if (supBotInput) supBotInput.value = '';
+
+  const q = text.toLowerCase();
+  setTimeout(() => {
+    if (q.includes('hello') || q.includes('hi') || q.includes('hey')) {
+      addSupBotMessage('bot', 'Hello ' + currentSupervisor.name + '! How can I assist you with floor operations, schedule rebalancing, or agent QA?');
+    } else if (q.includes('rebalance') || q.includes('surge') || q.includes('billing')) {
+      executeSupBotCommand('check_rebalance');
+    } else if (q.includes('flag') || q.includes('training') || q.includes('coaching') || q.includes('rude') || q.includes('qa')) {
+      executeSupBotCommand('flagged_qa');
+    } else if (q.includes('recall') || q.includes('overdue') || q.includes('bot call')) {
+      executeSupBotCommand('bot_recall');
+    } else if (q.includes('broadcast') || q.includes('alert') || q.includes('storm') || q.includes('tornado')) {
+      executeSupBotCommand('outage_alert');
+    } else if (q.includes('who') || q.includes('aux') || q.includes('tea') || q.includes('lunch') || q.includes('status') || q.includes('adherence')) {
+      executeSupBotCommand('floor_summary');
+    } else {
+      addSupBotMessage('bot', 'Understood, ' + currentSupervisor.name + '. I am monitoring all 12 agents across 4 skill campaigns. You can ask me to "check rebalance", "show flagged agents", "run floor summary", or "dispatch broadcast".');
+    }
+  }, 450);
+}
+
+if (btnSendSupBot) btnSendSupBot.addEventListener('click', sendUserBotMessage);
+if (supBotInput) supBotInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') sendUserBotMessage();
+});
+
+// Voice Briefing
+const btnSupVoiceBriefing = document.getElementById('btn-sup-voice-briefing');
+if (btnSupVoiceBriefing) {
+  btnSupVoiceBriefing.addEventListener('click', () => {
+    const text = 'Attention ' + currentSupervisor.name + ': Floor operations briefing. 12 agents logged in. Overall shift adherence is 89.2 percent. Customer Billing queue is operating under observation. 3 agents are eligible for dynamic skill flex. All systems online.';
+    btnSupVoiceBriefing.textContent = '🔊 Speaking...';
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = 1.0;
+      u.onend = () => { btnSupVoiceBriefing.textContent = '🔊 Voice Briefing'; };
+      window.speechSynthesis.speak(u);
+    } else {
+      alert(text);
+      btnSupVoiceBriefing.textContent = '🔊 Voice Briefing';
+    }
+  });
+}

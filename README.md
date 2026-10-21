@@ -117,63 +117,43 @@ An enterprise-grade desktop chatbot widget for contact center agents that stream
 - **Agent Desktop Widget Synchronization**: Pushes immediate banner alert (`🔄 Dynamic WFM Skill Flex: Customer Billing Support`) and elevates Billing copilot replies.
 - **Autonomous Restoration**: When call volume normalizes back below threshold, agents are automatically returned to their base Customer Service shift and normal AUX permissions resume.
 
+### 12. Supervisor AI Operations Copilot Bot & Multi-Account Administration
+- **REMI Supervisor Copilot Bot**: A floating interactive AI assistant embedded directly inside the Supervisor Command Center.
+  - **Natural Language Floor Audit**: Supervisors can query floor health, check queue surges, review non-compliant QA agents, or dispatch emergency broadcasts.
+  - **1-Click Execution within Chat**: Rebalances queues, assigns coaching modules, and places automated voice recalls directly from AI chat response bubbles.
+  - **Speech Synthesis Voice Briefing**: Reads real-time shift status briefings aloud via the Web Speech API.
+- **Multiple Supervisor Profiles**: Seamlessly switch between 5 distinct management accounts with dedicated supervisory scopes.
+
 ---
 
-## 🤖 Assistant Branding & Name Candidates
+## 👔 Available Supervisor Accounts
 
-| Name | Gender / Vibe | Full Form (Backronym) | Tagline |
+| Supervisor ID | Name | Role & Supervisory Scope | Campaign Queues Overseen |
 | :--- | :--- | :--- | :--- |
-| **REMI** | Neutral / Cute | **R**eal-time **E**mpathy, **M**ode & **I**nteraction | *"Little copilot. Big heart."* |
-| **ARIA** | Professional | **A**dherence, **R**esolution & **I**nteraction **A**ssistant | *"Harmonizing Breaks, Calls & Quality."* |
-| **MAX** | Male / Sleek | **M**ode, **A**dherence & **EX**cellence Engine | *"Maximum focus. Effortless adherence."* |
-| **MIA** | Female / Sweet | **M**ode, **I**nteraction & **A**dherence Assistant | *"Never miss a beat."* |
-
----
-
-## Quick Start & Running
-
-### Option 1: One-Click Desktop Launcher
-Double-click `run-widget.bat` in the project directory, or run in terminal:
-```powershell
-.\run-widget.bat
-```
-This starts the backend server on port 4000 and launches the desktop widget in dedicated Windows App Mode.
-
-### Option 2: Running via Node.js
-```bash
-node server.js
-```
-Then open:
-- **Supervisor Command Portal**: [http://localhost:4000/supervisor.html](http://localhost:4000/supervisor.html)
-- **Desktop Chatbot Widget**: [http://localhost:4000/widget.html](http://localhost:4000/widget.html)
-- **Break Request Web Portal**: [http://localhost:4000/portal.html](http://localhost:4000/portal.html)
-
----
-
-## Testing Each Scenario (Built-in Test Lab)
-
-Navigate to the **🚨 Alerts & Sim** tab in the widget to test scenarios instantly:
-1. **Test Tornado/Storm Broadcast**: Click `🌪️ Trigger Tornado / Storm Alert`.
-2. **Test Monday Peak Traffic**: Click `📈 Toggle Monday High-Traffic Mode`.
-3. **Test 2-Minute Pre-Expiry Alert**: Click `⏱️ Trigger 2-Min Break End Alert`.
-4. **Test Overdue Bot Voice Call**: Click `📞 Trigger Overdue Bot Call Alert`.
-5. **Test Excessive Tea Breaks Rejection**: Click `☕ Simulate Excessive Tea Break Pattern` (opens Web Portal with flagged history).
-6. **Test Extra Lunch Overage Rejection**: Click `🥪 Simulate Chronic Extra Lunch Overage`.
-7. **Test Frequency Rate Limit**: Click `🔁 Simulate Frequency Limit Spam`.
-8. **Reset to Clean Profile**: Click `🔄 Reset Agent History to Good`.
+| **`SUP-014`** | **Sarah Jenkins** | Floor Lead & WFM Operations | All Queues (Tier-2 Tech, Billing, Care, Emergency) |
+| **`SUP-021`** | **Michael Chang** | Billing & Retention Operations Manager | Customer Billing & Retention (ACD-02) |
+| **`SUP-035`** | **Elena Rostova** | Quality Assurance & Compliance Lead | Speech Tone, Verification & Coaching Matrix |
+| **`SUP-042`** | **David Sterling** | Emergency Inbound & Disaster Dispatch Lead | Emergency Inbound (ACD-01) & Regional Weather IVR |
+| **`SUP-059`** | **Priya Sharma** | Intraday WFM Scheduling Architect | Erlang-C Capacity & Dynamic Cross-Skilling Flex |
 
 ---
 
 ## 👥 Available Agent User Personas
 
-You can switch between any of these agents using the dropdown in the **Desktop Chatbot Widget** or the **Break Web Portal**:
+You can switch between any of these 12 agents using the dropdown in the **Desktop Chatbot Widget**, **Break Web Portal**, or **Supervisor Floor Wallboard**:
 
-| Agent ID | Name & Queue | Behavioral Trait | Scenario Tested |
+| Agent ID | Name & Queue | Behavioral Trait & Adherence | Scenario Tested |
 | :--- | :--- | :--- | :--- |
-| **`AGT-8842`** | **Alex Morgan** (Tier-2 Tech) | Adherence 96.4%, 1 Tea Break, 0m Lunch Over | **Auto-Approved**: Clean adherence buffer |
+| **`AGT-8842`** | **Alex Morgan** (Tier-2 Tech) | Adherence 96.4%, 1 Tea, 0m Lunch | **Auto-Approved**: Clean adherence buffer |
 | **`AGT-4092`** | **Jordan Miller** (Billing) | 4 Tea Breaks Taken Today | **Auto-Rejected**: Excessive tea break pattern |
-| **`AGT-9102`** | **Samantha Vance** (Customer Care) | +25m Lunch Overage on Prior Shift | **Auto-Rejected**: Chronic lunch overage |
-| **`AGT-7740`** | **David Chen** (Inbound) | 3 Break Requests in 10 Minutes | **Auto-Rejected**: Frequency rate limit |
-| **`AGT-6512`** | **Rachel Green** (Retention) | Medical Exemption On File | **Priority Override**: Approved during high queue |
-| **`AGT-8819`** | **Marcus Brody** (Trainee) | In Coaching Interval (AUX-4) | **Training Workflow**: Supervisor 1-on-1 |
+| **`AGT-9102`** | **Samantha Vance** (Customer Care) | +25m Lunch Overage on Prior Shift | **Auto-Rejected**: Chronic lunch overage / Flex |
+| **`AGT-7740`** | **David Chen** (Emergency Inbound) | 3 Break Requests in 10 Minutes | **Auto-Rejected**: Frequency rate limit |
+| **`AGT-6512`** | **Rachel Green** (Customer Care) | Medical Exemption On File | **Priority Override**: Approved / Cross-skilled flex |
+| **`AGT-8819`** | **Marcus Brody** (Customer Care) | In Coaching Interval (AUX-4) | **Training Workflow**: Supervisor 1-on-1 / Flex |
+| **`AGT-3310`** | **Chloe Bennett** (Customer Care) | Senior Lead • 94.2% Adherence | **Exemplary Care**: High FCR & clean record |
+| **`AGT-5521`** | **Lucas Wright** (Billing Specialist) | 88.5% Adherence • Fast 24s ACW | **Billing Speed**: Rapid wrap-up & credit adjustments |
+| **`AGT-7703`** | **Maya Patel** (Customer Care) | 97.0% Adherence • VIP Onboarding | **5.0★ CSAT**: Flawless empathy & greeting |
+| **`AGT-4491`** | **Carlos Mendez** (Tier-2 Tech) | 85.0% Adherence • VPN & Hardware | **Technical KB**: Network adapter diagnostics |
+| **`AGT-6628`** | **Olivia Taylor** (Emergency Inbound) | 99.5% Adherence • Disaster Routing | **Top Performer**: Emergency storm handling |
+| **`AGT-2219`** | **Liam O'Connor** (Customer Care) | 76.5% Adherence • Trainee | **Coaching Needed**: Missed PIN & hesitant tone |
 
