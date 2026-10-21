@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NICE CXone Supervisor Command Center & WFM Operations</title>
-  <link rel="stylesheet" href="supervisor.css" />
+  <link rel="stylesheet" href="supervisor.css?v=2.1" />
 </head>
 <body>
   <div class="sup-container">
@@ -34,7 +34,7 @@
             <span id="sup-role-subtext" style="font-size:11px; color:#9ca3af; display:block; margin-top:2px;">Floor Lead • All Queues & WFM</span>
           </div>
         </div>
-        <button id="btn-open-sup-bot-header" class="btn btn-sm btn-accent" style="display:flex; align-items:center; gap:6px;">
+        <button id="btn-open-sup-bot-header" class="btn btn-sm btn-accent" onclick="window.openSupBot && window.openSupBot()" style="display:flex; align-items:center; gap:6px;">
           <span>🤖</span> Ask Supervisor Bot
         </button>
         <a href="/widget.html" target="_blank" class="btn btn-outline-light">Open Agent Widget</a>
@@ -832,11 +832,8 @@
     </section>
 
   </div>
-
-  <script src="supervisor.js"></script>
-
-  <!-- FLOATING SUPERVISOR AI COPILOT LAUNCHER -->
-  <button id="btn-toggle-sup-bot" class="sup-bot-float-btn" title="Open Supervisor AI Copilot">
+<!-- FLOATING SUPERVISOR AI COPILOT LAUNCHER -->
+  <button id="btn-toggle-sup-bot" class="sup-bot-float-btn" onclick="window.toggleSupBot && window.toggleSupBot()" title="Open Supervisor AI Copilot">
     <span class="bot-icon">🤖</span>
     <span>Supervisor AI Copilot</span>
     <span class="bot-status-pulse"></span>
@@ -854,7 +851,7 @@
       </div>
       <div style="display:flex; align-items:center; gap:8px;">
         <button id="btn-sup-voice-briefing" class="btn-xs btn-outline" title="Listen to AI Floor Status Briefing">🔊 Voice Briefing</button>
-        <button id="btn-close-sup-bot" class="btn-xs btn-outline">✕</button>
+        <button id="btn-close-sup-bot" class="btn-xs btn-outline" onclick="window.closeSupBot && window.closeSupBot()">✕</button>
       </div>
     </div>
 
@@ -879,5 +876,6 @@
     </div>
   </div>
 
+  <script src="supervisor.js?v=2.1"></script>
 </body>
 </html>

@@ -1190,19 +1190,35 @@ const btnOpenSupBotHeader = document.getElementById('btn-open-sup-bot-header');
 const btnCloseSupBot = document.getElementById('btn-close-sup-bot');
 
 function openSupBot() {
-  if (supBotDrawer) supBotDrawer.classList.remove('hidden');
+  const drawer = document.getElementById('sup-bot-drawer');
+  if (drawer) drawer.classList.remove('hidden');
 }
 
 function closeSupBot() {
-  if (supBotDrawer) supBotDrawer.classList.add('hidden');
+  const drawer = document.getElementById('sup-bot-drawer');
+  if (drawer) drawer.classList.add('hidden');
 }
 
-if (btnToggleSupBot) btnToggleSupBot.addEventListener('click', () => {
-  if (supBotDrawer.classList.contains('hidden')) openSupBot();
-  else closeSupBot();
-});
-if (btnOpenSupBotHeader) btnOpenSupBotHeader.addEventListener('click', openSupBot);
-if (btnCloseSupBot) btnCloseSupBot.addEventListener('click', closeSupBot);
+function toggleSupBot() {
+  const drawer = document.getElementById('sup-bot-drawer');
+  if (drawer) {
+    if (drawer.classList.contains('hidden')) openSupBot();
+    else closeSupBot();
+  }
+}
+
+window.openSupBot = openSupBot;
+window.closeSupBot = closeSupBot;
+window.toggleSupBot = toggleSupBot;
+
+const btnToggleSupBotEl = document.getElementById('btn-toggle-sup-bot');
+if (btnToggleSupBotEl) btnToggleSupBotEl.addEventListener('click', toggleSupBot);
+
+const btnOpenSupBotHeaderEl = document.getElementById('btn-open-sup-bot-header');
+if (btnOpenSupBotHeaderEl) btnOpenSupBotHeaderEl.addEventListener('click', openSupBot);
+
+const btnCloseSupBotEl = document.getElementById('btn-close-sup-bot');
+if (btnCloseSupBotEl) btnCloseSupBotEl.addEventListener('click', closeSupBot);
 
 // Bot Messages Stream
 const supBotMessages = document.getElementById('sup-bot-messages');
