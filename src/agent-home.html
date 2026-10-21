@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agent Bot Workstation Home & AI Copilot Workspace</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="alternate icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="widget.css?v=2.2" />
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --primary: #2563eb;
+      --radius: 12px;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .agent-header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      padding: 16px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .brand-title h1 {
+      font-size: 18px;
+      font-weight: 800;
+      color: #0f172a;
+      margin: 0;
+    }
+    .brand-title p {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin: 2px 0 0 0;
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .agent-select {
+      background: #ffffff;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .agent-main-container {
+      max-width: 1200px;
+      margin: 24px auto;
+      padding: 0 20px;
+      width: 100%;
+      box-sizing: border-box;
+      flex: 1;
+    }
+    .shift-banner {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .shift-info h2 {
+      margin: 0 0 4px 0;
+      font-size: 17px;
+      color: #0f172a;
+    }
+    .shift-info p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .shift-stats {
+      display: flex;
+      gap: 24px;
+      text-align: right;
+    }
+    .s-stat span {
+      display: block;
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .s-stat strong {
+      font-size: 20px;
+      color: #0f172a;
+    }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    .home-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .home-card:hover {
+      border-color: #93c5fd;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(37,99,235,0.08);
+    }
+    .card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .card-icon {
+      font-size: 28px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 10px;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .card-title h3 {
+      margin: 0 0 4px 0;
+      font-size: 15px;
+      color: #0f172a;
+    }
+    .card-title p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+    .card-details {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 11px;
+      margin-bottom: 18px;
+      color: #334155;
+      line-height: 1.5;
+    }
+    .btn-launch {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 13px;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-launch-primary {
+      background: #2563eb;
+      color: #ffffff;
+    }
+    .btn-launch-primary:hover {
+      background: #1d4ed8;
+    }
+    .btn-launch-secondary {
+      background: #eff6ff;
+      color: #2563eb;
+      border: 1px solid #bfdbfe;
+    }
+    .btn-launch-secondary:hover {
+      background: #dbeafe;
+    }
+    .ticker-bar {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 12px;
+      color: #1e40af;
+      margin-bottom: 24px;
+    }
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-muted);
+      font-size: 12px;
+      border-top: 1px solid var(--border);
+      background: #ffffff;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- AGENT HEADER -->
+  <header class="agent-header">
+    <div class="header-brand">
+      <div class="brand-icon">
+        <img src="/favicon.svg" style="width:22px; height:22px;" />
+      </div>
+      <div class="brand-title">
+        <h1>NICE CXone Agent Bot Workstation</h1>
+        <p>Autonomous AI Copilot, Break Management & Operational Workspace</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <select id="agent-select" class="agent-select" title="Switch active agent profile">
+        <option value="AGT-8842">Alex Morgan (AGT-8842) • Tier-2 Tech Support</option>
+        <option value="AGT-4092">Jordan Miller (AGT-4092) • Customer Billing</option>
+        <option value="AGT-9102">Samantha Vance (AGT-9102) • Customer Service</option>
+        <option value="AGT-6512">Rachel Green (AGT-6512) • Emergency Inbound</option>
+        <option value="AGT-4491">Carlos Mendez (AGT-4491) • Tier-2 Tech Support</option>
+        <option value="AGT-3310">Chloe Bennett (AGT-3310) • Customer Service</option>
+        <option value="AGT-7703">Maya Patel (AGT-7703) • VIP Customer Care</option>
+      </select>
+      <a href="/index.html" class="btn btn-sm btn-outline" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; color:#2563eb; border:1px solid #cbd5e1; background:#ffffff; padding:6px 12px; border-radius:6px; font-size:12px; font-weight:700;">
+        Hub Home
+      </a>
+      <a href="/supervisor.html" class="btn btn-sm btn-outline" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px; color:#64748b; border:1px solid #cbd5e1; background:#ffffff; padding:6px 12px; border-radius:6px; font-size:12px;">
+        Supervisor Center
+      </a>
+    </div>
+  </header>
+
+  <main class="agent-main-container">
+
+    <!-- LIVE BROADCAST NOTIFICATION TICKER -->
+    <div class="ticker-bar">
+      <span style="font-size:18px;">📢</span>
+      <span style="font-weight:700;">Active Operational Advisory:</span>
+      <span id="active-advisory-text">All systems nominal. NICE CXone MAX softphone connected. Emergency IVR deflection standing by.</span>
+    </div>
+
+    <!-- AGENT SHIFT ADHERENCE & STATUS BANNER -->
+    <section class="shift-banner">
+      <div class="shift-info">
+        <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+          <span class="status-tag approved" id="agent-state-tag" style="background:#ecfdf5; color:#059669; padding:3px 8px; border-radius:4px; font-size:11px; font-weight:800;">● AVAILABLE</span>
+          <span style="color:#64748b; font-size:12px; font-family:monospace;" id="agent-id-label">AGT-8842</span>
+        </div>
+        <h2 id="agent-welcome-name">Welcome back, Alex Morgan</h2>
+        <p id="agent-shift-desc">Assigned Skill: <strong>Tier-2 Tech Support</strong> • Base Shift: <strong>08:00 - 16:30</strong> (Interval 15m)</p>
+      </div>
+      <div class="shift-stats">
+        <div class="s-stat">
+          <span>Schedule Adherence</span>
+          <strong id="agent-adh-stat" style="color:#10b981;">96.4%</strong>
+        </div>
+        <div class="s-stat">
+          <span>Tea Breaks Taken</span>
+          <strong id="agent-tea-stat">1 / 2</strong>
+        </div>
+        <div class="s-stat">
+          <span>Lunch Variance</span>
+          <strong id="agent-lunch-stat" style="color:#10b981;">0m</strong>
+        </div>
+        <div class="s-stat">
+          <span>Next Open Window</span>
+          <strong style="color:#2563eb;">15:00</strong>
+        </div>
+      </div>
+    </section>
+
+    <!-- CORE AGENT BOT ACTION CARDS -->
+    <div class="cards-grid">
+
+      <!-- CARD 1: AGENT AI COPILOT & ACW WIDGET -->
+      <div class="home-card">
+        <div>
+          <div class="card-top">
+            <div class="card-icon">🤖</div>
+            <div class="card-title">
+              <h3>Agent AI Copilot & ACW Widget</h3>
+              <p>Autonomous real-time assistant for call summaries, CRM notes, suggested replies, and compliance checks.</p>
+            </div>
+          </div>
+          <div class="card-details">
+            • <strong>Live Speech Suggestions</strong>: Fast customer objection handling<br/>
+            • <strong>Instant CRM Summarizer</strong>: Auto-generates structured ACW notes<br/>
+            • <strong>Disposition Sync</strong>: Directly logs call results to NICE CXone
+          </div>
+        </div>
+        <a href="/widget.html" class="btn-launch btn-launch-primary">
+          <span>🚀</span> Open Agent AI Widget
+        </a>
+      </div>
+
+      <!-- CARD 2: BREAK & AUX PORTAL -->
+      <div class="home-card">
+        <div>
+          <div class="card-top">
+            <div class="card-icon">☕</div>
+            <div class="card-title">
+              <h3>Discretionary Break Portal</h3>
+              <p>Apply for Tea, Bio, Lunch, or Training intervals with instant Erlang-C staffing capacity evaluation.</p>
+            </div>
+          </div>
+          <div class="card-details">
+            • <strong>Erlang-C Verification</strong>: Real-time traffic queue check<br/>
+            • <strong>Autonomous Grants</strong>: Instant 15-minute approval if staffing &ge;80%<br/>
+            • <strong>IT System Issue (AUX-5)</strong>: Report Citrix/VPN hardware errors
+          </div>
+        </div>
+        <a href="/portal.html" class="btn-launch btn-launch-secondary">
+          <span>☕</span> Open Break Portal
+        </a>
+      </div>
+
+      <!-- CARD 3: QA INTERACTION SCORECARD -->
+      <div class="home-card">
+        <div>
+          <div class="card-top">
+            <div class="card-icon">🎙️</div>
+            <div class="card-title">
+              <h3>My Interaction Quality & Tone</h3>
+              <p>Track your speech sentiment ratings, post-call customer CSAT stars, and review coaching feedback.</p>
+            </div>
+          </div>
+          <div class="card-details">
+            • <strong>Customer Interaction Tone</strong>: <span id="agent-qa-tone" style="color:#059669; font-weight:700;">Good / Empathetic</span><br/>
+            • <strong>Post-Call IVR Rating</strong>: <span id="agent-qa-csat" style="font-weight:700;">★ 5.0 / 5.0</span><br/>
+            • <strong>Overall Weighted QA Score</strong>: <span id="agent-qa-score" style="color:#2563eb; font-weight:800;">96% (Top Tier)</span>
+          </div>
+        </div>
+        <a href="/widget.html" class="btn-launch btn-launch-secondary" onclick="sessionStorage.setItem('openTab', 'tab-qa')">
+          <span>📊</span> View Detailed QA Feedback
+        </a>
+      </div>
+
+      <!-- CARD 4: KNOWLEDGE BASE & QUICK REPLIES -->
+      <div class="home-card">
+        <div>
+          <div class="card-top">
+            <div class="card-icon">📚</div>
+            <div class="card-title">
+              <h3>Knowledge Base & Response Templates</h3>
+              <p>Instant search for 150+ operational SOPs, billing dispute flowcharts, and compliance disclosures.</p>
+            </div>
+          </div>
+          <div class="card-details">
+            • <strong>KB-101</strong>: Fiber-Optic Modem Red Flashing Light Protocol<br/>
+            • <strong>KB-102</strong>: Storm Disconnection & Courtesy Credit Approval<br/>
+            • <strong>KB-103</strong>: Payment Arrangement & Late Fee Waiver SOP
+          </div>
+        </div>
+        <a href="/widget.html" class="btn-launch btn-launch-secondary" onclick="sessionStorage.setItem('openTab', 'tab-kb')">
+          <span>🔍</span> Browse Knowledge Base
+        </a>
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer>
+    NICE CXone Autonomous Agent Workforce Management Platform • Enterprise Telemetry Connected
+  </footer>
+
+  <script>
+    const AGENT_PROFILES = {
+      'AGT-8842': { name: 'Alex Morgan', queue: 'Tier-2 Tech Support', adh: '96.4%', tea: '1 / 2', lunch: '0m', tone: 'Good / Empathetic', csat: '★ 5.0 / 5.0', qa: '96%' },
+      'AGT-4092': { name: 'Jordan Miller', queue: 'Customer Billing & Retention', adh: '78.5%', tea: '4 / 2', lunch: '0m', tone: 'Rudely / Impatient', csat: '★ 1.0 / 5.0', qa: '48%' },
+      'AGT-9102': { name: 'Samantha Vance', queue: 'General Customer Service', adh: '71.2%', tea: '1 / 2', lunch: '+25m', tone: 'Bad / Confused', csat: '★ 2.0 / 5.0', qa: '32%' },
+      'AGT-6512': { name: 'Rachel Green', queue: 'Emergency Inbound', adh: '98.1%', tea: '1 / 2', lunch: '0m', tone: 'Good / Empathetic', csat: '★ 5.0 / 5.0', qa: '98%' },
+      'AGT-4491': { name: 'Carlos Mendez', queue: 'Tier-2 Tech Support', adh: '85.0%', tea: '2 / 2', lunch: '+10m', tone: 'Neutral / Direct', csat: '★ 3.8 / 5.0', qa: '84%' },
+      'AGT-3310': { name: 'Chloe Bennett', queue: 'General Customer Service', adh: '94.2%', tea: '1 / 2', lunch: '0m', tone: 'Good / Empathetic', csat: '★ 4.8 / 5.0', qa: '95%' },
+      'AGT-7703': { name: 'Maya Patel', queue: 'VIP Customer Care', adh: '97.0%', tea: '1 / 2', lunch: '0m', tone: 'Good / Empathetic', csat: '★ 5.0 / 5.0', qa: '99%' }
+    };
+
+    const agentSelect = document.getElementById('agent-select');
+    function updateAgentView(id) {
+      const p = AGENT_PROFILES[id] || AGENT_PROFILES['AGT-8842'];
+      document.getElementById('agent-welcome-name').textContent = 'Welcome back, ' + p.name;
+      document.getElementById('agent-id-label').textContent = id;
+      document.getElementById('agent-shift-desc').innerHTML = 'Assigned Skill: <strong>' + p.queue + '</strong> • Base Shift: <strong>08:00 - 16:30</strong> (Interval 15m)';
+      document.getElementById('agent-adh-stat').textContent = p.adh;
+      document.getElementById('agent-tea-stat').textContent = p.tea;
+      document.getElementById('agent-lunch-stat').textContent = p.lunch;
+      document.getElementById('agent-qa-tone').textContent = p.tone;
+      document.getElementById('agent-qa-csat').textContent = p.csat;
+      document.getElementById('agent-qa-score').textContent = p.qa;
+      localStorage.setItem('activeAgentId', id);
+    }
+
+    if (agentSelect) {
+      const saved = localStorage.getItem('activeAgentId') || 'AGT-8842';
+      agentSelect.value = saved;
+      updateAgentView(saved);
+      agentSelect.addEventListener('change', (e) => updateAgentView(e.target.value));
+    }
+  </script>
+</body>
+</html>

@@ -337,9 +337,8 @@ tabBtns.forEach(btn => {
 const btnAgentHome = document.getElementById('btn-agent-home');
 if (btnAgentHome) {
   btnAgentHome.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (tabBtns[0]) tabBtns[0].click();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Navigate to dedicated Agent Bot Home page
+    window.location.href = '/agent-home.html';
   });
 }
 

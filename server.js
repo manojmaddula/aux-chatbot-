@@ -724,6 +724,21 @@ function evaluateBreak(payload) {
 }
 
 // Real-Time Copilot Evaluation & Telemetry Synthesis
+const AGENT_QA_DATA = {
+  'AGT-8842': { name: 'Alex Morgan', queue: 'Tier-2 Tech Support', tone: 'Good / Empathetic', ivrStars: 5.0, qaScore: 96, queryResolved: true, verif: true, flagReason: 'None (Top Performer)' },
+  'AGT-4092': { name: 'Jordan Miller', queue: 'Customer Billing & Retention', tone: 'Rudely / Impatient', ivrStars: 1.0, qaScore: 48, queryResolved: false, verif: true, flagReason: 'Rude speech tone to customer + Unresolved dispute' },
+  'AGT-9102': { name: 'Samantha Vance', queue: 'General Customer Service', tone: 'Bad / Confused', ivrStars: 2.0, qaScore: 32, queryResolved: false, verif: false, flagReason: 'Missed customer security PIN verification + Unresolved inquiry' },
+  'AGT-7740': { name: 'David Chen', queue: 'General Customer Service', tone: 'Neutral / Direct', ivrStars: 3.5, qaScore: 85, queryResolved: true, verif: true, flagReason: 'None (Acceptable SLA)' },
+  'AGT-6512': { name: 'Rachel Green', queue: 'Emergency Inbound', tone: 'Good / Empathetic', ivrStars: 5.0, qaScore: 98, queryResolved: true, verif: true, flagReason: 'None (Exemplary Retention)' },
+  'AGT-8819': { name: 'Marcus Brody', queue: 'General Customer Service', tone: 'Neutral / Trainee', ivrStars: 4.0, qaScore: 81, queryResolved: true, verif: true, flagReason: 'Incomplete account details lookup' },
+  'AGT-3310': { name: 'Chloe Bennett', queue: 'General Customer Service', tone: 'Good / Empathetic', ivrStars: 4.8, qaScore: 95, queryResolved: true, verif: true, flagReason: 'None (Senior Lead)' },
+  'AGT-5521': { name: 'Lucas Wright', queue: 'Customer Billing & Retention', tone: 'Good / Professional', ivrStars: 4.6, qaScore: 92, queryResolved: true, verif: true, flagReason: 'None (Fast Wrap-up)' },
+  'AGT-7703': { name: 'Maya Patel', queue: 'General Customer Service', tone: 'Good / Empathetic', ivrStars: 5.0, qaScore: 99, queryResolved: true, verif: true, flagReason: 'None (VIP Care)' },
+  'AGT-4491': { name: 'Carlos Mendez', queue: 'Tier-2 Tech Support', tone: 'Neutral / Direct', ivrStars: 3.8, qaScore: 84, queryResolved: true, verif: true, flagReason: 'None (Hardware Specialist)' },
+  'AGT-6628': { name: 'Olivia Taylor', queue: 'Emergency Inbound', tone: 'Good / Calm', ivrStars: 5.0, qaScore: 100, queryResolved: true, verif: true, flagReason: 'None (Disaster Dispatch Lead)' },
+  'AGT-2219': { name: "Liam O'Connor", queue: 'General Customer Service', tone: 'Bad / Hesitant', ivrStars: 2.5, qaScore: 36, queryResolved: false, verif: false, flagReason: 'Failed resolution + Missing account history' }
+};
+
 const AGENT_ROSTER_TELEMETRY = {
   'AGT-8842': { name: 'Alex Morgan', queue: 'Tier-2 Tech Support', adherence: '96.4%', teaBreaks: '1 / 2', lunchVariance: '0 mins', freq: '1 / 3', status: 'Healthy Adherence' },
   'AGT-4092': { name: 'Jordan Miller', queue: 'Customer Billing & Retention', adherence: '78.5%', teaBreaks: '4 / 2', lunchVariance: '0 mins', freq: '2 / 3', status: 'Tea Overage Policy Flag' },
@@ -752,6 +767,129 @@ function evaluateCopilotQuery(payload) {
   const emergQ = wfmQueueBalanceState.queues.emergency;
   const isSurge = wfmQueueBalanceState.isSurgeActive;
   const isRebalanced = wfmQueueBalanceState.isRebalanced;
+
+  // ==========================================
+  // SUPERVISOR REQUIREMENT 1: SINGLE AGENT QUERIES
+  // ==========================================
+  const agentKeys = Object.keys(AGENT_ROSTER_TELEMETRY);
+  let matchedAgentKey = null;
+
+  for (const k of agentKeys) {
+    const ag = AGENT_ROSTER_TELEMETRY[k];
+    const first = ag.name.split(' ')[0].toLowerCase();
+    const last = ag.name.split(' ')[1] ? ag.name.split(' ')[1].toLowerCase() : '';
+    const idLower = k.toLowerCase();
+    if (qLower.includes(first) || (last && qLower.includes(last)) || qLower.includes(idLower)) {
+      matchedAgentKey = k;
+      break;
+    }
+  }
+
+  if (matchedAgentKey) {
+    const ag = AGENT_ROSTER_TELEMETRY[matchedAgentKey];
+    const qa = AGENT_QA_DATA[matchedAgentKey] || { tone: 'Neutral', ivrStars: 4.0, qaScore: 80, flagReason: 'Standard performance' };
+    const itTicket = itIncidents.find(t => t.agentId === matchedAgentKey);
+
+    let adherenceColor = parseFloat(ag.adherence) >= activeShiftPolicy.targetAdherence ? '#10b981' : '#ef4444';
+    let qaColor = qa.qaScore >= 80 ? '#10b981' : (qa.qaScore >= 60 ? '#f59e0b' : '#ef4444');
+    let toneColor = (qa.tone.includes('Rudely') || qa.tone.includes('Bad')) ? '#ef4444' : '#10b981';
+
+    let actionRecommendation = '';
+    if (qa.tone.includes('Rudely') || qa.tone.includes('Bad') || qa.qaScore < 60) {
+      actionRecommendation = `<div style="background:#fef2f2; border:1px solid #fecaca; border-radius:6px; padding:8px 10px; margin-top:8px; color:#991b1b; font-size:11px;">
+        <strong>🚨 Supervisor Action Recommended:</strong> Immediate coaching required on tone & verification. Discretionary break requests should be throttled until shift adherence recovers &ge;85%.
+      </div>`;
+    } else if (ag.adherence.includes('7') || ag.lunchVariance.includes('+25')) {
+      actionRecommendation = `<div style="background:#fffbeb; border:1px solid #fde68a; border-radius:6px; padding:8px 10px; margin-top:8px; color:#92400e; font-size:11px;">
+        <strong>⚠️ Supervisor Action Recommended:</strong> Shift schedule variance flag. Supervisor review needed before approving additional AUX intervals.
+      </div>`;
+    } else {
+      actionRecommendation = `<div style="background:#ecfdf5; border:1px solid #a7f3d0; border-radius:6px; padding:8px 10px; margin-top:8px; color:#065f46; font-size:11px;">
+        <strong>✓ Status Optimal:</strong> Agent is operating within schedule adherence targets and eligible for dynamic cross-skill flex if needed.
+      </div>`;
+    }
+
+    let text = `👤 <strong>Agent 360° Profile: ${ag.name} (${matchedAgentKey})</strong><br/>` +
+      `• <strong>Assigned Skill</strong>: ${ag.queue} | Status: <strong>${ag.status}</strong><br/>` +
+      `• <strong>Schedule Adherence</strong>: <strong style="color:${adherenceColor};">${ag.adherence}</strong> (Target: &ge;${activeShiftPolicy.targetAdherence}%)<br/>` +
+      `• <strong>Breaks Logged Today</strong>: <strong>${ag.teaBreaks} Tea Breaks</strong> | Lunch Variance: <strong>${ag.lunchVariance}</strong><br/>` +
+      `• <strong>Interaction Speech Tone</strong>: <strong style="color:${toneColor};">${qa.tone}</strong><br/>` +
+      `• <strong>Customer CSAT & QA Score</strong>: <strong>★ ${qa.ivrStars.toFixed(1)} / 5.0</strong> | QA: <strong style="color:${qaColor};">${qa.qaScore}%</strong><br/>` +
+      `• <strong>Open IT Incidents</strong>: ${itTicket ? `<span style="color:#ef4444; font-weight:700;">${itTicket.id} (${itTicket.category} - ${itTicket.status})</span>` : 'None (Hardware Normal)'}<br/>` +
+      actionRecommendation;
+
+    return { success: true, answer: text, category: 'single_agent_dossier' };
+  }
+
+  // ==========================================
+  // SUPERVISOR REQUIREMENT 2: NON-DASHBOARD REPORTS & DEEP DATA
+  // ==========================================
+
+  // Report A: Tone vs CSAT Correlation Report
+  if (qLower.includes('correlation') || qLower.includes('tone vs') || qLower.includes('csat report') || qLower.includes('sentiment vs') || qLower.includes('tone_csat_report')) {
+    let text = `📈 <strong>Executive Insight: Speech Tone vs Customer CSAT Correlation Report</strong><br/>` +
+      `<p style="font-size:11px; color:#475569; margin:4px 0 8px 0;">Cross-correlation analysis across 140 post-call IVR survey responses and automated speech emotion detection.</p>` +
+      `<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px; font-size:11px; margin-bottom:8px;">` +
+      `• <strong>Empathetic / Professional Tone (66.7% of agents)</strong>: Average CSAT <strong>★ 4.90 / 5.0</strong> | First Call Resolution: <strong>100%</strong> | Repeat Transfer Rate: <strong>2.1%</strong><br/>` +
+      `• <strong>Neutral / Direct Tone (16.7% of agents)</strong>: Average CSAT <strong>★ 3.70 / 5.0</strong> | First Call Resolution: <strong>80%</strong> | Repeat Transfer Rate: <strong>8.4%</strong><br/>` +
+      `• <strong>Rudely / Impatient / Confused Tone (16.6% of agents)</strong>: Average CSAT <strong>★ 1.83 / 5.0</strong> | First Call Resolution: <strong>0%</strong> | Repeat Transfer Rate: <strong>41.2%</strong>` +
+      `</div>` +
+      `<strong>Key Operational Takeaway:</strong> Impatient speech tone creates an immediate <strong>-3.07 star CSAT penalty</strong> and increases repeat callback probability by 5x. Recommending mandatory de-escalation coaching for flagged agents.`;
+    return { success: true, answer: text, category: 'tone_csat_correlation' };
+  }
+
+  // Report B: Burnout & Fatigue Risk Analysis
+  if (qLower.includes('burnout') || qLower.includes('fatigue') || qLower.includes('stress') || qLower.includes('overworked') || qLower.includes('burnout_report')) {
+    let text = `⚠️ <strong>Floor-Wide Agent Burnout & Fatigue Risk Report</strong><br/>` +
+      `<p style="font-size:11px; color:#475569; margin:4px 0 8px 0;">Algorithm evaluates consecutive call handling minutes, handle time variance, and missed discretionary break intervals.</p>` +
+      `<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px; font-size:11px; margin-bottom:8px;">` +
+      `• <strong>High Fatigue Risk (Tier-1 Alert)</strong>: <strong>Samantha Vance (AGT-9102)</strong> — 4.2 consecutive hours on high-load billing queue, missed 15:00 tea break, ACW handle time expanding (+28s).<br/>` +
+      `• <strong>Moderate Fatigue Risk</strong>: <strong>Carlos Mendez (AGT-4491)</strong> — Continuous VPN troubleshooting calls with zero AUX downtime today.<br/>` +
+      `• <strong>Optimal Energy Level</strong>: 10 of 12 agents operating with healthy break distribution and nominal occupancy (<82%).` +
+      `</div>` +
+      `<strong>Recommendation:</strong> Schedule an immediate 15-minute bio/tea break for Samantha Vance to prevent ACW degradation and customer escalation.`;
+    return { success: true, answer: text, category: 'burnout_risk' };
+  }
+
+  // Report C: Intraday Erlang-C Staffing Deficit Projection
+  if (qLower.includes('erlang') || qLower.includes('deficit') || qLower.includes('projection') || qLower.includes('understaff') || qLower.includes('forecast') || qLower.includes('erlang_report')) {
+    let text = `🎯 <strong>Intraday Erlang-C Staffing Deficit & Capacity Projection</strong><br/>` +
+      `<p style="font-size:11px; color:#475569; margin:4px 0 8px 0;">Calculates projected call arrivals against required human FTEs in 15-minute intervals across all active skills.</p>` +
+      `<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px; font-size:11px; margin-bottom:8px;">` +
+      `• <strong>Customer Billing Peak (10:00 - 11:30)</strong>: Projected Volume: <strong>320 calls/hr</strong> | Required FTEs: <strong>7.2</strong> | Assigned: <strong>4</strong> &rarr; <span style="color:#ef4444; font-weight:700;">Deficit: -3.2 FTEs (SLA risk: <40%)</span><br/>` +
+      `• <strong>General Customer Service (10:00 - 11:30)</strong>: Projected Volume: <strong>45 calls/hr</strong> | Required FTEs: <strong>2.0</strong> | Assigned: <strong>5</strong> &rarr; <span style="color:#10b981; font-weight:700;">Surplus: +3.0 FTEs (Occupancy: 28%)</span><br/>` +
+      `• <strong>Tech Support & Emergency Queues</strong>: Staffing matched to Erlang-C target (80% SLA in 20s).` +
+      `</div>` +
+      `<strong>Resolution:</strong> Execute Intraday Skill Flex (3 CS agents to Billing) to completely neutralize the -3.2 FTE deficit without costly overtime.`;
+    return { success: true, answer: text, category: 'erlang_deficit_projection' };
+  }
+
+  // Report D: Chronic Adherence Outliers & Repeat Violators
+  if (qLower.includes('outlier') || qLower.includes('violator') || qLower.includes('chronic') || qLower.includes('repeat overage') || qLower.includes('adherence_outliers')) {
+    let text = `🚨 <strong>Chronic Schedule Adherence Outliers Audit (Past 14 Days)</strong><br/>` +
+      `<p style="font-size:11px; color:#475569; margin:4px 0 8px 0;">Identifies repeat behavioral anomalies across tea break quotas, lunch overages, and CTI login punctuality.</p>` +
+      `<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px; font-size:11px; margin-bottom:8px;">` +
+      `1. <strong>Jordan Miller (AGT-4092)</strong>: <strong>78.5% Adherence</strong> | 4 Tea Breaks today (Limit: 2) | Pattern: 3rd occurrence this week.<br/>` +
+      `2. <strong>Samantha Vance (AGT-9102)</strong>: <strong>71.2% Adherence</strong> | +25 mins Lunch Variance | Barred from self-service lunch grants.<br/>` +
+      `3. <strong>David Chen (AGT-7740)</strong>: <strong>68.0% Adherence</strong> | Frequent mid-shift CTI disconnects (Throttle active).` +
+      `</div>` +
+      `<strong>Recommended Action:</strong> Issue formal automated WFM adherence counseling notices to Jordan Miller and Samantha Vance.`;
+    return { success: true, answer: text, category: 'chronic_outliers' };
+  }
+
+  // Report E: Cross-Queue Multi-Skill Flex Readiness Matrix
+  if (qLower.includes('matrix') || qLower.includes('multi-skill') || qLower.includes('readiness') || qLower.includes('cross-trained') || qLower.includes('multiskill_matrix')) {
+    let text = `⚡ <strong>Multi-Skill Cross-Training & Dynamic Flex Readiness Matrix</strong><br/>` +
+      `<p style="font-size:11px; color:#475569; margin:4px 0 8px 0;">Real-time inventory of agents cross-certified to handle secondary surge queues.</p>` +
+      `<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px; font-size:11px; margin-bottom:8px;">` +
+      `• <strong>Samantha Vance (AGT-9102)</strong>: Base: Customer Service &bull; Certified Secondary: <strong>Billing & Payments (Level 2)</strong> &bull; Flex Ready: <strong style="color:#10b981;">YES</strong><br/>` +
+      `• <strong>Rachel Green (AGT-6512)</strong>: Base: Customer Service &bull; Certified Secondary: <strong>Billing & Payments (Level 3)</strong> &bull; Flex Ready: <strong style="color:#10b981;">YES</strong><br/>` +
+      `• <strong>Marcus Brody (AGT-8819)</strong>: Base: Customer Service &bull; Certified Secondary: <strong>Billing & Payments (Level 1)</strong> &bull; Flex Ready: <strong style="color:#10b981;">YES</strong><br/>` +
+      `• <strong>Carlos Mendez (AGT-4491)</strong>: Base: Tech Support &bull; Certified Secondary: <strong>Hardware Diagnostics</strong> &bull; Flex Ready: Standby` +
+      `</div>` +
+      `All 3 certified Billing agents can be flexed simultaneously in under 5 seconds with zero system restart required.`;
+    return { success: true, answer: text, category: 'multiskill_matrix' };
+  }
 
   // 1. ACD Queue Volume, Wait Times & Traffic Queries
   if (qLower.includes('volume') || qLower.includes('queue') || qLower.includes('calls waiting') || qLower.includes('billing calls') || qLower.includes('traffic') || qLower.includes('wait time') || qLower.includes('how many calls') || qLower.includes('surge')) {

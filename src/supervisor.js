@@ -1098,99 +1098,124 @@ function renderQueueBalanceUI() {
   const bannerIcon = document.getElementById('rebalance-banner-icon');
   const bannerTitle = document.getElementById('rebalance-banner-title');
   const bannerDesc = document.getElementById('rebalance-banner-desc');
-  const wbSurgeAlert = document.getElementById('wallboard-surge-alert');
   const btnToggleAutoflex = document.getElementById('btn-toggle-autoflex');
 
+  // Wallboard Banner Elements
+  const wbSurgeAlert = document.getElementById('wallboard-surge-alert');
+  const wbSurgeIcon = document.getElementById('wb-surge-icon');
+  const wbSurgeBadge = document.getElementById('wb-surge-status-badge');
+  const wbSurgeHeadline = document.getElementById('wb-surge-headline');
+  const wbSurgeSubtext = document.getElementById('wb-surge-subtext');
+
   if (!wfmRebalanceData || !wfmRebalanceData.queues) return;
+
+  // Update All 6 Queue Cards Statically & Accurately
+  const qMap = wfmRebalanceData.queues;
+  for (const [key, q] of Object.entries(qMap)) {
+    const waitEl = document.getElementById(`q-${key}-waiting`);
+    const asaEl = document.getElementById(`q-${key}-asa`);
+    const slaEl = document.getElementById(`q-${key}-sla`);
+    const agEl = document.getElementById(`q-${key}-agents`);
+    const tagEl = document.getElementById(`qtag-${key}`);
+    const cardEl = document.getElementById(`qcard-${key}`);
+
+    const mins = Math.floor((q.avgWaitSeconds || 0) / 60);
+    const secs = (q.avgWaitSeconds || 0) % 60;
+    const asaStr = String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+
+    if (waitEl) {
+      waitEl.textContent = q.callsWaiting;
+      waitEl.style.color = q.callsWaiting > 50 ? '#ef4444' : '#0f172a';
+    }
+    if (asaEl) asaEl.textContent = asaStr;
+    if (slaEl) {
+      slaEl.textContent = q.currentSla + '%';
+      slaEl.style.color = q.currentSla >= 80 ? '#10b981' : '#ef4444';
+    }
+    if (agEl) agEl.textContent = q.assignedAgents + ' Logged-in';
+
+    if (tagEl) {
+      if (q.status === 'SURGE_CRITICAL') {
+        tagEl.className = 'status-tag rejected';
+        tagEl.textContent = 'SURGE CRITICAL';
+        if (cardEl) { cardEl.style.borderColor = '#ef4444'; cardEl.style.boxShadow = '0 0 15px rgba(239, 68, 68, 0.2)'; }
+      } else if (q.status === 'REBALANCED') {
+        tagEl.className = 'status-tag approved';
+        tagEl.textContent = 'REBALANCED (FLEX ACTIVE)';
+        if (cardEl) { cardEl.style.borderColor = '#2563eb'; cardEl.style.boxShadow = '0 0 15px rgba(37, 99, 235, 0.15)'; }
+      } else if (q.status === 'FLEXED_DONOR') {
+        tagEl.className = 'status-tag aux';
+        tagEl.textContent = 'DONOR (3 FLEXED)';
+        if (cardEl) { cardEl.style.borderColor = '#f59e0b'; cardEl.style.boxShadow = 'none'; }
+      } else {
+        tagEl.className = 'status-tag approved';
+        tagEl.textContent = 'NORMAL (SLA OK)';
+        if (cardEl) { cardEl.style.borderColor = '#e2e8f0'; cardEl.style.boxShadow = 'none'; }
+      }
+    }
+  }
 
   const b = wfmRebalanceData.queues.billing || {};
   const cs = wfmRebalanceData.queues.customerService || {};
 
-  // Render Dynamic Queues Grid (All 6 Queues)
-  const grid = document.getElementById('dynamic-queues-grid');
-  if (grid && wfmRebalanceData.queues) {
-    const queueEntries = Object.entries(wfmRebalanceData.queues);
-    grid.innerHTML = queueEntries.map(([key, q]) => {
-      let borderLeft = '#2563eb';
-      let tagClass = 'approved';
-      let tagText = q.status || 'NORMAL';
-      let cardClass = 'card queue-card';
-
-      if (q.status === 'SURGE_CRITICAL') {
-        borderLeft = '#ef4444';
-        tagClass = 'rejected';
-        tagText = 'SURGE CRITICAL';
-        cardClass += ' surge-highlight';
-      } else if (q.status === 'REBALANCED') {
-        borderLeft = '#2563eb';
-        tagClass = 'approved';
-        tagText = 'REBALANCED (FLEX ACTIVE)';
-        cardClass += ' flex-highlight';
-      } else if (q.status === 'FLEXED_DONOR') {
-        borderLeft = '#f59e0b';
-        tagClass = 'aux';
-        tagText = 'DONOR (3 FLEXED)';
-      } else if (q.status === 'IDLE_SURPLUS') {
-        borderLeft = '#10b981';
-        tagClass = 'approved';
-        tagText = 'IDLE SURPLUS';
+  // Update Floor Telemetry Surge & Skill Flex Console
+  if (wbSurgeAlert) {
+    if (wfmRebalanceData.isRebalanced) {
+      wbSurgeAlert.style.borderLeftColor = '#2563eb';
+      if (wbSurgeIcon) wbSurgeIcon.textContent = '🔄';
+      if (wbSurgeBadge) {
+        wbSurgeBadge.className = 'status-tag approved';
+        wbSurgeBadge.textContent = 'FLEX ACTIVE (3 REALLOCATED)';
       }
-
-      const mins = Math.floor((q.avgWaitSeconds || 0) / 60);
-      const secs = (q.avgWaitSeconds || 0) % 60;
-      const asaStr = String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
-
-      return `
-        <div class="${cardClass}" id="qcard-${key}" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
-          <div class="card-header" style="border-left: 4px solid ${borderLeft}; background:#f8fafc; padding:12px 16px; border-bottom:1px solid #e2e8f0;">
-            <div>
-              <div style="display:flex; align-items:center; gap:8px;">
-                <span class="status-tag ${tagClass}">${tagText}</span>
-                <span style="color:#64748b; font-size:11px;">${q.id || key}</span>
-              </div>
-              <h3 style="margin-top:4px; font-size:14px; color:#0f172a;">${q.name || key}</h3>
-            </div>
-          </div>
-          <div class="card-body" style="padding:16px;">
-            <div class="q-stats-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
-              <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Calls Waiting:</span>
-                <div class="q-val" style="font-size:22px; font-weight:800; color:${q.callsWaiting > 50 ? '#ef4444' : '#0f172a'};">${q.callsWaiting}</div>
-                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 15</small>
-              </div>
-              <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Avg Speed Answer:</span>
-                <div class="q-val" style="font-size:22px; font-weight:800; color:#0f172a;">${asaStr}</div>
-                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 30s</small>
-              </div>
-              <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Projected SLA %:</span>
-                <div class="q-val" style="font-size:22px; font-weight:800; color:${q.currentSla >= 80 ? '#10b981' : '#ef4444'};">${q.currentSla}%</div>
-                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &ge; 80%</small>
-              </div>
-              <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Assigned Staff:</span>
-                <div class="q-val" style="font-size:22px; font-weight:800; color:#2563eb;">${q.assignedAgents} Logged-in</div>
-                <small class="text-muted" style="font-size:10px; color:#64748b;">Required: ${q.requiredAgents || q.assignedAgents}</small>
-              </div>
-            </div>
-          </div>
-        </div>
-      `;
-    }).join('');
+      if (wbSurgeHeadline) {
+        wbSurgeHeadline.style.color = '#2563eb';
+        wbSurgeHeadline.textContent = `WFM Rebalance Active: 3 CS Agents Flexed to Billing (Calls Cleared: ${b.callsWaiting})`;
+      }
+      if (wbSurgeSubtext) {
+        wbSurgeSubtext.textContent = `Samantha Vance, Rachel Green, and Marcus Brody reassigned to Billing queue. Customer Service SLA stable at ${cs.currentSla}%.`;
+      }
+    } else if (wfmRebalanceData.isSurgeActive) {
+      wbSurgeAlert.style.borderLeftColor = '#ef4444';
+      if (wbSurgeIcon) wbSurgeIcon.textContent = '⚠️';
+      if (wbSurgeBadge) {
+        wbSurgeBadge.className = 'status-tag rejected';
+        wbSurgeBadge.textContent = 'CRITICAL SURGE DETECTED';
+      }
+      if (wbSurgeHeadline) {
+        wbSurgeHeadline.style.color = '#ef4444';
+        wbSurgeHeadline.textContent = `Sudden Queue Surge: Billing Queue Overloaded (${b.callsWaiting} Calls Waiting)!`;
+      }
+      if (wbSurgeSubtext) {
+        wbSurgeSubtext.textContent = 'Customer Service agents underutilized. WFM recommends dynamic cross-skilling rebalance.';
+      }
+    } else {
+      wbSurgeAlert.style.borderLeftColor = '#10b981';
+      if (wbSurgeIcon) wbSurgeIcon.textContent = '🟢';
+      if (wbSurgeBadge) {
+        wbSurgeBadge.className = 'status-tag approved';
+        wbSurgeBadge.textContent = 'NORMAL (SLA OK)';
+      }
+      if (wbSurgeHeadline) {
+        wbSurgeHeadline.style.color = '#0f172a';
+        wbSurgeHeadline.textContent = `ACD Queues Balanced: Billing (${b.callsWaiting || 42} Calls) vs Customer Service (${cs.callsWaiting || 8} Calls)`;
+      }
+      if (wbSurgeSubtext) {
+        wbSurgeSubtext.textContent = 'Simulate unexpected queue spikes or reallocate idle Customer Service agents to Billing immediately.';
+      }
+    }
   }
 
-  // Banner & Wallboard alert
+  // Update Rebalance Tab Status Tag & Alert Banner
   if (statusTag) {
     if (wfmRebalanceData.isRebalanced) {
       statusTag.textContent = 'Flex Active (3 Reallocated)';
-      statusTag.style.color = '#38bdf8';
+      statusTag.style.color = '#2563eb';
     } else if (wfmRebalanceData.isSurgeActive) {
       statusTag.textContent = 'Surge Detected!';
       statusTag.style.color = '#ef4444';
     } else {
       statusTag.textContent = 'Normal';
-      statusTag.style.color = '#34d399';
+      statusTag.style.color = '#10b981';
     }
   }
 
@@ -1199,13 +1224,12 @@ function renderQueueBalanceUI() {
       alertBanner.className = 'rebalance-banner-box rebalanced';
       if (bannerIcon) bannerIcon.textContent = '🔄';
       if (bannerTitle) {
-        bannerTitle.style.color = '#38bdf8';
+        bannerTitle.style.color = '#2563eb';
         bannerTitle.textContent = 'Intraday WFM Skill Flex Active: 3 Agents Reallocated to Billing';
       }
       if (bannerDesc) {
         bannerDesc.textContent = 'Billing Queue calls cleared down from 318 -> ' + b.callsWaiting + '. ASA recovered to ' + b.avgWaitSeconds + 's. Customer Service queue remains healthy (' + cs.currentSla + '% SLA).';
       }
-      if (wbSurgeAlert) wbSurgeAlert.classList.add('hidden');
     } else if (wfmRebalanceData.isSurgeActive) {
       alertBanner.className = 'rebalance-banner-box surge';
       if (bannerIcon) bannerIcon.textContent = '⚠️';
@@ -1214,20 +1238,18 @@ function renderQueueBalanceUI() {
         bannerTitle.textContent = 'Critical Queue Imbalance: Billing Overloaded (' + b.callsWaiting + ' Waiting) vs Customer Service Idle';
       }
       if (bannerDesc) {
-        bannerDesc.textContent = 'Billing SLA plunged to ' + b.currentSla + '%. 5 Customer Service agents are underutilized (28% occupancy). WFM recommends dynamic cross-skilling.';
+        bannerDesc.textContent = 'Billing SLA plunged to ' + b.currentSla + '%. Customer Service agents underutilized. WFM recommends dynamic cross-skilling.';
       }
-      if (wbSurgeAlert) wbSurgeAlert.classList.remove('hidden');
     } else {
       alertBanner.className = 'rebalance-banner-box normal';
       if (bannerIcon) bannerIcon.textContent = '🟢';
       if (bannerTitle) {
-        bannerTitle.style.color = '#34d399';
+        bannerTitle.style.color = '#10b981';
         bannerTitle.textContent = 'ACD Queue Volumes Balanced across All Skills';
       }
       if (bannerDesc) {
-        bannerDesc.textContent = 'Customer Billing and General Customer Service queues are operating within standard SLA targets (>=80%).';
+        bannerDesc.textContent = 'Customer Billing, Customer Service, Tech Support, Emergency, Spanish, and Collections queues operating normally.';
       }
-      if (wbSurgeAlert) wbSurgeAlert.classList.add('hidden');
     }
   }
 
@@ -1421,6 +1443,16 @@ function executeSurgeBilling() {
   postQueueBalance('SURGE_BILLING');
 }
 
+
+// Floor Telemetry Sudden Surge Controls Wire-up
+document.getElementById('btn-wb-sim-surge')?.addEventListener('click', () => {
+  executeSurgeBilling();
+});
+
+document.getElementById('btn-wb-restore-base')?.addEventListener('click', () => {
+  executeRestoreBase();
+});
+
 document.getElementById('btn-sim-billing-surge')?.addEventListener('click', executeSurgeBilling);
 document.getElementById('btn-trigger-wfm-rebalance')?.addEventListener('click', executeClientRebalance);
 document.getElementById('btn-quick-rebalance-wallboard')?.addEventListener('click', executeClientRebalance);
@@ -1522,6 +1554,83 @@ document.querySelectorAll('.sup-chip').forEach(chip => {
 });
 
 function executeSupBotCommand(cmd) {
+  if (cmd === 'agent_jordan') {
+    addSupBotMessage('user', 'Show single agent dossier for Jordan Miller (AGT-4092)');
+    setTimeout(() => {
+      fetch('/api/copilot/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: 'Jordan Miller', role: 'supervisor' })
+      }).then(r => r.json()).then(data => addSupBotMessage('bot', '', data.answer));
+    }, 300);
+    return;
+  }
+  else if (cmd === 'agent_samantha') {
+    addSupBotMessage('user', 'Show single agent dossier for Samantha Vance (AGT-9102)');
+    setTimeout(() => {
+      fetch('/api/copilot/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: 'Samantha Vance', role: 'supervisor' })
+      }).then(r => r.json()).then(data => addSupBotMessage('bot', '', data.answer));
+    }, 300);
+    return;
+  }
+  else if (cmd === 'tone_csat_report') {
+    addSupBotMessage('user', 'Generate Speech Tone vs Customer CSAT Correlation Report');
+    setTimeout(() => {
+      fetch('/api/copilot/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: 'tone vs csat correlation report', role: 'supervisor' })
+      }).then(r => r.json()).then(data => addSupBotMessage('bot', '', data.answer));
+    }, 300);
+    return;
+  }
+  else if (cmd === 'burnout_report') {
+    addSupBotMessage('user', 'Run Agent Burnout & Fatigue Risk Analysis');
+    setTimeout(() => {
+      fetch('/api/copilot/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: 'burnout and fatigue risk analysis', role: 'supervisor' })
+      }).then(r => r.json()).then(data => addSupBotMessage('bot', '', data.answer));
+    }, 300);
+    return;
+  }
+  else if (cmd === 'erlang_report') {
+    addSupBotMessage('user', 'Forecast Intraday Erlang-C Staffing Deficit');
+    setTimeout(() => {
+      fetch('/api/copilot/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: 'intraday erlang staffing deficit projection', role: 'supervisor' })
+      }).then(r => r.json()).then(data => addSupBotMessage('bot', '', data.answer));
+    }, 300);
+    return;
+  }
+  else if (cmd === 'adherence_outliers') {
+    addSupBotMessage('user', 'Audit Chronic Schedule Adherence Outliers');
+    setTimeout(() => {
+      fetch('/api/copilot/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: 'chronic adherence outliers report', role: 'supervisor' })
+      }).then(r => r.json()).then(data => addSupBotMessage('bot', '', data.answer));
+    }, 300);
+    return;
+  }
+  else if (cmd === 'multiskill_matrix') {
+    addSupBotMessage('user', 'Show Cross-Queue Multi-Skill Flex Readiness Matrix');
+    setTimeout(() => {
+      fetch('/api/copilot/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: 'multi-skill flex readiness matrix', role: 'supervisor' })
+      }).then(r => r.json()).then(data => addSupBotMessage('bot', '', data.answer));
+    }, 300);
+    return;
+  }
   if (cmd === 'floor_summary') {
     addSupBotMessage('user', 'Run Floor Health Check');
     const total = activeAgents.length;

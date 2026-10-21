@@ -94,15 +94,24 @@
 
     <!-- TAB 1: FLOOR WALLBOARD & TELEMETRY -->
     <section id="stab-wallboard" class="sup-tab-pane active">
-      <!-- LIVE SURGE & IMBALANCE ALERT BANNER ON WALLBOARD -->
-      <div id="wallboard-surge-alert" class="rebalance-banner-box hidden" style="margin-bottom:16px;">
+      <!-- SUDDEN SURGE & DYNAMIC WFM REALLOCATION PANEL (FLOOR TELEMETRY) -->
+      <div id="wallboard-surge-alert" class="rebalance-banner-box normal" style="margin-bottom:16px; background:#ffffff; border:1px solid #e2e8f0; border-left:4px solid #10b981; padding:14px 18px; border-radius:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
         <div style="display:flex; align-items:center; gap:12px;">
-          <span style="font-size:24px;">⚡</span>
+          <span id="wb-surge-icon" style="font-size:24px;">🟢</span>
           <div>
-            <strong style="color:#f87171; font-size:13px;">Sudden Queue Surge: Billing Queue Overloaded (318 Calls Waiting)!</strong>
-            <p style="color:#cbd5e1; font-size:11px;">Customer Service agents are underutilized. WFM recommends dynamic cross-skilling rebalance.</p>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span id="wb-surge-status-badge" class="status-tag approved" style="font-size:10px;">NORMAL (SLA OK)</span>
+              <strong id="wb-surge-headline" style="color:#0f172a; font-size:13px;">ACD Queues Balanced: Billing (42 Calls) vs Customer Service (8 Calls)</strong>
+            </div>
+            <p id="wb-surge-subtext" style="color:#64748b; font-size:11px; margin:2px 0 0 0;">Simulate unexpected queue spikes or reallocate idle Customer Service agents to Billing immediately.</p>
           </div>
         </div>
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <button id="btn-wb-sim-surge" class="btn btn-sm btn-emergency sev1" style="background:#dc2626; color:#fff;">⚡ 1. Simulate Surge (+318)</button>
+          <button id="btn-quick-rebalance-wallboard" class="btn btn-sm btn-primary" style="background:#2563eb; color:#fff; font-weight:700;">🔄 2. Reallocate 3 Agents Now</button>
+          <button id="btn-wb-restore-base" class="btn btn-sm btn-success" style="background:#059669; color:#fff;">🟢 3. Restore Base</button>
+        </div>
+      </div>
         <button id="btn-quick-rebalance-wallboard" class="btn btn-sm btn-primary">🔄 Reallocate 3 Agents Now</button>
       </div>
 
@@ -180,7 +189,7 @@
 
     <!-- TAB 3: ALERT & BROADCAST SETUP (SUPERVISOR CONTROLS) -->
     <section id="stab-alerts" class="sup-tab-pane">
-      <p class="tab-tagline" style="color:#64748b; font-size:12px; margin-bottom:14px; margin-top:-4px;">Floor-wide emergency broadcasting, real-time agent notifications, and automated IVR deflection for high-volume call surges.</p>
+      
 
       <!-- STORM OUTAGE & IVR AUTO-DEFLECTION ENGINE (1000 CALLS/MIN THRESHOLD) -->
       <div class="card deflection-card" style="margin-bottom: 20px;">
@@ -201,25 +210,7 @@
               <div class="d-val" id="deflection-rate-display">420 calls / min</div>
               <span class="d-sub text-ok" id="deflection-rate-sub">Under 1,000 threshold (Standard ACD routing)</span>
             </div>
-            <div class="deflection-stat-box">
-              <span class="d-label">Deflection Threshold:</span>
-              <div style="display:flex; align-items:center; gap:6px; margin-top:4px;">
-                <input type="number" id="input-deflection-threshold" min="100" max="5000" step="50" value="1000" style="width:100px; padding:4px 8px; border-radius:4px; border:1px solid #cbd5e1; font-weight:700; font-size:13px; color:#0f172a; background:#fff;" />
-                <button id="btn-save-deflection-threshold" class="btn btn-xs btn-primary">Set</button>
-              </div>
-              <span class="d-sub text-muted" id="threshold-current-label">Triggers on call 1,001+</span>
-            </div>
-            <div class="deflection-stat-box">
-              <span class="d-label">Storm Outage Mode:</span>
-              <div class="d-val text-warning" id="deflection-mode-display">INACTIVE</div>
-              <button id="btn-toggle-storm-mode" class="btn btn-xs btn-outline" style="margin-top:4px;">Toggle Storm Mode</button>
-            </div>
-            <div class="deflection-stat-box">
-              <span class="d-label">Deflected Callers Greeted:</span>
-              <div class="d-val text-ok" id="deflection-count-display">0 calls</div>
-              <span class="d-sub text-muted">Protected human queue</span>
-            </div>
-          </div>
+            
 
           <!-- Announcement Script Box & Caller Audio Test -->
           <div class="announcement-preview-box">
@@ -606,8 +597,8 @@
         <div style="display:flex; align-items:center; gap:12px;">
           <span id="rebalance-banner-icon" style="font-size:26px;">🟢</span>
           <div>
-            <h4 id="rebalance-banner-title" style="color:#34d399; font-size:14px; margin-bottom:2px;">ACD Queue Volumes Balanced across All Skills</h4>
-            <p id="rebalance-banner-desc" style="color:#cbd5e1; font-size:12px;">Customer Billing and General Customer Service queues are operating within standard SLA targets (&ge;80%).</p>
+            <h4 id="rebalance-banner-title" style="color:#10b981; font-size:14px; margin-bottom:2px;">ACD Queue Volumes Balanced across All Skills</h4>
+            <p id="rebalance-banner-desc" style="color:#64748b; font-size:12px;">Customer Billing, Customer Service, Tech Support, Emergency, Spanish, and Collections queues operating normally.</p>
           </div>
         </div>
         <div style="display:flex; gap:8px;">
@@ -615,9 +606,231 @@
         </div>
       </div>
 
-      <!-- QUEUE IMBALANCE TELEMETRY GRID (DYNAMIC) -->
-      <div class="queue-telemetry-grid" id="dynamic-queues-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:16px;">
-        <!-- Dynamically populated queues: Customer Billing, General CS, Tech Support, Emergency, Spanish Inbound, Outbound & Collections -->
+      <!-- QUEUE TELEMETRY GRID: ALL 6 ACTIVE QUEUES CONFIGURED -->
+      <div class="queue-telemetry-grid" id="dynamic-queues-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap:16px; margin-top:16px;">
+        
+        <!-- QUEUE 1: BILLING & RETENTION (SURGE / TARGET QUEUE) -->
+        <div class="card queue-card" id="qcard-billing" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
+          <div class="card-header" style="border-left: 4px solid #2563eb; background:#f8fafc; padding:12px 16px; border-bottom:1px solid #e2e8f0;">
+            <div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="status-tag approved" id="qtag-billing">NORMAL (SLA OK)</span>
+                <span style="color:#64748b; font-size:11px;">SKILL-101</span>
+              </div>
+              <h3 style="margin-top:4px; font-size:14px; color:#0f172a;">💳 Customer Billing & Retention</h3>
+            </div>
+          </div>
+          <div class="card-body" style="padding:16px;">
+            <div class="q-stats-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Calls Waiting:</span>
+                <div class="q-val" id="q-billing-waiting" style="font-size:22px; font-weight:800; color:#0f172a;">42</div>
+                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 15</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Avg Speed Answer:</span>
+                <div class="q-val" id="q-billing-asa" style="font-size:22px; font-weight:800; color:#0f172a;">00:35</div>
+                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 30s</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Projected SLA %:</span>
+                <div class="q-val" id="q-billing-sla" style="font-size:22px; font-weight:800; color:#10b981;">86.4%</div>
+                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &ge; 80%</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Assigned Staff:</span>
+                <div class="q-val" id="q-billing-agents" style="font-size:22px; font-weight:800; color:#2563eb;">4 Logged-in</div>
+                <small class="text-muted" id="q-billing-req" style="font-size:10px; color:#64748b;">Required: 4</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- QUEUE 2: GENERAL CUSTOMER SERVICE (DONOR QUEUE) -->
+        <div class="card queue-card" id="qcard-cs" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
+          <div class="card-header" style="border-left: 4px solid #10b981; background:#f8fafc; padding:12px 16px; border-bottom:1px solid #e2e8f0;">
+            <div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="status-tag approved" id="qtag-cs">IDLE SURPLUS</span>
+                <span style="color:#64748b; font-size:11px;">SKILL-102</span>
+              </div>
+              <h3 style="margin-top:4px; font-size:14px; color:#0f172a;">🎧 General Customer Service</h3>
+            </div>
+          </div>
+          <div class="card-body" style="padding:16px;">
+            <div class="q-stats-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Calls Waiting:</span>
+                <div class="q-val" id="q-cs-waiting" style="font-size:22px; font-weight:800; color:#0f172a;">8</div>
+                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 15</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Avg Speed Answer:</span>
+                <div class="q-val" id="q-cs-asa" style="font-size:22px; font-weight:800; color:#0f172a;">00:14</div>
+                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 30s</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Projected SLA %:</span>
+                <div class="q-val" id="q-cs-sla" style="font-size:22px; font-weight:800; color:#10b981;">97.2%</div>
+                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &ge; 80%</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Assigned Staff:</span>
+                <div class="q-val" id="q-cs-agents" style="font-size:22px; font-weight:800; color:#2563eb;">5 Logged-in</div>
+                <small class="text-muted" id="q-cs-req" style="font-size:10px; color:#64748b;">3 Idle / Underutilized</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- QUEUE 3: TIER-2 TECH SUPPORT -->
+        <div class="card queue-card" id="qcard-techSupport" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
+          <div class="card-header" style="border-left: 4px solid #3b82f6; background:#f8fafc; padding:12px 16px; border-bottom:1px solid #e2e8f0;">
+            <div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="status-tag approved" id="qtag-techSupport">NORMAL (SLA OK)</span>
+                <span style="color:#64748b; font-size:11px;">SKILL-103</span>
+              </div>
+              <h3 style="margin-top:4px; font-size:14px; color:#0f172a;">💻 Tier-2 Tech Support</h3>
+            </div>
+          </div>
+          <div class="card-body" style="padding:16px;">
+            <div class="q-stats-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Calls Waiting:</span>
+                <div class="q-val" id="q-techSupport-waiting" style="font-size:22px; font-weight:800; color:#0f172a;">15</div>
+                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 15</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Avg Speed Answer:</span>
+                <div class="q-val" id="q-techSupport-asa" style="font-size:22px; font-weight:800; color:#0f172a;">00:32</div>
+                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 30s</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Projected SLA %:</span>
+                <div class="q-val" id="q-techSupport-sla" style="font-size:22px; font-weight:800; color:#10b981;">88.0%</div>
+                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &ge; 80%</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Assigned Staff:</span>
+                <div class="q-val" id="q-techSupport-agents" style="font-size:22px; font-weight:800; color:#2563eb;">3 Logged-in</div>
+                <small class="text-muted" style="font-size:10px; color:#64748b;">Required: 3</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- QUEUE 4: EMERGENCY INBOUND -->
+        <div class="card queue-card" id="qcard-emergency" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
+          <div class="card-header" style="border-left: 4px solid #ef4444; background:#f8fafc; padding:12px 16px; border-bottom:1px solid #e2e8f0;">
+            <div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="status-tag approved" id="qtag-emergency">NORMAL (SLA OK)</span>
+                <span style="color:#64748b; font-size:11px;">SKILL-104</span>
+              </div>
+              <h3 style="margin-top:4px; font-size:14px; color:#0f172a;">🚨 Emergency Inbound Care</h3>
+            </div>
+          </div>
+          <div class="card-body" style="padding:16px;">
+            <div class="q-stats-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Calls Waiting:</span>
+                <div class="q-val" id="q-emergency-waiting" style="font-size:22px; font-weight:800; color:#0f172a;">3</div>
+                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 5</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Avg Speed Answer:</span>
+                <div class="q-val" id="q-emergency-asa" style="font-size:22px; font-weight:800; color:#0f172a;">00:09</div>
+                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 10s</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Projected SLA %:</span>
+                <div class="q-val" id="q-emergency-sla" style="font-size:22px; font-weight:800; color:#10b981;">98.0%</div>
+                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &ge; 95%</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Assigned Staff:</span>
+                <div class="q-val" id="q-emergency-agents" style="font-size:22px; font-weight:800; color:#2563eb;">2 Logged-in</div>
+                <small class="text-muted" style="font-size:10px; color:#64748b;">Required: 2</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- QUEUE 5: BILINGUAL / SPANISH INBOUND -->
+        <div class="card queue-card" id="qcard-spanishSupport" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
+          <div class="card-header" style="border-left: 4px solid #8b5cf6; background:#f8fafc; padding:12px 16px; border-bottom:1px solid #e2e8f0;">
+            <div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="status-tag approved" id="qtag-spanishSupport">NORMAL (SLA OK)</span>
+                <span style="color:#64748b; font-size:11px;">SKILL-105</span>
+              </div>
+              <h3 style="margin-top:4px; font-size:14px; color:#0f172a;">🌐 Bilingual / Spanish Support</h3>
+            </div>
+          </div>
+          <div class="card-body" style="padding:16px;">
+            <div class="q-stats-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Calls Waiting:</span>
+                <div class="q-val" id="q-spanishSupport-waiting" style="font-size:22px; font-weight:800; color:#0f172a;">6</div>
+                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 15</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Avg Speed Answer:</span>
+                <div class="q-val" id="q-spanishSupport-asa" style="font-size:22px; font-weight:800; color:#0f172a;">00:19</div>
+                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 30s</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Projected SLA %:</span>
+                <div class="q-val" id="q-spanishSupport-sla" style="font-size:22px; font-weight:800; color:#10b981;">94.5%</div>
+                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &ge; 80%</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Assigned Staff:</span>
+                <div class="q-val" id="q-spanishSupport-agents" style="font-size:22px; font-weight:800; color:#2563eb;">2 Logged-in</div>
+                <small class="text-muted" style="font-size:10px; color:#64748b;">Required: 2</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- QUEUE 6: OUTBOUND & COLLECTIONS -->
+        <div class="card queue-card" id="qcard-collections" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
+          <div class="card-header" style="border-left: 4px solid #f59e0b; background:#f8fafc; padding:12px 16px; border-bottom:1px solid #e2e8f0;">
+            <div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="status-tag approved" id="qtag-collections">NORMAL (SLA OK)</span>
+                <span style="color:#64748b; font-size:11px;">SKILL-106</span>
+              </div>
+              <h3 style="margin-top:4px; font-size:14px; color:#0f172a;">📞 Outbound & Collections</h3>
+            </div>
+          </div>
+          <div class="card-body" style="padding:16px;">
+            <div class="q-stats-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Calls Waiting:</span>
+                <div class="q-val" id="q-collections-waiting" style="font-size:22px; font-weight:800; color:#0f172a;">12</div>
+                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 15</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Avg Speed Answer:</span>
+                <div class="q-val" id="q-collections-asa" style="font-size:22px; font-weight:800; color:#0f172a;">00:28</div>
+                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 30s</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Projected SLA %:</span>
+                <div class="q-val" id="q-collections-sla" style="font-size:22px; font-weight:800; color:#10b981;">89.2%</div>
+                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &ge; 80%</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Assigned Staff:</span>
+                <div class="q-val" id="q-collections-agents" style="font-size:22px; font-weight:800; color:#2563eb;">3 Logged-in</div>
+                <small class="text-muted" style="font-size:10px; color:#64748b;">Required: 3</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- SIMULATION & REBALANCE CONTROLS -->
@@ -634,7 +847,7 @@
             <button id="btn-sim-billing-surge" class="btn btn-emergency sev1">
               <span>⚡</span> 1. Simulate Sudden Billing Spike (+318 Calls)
             </button>
-            <button id="btn-trigger-wfm-rebalance" class="btn btn-primary" style="background:#2563eb;">
+            <button id="btn-trigger-wfm-rebalance" class="btn btn-primary" style="background:#2563eb; font-weight:700;">
               <span>🔄</span> 2. Reallocate Agents (Execute WFM Rebalance)
             </button>
             <button id="btn-restore-base-schedules" class="btn btn-success">
@@ -644,8 +857,8 @@
 
           <!-- WFM ALGORITHM EXPLANATION BANNER -->
           <div class="rebalance-explainer-banner">
-            <strong style="color:#93c5fd; font-size:12px;">📐 How WFM Dynamic Cross-Skilling Works:</strong>
-            <ul style="color:#cbd5e1; font-size:11px; margin-top:6px; line-height:1.6; padding-left:18px;">
+            <strong style="color:#1d4ed8; font-size:12px;">📐 How WFM Dynamic Cross-Skilling Works:</strong>
+            <ul style="color:#334155; font-size:11px; margin-top:6px; line-height:1.6; padding-left:18px;">
               <li><strong>Intraday Surge Detection</strong>: When Billing calls exceed 150+ and ASA &gt; 3m while Customer Service agents have &lt;35% occupancy, the engine calculates the Erlang-C staffing deficit (+4 required).</li>
               <li><strong>Eligible Agent Selection</strong>: Evaluates cross-trained agents in Customer Service (Samantha Vance, Rachel Green, Marcus Brody) with Billing certification.</li>
               <li><strong>WFM Schedule Injection</strong>: Automatically inserts a temporary <code>10:00 - 11:30 Intraday Skill Flex</code> interval into their shift.</li>
@@ -665,7 +878,7 @@
             <p>Real-time view of agents temporarily flexed from Customer Service to Billing queue to absorb call volume.</p>
           </div>
           <div class="header-actions">
-            <span id="reallocated-count-badge" class="sup-badge" style="background:rgba(16,185,129,0.2); color:#34d399; font-size:12px;">0 Agents Flexed</span>
+            <span id="reallocated-count-badge" class="sup-badge" style="background:rgba(16,185,129,0.2); color:#059669; font-size:12px; font-weight:700;">0 Agents Flexed</span>
           </div>
         </div>
         <div class="table-responsive">
@@ -723,11 +936,14 @@
 
     <!-- QUICK COMMAND CHIPS -->
     <div class="sup-bot-chips">
+      <button class="sup-chip" data-cmd="agent_jordan">👤 Agent: Jordan Miller</button>
+      <button class="sup-chip" data-cmd="agent_samantha">👤 Agent: Samantha Vance</button>
+      <button class="sup-chip" data-cmd="tone_csat_report">📈 Tone vs CSAT Correlation</button>
+      <button class="sup-chip" data-cmd="burnout_report">⚠️ Burnout & Fatigue Risk</button>
+      <button class="sup-chip" data-cmd="erlang_report">🎯 Erlang-C Deficit Projection</button>
+      <button class="sup-chip" data-cmd="adherence_outliers">🚨 Chronic Adherence Outliers</button>
+      <button class="sup-chip" data-cmd="multiskill_matrix">⚡ Multi-Skill Flex Matrix</button>
       <button class="sup-chip" data-cmd="floor_summary">📊 Floor Health Check</button>
-      <button class="sup-chip" data-cmd="check_rebalance">⚡ Intraday Queue Imbalance</button>
-      <button class="sup-chip" data-cmd="flagged_qa">🎓 Flagged QA Agents</button>
-      <button class="sup-chip" data-cmd="bot_recall">📞 Overdue Bot Recall</button>
-      <button class="sup-chip" data-cmd="outage_alert">🌪️ Tornado / Disaster Alert</button>
     </div>
 
     <!-- CHAT MESSAGES STREAM -->
