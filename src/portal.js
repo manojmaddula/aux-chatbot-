@@ -299,6 +299,8 @@ function runClientSideDecisionEngine(payload) {
     return {
       status: 'REJECTED',
       code: 'FREQ_LIMIT_EXCEEDED',
+      checkBackLater: true,
+      nextOpenInterval: '11:30 AM (15m Cooldown)',
       title: 'Auto-Rejected: Request Frequency Limit Exceeded',
       description: `You have submitted ${recentWithin30m.length} requests in the last 30 minutes. To protect queue stability, subsequent requests are automatically throttled for 15 minutes.`,
       metrics: {
@@ -315,6 +317,8 @@ function runClientSideDecisionEngine(payload) {
     return {
       status: 'REJECTED',
       code: 'BEHAVIORAL_TEA_OVERAGE',
+      checkBackLater: true,
+      nextOpenInterval: 'Check Back Later with Supervisor Approval',
       title: 'Auto-Rejected: Tea Break Frequency Pattern Exceeded',
       description: `AI Behavioral Pattern Alert: Agent has already logged ${payload.agent.recentBreaksToday} short tea breaks today. Company policy allocates a maximum of 2 discretionary tea breaks per 8-hour shift.`,
       metrics: {
@@ -329,6 +333,8 @@ function runClientSideDecisionEngine(payload) {
     return {
       status: 'REJECTED',
       code: 'BEHAVIORAL_LUNCH_OVERAGE',
+      checkBackLater: true,
+      nextOpenInterval: 'Check Back Later after WFM Review',
       title: 'Auto-Rejected: Chronic Lunch Overage Pattern Flagged',
       description: `Adherence pattern detection flagged an unauthorized lunch overage of +${payload.agent.lunchOverageHistoryMinutes} mins on previous shift. Autonomous break grants are restricted until supervisor 1-on-1 coaching is completed.`,
       metrics: {
@@ -348,6 +354,8 @@ function runClientSideDecisionEngine(payload) {
     return {
       status: 'REJECTED',
       code: 'WFM_ACD_STAFFING_LIMITED',
+      checkBackLater: true,
+      nextOpenInterval: '11:45 AM (Queue Recovery)',
       title: 'Auto-Rejected: ACD Call Volume Peak / Insufficient Staffing',
       description: 'WFM Forecast predicts an ACD call arrival spike of 45 calls in the next 15-minute interval. Current active agent staffing is below the SLA safety threshold (projected SLA: 71.4% vs 80.0% target).',
       metrics: {
@@ -355,7 +363,7 @@ function runClientSideDecisionEngine(payload) {
         'Current Available Agents': `${liveStaffing} Agents`,
         'Minimum Required Agents': '27 Agents',
         'Projected SLA Impact': 'Drops to 71.4% (Violates SLA)',
-        'Next Suggested Window': 'Available at 16:45 (Staffing recovery)'
+        'Next Suggested Window': 'Available at 11:45 AM (Staffing recovery)'
       }
     };
   }
@@ -407,7 +415,11 @@ btnSubmitBreak.addEventListener('click', async () => {
 
   // Show evaluating modal
   decisionOverlay.classList.remove('hidden');
+  const checkBackCard = document.getElementById('check-back-later-card');
+  if (checkBackCard) checkBackCard.classList.add('hidden');
+
   decisionIcon.textContent = '⏳';
+  decisionTitle.style.color = '#f8fafc';
   decisionTitle.textContent = 'Evaluating ACD & Behavioral Forecast...';
   decisionDesc.textContent = 'Communicating with WFM Telephony Switch & analyzing agent adherence records...';
   decisionMetrics.innerHTML = '<div style="text-align:center; padding:10px; color:#94a3b8;">Processing Erlang-C staffing matrix...</div>';
@@ -416,6 +428,9 @@ btnSubmitBreak.addEventListener('click', async () => {
 
   setTimeout(() => {
     if (decision.status === 'APPROVED') {
+      // Hide check-back-later card on approval
+      if (checkBackCard) checkBackCard.classList.add('hidden');
+
       decisionIcon.textContent = '✅';
       decisionTitle.style.color = '#10b981';
       decisionTitle.textContent = decision.title;
@@ -445,6 +460,15 @@ btnSubmitBreak.addEventListener('click', async () => {
 
       btnSyncChatbot.textContent = '✓ Start Break in Desktop Widget & Close Window';
     } else {
+      // Show check-back-later card ONLY on rejection
+      if (checkBackCard) {
+        checkBackCard.classList.remove('hidden');
+        const nextWinEl = document.getElementById('checkback-next-window');
+        const countEl = document.getElementById('checkback-countdown');
+        if (nextWinEl) nextWinEl.textContent = decision.nextOpenInterval || '11:45 AM';
+        if (countEl) countEl.textContent = decision.code === 'FREQ_LIMIT_EXCEEDED' ? 'Throttled (Cooldown)' : 'Queue Busy - Hold';
+      }
+
       decisionIcon.textContent = '❌';
       decisionTitle.style.color = '#ef4444';
       decisionTitle.textContent = decision.title;
