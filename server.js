@@ -7,6 +7,26 @@ const url = require('url');
 const PORT = 4000;
 const PUBLIC_DIR = path.join(__dirname, 'src');
 
+// Agent to Supervisor Mapping (Team Tagging)
+const AGENT_SUPERVISOR_MAP = {
+  'AGT-9102': { supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins' },
+  'AGT-6512': { supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins' },
+  'AGT-8819': { supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins' },
+  'AGT-3310': { supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins' },
+
+  'AGT-4092': { supervisorId: 'SUP-021', supervisorName: 'Michael Chang' },
+  'AGT-5521': { supervisorId: 'SUP-021', supervisorName: 'Michael Chang' },
+  'AGT-7703': { supervisorId: 'SUP-021', supervisorName: 'Michael Chang' },
+
+  'AGT-8842': { supervisorId: 'SUP-035', supervisorName: 'Elena Rostova' },
+  'AGT-4491': { supervisorId: 'SUP-035', supervisorName: 'Elena Rostova' },
+
+  'AGT-7740': { supervisorId: 'SUP-042', supervisorName: 'David Sterling' },
+  'AGT-6628': { supervisorId: 'SUP-042', supervisorName: 'David Sterling' },
+
+  'AGT-2219': { supervisorId: 'SUP-059', supervisorName: 'Priya Sharma' }
+};
+
 // In-memory supervisor queue & state
 const supervisorQueue = [
   {
@@ -207,11 +227,15 @@ const server = http.createServer((req, res) => {
         const decision = evaluateBreak(payload);
         
         // Log to supervisor queue
+        const aId = payload.agent?.id || 'AGT-UNKNOWN';
+        const supInfo = AGENT_SUPERVISOR_MAP[aId] || { supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins' };
         supervisorQueue.unshift({
           id: payload.id || ('REQ-' + Math.floor(Math.random() * 900000 + 100000)),
           timestamp: new Date().toISOString(),
-          agentId: payload.agent?.id || 'AGT-UNKNOWN',
+          agentId: aId,
           agentName: payload.agent?.name || 'Agent',
+          supervisorId: supInfo.supervisorId,
+          supervisorName: supInfo.supervisorName,
           auxCode: payload.auxCode,
           durationMinutes: payload.durationMinutes,
           status: decision.status,
@@ -809,7 +833,9 @@ function evaluateCopilotQuery(payload) {
       </div>`;
     }
 
+    const assignedSup = AGENT_SUPERVISOR_MAP[matchedAgentKey] || { supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins' };
     let text = `👤 <strong>Agent 360° Profile: ${ag.name} (${matchedAgentKey})</strong><br/>` +
+      `• <strong>Assigned Supervisor</strong>: <span style="background:#eff6ff; color:#1d4ed8; padding:1px 6px; border-radius:4px; font-weight:700;">${assignedSup.supervisorName} (${assignedSup.supervisorId})</span><br/>` +
       `• <strong>Assigned Skill</strong>: ${ag.queue} | Status: <strong>${ag.status}</strong><br/>` +
       `• <strong>Schedule Adherence</strong>: <strong style="color:${adherenceColor};">${ag.adherence}</strong> (Target: &ge;${activeShiftPolicy.targetAdherence}%)<br/>` +
       `• <strong>Breaks Logged Today</strong>: <strong>${ag.teaBreaks} Tea Breaks</strong> | Lunch Variance: <strong>${ag.lunchVariance}</strong><br/>` +

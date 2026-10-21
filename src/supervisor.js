@@ -2,18 +2,27 @@
 
 // Active Shift Agents Roster
 let activeAgents = [
-  { id: 'AGT-8842', name: 'Alex Morgan', queue: 'Tier-2 Tech Support', state: 'AVAILABLE', breakLeft: '-', adherence: '96.4%', teaCount: 1, lunchVar: '0m' },
-  { id: 'AGT-4092', name: 'Jordan Miller', queue: 'Customer Billing & Retention', state: 'AVAILABLE', breakLeft: '-', adherence: '78.5%', teaCount: 4, lunchVar: '0m' },
-  { id: 'AGT-9102', name: 'Samantha Vance', queue: 'General Customer Service', state: 'WORKING (IN CALL)', breakLeft: '-', adherence: '71.2%', teaCount: 1, lunchVar: '+25m' },
-  { id: 'AGT-7740', name: 'David Chen', queue: 'Emergency Inbound', state: 'AUX: TEA BREAK', breakLeft: '08:42', adherence: '82.0%', teaCount: 2, lunchVar: '0m' },
-  { id: 'AGT-6512', name: 'Rachel Green', queue: 'General Customer Service', state: 'AVAILABLE', breakLeft: '-', adherence: '98.2%', teaCount: 1, lunchVar: '0m' },
-  { id: 'AGT-8819', name: 'Marcus Brody', queue: 'General Customer Service', state: 'WORKING (IN CALL)', breakLeft: '-', adherence: '91.0%', teaCount: 1, lunchVar: '+2m' },
-  { id: 'AGT-3310', name: 'Chloe Bennett', queue: 'General Customer Service', state: 'AVAILABLE', breakLeft: '-', adherence: '94.2%', teaCount: 1, lunchVar: '0m' },
-  { id: 'AGT-5521', name: 'Lucas Wright', queue: 'Customer Billing & Retention', state: 'WORKING (IN CALL)', breakLeft: '-', adherence: '88.5%', teaCount: 2, lunchVar: '0m' },
-  { id: 'AGT-7703', name: 'Maya Patel', queue: 'General Customer Service', state: 'AVAILABLE', breakLeft: '-', adherence: '97.0%', teaCount: 1, lunchVar: '0m' },
-  { id: 'AGT-4491', name: 'Carlos Mendez', queue: 'Tier-2 Tech Support', state: 'AVAILABLE', breakLeft: '-', adherence: '85.0%', teaCount: 2, lunchVar: '+6m' },
-  { id: 'AGT-6628', name: 'Olivia Taylor', queue: 'Emergency Inbound', state: 'AVAILABLE', breakLeft: '-', adherence: '99.5%', teaCount: 1, lunchVar: '0m' },
-  { id: 'AGT-2219', name: "Liam O'Connor", queue: 'General Customer Service', state: 'AUX: TRAINING', breakLeft: '22:15', adherence: '76.5%', teaCount: 3, lunchVar: '+14m' }
+  // Sarah Jenkins (SUP-014) - Floor Lead & General Customer Service
+  { id: 'AGT-9102', name: 'Samantha Vance', queue: 'General Customer Service', state: 'WORKING (IN CALL)', breakLeft: '-', adherence: '71.2%', teaCount: 1, lunchVar: '+25m', supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins' },
+  { id: 'AGT-6512', name: 'Rachel Green', queue: 'General Customer Service', state: 'AVAILABLE', breakLeft: '-', adherence: '98.2%', teaCount: 1, lunchVar: '0m', supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins' },
+  { id: 'AGT-8819', name: 'Marcus Brody', queue: 'General Customer Service', state: 'WORKING (IN CALL)', breakLeft: '-', adherence: '91.0%', teaCount: 1, lunchVar: '+2m', supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins' },
+  { id: 'AGT-3310', name: 'Chloe Bennett', queue: 'General Customer Service', state: 'AVAILABLE', breakLeft: '-', adherence: '94.2%', teaCount: 1, lunchVar: '0m', supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins' },
+
+  // Michael Chang (SUP-021) - Customer Billing & Retention Manager
+  { id: 'AGT-4092', name: 'Jordan Miller', queue: 'Customer Billing & Retention', state: 'AVAILABLE', breakLeft: '-', adherence: '78.5%', teaCount: 4, lunchVar: '0m', supervisorId: 'SUP-021', supervisorName: 'Michael Chang' },
+  { id: 'AGT-5521', name: 'Lucas Wright', queue: 'Customer Billing & Retention', state: 'WORKING (IN CALL)', breakLeft: '-', adherence: '88.5%', teaCount: 2, lunchVar: '0m', supervisorId: 'SUP-021', supervisorName: 'Michael Chang' },
+  { id: 'AGT-7703', name: 'Maya Patel', queue: 'Customer Billing & Retention', state: 'AVAILABLE', breakLeft: '-', adherence: '97.0%', teaCount: 1, lunchVar: '0m', supervisorId: 'SUP-021', supervisorName: 'Michael Chang' },
+
+  // Elena Rostova (SUP-035) - QA & Tier-2 Tech Support Director
+  { id: 'AGT-8842', name: 'Alex Morgan', queue: 'Tier-2 Tech Support', state: 'AVAILABLE', breakLeft: '-', adherence: '96.4%', teaCount: 1, lunchVar: '0m', supervisorId: 'SUP-035', supervisorName: 'Elena Rostova' },
+  { id: 'AGT-4491', name: 'Carlos Mendez', queue: 'Tier-2 Tech Support', state: 'AVAILABLE', breakLeft: '-', adherence: '85.0%', teaCount: 2, lunchVar: '+6m', supervisorId: 'SUP-035', supervisorName: 'Elena Rostova' },
+
+  // David Sterling (SUP-042) - Emergency Inbound Director
+  { id: 'AGT-7740', name: 'David Chen', queue: 'Emergency Inbound', state: 'AUX: TEA BREAK', breakLeft: '08:42', adherence: '82.0%', teaCount: 2, lunchVar: '0m', supervisorId: 'SUP-042', supervisorName: 'David Sterling' },
+  { id: 'AGT-6628', name: 'Olivia Taylor', queue: 'Emergency Inbound', state: 'AVAILABLE', breakLeft: '-', adherence: '99.5%', teaCount: 1, lunchVar: '0m', supervisorId: 'SUP-042', supervisorName: 'David Sterling' },
+
+  // Priya Sharma (SUP-059) - WFM Scheduling & Trainee Development Lead
+  { id: 'AGT-2219', name: "Liam O'Connor", queue: 'General Customer Service', state: 'AUX: TRAINING', breakLeft: '22:15', adherence: '76.5%', teaCount: 3, lunchVar: '+14m', supervisorId: 'SUP-059', supervisorName: 'Priya Sharma' }
 ];
 
 // Supervisor Accounts
@@ -124,6 +133,88 @@ supTabBtns.forEach(btn => {
 });
 
 // ==========================================
+// ==========================================
+// SUPERVISOR SPECIFIC AGENT TEAM FILTERING
+// ==========================================
+let teamViewMode = 'my_team';   // 'my_team' | 'all_floor'
+let queueViewMode = 'my_team';  // 'my_team' | 'all'
+let qaTeamViewMode = 'my_team'; // 'my_team' | 'all'
+let currentQueueItems = [];
+
+window.setTeamFilter = function(mode) {
+  teamViewMode = mode;
+  const btnMy = document.getElementById('btn-team-filter-my');
+  const btnAll = document.getElementById('btn-team-filter-all');
+  if (btnMy && btnAll) {
+    if (mode === 'my_team') {
+      btnMy.className = 'btn btn-xs btn-primary';
+      btnMy.style.color = '#fff';
+      btnMy.style.background = '#2563eb';
+      btnAll.className = 'btn btn-xs btn-outline';
+      btnAll.style.color = '#64748b';
+      btnAll.style.background = '#ffffff';
+    } else {
+      btnAll.className = 'btn btn-xs btn-primary';
+      btnAll.style.color = '#fff';
+      btnAll.style.background = '#2563eb';
+      btnMy.className = 'btn btn-xs btn-outline';
+      btnMy.style.color = '#64748b';
+      btnMy.style.background = '#ffffff';
+    }
+  }
+  renderWallboard();
+  const selRep = document.getElementById('report-type-select');
+  if (selRep) loadReport(selRep.value || currentReportKey);
+};
+
+window.setQueueFilter = function(mode) {
+  queueViewMode = mode;
+  const btnMy = document.getElementById('btn-queue-team-my');
+  const btnAll = document.getElementById('btn-queue-team-all');
+  if (btnMy && btnAll) {
+    if (mode === 'my_team') {
+      btnMy.className = 'btn btn-xs btn-primary';
+      btnMy.style.color = '#fff';
+      btnMy.style.background = '#2563eb';
+      btnAll.className = 'btn btn-xs btn-outline';
+      btnAll.style.color = '#64748b';
+      btnAll.style.background = '#ffffff';
+    } else {
+      btnAll.className = 'btn btn-xs btn-primary';
+      btnAll.style.color = '#fff';
+      btnAll.style.background = '#2563eb';
+      btnMy.className = 'btn btn-xs btn-outline';
+      btnMy.style.color = '#64748b';
+      btnMy.style.background = '#ffffff';
+    }
+  }
+  renderQueue(currentQueueItems);
+};
+
+window.setQATeamFilter = function(mode) {
+  qaTeamViewMode = mode;
+  const btnMy = document.getElementById('btn-qa-team-my');
+  const btnAll = document.getElementById('btn-qa-team-all');
+  if (btnMy && btnAll) {
+    if (mode === 'my_team') {
+      btnMy.className = 'btn btn-xs btn-primary';
+      btnMy.style.color = '#fff';
+      btnMy.style.background = '#2563eb';
+      btnAll.className = 'btn btn-xs btn-outline';
+      btnAll.style.color = '#64748b';
+      btnAll.style.background = '#ffffff';
+    } else {
+      btnAll.className = 'btn btn-xs btn-primary';
+      btnAll.style.color = '#fff';
+      btnAll.style.background = '#2563eb';
+      btnMy.className = 'btn btn-xs btn-outline';
+      btnMy.style.color = '#64748b';
+      btnMy.style.background = '#ffffff';
+    }
+  }
+  renderQAScorecard();
+};
+
 // TAB 1: WALLBOARD LOGIC
 // ==========================================
 
@@ -133,19 +224,52 @@ function renderWallboard() {
   const tbody = document.getElementById('agent-wallboard-body');
   if (!tbody) return;
 
+  // 1. Calculate supervisor's assigned team count
+  const myTeamAgents = activeAgents.filter(ag => ag.supervisorId === currentSupervisor.id);
+  const myTeamCountEl = document.getElementById('my-team-count');
+  if (myTeamCountEl) myTeamCountEl.textContent = myTeamAgents.length;
+
+  // 2. Select base list according to active view mode (Default: My Assigned Team)
+  const baseList = teamViewMode === 'my_team' ? myTeamAgents : activeAgents;
+
   let overdueCount = 0;
 
-  const filteredAgents = activeAgents.filter(ag => {
+  const filteredAgents = baseList.filter(ag => {
     if (!agentSearchQuery) return true;
     const q = agentSearchQuery.toLowerCase();
     return ag.name.toLowerCase().includes(q) ||
            ag.id.toLowerCase().includes(q) ||
            ag.queue.toLowerCase().includes(q) ||
-           ag.state.toLowerCase().includes(q);
+           ag.state.toLowerCase().includes(q) ||
+           (ag.supervisorName && ag.supervisorName.toLowerCase().includes(q));
   });
 
+  // 3. Update Live Metrics KPI Row dynamically for this supervisor's active team
+  const staffKpi = document.getElementById('kpi-staff');
+  if (staffKpi) {
+    if (teamViewMode === 'my_team') {
+      staffKpi.textContent = `${myTeamAgents.length} / ${myTeamAgents.length}`;
+      const sub = staffKpi.nextElementSibling;
+      if (sub) sub.textContent = `✓ ${currentSupervisor.name}'s Assigned Team`;
+    } else {
+      staffKpi.textContent = `${activeAgents.length} / ${activeAgents.length}`;
+      const sub = staffKpi.nextElementSibling;
+      if (sub) sub.textContent = '✓ All Floor Contact Center Fleet';
+    }
+  }
+
+  const auxKpi = document.getElementById('kpi-aux');
+  if (auxKpi) {
+    const inAux = baseList.filter(a => a.state.includes('AUX')).length;
+    auxKpi.textContent = `${inAux} Agents`;
+    const auxSub = auxKpi.nextElementSibling;
+    if (auxSub) auxSub.textContent = teamViewMode === 'my_team' ? `In ${currentSupervisor.name}'s team` : 'Across all floor queues';
+  }
+
   if (filteredAgents.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:#64748b;">No agents found matching "${agentSearchQuery}".</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:24px; color:#64748b;">
+      No agents found in ${teamViewMode === 'my_team' ? currentSupervisor.name + "'s assigned team" : 'the contact center floor'} matching "${agentSearchQuery}".
+    </td></tr>`;
     return;
   }
 
@@ -158,11 +282,18 @@ function renderWallboard() {
       overdueCount++;
     }
 
+    const isMine = ag.supervisorId === currentSupervisor.id;
+
     return `
-      <tr>
+      <tr style="${isMine ? 'background: rgba(37, 99, 235, 0.02);' : ''}">
         <td style="font-family:monospace; color:#64748b;">${ag.id}</td>
         <td><strong style="color:#0f172a;">${ag.name}</strong></td>
         <td style="color:#334155;">${ag.queue}</td>
+        <td>
+          <span class="status-tag" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:10px; font-weight:700;">
+            ${ag.supervisorName}
+          </span>
+        </td>
         <td><span class="status-tag ${stateTag}">${ag.state}</span></td>
         <td style="font-family:monospace; color:#2563eb; font-weight:700;">${ag.breakLeft}</td>
         <td style="font-weight:700; color:${parseFloat(ag.adherence) >= policyLimits.targetAdherence ? '#10b981' : '#ef4444'};">${ag.adherence}</td>
@@ -182,11 +313,11 @@ function renderWallboard() {
   const overdueEl = document.getElementById('kpi-overdue');
   const overdueSub = document.getElementById('kpi-overdue-sub');
   if (overdueCount > 0) {
-    overdueEl.textContent = overdueCount;
-    overdueSub.textContent = 'Action Required: Bot call placed';
+    if (overdueEl) overdueEl.textContent = overdueCount;
+    if (overdueSub) overdueSub.textContent = 'Action Required: Bot call placed';
   } else {
-    overdueEl.textContent = '0';
-    overdueSub.textContent = 'No active overages';
+    if (overdueEl) overdueEl.textContent = '0';
+    if (overdueSub) overdueSub.textContent = 'No active overages';
   }
 }
 
@@ -252,16 +383,35 @@ async function fetchQueue() {
 }
 
 function renderQueue(queue) {
+  currentQueueItems = queue || [];
   const tbody = document.getElementById('queue-table-body');
   const badgeEl = document.getElementById('sup-queue-badge');
-  badgeEl.textContent = queue.length || 0;
 
-  if (!queue || queue.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#9ca3af; padding:20px;">No break requests in queue.</td></tr>`;
+  // Tag items with supervisor mapping
+  const taggedQueue = (queue || []).map(item => {
+    const ag = activeAgents.find(a => a.id === item.agentId);
+    return {
+      ...item,
+      supervisorId: item.supervisorId || (ag ? ag.supervisorId : 'SUP-014'),
+      supervisorName: item.supervisorName || (ag ? ag.supervisorName : 'Sarah Jenkins')
+    };
+  });
+
+  const myTeamQueue = taggedQueue.filter(item => item.supervisorId === currentSupervisor.id);
+  const queueCountEl = document.getElementById('queue-team-count');
+  if (queueCountEl) queueCountEl.textContent = myTeamQueue.length;
+
+  const displayQueue = queueViewMode === 'my_team' ? myTeamQueue : taggedQueue;
+  if (badgeEl) badgeEl.textContent = displayQueue.length;
+
+  if (!displayQueue || displayQueue.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:#9ca3af; padding:20px;">
+      No break requests in ${queueViewMode === 'my_team' ? currentSupervisor.name + "'s queue" : 'all floor queues'}.
+    </td></tr>`;
     return;
   }
 
-  tbody.innerHTML = queue.map(item => {
+  tbody.innerHTML = displayQueue.map(item => {
     const timeStr = item.timestamp ? new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : 'Now';
     const isApproved = item.status === 'APPROVED';
     const tagClass = isApproved ? 'approved' : 'rejected';
@@ -273,6 +423,11 @@ function renderQueue(queue) {
         <td>
           <div style="font-weight:600; color:#fff;">${item.agentName || 'Agent'}</div>
           <small style="color:#9ca3af;">${item.agentId || 'AGT'}</small>
+          <div style="margin-top:2px;">
+            <span class="status-tag" style="background:#1e293b; color:#93c5fd; border:1px solid #334155; font-size:9px;">
+              ${item.supervisorName}
+            </span>
+          </div>
         </td>
         <td>${item.auxCode || 'Break'}</td>
         <td>${item.durationMinutes ? item.durationMinutes + ' mins' : '-'}</td>
@@ -501,15 +656,37 @@ function loadReport(key) {
   currentReportKey = key;
   const rep = reportsData[key] || reportsData.adherence;
 
-  document.getElementById('report-summary-bar').innerHTML = rep.summary;
+  let displayRows = rep.rows;
+  if (teamViewMode === 'my_team') {
+    displayRows = rep.rows.filter(row => {
+      const agId = row[0];
+      const ag = activeAgents.find(a => a.id === agId);
+      return ag && ag.supervisorId === currentSupervisor.id;
+    });
+  }
+
+  const sumBar = document.getElementById('report-summary-bar');
+  if (sumBar) {
+    sumBar.innerHTML = teamViewMode === 'my_team'
+      ? `<strong>Viewing:</strong> ${currentSupervisor.name}'s Assigned Team (${displayRows.length} Agents) | ${rep.summary}`
+      : `<strong>Viewing:</strong> All Floor Fleet (${rep.rows.length} Agents) | ${rep.summary}`;
+  }
 
   const thead = document.getElementById('report-table-head');
-  thead.innerHTML = `<tr>${rep.headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
+  if (thead) thead.innerHTML = `<tr>${rep.headers.map(h => `<th>${h}</th>`).join('')}</tr>`;
 
   const tbody = document.getElementById('report-table-body');
-  tbody.innerHTML = rep.rows.map(row => {
-    return `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`;
-  }).join('');
+  if (tbody) {
+    if (displayRows.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="${rep.headers.length}" style="text-align:center; padding:24px; color:#64748b;">
+        No entries in this audit report for ${currentSupervisor.name}'s assigned agents. Toggle 'All Floor' to inspect organization-wide metrics.
+      </td></tr>`;
+    } else {
+      tbody.innerHTML = displayRows.map(row => {
+        return `<tr>${row.map(cell => `<td>${cell}</td>`).join('')}</tr>`;
+      }).join('');
+    }
+  }
 }
 
 document.getElementById('report-type-select')?.addEventListener('change', (e) => {
@@ -547,18 +724,27 @@ document.getElementById('btn-export-csv')?.addEventListener('click', () => {
 // ==========================================
 
 const qaScorecardData = [
-  { agentId: 'AGT-8842', name: 'Alex Morgan', contactId: '#90421', tone: 'Good / Empathetic', securityVerified: true, detailsRetrieved: true, queryResolved: true, ivrStars: 5.0, qaScore: 96, recommendedModule: 'MOD-104', flagReason: 'None (Top Performer)', trainingAssigned: false },
-  { agentId: 'AGT-4092', name: 'Jordan Miller', contactId: '#90425', tone: 'Rudely / Impatient', securityVerified: true, detailsRetrieved: true, queryResolved: false, ivrStars: 1.0, qaScore: 48, recommendedModule: 'MOD-101', flagReason: 'Rude speech tone to customer + Unresolved dispute', trainingAssigned: false },
-  { agentId: 'AGT-9102', name: 'Samantha Vance', contactId: '#90429', tone: 'Bad / Confused', securityVerified: false, detailsRetrieved: false, queryResolved: false, ivrStars: 2.0, qaScore: 32, recommendedModule: 'MOD-102', flagReason: 'Missed customer security PIN verification + Unresolved inquiry', trainingAssigned: false },
-  { agentId: 'AGT-7740', name: 'David Chen', contactId: '#90432', tone: 'Neutral / Direct', securityVerified: true, detailsRetrieved: true, queryResolved: true, ivrStars: 3.5, qaScore: 85, recommendedModule: 'MOD-104', flagReason: 'None (Acceptable SLA)', trainingAssigned: false },
-  { agentId: 'AGT-6512', name: 'Rachel Green', contactId: '#90438', tone: 'Good / Empathetic', securityVerified: true, detailsRetrieved: true, queryResolved: true, ivrStars: 5.0, qaScore: 98, recommendedModule: 'MOD-104', flagReason: 'None (Exemplary Retention)', trainingAssigned: false },
-  { agentId: 'AGT-8819', name: 'Marcus Brody', contactId: '#90441', tone: 'Neutral / Trainee', securityVerified: true, detailsRetrieved: false, queryResolved: true, ivrStars: 4.0, qaScore: 81, recommendedModule: 'MOD-103', flagReason: 'Incomplete account details lookup', trainingAssigned: false },
-  { agentId: 'AGT-3310', name: 'Chloe Bennett', contactId: '#90445', tone: 'Good / Empathetic', securityVerified: true, detailsRetrieved: true, queryResolved: true, ivrStars: 4.8, qaScore: 95, recommendedModule: 'MOD-104', flagReason: 'None (Senior Lead)', trainingAssigned: false },
-  { agentId: 'AGT-5521', name: 'Lucas Wright', contactId: '#90449', tone: 'Good / Professional', securityVerified: true, detailsRetrieved: true, queryResolved: true, ivrStars: 4.6, qaScore: 92, recommendedModule: 'MOD-104', flagReason: 'None (Fast Wrap-up)', trainingAssigned: false },
-  { agentId: 'AGT-7703', name: 'Maya Patel', contactId: '#90453', tone: 'Good / Empathetic', securityVerified: true, detailsRetrieved: true, queryResolved: true, ivrStars: 5.0, qaScore: 99, recommendedModule: 'MOD-104', flagReason: 'None (VIP Care)', trainingAssigned: false },
-  { agentId: 'AGT-4491', name: 'Carlos Mendez', contactId: '#90458', tone: 'Neutral / Direct', securityVerified: true, detailsRetrieved: true, queryResolved: true, ivrStars: 3.8, qaScore: 84, recommendedModule: 'MOD-104', flagReason: 'None (Hardware Specialist)', trainingAssigned: false },
-  { agentId: 'AGT-6628', name: 'Olivia Taylor', contactId: '#90462', tone: 'Good / Calm', securityVerified: true, detailsRetrieved: true, queryResolved: true, ivrStars: 5.0, qaScore: 100, recommendedModule: 'MOD-104', flagReason: 'None (Disaster Dispatch Lead)', trainingAssigned: false },
-  { agentId: 'AGT-2219', name: "Liam O'Connor", contactId: '#90468', tone: 'Bad / Hesitant', securityVerified: false, detailsRetrieved: false, queryResolved: false, ivrStars: 2.5, qaScore: 36, recommendedModule: 'MOD-103', flagReason: 'Failed resolution + Missing account history', trainingAssigned: false }
+  // Sarah Jenkins (SUP-014)
+  { agentId: 'AGT-9102', name: 'Samantha Vance', supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins', contactId: '#90429', tone: 'Bad / Confused', securityVerified: false, detailsRetrieved: false, queryResolved: false, ivrStars: 2.0, qaScore: 32, recommendedModule: 'MOD-102', flagReason: 'Missed customer security PIN verification + Unresolved inquiry', trainingAssigned: false },
+  { agentId: 'AGT-6512', name: 'Rachel Green', supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins', contactId: '#90438', tone: 'Good / Empathetic', securityVerified: true, detailsRetrieved: true, queryResolved: true, ivrStars: 5.0, qaScore: 98, recommendedModule: 'MOD-104', flagReason: 'None (Exemplary Retention)', trainingAssigned: false },
+  { agentId: 'AGT-8819', name: 'Marcus Brody', supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins', contactId: '#90441', tone: 'Neutral / Trainee', securityVerified: true, detailsRetrieved: false, queryResolved: true, ivrStars: 4.0, qaScore: 81, recommendedModule: 'MOD-103', flagReason: 'Incomplete account details lookup', trainingAssigned: false },
+  { agentId: 'AGT-3310', name: 'Chloe Bennett', supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins', contactId: '#90445', tone: 'Good / Empathetic', securityVerified: true, detailsRetrieved: true, queryResolved: true, ivrStars: 4.8, qaScore: 95, recommendedModule: 'MOD-104', flagReason: 'None (Senior Lead)', trainingAssigned: false },
+
+  // Michael Chang (SUP-021)
+  { agentId: 'AGT-4092', name: 'Jordan Miller', supervisorId: 'SUP-021', supervisorName: 'Michael Chang', contactId: '#90425', tone: 'Rudely / Impatient', securityVerified: true, detailsRetrieved: true, queryResolved: false, ivrStars: 1.0, qaScore: 48, recommendedModule: 'MOD-101', flagReason: 'Rude speech tone to customer + Unresolved dispute', trainingAssigned: false },
+  { agentId: 'AGT-5521', name: 'Lucas Wright', supervisorId: 'SUP-021', supervisorName: 'Michael Chang', contactId: '#90449', tone: 'Good / Professional', securityVerified: true, detailsRetrieved: true, queryResolved: true, ivrStars: 4.6, qaScore: 92, recommendedModule: 'MOD-104', flagReason: 'None (Fast Wrap-up)', trainingAssigned: false },
+  { agentId: 'AGT-7703', name: 'Maya Patel', supervisorId: 'SUP-021', supervisorName: 'Michael Chang', contactId: '#90453', tone: 'Good / Empathetic', securityVerified: true, detailsRetrieved: true, queryResolved: true, ivrStars: 5.0, qaScore: 99, recommendedModule: 'MOD-104', flagReason: 'None (VIP Care)', trainingAssigned: false },
+
+  // Elena Rostova (SUP-035)
+  { agentId: 'AGT-8842', name: 'Alex Morgan', supervisorId: 'SUP-035', supervisorName: 'Elena Rostova', contactId: '#90421', tone: 'Good / Empathetic', securityVerified: true, detailsRetrieved: true, queryResolved: true, ivrStars: 5.0, qaScore: 96, recommendedModule: 'MOD-104', flagReason: 'None (Top Performer)', trainingAssigned: false },
+  { agentId: 'AGT-4491', name: 'Carlos Mendez', supervisorId: 'SUP-035', supervisorName: 'Elena Rostova', contactId: '#90458', tone: 'Neutral / Direct', securityVerified: true, detailsRetrieved: true, queryResolved: true, ivrStars: 3.8, qaScore: 84, recommendedModule: 'MOD-104', flagReason: 'None (Hardware Specialist)', trainingAssigned: false },
+
+  // David Sterling (SUP-042)
+  { agentId: 'AGT-7740', name: 'David Chen', supervisorId: 'SUP-042', supervisorName: 'David Sterling', contactId: '#90432', tone: 'Neutral / Direct', securityVerified: true, detailsRetrieved: true, queryResolved: true, ivrStars: 3.5, qaScore: 85, recommendedModule: 'MOD-104', flagReason: 'None (Acceptable SLA)', trainingAssigned: false },
+  { agentId: 'AGT-6628', name: 'Olivia Taylor', supervisorId: 'SUP-042', supervisorName: 'David Sterling', contactId: '#90462', tone: 'Good / Calm', securityVerified: true, detailsRetrieved: true, queryResolved: true, ivrStars: 5.0, qaScore: 100, recommendedModule: 'MOD-104', flagReason: 'None (Disaster Dispatch Lead)', trainingAssigned: false },
+
+  // Priya Sharma (SUP-059)
+  { agentId: 'AGT-2219', name: "Liam O'Connor", supervisorId: 'SUP-059', supervisorName: 'Priya Sharma', contactId: '#90468', tone: 'Bad / Hesitant', securityVerified: false, detailsRetrieved: false, queryResolved: false, ivrStars: 2.5, qaScore: 36, recommendedModule: 'MOD-103', flagReason: 'Failed resolution + Missing account history', trainingAssigned: false }
 ];
 
 let qaFilterState = 'all';
@@ -569,6 +755,7 @@ function renderQAScorecard() {
   if (!tbody) return;
 
   const filteredData = qaScorecardData.filter(item => {
+    if (qaTeamViewMode === 'my_team' && item.supervisorId !== currentSupervisor.id) return false;
     const isRudeOrBad = item.tone.includes('Rudely') || item.tone.includes('Bad');
     if (qaFilterState === 'flagged' && !isRudeOrBad) return false;
     if (qaFilterState === 'low_score' && item.qaScore >= 70) return false;
@@ -1487,6 +1674,11 @@ if (supSelect) {
     if (roleEl) roleEl.textContent = prof.subtext;
 
     addSupBotMessage('bot', prof.greeting);
+    renderWallboard();
+    fetchQueue();
+    renderQAScorecard();
+    const selRep = document.getElementById('report-type-select');
+    if (selRep) loadReport(selRep.value);
   });
 }
 
