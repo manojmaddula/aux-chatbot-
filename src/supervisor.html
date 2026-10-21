@@ -549,9 +549,14 @@
                 <small class="text-muted">Agents exceeding this on prior shifts are barred from self-service lunch grants.</small>
               </div>
               <div class="form-group">
-                <label>Break Request Frequency Limit (in 30 mins):</label>
-                <input type="number" id="limit-req-freq" min="1" max="10" value="3" />
-                <small class="text-muted">Maximum break requests before 15-minute throttle lock activates.</small>
+                <label>Discretionary Break Frequency Policy Window:</label>
+                <select id="limit-freq-window" style="background:#0f172a; color:#fff; border:1px solid #334155; padding:8px; border-radius:6px; margin-bottom:8px;">
+                  <option value="1_WEEK" selected>1 Week (Rolling 7-Day Window)</option>
+                  <option value="2_WEEKS">2 Weeks (Bi-Weekly 14-Day Window)</option>
+                </select>
+                <label>Max Discretionary Requests (per window):</label>
+                <input type="number" id="limit-req-freq" min="1" max="25" value="5" />
+                <small class="text-muted">Maximum discretionary requests before automated WFM window throttle activates.</small>
               </div>
               <div class="form-group">
                 <label>Target Schedule Adherence Threshold (%):</label>

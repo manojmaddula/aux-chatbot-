@@ -8,17 +8,17 @@
   <link rel="alternate icon" href="/favicon.ico" />
   <style>
     :root {
-      --bg: #070b14;
-      --card-bg: #0f172a;
-      --card-hover: #1e293b;
-      --border: #1e293b;
-      --border-focus: #38bdf8;
-      --primary: #38bdf8;
-      --primary-glow: rgba(56, 189, 248, 0.25);
-      --success: #10b981;
-      --accent: #818cf8;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
+      --bg: #ffffff;
+      --card-bg: #ffffff;
+      --card-hover: #f8fafc;
+      --border: #e2e8f0;
+      --border-focus: #2563eb;
+      --primary: #2563eb;
+      --primary-glow: rgba(37, 99, 235, 0.12);
+      --success: #059669;
+      --accent: #4f46e5;
+      --text: #0f172a;
+      --text-muted: #475569;
     }
 
     * {
@@ -38,8 +38,8 @@
       align-items: center;
       padding: 32px 20px 24px;
       background-image: 
-        radial-gradient(ellipse at 50% 0%, rgba(56, 189, 248, 0.08) 0%, transparent 60%),
-        radial-gradient(ellipse at 50% 100%, rgba(99, 102, 241, 0.05) 0%, transparent 60%);
+        radial-gradient(ellipse at 50% 0%, rgba(37, 99, 235, 0.05) 0%, transparent 60%),
+        radial-gradient(ellipse at 50% 100%, rgba(99, 102, 241, 0.03) 0%, transparent 60%);
     }
 
     .home-container {
@@ -63,9 +63,9 @@
       width: 72px;
       height: 72px;
       border-radius: 20px;
-      background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(99, 102, 241, 0.25));
-      border: 1px solid rgba(56, 189, 248, 0.4);
-      box-shadow: 0 0 25px rgba(56, 189, 248, 0.2);
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(99, 102, 241, 0.12));
+      border: 1px solid rgba(37, 99, 235, 0.25);
+      box-shadow: 0 4px 16px rgba(37, 99, 235, 0.1);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -86,15 +86,15 @@
       height: 14px;
       background: var(--success);
       border-radius: 50%;
-      border: 3px solid var(--bg);
-      box-shadow: 0 0 8px var(--success);
+      border: 3px solid #ffffff;
+      box-shadow: 0 0 6px var(--success);
     }
 
     .hero-title {
       font-size: 28px;
       font-weight: 800;
       letter-spacing: -0.5px;
-      background: linear-gradient(135deg, #ffffff 30%, #38bdf8 100%);
+      background: linear-gradient(135deg, #0f172a 30%, #2563eb 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       margin-bottom: 8px;
@@ -111,11 +111,11 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.25);
+      background: rgba(5, 150, 105, 0.08);
+      border: 1px solid rgba(5, 150, 105, 0.25);
       padding: 4px 12px;
       border-radius: 20px;
-      color: #34d399;
+      color: #059669;
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.5px;
@@ -127,8 +127,8 @@
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      background: #10b981;
-      box-shadow: 0 0 6px #10b981;
+      background: #059669;
+      box-shadow: 0 0 6px #059669;
     }
 
     /* GATEWAY CARDS GRID */
@@ -159,6 +159,7 @@
       transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       position: relative;
       overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
     }
 
     .gateway-card::before {
@@ -174,13 +175,13 @@
 
     .gateway-card:hover {
       background: var(--card-hover);
-      border-color: rgba(56, 189, 248, 0.4);
+      border-color: #3b82f6;
       transform: translateY(-3px);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(56, 189, 248, 0.1);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08), 0 0 14px rgba(37, 99, 235, 0.08);
     }
 
     .gateway-card:hover::before {
-      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      background: linear-gradient(90deg, #2563eb, #6366f1);
     }
 
     .card-top {
@@ -198,8 +199,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
     }
 
     .card-badge {
@@ -212,27 +213,27 @@
     }
 
     .badge-agent {
-      background: rgba(56, 189, 248, 0.15);
-      color: #38bdf8;
-      border: 1px solid rgba(56, 189, 248, 0.3);
+      background: rgba(37, 99, 235, 0.1);
+      color: #2563eb;
+      border: 1px solid rgba(37, 99, 235, 0.25);
     }
 
     .badge-portal {
-      background: rgba(245, 158, 11, 0.15);
-      color: #fbbf24;
-      border: 1px solid rgba(245, 158, 11, 0.3);
+      background: rgba(217, 119, 6, 0.1);
+      color: #d97706;
+      border: 1px solid rgba(217, 119, 6, 0.25);
     }
 
     .badge-sup {
-      background: rgba(168, 85, 247, 0.15);
-      color: #c084fc;
-      border: 1px solid rgba(168, 85, 247, 0.3);
+      background: rgba(124, 58, 237, 0.1);
+      color: #7c3aed;
+      border: 1px solid rgba(124, 58, 237, 0.25);
     }
 
     .card-title {
       font-size: 17px;
       font-weight: 700;
-      color: #ffffff;
+      color: #0f172a;
       margin-bottom: 6px;
     }
 
@@ -250,10 +251,10 @@
       justify-content: space-between;
       width: 100%;
       padding: 10px 14px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
       border-radius: 8px;
-      color: #ffffff;
+      color: #0f172a;
       font-size: 12px;
       font-weight: 700;
       transition: all 0.2s ease;
@@ -261,14 +262,15 @@
 
     .gateway-card:hover .card-action-btn {
       background: #2563eb;
-      border-color: #3b82f6;
-      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+      border-color: #2563eb;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
     }
 
     /* REAL-TIME TELEMETRY STRIP */
     .telemetry-strip {
       width: 100%;
-      background: rgba(15, 23, 42, 0.6);
+      background: #f8fafc;
       border: 1px solid var(--border);
       border-radius: 12px;
       padding: 14px 20px;
@@ -277,6 +279,7 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 16px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
     }
 
     .telemetry-item {
@@ -298,21 +301,21 @@
     .telemetry-value {
       font-size: 14px;
       font-weight: 800;
-      color: #f8fafc;
+      color: #0f172a;
     }
 
     .telemetry-value.accent {
-      color: #38bdf8;
+      color: #2563eb;
     }
 
     .telemetry-value.success {
-      color: #34d399;
+      color: #059669;
     }
 
     /* FOOTER */
     .home-footer {
       text-align: center;
-      color: #64748b;
+      color: #94a3b8;
       font-size: 11px;
       margin-top: 24px;
     }

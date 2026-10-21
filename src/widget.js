@@ -371,9 +371,10 @@ try {
       });
       renderAdvisories();
     } else if (data.type === 'POLICY_UPDATE') {
-      // Supervisor changed policies
-      addSupervisorLog('POLICY', 'WFM operational policy thresholds updated by supervisor.');
-      showNotification('Policy Update', 'Supervisor updated break thresholds and rate limits.');
+      // Supervisor changed policies - sync immediately to agent bot
+      applyPolicyUpdate(data.payload);
+      showNotification('Shift Policy Updated', `Supervisor updated shift policies: Max Tea Breaks: ${data.payload.maxTeaBreaks}, Target Adherence: ${data.payload.targetAdherence}%.`);
+      addChatMessage('ai', `🛡️ **Operations Shift Policy Updated by Floor Supervisor:**<br/>• Max Tea Breaks: <strong>${data.payload.maxTeaBreaks} / shift</strong><br/>• Lunch Variance Allowed: <strong>Max +${data.payload.lunchVarianceThreshold}m</strong><br/>• Request Frequency: <strong>Max ${data.payload.maxFrequencyRequests} requests / ${data.payload.frequencyWindow === '2_WEEKS' ? '2-Wks' : '1-Wk'}</strong><br/>• Target Adherence: <strong>≥ ${data.payload.targetAdherence}%</strong>`);
     } else if (data.type === 'IVR_DEFLECTION_UPDATE') {
       handleIvrDeflectionUpdate(data.payload);
     } else if (data.type === 'WFM_REBALANCE_UPDATE') {
@@ -596,34 +597,58 @@ function updateAcwDisplay() {
   acwTimerEl.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
-// Generate Instant AI Call Summary for ACW
+// Generate Instant AI Call Summary for ACW (With Full Agent Edit Capability)
 btnGenSummary.addEventListener('click', () => {
   const selectedDisp = cxoneDispositionSelect.value;
   summaryResult.classList.remove('hidden');
-  summaryResult.innerHTML = `
-    <div class="summary-badge">NICE CXONE AI SUMMARY ENRICHED</div>
-    <div class="summary-body">
-      <strong>• Contact ID:</strong> #90421 (Inbound Tier-2 Billing)<br>
-      <strong>• Customer:</strong> Jordan Miller (+1-555-019-4821)<br>
-      <strong>• Verified Intent:</strong> Inquired regarding recurring promotional discount expiration on fiber plan.<br>
-      <strong>• Actions Executed:</strong> Validated CTI ledger, restored promotional code RET-2026, issued $25 credit.<br>
-      <strong>• CXone Disposition:</strong> ${selectedDisp}<br>
-      <strong>• Sentiment Score:</strong> +0.82 (De-escalated / Satisfied)<br>
-      <strong>• Follow-up Task:</strong> Automated SMS confirmation queued (No callback required).
-    </div>
-  `;
+
+  const contentBlock = document.getElementById('summary-content-block');
+  if (contentBlock) {
+    contentBlock.innerHTML = `
+      <div class="summary-body">
+        <strong>• Contact ID:</strong> #90421 (Inbound Tier-2 Billing)<br>
+        <strong>• Customer:</strong> Jordan Miller (+1-555-019-4821)<br>
+        <strong>• Verified Intent:</strong> Inquired regarding recurring promotional discount expiration on fiber plan.<br>
+        <strong>• Actions Executed:</strong> Validated CTI ledger, restored promotional code RET-2026, issued $25 credit.<br>
+        <strong>• CXone Disposition:</strong> ${selectedDisp}<br>
+        <strong>• Sentiment Score:</strong> +0.82 (De-escalated / Satisfied)<br>
+        <strong>• Follow-up Task:</strong> Automated SMS confirmation queued (No callback required).
+      </div>
+    `;
+  }
+
+  const editNotes = document.getElementById('acw-edit-summary');
+  if (editNotes && !editNotes.value.trim()) {
+    editNotes.value = `Verified security PIN with customer Jordan Miller. Approved one-time promotional discount credit of $25 on Fiber Account. Customer satisfied, no further escalation needed.`;
+  }
+
   playTone(659.25, 'sine', 0.15); // E5
 });
+
+// Quick note appending for agent
+const btnAddQuickNote = document.getElementById('btn-add-quick-note');
+if (btnAddQuickNote) {
+  btnAddQuickNote.addEventListener('click', () => {
+    const editNotes = document.getElementById('acw-edit-summary');
+    if (editNotes) {
+      editNotes.value += `\n[Agent Note ${new Date().toLocaleTimeString()}]: Customer requested SMS confirmation sent to +1-555-019-4821.`;
+    }
+  });
+}
 
 // Complete ACW & Return to Available
 btnCompleteAcw.addEventListener('click', async () => {
   if (acwInterval) clearInterval(acwInterval);
   acwInterval = null;
 
+  const editNotes = document.getElementById('acw-edit-summary');
+  const agentCustomNotes = editNotes ? editNotes.value.trim() : '';
+
   const payload = {
     contactId: '90421',
     agentId: agentState.id,
     disposition: cxoneDispositionSelect.value,
+    summaryNotes: agentCustomNotes || 'Standard billing adjustment applied and validated.',
     acwDurationSeconds: 45 - Math.max(0, acwSecondsRemaining),
     timestamp: new Date().toISOString()
   };
@@ -645,7 +670,8 @@ btnCompleteAcw.addEventListener('click', async () => {
   agentStateLabel.className = 'state-label';
   agentStateLabel.textContent = 'NICE CXone: AVAILABLE';
 
-  addSupervisorLog('ACW_COMPLETE', `ACW finalized with disposition "${payload.disposition}". Returned to AVAILABLE.`);
+  addSupervisorLog('ACW_COMPLETE', `ACW finalized with disposition "${payload.disposition}" & agent wrap notes saved.`);
+  showNotification('ACW Complete', `Summary and wrap notes saved to CRM record #90421.`);
   playTone(523.25, 'sine', 0.2); // C5
 });
 
@@ -800,17 +826,121 @@ function addSupervisorLog(tag, message) {
   list.prepend(entry);
 }
 
-// Suggested Replies & Copy
-document.querySelectorAll('.btn-copy').forEach(btn => {
-  btn.addEventListener('click', (e) => {
-    const parent = e.target.closest('.suggestion-item');
-    const text = parent.getAttribute('data-text');
-    navigator.clipboard.writeText(text).then(() => {
-      btn.textContent = '✓ Copied!';
-      setTimeout(() => btn.textContent = 'Copy to Chat', 1500);
+// ==========================================
+// DYNAMIC AI SUGGESTED REPLIES ENGINE
+// ==========================================
+
+const AI_REPLY_TOPICS = {
+  billing: [
+    {
+      tag: 'Empathy + Credit Approval',
+      text: 'I apologize for the confusion regarding the $25 monthly surcharge. I have reviewed your billing record and applied a one-time adjustment credit to your balance today.'
+    },
+    {
+      tag: 'Auto-Pay Enrollment Link',
+      text: 'I have verified your account security PIN. Let me guide you to our self-service billing management portal to update your auto-pay method and receive the $5 paperless discount.'
+    }
+  ],
+  security: [
+    {
+      tag: 'PIN Verification Required',
+      text: 'To protect your account security, I have dispatched a one-time 6-digit verification code to the phone number on file. Please read that back to me when received.'
+    },
+    {
+      tag: 'Identity Confirmed',
+      text: 'Thank you for confirming your security credentials. Your account is verified and I can now assist with any service modifications.'
+    }
+  ],
+  outage: [
+    {
+      tag: 'Storm / Outage Guidance',
+      text: 'Our dispatch center confirms that regional utility field technicians are actively working to restore service in your sector. Real-time restoration status is available via SMS updates.'
+    },
+    {
+      tag: 'Emergency Gas Safety',
+      text: 'If you smell natural gas or suspect a line leak: please evacuate the premises immediately, avoid using electrical switches, and call emergency services from outside.'
+    }
+  ],
+  empathy: [
+    {
+      tag: 'De-escalation & Ownership',
+      text: 'I completely understand your frustration with this service delay, and I appreciate your patience. I am taking direct personal ownership of this inquiry until resolved.'
+    },
+    {
+      tag: 'Closing & Confirmation',
+      text: 'Thank you for your time today. All changes have been logged in your account history, and a detailed confirmation email has been dispatched.'
+    }
+  ]
+};
+
+function renderSuggestedReplies(topic) {
+  const container = document.getElementById('ai-suggestions');
+  if (!container) return;
+  const items = AI_REPLY_TOPICS[topic] || AI_REPLY_TOPICS.billing;
+  
+  let html = '';
+  items.forEach(item => {
+    html += `
+      <div class="suggestion-item" data-text="${item.text}">
+        <span class="suggestion-tag">${item.tag}</span>
+        <p>"${item.text}"</p>
+        <div style="display:flex; gap:6px; margin-top:6px;">
+          <button class="btn-copy">Copy</button>
+          <button class="btn-insert-chat btn-xs btn-primary" style="padding:2px 6px;">Insert into Chat</button>
+        </div>
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+  bindSuggestionButtons();
+}
+
+function bindSuggestionButtons() {
+  document.querySelectorAll('.btn-copy').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const parent = e.target.closest('.suggestion-item');
+      const text = parent.getAttribute('data-text');
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = '✓ Copied!';
+        setTimeout(() => btn.textContent = 'Copy', 1500);
+      });
     });
   });
+
+  document.querySelectorAll('.btn-insert-chat').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const parent = e.target.closest('.suggestion-item');
+      const text = parent.getAttribute('data-text');
+      if (chatInput) {
+        chatInput.value = text;
+        chatInput.focus();
+        btn.textContent = '✓ Inserted!';
+        setTimeout(() => btn.textContent = 'Insert into Chat', 1500);
+      }
+    });
+  });
+}
+
+document.querySelectorAll('.reply-filter-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.reply-filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    const topic = chip.getAttribute('data-topic');
+    renderSuggestedReplies(topic);
+  });
 });
+
+const btnRefreshReplies = document.getElementById('btn-refresh-replies');
+if (btnRefreshReplies) {
+  btnRefreshReplies.addEventListener('click', () => {
+    const activeChip = document.querySelector('.reply-filter-chip.active');
+    const topic = activeChip ? activeChip.getAttribute('data-topic') : 'billing';
+    renderSuggestedReplies(topic);
+    playTone(550, 'sine', 0.1);
+  });
+}
+
+bindSuggestionButtons();
 
 // Chat Stream with Copilot
 const chatHistory = document.getElementById('chat-history');
@@ -986,12 +1116,70 @@ function renderArticles(list) {
       <div class="article-desc">${item.desc}</div>
     `;
     card.addEventListener('click', () => {
-      addChatMessage('ai', `Opened Guide: **${item.title}**\n\n${item.desc}\n\n*Would you like me to run automated diagnostics for this issue?*`);
-      tabBtns[0].click();
+      openArticleDetail(item);
     });
     container.appendChild(card);
   });
 }
+
+function openArticleDetail(item) {
+  const detailView = document.getElementById('article-detail-view');
+  if (!detailView) return;
+  
+  const catEl = document.getElementById('article-detail-cat');
+  const titleEl = document.getElementById('article-detail-title');
+  const descEl = document.getElementById('article-detail-desc');
+  const stepsEl = document.getElementById('article-detail-steps');
+
+  if (catEl) catEl.textContent = item.cat.toUpperCase();
+  if (titleEl) titleEl.textContent = item.title;
+  if (descEl) descEl.textContent = item.desc;
+
+  let steps = '';
+  if (item.cat === 'cxone') {
+    steps = '1. Open Chrome/Edge site settings for NICE CXone. 2. Verify microphone is allowed. 3. Click "Ping CXone Cluster" below to verify WebSockets latency < 45ms.';
+  } else if (item.cat === 'vpn') {
+    steps = '1. Open Cisco AnyConnect / VPN client. 2. Verify Wi-Fi MTU is clamped to 1350 bytes. 3. Click "Flush DNS & Reset Route" below to clear stale route tables.';
+  } else if (item.cat === 'vdi') {
+    steps = '1. Press Ctrl+F2 to release keyboard hook. 2. Restart Citrix Workspace from system tray. 3. Click "Ping CXone Cluster" to confirm host reachability.';
+  } else {
+    steps = '1. Open Windows Sound Control Panel. 2. Uncheck "Exclusive Mode" on default headset. 3. Click "Reset Headset Driver" below.';
+  }
+  if (stepsEl) stepsEl.textContent = steps;
+
+  detailView.classList.remove('hidden');
+  detailView.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+const btnCloseArticle = document.getElementById('btn-close-article');
+if (btnCloseArticle) {
+  btnCloseArticle.addEventListener('click', () => {
+    const detailView = document.getElementById('article-detail-view');
+    if (detailView) detailView.classList.add('hidden');
+  });
+}
+
+const btnArticleRunDiag = document.getElementById('btn-article-run-diag');
+if (btnArticleRunDiag) {
+  btnArticleRunDiag.addEventListener('click', () => {
+    const pingBtn = document.getElementById('btn-ping-cxone');
+    if (pingBtn) pingBtn.click();
+    showNotification('Diagnostic Executed', 'Network and softphone socket telemetry validated.');
+  });
+}
+
+const btnArticleCopy = document.getElementById('btn-article-copy');
+if (btnArticleCopy) {
+  btnArticleCopy.addEventListener('click', () => {
+    const title = document.getElementById('article-detail-title')?.textContent || '';
+    const steps = document.getElementById('article-detail-steps')?.textContent || '';
+    navigator.clipboard.writeText(`Resolution Guide: ${title}\n${steps}`).then(() => {
+      btnArticleCopy.textContent = '✓ Copied!';
+      setTimeout(() => btnArticleCopy.textContent = '📋 Copy Steps', 1500);
+    });
+  });
+}
+
 renderArticles(articlesData);
 
 document.querySelectorAll('.kb-pill').forEach(pill => {
@@ -1208,3 +1396,57 @@ async function pollAgentRebalance() {
 
 pollAgentRebalance();
 setInterval(pollAgentRebalance, 4000);
+
+// ==========================================
+// 5. SHIFT ADHERENCE POLICY REAL-TIME SYNC
+// ==========================================
+
+function applyPolicyUpdate(policy) {
+  if (!policy) return;
+
+  const teaLimit = policy.maxTeaBreaks || 2;
+  const lunchLimit = policy.lunchVarianceThreshold || 10;
+  const targetAdh = policy.targetAdherence || 90;
+  const freqWindow = policy.frequencyWindow === '2_WEEKS' ? '2-Wks' : '1-Wk';
+  const freqLimit = policy.maxFrequencyRequests || 5;
+
+  // Update Tab 4 Policy Summary
+  const teaEl = document.getElementById('agent-policy-tea');
+  const lunchEl = document.getElementById('agent-policy-lunch');
+  const freqEl = document.getElementById('agent-policy-freq');
+  const adhEl = document.getElementById('agent-policy-adh');
+
+  if (teaEl) teaEl.textContent = `${teaLimit} breaks / shift`;
+  if (lunchEl) lunchEl.textContent = `Max +${lunchLimit} mins`;
+  if (freqEl) freqEl.textContent = `Max ${freqLimit} requests / ${freqWindow}`;
+  if (adhEl) adhEl.textContent = `≥ ${targetAdh}.0%`;
+
+  // Update Tab 2 Metric Cards
+  const lblTeaSub = document.getElementById('lbl-tea-sub');
+  const lblLunchSub = document.getElementById('lbl-lunch-sub');
+  const lblAdhSub = document.getElementById('lbl-adh-sub');
+  const lblFreqSub = document.getElementById('lbl-freq-sub');
+  const lblFreqTitle = document.getElementById('lbl-freq-title');
+
+  if (lblTeaSub) lblTeaSub.textContent = `Policy Limit: Max ${teaLimit}`;
+  if (lblLunchSub) lblLunchSub.textContent = `Threshold: <${lunchLimit}m`;
+  if (lblAdhSub) lblAdhSub.textContent = `Target: ≥ ${targetAdh}%`;
+  if (lblFreqSub) lblFreqSub.textContent = `Threshold: ${freqLimit} / ${freqWindow}`;
+  if (lblFreqTitle) lblFreqTitle.textContent = `Request Frequency (${freqWindow})`;
+
+  // Save to local storage
+  localStorage.setItem('wfm_policy_limits', JSON.stringify(policy));
+}
+
+// Initial Policy Fetch on Widget Startup
+fetch('/api/policy')
+  .then(r => r.json())
+  .then(p => applyPolicyUpdate(p))
+  .catch(() => {
+    const cached = localStorage.getItem('wfm_policy_limits');
+    if (cached) {
+      try {
+        applyPolicyUpdate(JSON.parse(cached));
+      } catch (e) {}
+    }
+  });

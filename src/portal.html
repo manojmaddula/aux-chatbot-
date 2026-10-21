@@ -38,8 +38,8 @@
         <p class="subtitle">Enter your enterprise agent credentials to access AUX authorization.</p>
         <div class="form-grid">
           <div class="form-group" style="grid-column: span 2; background: rgba(37, 99, 235, 0.1); padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(37, 99, 235, 0.3);">
-            <label style="color: #93c5fd; font-weight: 700; font-size: 12px;">👤 Switch Agent User Persona (Pre-Configured Scenarios):</label>
-            <select id="preset-agent-select" style="margin-top: 6px; background: #0f172a; font-weight: 600; color: #f8fafc; border: 1px solid #3b82f6;">
+            <label style="color: #1e40af; font-weight: 700; font-size: 12px;">👤 Switch Agent User Persona (Pre-Configured Scenarios):</label>
+            <select id="preset-agent-select" style="margin-top: 6px; background: #ffffff; font-weight: 600; color: #0f172a; border: 1px solid #3b82f6;">
               <option value="AGT-8842">Alex Morgan (AGT-8842) • Tier-2 Tech • Clean Adherence 96% (Auto-Approve)</option>
               <option value="AGT-4092">Jordan Miller (AGT-4092) • Billing • 4 Tea Breaks Taken (Triggers Tea Pattern Reject)</option>
               <option value="AGT-9102">Samantha Vance (AGT-9102) • Customer Care • +25m Lunch Overage (Triggers Lunch Reject)</option>
@@ -159,19 +159,19 @@
           </div>
         </div>
 
-        <!-- IT SYSTEM ISSUE DOCUMENTATION (SHOWN WHEN AUX-5 IS SELECTED) -->
-        <div id="it-system-issue-box" class="it-issue-box hidden" style="background:rgba(30,58,138,0.2); border:1px solid #3b82f6; border-radius:8px; padding:12px; margin-top:12px;">
+        <!-- IT SYSTEM ISSUE DOCUMENTATION (SHOWN ONLY WHEN AUX-5 IS SELECTED) -->
+        <div id="it-system-issue-box" class="it-issue-box hidden" style="background:rgba(37,99,235,0.06); border:1px solid #93c5fd; border-radius:8px; padding:12px; margin-top:12px;">
           <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
             <span style="font-size:20px;">💻</span>
             <div>
-              <strong style="color:#93c5fd; font-size:12px;">System Issue Alert: Document & Distribute to IT Helpdesk</strong>
-              <p style="font-size:11px; color:#cbd5e1; margin-top:2px;">Direct IT portal distribution ensures faster technical resolution while you are in AUX-5.</p>
+              <strong style="color:#1e40af; font-size:12px;">System Issue Alert: Document & Distribute to IT Helpdesk</strong>
+              <p style="font-size:11px; color:#475569; margin-top:2px;">Direct IT portal distribution ensures faster technical resolution while you are in AUX-5.</p>
             </div>
           </div>
           <div class="form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:8px;">
             <div class="form-group">
-              <label style="font-size:11px; color:#94a3b8;">Technical Failure Category:</label>
-              <select id="it-issue-category" style="background:#090d16; color:#fff; border:1px solid #3b82f6; padding:6px; border-radius:4px; width:100%;">
+              <label style="font-size:11px; color:#475569;">Technical Failure Category:</label>
+              <select id="it-issue-category" style="background:#ffffff; color:#0f172a; border:1px solid #93c5fd; padding:6px; border-radius:4px; width:100%;">
                 <option value="Cisco AnyConnect / VPN Error 412">Cisco AnyConnect / VPN Error 412 (MTU/Tunnel)</option>
                 <option value="Citrix Workspace VDI Freeze">Citrix Workspace VDI Black Screen / Freeze</option>
                 <option value="NICE CXone MAX Audio / WebRTC Drop">NICE CXone MAX Audio Drop / Code 99 CTI Lockout</option>
@@ -180,13 +180,13 @@
               </select>
             </div>
             <div class="form-group">
-              <label style="font-size:11px; color:#94a3b8;">Error Code / Specific Symptoms:</label>
-              <input type="text" id="it-issue-details" placeholder="e.g. Lost audio stream on incoming call #90421" style="background:#090d16; color:#fff; border:1px solid #3b82f6; padding:6px; border-radius:4px; width:100%;" />
+              <label style="font-size:11px; color:#475569;">Error Code / Specific Symptoms:</label>
+              <input type="text" id="it-issue-details" placeholder="e.g. Lost audio stream on incoming call #90421" style="background:#ffffff; color:#0f172a; border:1px solid #93c5fd; padding:6px; border-radius:4px; width:100%;" />
             </div>
           </div>
           <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
             <input type="checkbox" id="it-notify-chk" checked style="cursor:pointer;" />
-            <label for="it-notify-chk" style="color:#f8fafc; font-size:11px; cursor:pointer;">
+            <label for="it-notify-chk" style="color:#334155; font-size:11px; cursor:pointer;">
               <strong>Auto-dispatch ticket to IT Support queue</strong> for rapid response
             </label>
           </div>
@@ -252,13 +252,13 @@
           <div style="display:flex; align-items:center; gap:10px;">
             <span style="font-size:24px;">⏳</span>
             <div>
-              <strong style="color:#fbbf24; font-size:13px; display:block;">Check Back Later for AUX Availability</strong>
-              <p style="color:#cbd5e1; font-size:11px; margin-top:2px;">
+              <strong style="color:#b45309; font-size:13px; display:block;">Check Back Later for AUX Availability</strong>
+              <p style="color:#475569; font-size:11px; margin-top:2px;">
                 ACD queue depth or staffing constraints are currently active. Discretionary AUX requests are temporarily held.
               </p>
               <div style="margin-top:6px; display:flex; gap:14px; font-size:11px; font-weight:700;">
-                <span style="color:#38bdf8;">Next Open Window: <span id="checkback-next-window">11:45 AM</span></span>
-                <span style="color:#a78bfa;">Status: <span id="checkback-countdown">Queue Busy - Hold</span></span>
+                <span style="color:#0284c7;">Next Open Window: <span id="checkback-next-window">11:45 AM</span></span>
+                <span style="color:#7c3aed;">Status: <span id="checkback-countdown">Queue Busy - Hold</span></span>
               </div>
             </div>
           </div>
@@ -275,11 +275,11 @@
     </div>
   
     <!-- BUSINESS CONTINUITY PLAN (BCP) CONTINGENCY FOOTER -->
-    <footer class="portal-bcp-footer" style="margin-top:20px; padding:12px; background:rgba(15,23,42,0.6); border:1px solid #1e293b; border-radius:8px;">
+    <footer class="portal-bcp-footer" style="margin-top:20px; padding:12px; background:#ffffff; border:1px solid #e2e8f0; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
         <div style="display:flex; align-items:center; gap:8px;">
           <span style="font-size:18px;">🛡️</span>
-          <span style="color:#94a3b8; font-size:11px;">
+          <span style="color:#475569; font-size:11px;">
             <strong>Business Continuity Contingency Plan (BCP):</strong> In the event of system disruption, use the offline manual break voucher protocol.
           </span>
         </div>

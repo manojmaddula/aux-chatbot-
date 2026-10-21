@@ -132,6 +132,19 @@ const itIncidents = [
     assignedTo: 'VDI Desktop Support'
   }
 ];
+
+// Centralized Shift Adherence Policy & Limits (Configured by Floor Supervisors)
+const activeShiftPolicy = {
+  maxTeaBreaks: 2,
+  lunchVarianceThreshold: 10,
+  frequencyWindow: '1_WEEK', // '1_WEEK' (7 days) or '2_WEEKS' (14 days)
+  maxFrequencyRequests: 5,
+  targetAdherence: 90,
+  targetAcwSeconds: 45,
+  botGraceSeconds: 10,
+  lastUpdatedBy: 'SUP-014 (Sarah Jenkins)',
+  updatedAt: new Date().toISOString()
+};
  // agentId -> array of timestamps
 
 const MIME_TYPES = {
@@ -217,6 +230,40 @@ const server = http.createServer((req, res) => {
     req.on('end', () => {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: true, message: 'Broadcast dispatched to all agent widgets.' }));
+    });
+    return;
+  }
+
+  // API ROUTE: Get Shift Adherence Policy Limits
+  if (pathname === '/api/policy' && req.method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(activeShiftPolicy));
+    return;
+  }
+
+  // API ROUTE: Update Shift Adherence Policy Limits (Supervisor Deployed)
+  if (pathname === '/api/policy' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        if (typeof payload.maxTeaBreaks === 'number') activeShiftPolicy.maxTeaBreaks = payload.maxTeaBreaks;
+        if (typeof payload.lunchVarianceThreshold === 'number') activeShiftPolicy.lunchVarianceThreshold = payload.lunchVarianceThreshold;
+        if (payload.frequencyWindow) activeShiftPolicy.frequencyWindow = payload.frequencyWindow;
+        if (typeof payload.maxFrequencyRequests === 'number') activeShiftPolicy.maxFrequencyRequests = payload.maxFrequencyRequests;
+        if (typeof payload.targetAdherence === 'number') activeShiftPolicy.targetAdherence = payload.targetAdherence;
+        if (typeof payload.targetAcwSeconds === 'number') activeShiftPolicy.targetAcwSeconds = payload.targetAcwSeconds;
+        if (typeof payload.botGraceSeconds === 'number') activeShiftPolicy.botGraceSeconds = payload.botGraceSeconds;
+        if (payload.supervisorId) activeShiftPolicy.lastUpdatedBy = payload.supervisorId;
+        activeShiftPolicy.updatedAt = new Date().toISOString();
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, policy: activeShiftPolicy }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
     });
     return;
   }
@@ -552,24 +599,28 @@ function evaluateBreak(payload) {
     });
   }
 
-  // 1. Frequency Limiting
+  // 1. Frequency Limiting (1-Week or 2-Week Policy Window)
   const now = Date.now();
+  const windowDays = activeShiftPolicy.frequencyWindow === '2_WEEKS' ? 14 : 7;
+  const windowMs = windowDays * 24 * 60 * 60 * 1000;
+  const maxReqAllowed = activeShiftPolicy.maxFrequencyRequests || (windowDays === 14 ? 10 : 5);
+
   let timestamps = agentRequestLog.get(agentId) || [];
-  timestamps = timestamps.filter(t => (now - t) < 30 * 60 * 1000); // last 30 minutes
+  timestamps = timestamps.filter(t => (now - t) < windowMs);
   agentRequestLog.set(agentId, timestamps);
 
-  if (timestamps.length >= 3 || agent.forceRateLimit) {
+  if (timestamps.length >= maxReqAllowed || agent.forceRateLimit) {
     return {
       status: 'REJECTED',
       code: 'FREQ_LIMIT_EXCEEDED',
       checkBackLater: true,
-      nextOpenInterval: '11:30 AM (15m Cooldown)',
+      nextOpenInterval: 'Next Scheduling Interval (Weekly Window)',
       title: 'Auto-Rejected: Request Frequency Limit Exceeded',
-      description: `Rate limit triggered: Agent has sent 3 break requests in the past 10 minutes. Automated throttle active to prevent queue volatility.`,
+      description: `WFM Policy Restriction: Agent has reached the threshold of ${timestamps.length} discretionary requests for the active ${windowDays}-day scheduling window (Policy limit: ${maxReqAllowed} requests / ${windowDays === 14 ? '2 weeks' : '1 week'}). Discretionary requests are throttled to ensure shift coverage stability.`,
       metrics: {
-        'Recent Requests (30m)': `${timestamps.length} requests`,
-        'Allowed Threshold': 'Max 3 requests / 30m',
-        'Action Required': 'Wait for 15-minute cooldown or contact supervisor.'
+        'Policy Window': `${windowDays === 14 ? '2 Weeks (Bi-Weekly)' : '1 Week (Rolling)'}`,
+        'Logged Requests': `${timestamps.length} / ${maxReqAllowed} allowed`,
+        'Action Required': 'Wait for window reset or contact supervisor for exception code.'
       }
     };
   }
@@ -692,17 +743,20 @@ function evaluateCopilotQuery(payload) {
   // 2. Schedule Adherence & Breaks
   if (qLower.includes('adherence') || qLower.includes('tea break') || qLower.includes('my break') || qLower.includes('lunch') || qLower.includes('can i take') || qLower.includes('breaks left') || qLower.includes('quota') || qLower.includes('policy')) {
     let advice = '✓ Your adherence and break history are in good standing.';
-    if (agent.teaBreaks.startsWith('4')) {
-      advice = '⚠️ Behavioral Flag: You have logged 4 short tea breaks today (Shift limit is 2). Next requests will require supervisor override.';
-    } else if (agent.lunchVariance.includes('+25')) {
-      advice = '⚠️ Chronic Lunch Overage: Previous shift logged +25m unauthorized variance. Break grants require supervisor review.';
+    if (parseInt(agent.teaBreaks.split('/')[0]) > activeShiftPolicy.maxTeaBreaks) {
+      advice = `⚠️ Behavioral Flag: You have logged ${agent.teaBreaks.split('/')[0]} tea breaks today (Shift limit set by supervisor: ${activeShiftPolicy.maxTeaBreaks}). Next requests require supervisor override.`;
+    } else if (agent.lunchVariance.includes('+') && parseInt(agent.lunchVariance.replace(/[^0-9]/g, '')) > activeShiftPolicy.lunchVarianceThreshold) {
+      advice = `⚠️ Chronic Lunch Overage: Previous shift logged ${agent.lunchVariance} variance (Supervisor threshold: <${activeShiftPolicy.lunchVarianceThreshold}m). Break grants require supervisor review.`;
     }
 
+    const windowLabel = activeShiftPolicy.frequencyWindow === '2_WEEKS' ? '2 Weeks (Bi-Weekly)' : '1 Week (Rolling)';
+
     let text = `⏱️ <strong>Live Adherence & Schedule Parameters (${agent.name}):</strong><br/>` +
-      `• <strong>CXone Adherence</strong>: <strong style="color:${parseFloat(agent.adherence) >= 90 ? '#34d399' : '#f87171'};">${agent.adherence}</strong> (Target: &ge; 90%)<br/>` +
-      `• <strong>Tea Breaks Taken</strong>: <strong>${agent.teaBreaks}</strong> (Company Policy Limit: 2)<br/>` +
-      `• <strong>Lunch Variance</strong>: <strong>${agent.lunchVariance}</strong> (Tolerance: &lt;15m)<br/>` +
-      `• <strong>Request Frequency</strong>: <strong>${agent.freq}</strong> requests / 30m<br/>` +
+      `• <strong>CXone Adherence</strong>: <strong style="color:${parseFloat(agent.adherence) >= activeShiftPolicy.targetAdherence ? '#34d399' : '#f87171'};">${agent.adherence}</strong> (Supervisor Target: &ge; ${activeShiftPolicy.targetAdherence}%)<br/>` +
+      `• <strong>Tea Breaks Taken</strong>: <strong>${agent.teaBreaks.split('/')[0]} / ${activeShiftPolicy.maxTeaBreaks}</strong> (Policy Limit: Max ${activeShiftPolicy.maxTeaBreaks}/shift)<br/>` +
+      `• <strong>Lunch Variance</strong>: <strong>${agent.lunchVariance}</strong> (Allowed Tolerance: &lt;${activeShiftPolicy.lunchVarianceThreshold}m)<br/>` +
+      `• <strong>Request Frequency Limit</strong>: <strong>${agent.freq.split('/')[0]} / ${activeShiftPolicy.maxFrequencyRequests}</strong> requests per ${windowLabel}<br/>` +
+      `<small style="color:#94a3b8; display:block; margin-top:4px;">*Shift policy limits administered in real-time by Floor Supervisor (${activeShiftPolicy.lastUpdatedBy}).</small>` +
       `<p style="margin-top:6px; font-size:11px; color:#cbd5e1;">${advice}</p>`;
     return { success: true, answer: text, category: 'adherence_telemetry' };
   }

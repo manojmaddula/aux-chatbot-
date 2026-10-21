@@ -727,15 +727,31 @@ if (btnRefreshQa) btnRefreshQa.addEventListener('click', renderQAScorecard);
 // TAB 6: AGENT LIMITS & POLICY SETUP
 // ==========================================
 
-document.getElementById('btn-save-policies').addEventListener('click', () => {
+document.getElementById('btn-save-policies').addEventListener('click', async () => {
   policyLimits.maxTeaBreaks = parseInt(document.getElementById('limit-max-tea').value, 10) || 2;
-  policyLimits.lunchVarianceThreshold = parseInt(document.getElementById('limit-lunch-variance').value, 10) || 15;
-  policyLimits.frequencyLimit30m = parseInt(document.getElementById('limit-req-freq').value, 10) || 3;
+  policyLimits.lunchVarianceThreshold = parseInt(document.getElementById('limit-lunch-variance').value, 10) || 10;
+  policyLimits.frequencyWindow = document.getElementById('limit-freq-window') ? document.getElementById('limit-freq-window').value : '1_WEEK';
+  policyLimits.maxFrequencyRequests = parseInt(document.getElementById('limit-req-freq').value, 10) || 5;
   policyLimits.targetAdherence = parseInt(document.getElementById('limit-target-adh').value, 10) || 90;
   policyLimits.targetAcwSeconds = parseInt(document.getElementById('limit-acw-sec').value, 10) || 45;
   policyLimits.botGraceSeconds = parseInt(document.getElementById('limit-bot-grace').value, 10) || 10;
+  policyLimits.supervisorId = currentSupervisor ? currentSupervisor.name : 'Supervisor Lead';
 
-  // Broadcast policy update to all agent widgets
+  // Persist locally
+  localStorage.setItem('wfm_policy_limits', JSON.stringify(policyLimits));
+
+  // Sync to central backend policy store
+  try {
+    await fetch('/api/policy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(policyLimits)
+    });
+  } catch (err) {
+    console.warn('Backend policy endpoint offline, using local broadcast:', err);
+  }
+
+  // Broadcast policy update to all agent widgets & bots in real time
   if (bc) {
     bc.postMessage({
       type: 'POLICY_UPDATE',
@@ -748,9 +764,23 @@ document.getElementById('btn-save-policies').addEventListener('click', () => {
 
   const msg = document.getElementById('policy-save-msg');
   msg.style.color = '#34d399';
-  msg.textContent = '✓ Operational policy limits successfully saved and synchronized across all agent widgets!';
+  msg.textContent = '✓ Operational shift adherence policy limits deployed and synchronized across all agent widgets and bots!';
   setTimeout(() => { msg.textContent = ''; }, 4500);
 });
+
+// Load saved policy limits on supervisor startup
+fetch('/api/policy')
+  .then(r => r.json())
+  .then(p => {
+    if (p) {
+      if (document.getElementById('limit-max-tea')) document.getElementById('limit-max-tea').value = p.maxTeaBreaks;
+      if (document.getElementById('limit-lunch-variance')) document.getElementById('limit-lunch-variance').value = p.lunchVarianceThreshold;
+      if (document.getElementById('limit-freq-window') && p.frequencyWindow) document.getElementById('limit-freq-window').value = p.frequencyWindow;
+      if (document.getElementById('limit-req-freq')) document.getElementById('limit-req-freq').value = p.maxFrequencyRequests;
+      if (document.getElementById('limit-target-adh')) document.getElementById('limit-target-adh').value = p.targetAdherence;
+    }
+  })
+  .catch(() => {});
 
 // ==========================================
 // TAB 7: NICE CXONE DIAGNOSTICS

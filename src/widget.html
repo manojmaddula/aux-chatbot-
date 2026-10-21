@@ -213,26 +213,57 @@
         </div>
 
         <div id="summary-result" class="summary-result hidden">
-          <!-- Rendered AI Call Summary -->
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span class="summary-badge">NICE CXONE AI SUMMARY</span>
+            <span style="font-size:10px; color:#2563eb; font-weight:700;">✏️ Agent Editable</span>
+          </div>
+          <div id="summary-content-block">
+            <!-- Structured summary filled dynamically -->
+          </div>
+          <div class="acw-agent-edit-box" style="margin-top:10px; border-top:1px dashed #cbd5e1; padding-top:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <label style="font-size:11px; font-weight:700; color:#334155;">✏️ Agent Wrap-Up Notes & Edits (Appended to CRM):</label>
+              <button id="btn-add-quick-note" class="btn-xs btn-outline" style="font-size:10px; padding:2px 6px;">＋ Append Note</button>
+            </div>
+            <textarea id="acw-edit-summary" rows="3" style="width:100%; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a; font-size:11px; padding:8px; resize:vertical; font-family:inherit; box-sizing:border-box;" placeholder="Add agent wrap notes, customer details, or modifications here..."></textarea>
+          </div>
         </div>
       </div>
 
-      <!-- Real-Time AI Suggested Replies -->
+      <!-- Real-Time AI Suggested Replies (Dynamic AI Reply Engine) -->
       <div class="copilot-box">
-        <div class="copilot-header">
-          <span class="sparkle">✨</span>
-          <span>NICE CXone Real-time AI Suggested Responses</span>
+        <div class="copilot-header" style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span class="sparkle">✨</span>
+            <span>AI Suggested Replies for Agent</span>
+          </div>
+          <button id="btn-refresh-replies" class="btn-xs btn-outline" style="font-size:10px; padding:2px 6px;" title="Refresh reply suggestions">🔄 Refresh</button>
         </div>
+
+        <!-- Suggestion Filter Chips -->
+        <div class="suggestion-chips" style="display:flex; gap:4px; overflow-x:auto; padding:6px 0; margin-bottom:6px;">
+          <button class="reply-filter-chip active" data-topic="billing">💳 Billing</button>
+          <button class="reply-filter-chip" data-topic="security">🛡️ PIN / Security</button>
+          <button class="reply-filter-chip" data-topic="outage">⚡ Outage Deflection</button>
+          <button class="reply-filter-chip" data-topic="empathy">🤝 Empathy</button>
+        </div>
+
         <div class="ai-suggestions-list" id="ai-suggestions">
           <div class="suggestion-item" data-text="I apologize for the confusion regarding the $25 monthly surcharge. I have applied a one-time adjustment credit to your balance today.">
             <span class="suggestion-tag">Empathy + Credit Approval</span>
             <p>"I apologize for the confusion regarding the $25 monthly surcharge. I have applied a one-time adjustment credit to your balance today."</p>
-            <button class="btn-copy">Copy to Chat</button>
+            <div style="display:flex; gap:6px; margin-top:6px;">
+              <button class="btn-copy">Copy</button>
+              <button class="btn-insert-chat btn-xs btn-primary" style="padding:2px 6px;">Insert into Chat</button>
+            </div>
           </div>
           <div class="suggestion-item" data-text="I have verified your account security PIN. Let me guide you to our self-service billing management portal to update your auto-pay method.">
             <span class="suggestion-tag">Self-Service Link</span>
             <p>"I have verified your account security PIN. Let me guide you to our self-service billing management portal to update your auto-pay method."</p>
-            <button class="btn-copy">Copy to Chat</button>
+            <div style="display:flex; gap:6px; margin-top:6px;">
+              <button class="btn-copy">Copy</button>
+              <button class="btn-insert-chat btn-xs btn-primary" style="padding:2px 6px;">Insert into Chat</button>
+            </div>
           </div>
         </div>
       </div>
@@ -283,22 +314,22 @@
           <div class="metric-card">
             <span class="m-title">Tea Breaks Logged</span>
             <span class="m-val" id="b-tea-count">1 / 2</span>
-            <span class="m-sub text-ok">Policy Limit: Max 2</span>
+            <span class="m-sub text-ok" id="lbl-tea-sub">Policy Limit: Max 2</span>
           </div>
           <div class="metric-card">
             <span class="m-title">Prior Lunch Variance</span>
             <span class="m-val" id="b-lunch-overage">0 mins</span>
-            <span class="m-sub text-ok">Threshold: &lt;15m</span>
+            <span class="m-sub text-ok" id="lbl-lunch-sub">Threshold: &lt;10m</span>
           </div>
           <div class="metric-card">
             <span class="m-title">CXone Schedule Adherence</span>
             <span class="m-val highlight" id="b-adherence">96.4%</span>
-            <span class="m-sub text-ok">Target: &ge; 90%</span>
+            <span class="m-sub text-ok" id="lbl-adh-sub">Target: &ge; 90%</span>
           </div>
           <div class="metric-card">
-            <span class="m-title">Request Frequency (30m)</span>
-            <span class="m-val" id="b-freq-count">1 / 3</span>
-            <span class="m-sub text-ok">Throttle Threshold: 3</span>
+            <span class="m-title" id="lbl-freq-title">Request Frequency (1-Wk)</span>
+            <span class="m-val" id="b-freq-count">1 / 5</span>
+            <span class="m-sub text-ok" id="lbl-freq-sub">Threshold: 5 / week</span>
           </div>
         </div>
       </div>
@@ -325,23 +356,6 @@
         </div>
         <p class="forecast-note">✓ Staffing buffer healthy. Standard AUX requests eligible for auto-approval.</p>
       </div>
-
-      <!-- Supervisor Tracking & Audit Logs -->
-      <div class="card-section">
-        <h4>Supervisor Audit Log (Dispatched Decisions)</h4>
-        <div id="supervisor-log-list" class="supervisor-log-list">
-          <div class="log-entry">
-            <span class="log-time">10:15 AM</span>
-            <span class="log-tag approved">APPROVED</span>
-            <span class="log-text">AUX-2 (Tea Break, 15m) auto-approved. Staffing surplus +3. Sent to Supervisor SUP-014.</span>
-          </div>
-          <div class="log-entry">
-            <span class="log-time">08:30 AM</span>
-            <span class="log-tag system">LOGIN</span>
-            <span class="log-text">Agent Alex Morgan shifted to AVAILABLE state in NICE CXone.</span>
-          </div>
-        </div>
-      </div>
     </section>
 
     <!-- TAB 3: TROUBLESHOOTING ARTICLES (NICE CXONE & SYSTEM) -->
@@ -356,6 +370,24 @@
         <button class="kb-pill" data-cat="vpn">VPN / Network</button>
         <button class="kb-pill" data-cat="vdi">Citrix / VDI</button>
         <button class="kb-pill" data-cat="audio">Headset & Audio</button>
+      </div>
+
+      <!-- INLINE FULL ARTICLE READER (STAYS ON TAB 3, NO REDIRECT) -->
+      <div id="article-detail-view" class="article-detail-view hidden" style="background:var(--card-bg); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:14px; margin-bottom:12px; animation: slide-down 0.2s ease;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+          <span id="article-detail-cat" class="card-badge badge-agent" style="font-size:10px; font-weight:700;">NICE CXone</span>
+          <button id="btn-close-article" class="btn-xs btn-outline" style="font-size:10px; padding:2px 8px;">✕ Close Guide</button>
+        </div>
+        <h3 id="article-detail-title" style="font-size:13px; font-weight:700; margin-bottom:6px; color:var(--text-main);">Article Title</h3>
+        <p id="article-detail-desc" style="font-size:11px; color:var(--text-muted); line-height:1.4; margin-bottom:10px;">Article description and root cause.</p>
+        <div style="background:rgba(37,99,235,0.06); border:1px solid rgba(37,99,235,0.2); border-radius:6px; padding:8px; margin-bottom:10px;">
+          <strong style="color:var(--primary); font-size:10px; display:block; margin-bottom:2px;">🔧 Step-by-Step Resolution:</strong>
+          <p id="article-detail-steps" style="font-size:11px; color:var(--text-main); line-height:1.3;"></p>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button id="btn-article-run-diag" class="btn btn-primary btn-xs" style="padding:4px 8px;">⚡ Run Diagnostic</button>
+          <button id="btn-article-copy" class="btn btn-outline btn-xs" style="padding:4px 8px;">📋 Copy Steps</button>
+        </div>
       </div>
 
       <div class="articles-list" id="articles-container">
@@ -395,19 +427,19 @@
         <div class="policy-agent-summary">
           <div class="policy-row-agent">
             <span>Max Discretionary Tea Breaks:</span>
-            <strong>2 breaks / shift</strong>
+            <strong id="agent-policy-tea">2 breaks / shift</strong>
           </div>
           <div class="policy-row-agent">
             <span>Lunch Variance Allowed:</span>
-            <strong>Max +10 mins</strong>
+            <strong id="agent-policy-lunch">Max +10 mins</strong>
           </div>
           <div class="policy-row-agent">
             <span>Request Frequency Throttle:</span>
-            <strong>Max 3 requests / 30m</strong>
+            <strong id="agent-policy-freq">Max 5 requests / 1-Wk</strong>
           </div>
           <div class="policy-row-agent">
             <span>Target CXone Adherence:</span>
-            <strong>&ge; 90.0%</strong>
+            <strong id="agent-policy-adh">&ge; 90.0%</strong>
           </div>
         </div>
         <small class="text-muted" style="display:block; margin-top:8px;">*Limits are administered exclusively by the Operations Supervisor.</small>

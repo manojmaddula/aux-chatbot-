@@ -291,21 +291,22 @@ async function evaluateBreakRequest(requestPayload) {
 }
 
 function runClientSideDecisionEngine(payload) {
-  // 1. Request Frequency Check (Limiter)
+  // 1. Request Frequency Check (1-Week Scheduling Window)
   const reqHistory = JSON.parse(localStorage.getItem('wfm_request_history') || '[]');
   const now = Date.now();
-  const recentWithin30m = reqHistory.filter(t => (now - t) < 30 * 60 * 1000);
-  if (recentWithin30m.length >= 3) {
+  const oneWeekMs = 7 * 24 * 60 * 60 * 1000;
+  const recentWithin1Wk = reqHistory.filter(t => (now - t) < oneWeekMs);
+  if (recentWithin1Wk.length >= 5) {
     return {
       status: 'REJECTED',
       code: 'FREQ_LIMIT_EXCEEDED',
       checkBackLater: true,
-      nextOpenInterval: '11:30 AM (15m Cooldown)',
-      title: 'Auto-Rejected: Request Frequency Limit Exceeded',
-      description: `You have submitted ${recentWithin30m.length} requests in the last 30 minutes. To protect queue stability, subsequent requests are automatically throttled for 15 minutes.`,
+      nextOpenInterval: 'Next Scheduling Week (Window Reset)',
+      title: 'Auto-Rejected: Weekly Request Frequency Limit Exceeded',
+      description: `You have submitted ${recentWithin1Wk.length} requests in the active 1-week scheduling window. To ensure queue coverage, subsequent requests are held until the weekly quota resets or supervisor provides an exception.`,
       metrics: {
-        'Request Frequency': `${recentWithin30m.length} requests / 30m (Limit: 3)`,
-        'Cooldown Remaining': '12 mins',
+        'Weekly Frequency': `${recentWithin1Wk.length} requests / 1-Week (Limit: 5)`,
+        'Policy Window': '1 Week (Rolling 7 Days)',
         'Supervisor Notification': 'Dispatched (Audit flag)'
       }
     };
@@ -499,8 +500,8 @@ btnSubmitBreak.addEventListener('click', async () => {
     for (const [key, val] of Object.entries(decision.metrics || {})) {
       metricsHtml += `
         <div class="metric-row">
-          <span style="color:#94a3b8;">${key}</span>
-          <strong style="color:#f8fafc;">${val}</strong>
+          <span style="color:#475569; font-weight:600;">${key}</span>
+          <strong style="color:#0f172a;">${val}</strong>
         </div>
       `;
     }
@@ -520,16 +521,27 @@ btnSyncChatbot.addEventListener('click', () => {
   }
 });
 
-// Toggle IT issue documentation when AUX-5 is selected
-document.querySelectorAll('input[name="aux-code"]').forEach(radio => {
-  radio.addEventListener('change', (e) => {
-    const itBox = document.getElementById('it-system-issue-box');
-    if (itBox) {
-      if (e.target.value.includes('AUX-5')) {
-        itBox.classList.remove('hidden');
-      } else {
-        itBox.classList.add('hidden');
-      }
+// Strictly toggle IT issue documentation ONLY when AUX-5 is selected
+function syncItIssueBoxVisibility() {
+  const selectedAux = document.querySelector('input[name="aux-code"]:checked');
+  const itBox = document.getElementById('it-system-issue-box');
+  if (itBox) {
+    if (selectedAux && selectedAux.value.includes('AUX-5')) {
+      itBox.classList.remove('hidden');
+    } else {
+      itBox.classList.add('hidden');
     }
+  }
+}
+
+// Initial sync on load
+syncItIssueBoxVisibility();
+
+document.querySelectorAll('input[name="aux-code"]').forEach(radio => {
+  radio.addEventListener('change', syncItIssueBoxVisibility);
+});
+document.querySelectorAll('.aux-option').forEach(opt => {
+  opt.addEventListener('click', () => {
+    setTimeout(syncItIssueBoxVisibility, 50);
   });
 });

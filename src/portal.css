@@ -1,14 +1,14 @@
 :root {
   --primary: #2563eb;
   --primary-hover: #1d4ed8;
-  --success: #10b981;
-  --danger: #ef4444;
-  --warning: #f59e0b;
-  --bg-dark: #0f172a;
-  --card-bg: #1e293b;
-  --border: #334155;
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
+  --success: #059669;
+  --danger: #dc2626;
+  --warning: #d97706;
+  --bg-dark: #f8fafc;
+  --card-bg: #ffffff;
+  --border: #e2e8f0;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
   --radius: 12px;
 }
 
@@ -154,7 +154,7 @@ body {
 .form-group label {
   font-size: 12px;
   font-weight: 600;
-  color: #cbd5e1;
+  color: #334155;
 }
 
 .section-label {
@@ -162,13 +162,13 @@ body {
   font-size: 13px;
   font-weight: 600;
   margin-bottom: 10px;
-  color: #cbd5e1;
+  color: #334155;
 }
 
 input, select, textarea {
-  background: #0f172a;
+  background: #ffffff;
   border: 1px solid var(--border);
-  color: #fff;
+  color: #0f172a;
   padding: 10px 14px;
   border-radius: 8px;
   font-size: 14px;
@@ -183,8 +183,8 @@ input:focus, select:focus, textarea:focus {
 .wfm-gauge-banner {
   display: flex;
   justify-content: space-around;
-  background: rgba(37, 99, 235, 0.1);
-  border: 1px dashed rgba(37, 99, 235, 0.4);
+  background: rgba(37, 99, 235, 0.06);
+  border: 1px dashed rgba(37, 99, 235, 0.3);
   padding: 12px;
   border-radius: 8px;
   margin-bottom: 20px;
@@ -206,11 +206,11 @@ input:focus, select:focus, textarea:focus {
 .gauge-val {
   font-size: 14px;
   font-weight: 700;
-  color: #fff;
+  color: #0f172a;
 }
 
 .gauge-val.highlight {
-  color: #38bdf8;
+  color: var(--primary);
 }
 
 .aux-grid {
@@ -230,7 +230,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 .aux-card {
-  background: #0f172a;
+  background: #ffffff;
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 14px 10px;
@@ -240,6 +240,7 @@ input:focus, select:focus, textarea:focus {
   text-align: center;
   gap: 6px;
   transition: all 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
 }
 
 .aux-card .aux-icon {
@@ -248,7 +249,7 @@ input:focus, select:focus, textarea:focus {
 
 .aux-card strong {
   font-size: 13px;
-  color: #e2e8f0;
+  color: #0f172a;
 }
 
 .aux-card small {
@@ -258,7 +259,7 @@ input:focus, select:focus, textarea:focus {
 
 .aux-option input[type="radio"]:checked + .aux-card {
   border-color: var(--primary);
-  background: rgba(37, 99, 235, 0.15);
+  background: rgba(37, 99, 235, 0.08);
   box-shadow: 0 0 0 1px var(--primary);
 }
 
@@ -270,9 +271,9 @@ input:focus, select:focus, textarea:focus {
 }
 
 .pill {
-  background: #0f172a;
+  background: #f1f5f9;
   border: 1px solid var(--border);
-  color: #cbd5e1;
+  color: #334155;
   padding: 8px 16px;
   border-radius: 20px;
   cursor: pointer;
@@ -282,8 +283,8 @@ input:focus, select:focus, textarea:focus {
 }
 
 .pill:hover {
-  background: #1e293b;
-  border-color: #64748b;
+  background: #e2e8f0;
+  border-color: #94a3b8;
 }
 
 .pill.active {
@@ -291,6 +292,11 @@ input:focus, select:focus, textarea:focus {
   border-color: var(--primary);
   color: #fff;
   font-weight: 600;
+}
+
+#it-system-issue-box.hidden,
+.it-issue-box.hidden {
+  display: none !important;
 }
 
 .custom-duration {
@@ -429,7 +435,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 .decision-metrics {
-  background: #0f172a;
+  background: #f8fafc;
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 16px;
@@ -444,7 +450,7 @@ input:focus, select:focus, textarea:focus {
 .metric-row {
   display: flex;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  border-bottom: 1px solid #e2e8f0;
   padding-bottom: 6px;
 }
 
