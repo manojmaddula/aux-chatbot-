@@ -495,3 +495,17 @@ btnSyncChatbot.addEventListener('click', () => {
     window.location.href = '/widget.html';
   }
 });
+
+// Toggle IT issue documentation when AUX-5 is selected
+document.querySelectorAll('input[name="aux-code"]').forEach(radio => {
+  radio.addEventListener('change', (e) => {
+    const itBox = document.getElementById('it-system-issue-box');
+    if (itBox) {
+      if (e.target.value.includes('AUX-5')) {
+        itBox.classList.remove('hidden');
+      } else {
+        itBox.classList.add('hidden');
+      }
+    }
+  });
+});

@@ -103,7 +103,36 @@ const wfmQueueBalanceState = {
   ]
 };
 
-const agentRequestLog = new Map(); // agentId -> array of timestamps
+const agentRequestLog = new Map();
+
+// Centralized IT System Issue Incidents Store
+const itIncidents = [
+  {
+    id: 'INC-88102',
+    timestamp: new Date(Date.now() - 5400000).toISOString(),
+    agentId: 'AGT-4491',
+    agentName: 'Carlos Mendez',
+    queue: 'Tier-2 Tech Support',
+    category: 'Cisco AnyConnect VPN Error 412',
+    severity: 'HIGH',
+    description: 'MTU mismatch on Wi-Fi adapter causing WebRTC voice drop.',
+    status: 'IN_PROGRESS',
+    assignedTo: 'IT Network Engineering'
+  },
+  {
+    id: 'INC-88103',
+    timestamp: new Date(Date.now() - 1800000).toISOString(),
+    agentId: 'AGT-9102',
+    agentName: 'Samantha Vance',
+    queue: 'General Customer Service',
+    category: 'Citrix Workspace Black Screen',
+    severity: 'MEDIUM',
+    description: 'Virtual display driver freeze on reconnect after lunch.',
+    status: 'RESOLVED',
+    assignedTo: 'VDI Desktop Support'
+  }
+];
+ // agentId -> array of timestamps
 
 const MIME_TYPES = {
   '.html': 'text/html; charset=UTF-8',
@@ -399,6 +428,45 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+
+  // API ROUTE: Get IT System Issue Incidents
+  if (pathname === '/api/it/incidents' && req.method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(itIncidents));
+    return;
+  }
+
+  // API ROUTE: Log New IT System Issue Incident from Portal
+  if (pathname === '/api/it/incidents' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const incident = {
+          id: 'INC-' + Math.floor(Math.random() * 90000 + 10000),
+          timestamp: new Date().toISOString(),
+          agentId: payload.agentId || 'AGT-UNKNOWN',
+          agentName: payload.agentName || 'Agent',
+          queue: payload.queue || 'Inbound',
+          category: payload.category || 'General System Issue',
+          severity: payload.severity || 'MEDIUM',
+          description: payload.description || 'System issue logged from AUX-5 portal.',
+          status: 'NEW',
+          assignedTo: 'IT Helpdesk & Telecom'
+        };
+        itIncidents.unshift(incident);
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, incident }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
   // Serve static files from /src
   let filePath = path.join(PUBLIC_DIR, pathname === '/' ? 'widget.html' : pathname);
 
@@ -441,6 +509,24 @@ function evaluateBreak(payload) {
   const agent = payload.agent || {};
   const agentId = agent.id || 'AGT-DEFAULT';
 
+  // Auto-log IT incident if AUX-5 System Issue
+  let generatedItTicket = null;
+  if (payload.auxCode && payload.auxCode.includes('AUX-5')) {
+    generatedItTicket = 'INC-' + Math.floor(Math.random() * 90000 + 10000);
+    itIncidents.unshift({
+      id: generatedItTicket,
+      timestamp: new Date().toISOString(),
+      agentId: agent.id || 'AGT-SYSTEM',
+      agentName: agent.name || 'Agent',
+      queue: agent.queue || 'Inbound',
+      category: payload.itIssueCategory || 'NICE CXone / VPN System Issue',
+      severity: 'HIGH',
+      description: payload.itIssueDetails || payload.notes || 'Agent switched to AUX-5 System Issue.',
+      status: 'NEW',
+      assignedTo: 'IT Helpdesk (Direct Dispatch)'
+    });
+  }
+
   // 1. Frequency Limiting
   const now = Date.now();
   let timestamps = agentRequestLog.get(agentId) || [];
@@ -451,6 +537,8 @@ function evaluateBreak(payload) {
     return {
       status: 'REJECTED',
       code: 'FREQ_LIMIT_EXCEEDED',
+      checkBackLater: true,
+      nextOpenInterval: '11:30 AM (15m Cooldown)',
       title: 'Auto-Rejected: Request Frequency Limit Exceeded',
       description: `Rate limit triggered: Agent has sent 3 break requests in the past 10 minutes. Automated throttle active to prevent queue volatility.`,
       metrics: {
@@ -468,6 +556,8 @@ function evaluateBreak(payload) {
     return {
       status: 'REJECTED',
       code: 'BEHAVIORAL_TEA_OVERAGE',
+      checkBackLater: true,
+      nextOpenInterval: 'Check Back Later with Supervisor Approval',
       title: 'Auto-Rejected: Tea Break Frequency Pattern Exceeded',
       description: 'Behavioral analysis indicates agent has logged 4 or more short breaks today. Exceeds standard shift policy.',
       metrics: {
@@ -482,6 +572,8 @@ function evaluateBreak(payload) {
     return {
       status: 'REJECTED',
       code: 'BEHAVIORAL_LUNCH_OVERAGE',
+      checkBackLater: true,
+      nextOpenInterval: 'Check Back Later after WFM Review',
       title: 'Auto-Rejected: Chronic Extra Lunch Pattern Detected',
       description: 'Historical records show repeated lunch overages exceeding +15 minutes without authorization. Self-service AUX approval suspended.',
       metrics: {
@@ -503,6 +595,8 @@ function evaluateBreak(payload) {
     return {
       status: 'REJECTED',
       code: 'WFM_ACD_STAFFING_LIMITED',
+      checkBackLater: true,
+      nextOpenInterval: '11:45 AM (After Morning Rush)',
       title: 'Auto-Rejected: Monday Peak Call Volume Active',
       description: 'ACD arrival surge detected (Monday Morning Rush). Queue depth exceeds normal thresholds; non-critical AUX requests temporarily restricted.',
       metrics: {

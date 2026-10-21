@@ -1328,6 +1328,15 @@ function sendUserBotMessage() {
       executeSupBotCommand('flagged_qa');
     } else if (q.includes('recall') || q.includes('overdue') || q.includes('bot call')) {
       executeSupBotCommand('bot_recall');
+    } else if (q.includes('it') || q.includes('ticket') || q.includes('vpn') || q.includes('incident') || q.includes('technical')) {
+      addSupBotMessage('user', 'Show IT System Incidents');
+      fetch('/api/it/incidents').then(r => r.json()).then(tickets => {
+        let h = '<strong>💻 Logged IT System Incidents (' + tickets.length + '):</strong><br/>';
+        tickets.slice(0, 3).forEach(t => {
+          h += '• <strong>' + t.id + ' [' + t.status + ']:</strong> ' + t.agentName + ' - ' + t.category + '<br/>&nbsp;&nbsp;&nbsp;Symptoms: ' + t.description + '<br/>';
+        });
+        setTimeout(() => addSupBotMessage('bot', '', h), 300);
+      });
     } else if (q.includes('broadcast') || q.includes('alert') || q.includes('storm') || q.includes('tornado')) {
       executeSupBotCommand('outage_alert');
     } else if (q.includes('who') || q.includes('aux') || q.includes('tea') || q.includes('lunch') || q.includes('status') || q.includes('adherence')) {
@@ -1361,3 +1370,52 @@ if (btnSupVoiceBriefing) {
     }
   });
 }
+
+// ==========================================
+// IT SYSTEM ISSUE INCIDENTS LOGIC
+// ==========================================
+
+async function fetchItIncidents() {
+  try {
+    const res = await fetch('/api/it/incidents');
+    if (res.ok) {
+      const tickets = await res.json();
+      renderItIncidents(tickets);
+    }
+  } catch (e) {
+    console.warn('Could not fetch IT incidents:', e);
+  }
+}
+
+function renderItIncidents(tickets) {
+  const tbody = document.getElementById('it-incidents-body');
+  if (!tbody) return;
+
+  if (!tickets || tickets.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#9ca3af; padding:16px;">No active IT system incidents reported. All systems operational.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = tickets.map(t => {
+    const timeStr = new Date(t.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    let tagClass = 'aux';
+    if (t.status === 'NEW') tagClass = 'rejected';
+    if (t.status === 'RESOLVED') tagClass = 'approved';
+
+    return '<tr>' +
+      '<td style="font-family:monospace; color:#38bdf8; font-weight:700;">' + t.id + '</td>' +
+      '<td style="font-family:monospace; color:#9ca3af;">' + timeStr + '</td>' +
+      '<td><strong style="color:#fff;">' + t.agentName + '</strong><div style="font-family:monospace; font-size:11px; color:#9ca3af;">' + t.agentId + ' (' + t.queue + ')</div></td>' +
+      '<td><span class="status-tag ' + tagClass + '">' + t.category + '</span></td>' +
+      '<td style="color:#cbd5e1; max-width:320px; line-height:1.4;">' + t.description + '</td>' +
+      '<td><small style="color:#a78bfa; font-weight:700;">' + t.assignedTo + '</small></td>' +
+      '<td><span class="status-tag ' + tagClass + '">' + t.status + '</span></td>' +
+    '</tr>';
+  }).join('');
+}
+
+document.getElementById('btn-refresh-it-tickets')?.addEventListener('click', fetchItIncidents);
+
+// Fetch IT tickets on init and periodic
+fetchItIncidents();
+setInterval(fetchItIncidents, 6000);

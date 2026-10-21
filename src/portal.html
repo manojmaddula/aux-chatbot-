@@ -152,6 +152,39 @@
           </div>
         </div>
 
+        <!-- IT SYSTEM ISSUE DOCUMENTATION (SHOWN WHEN AUX-5 IS SELECTED) -->
+        <div id="it-system-issue-box" class="it-issue-box hidden" style="background:rgba(30,58,138,0.2); border:1px solid #3b82f6; border-radius:8px; padding:12px; margin-top:12px;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+            <span style="font-size:20px;">💻</span>
+            <div>
+              <strong style="color:#93c5fd; font-size:12px;">System Issue Alert: Document & Distribute to IT Helpdesk</strong>
+              <p style="font-size:11px; color:#cbd5e1; margin-top:2px;">Direct IT portal distribution ensures faster technical resolution while you are in AUX-5.</p>
+            </div>
+          </div>
+          <div class="form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:8px;">
+            <div class="form-group">
+              <label style="font-size:11px; color:#94a3b8;">Technical Failure Category:</label>
+              <select id="it-issue-category" style="background:#090d16; color:#fff; border:1px solid #3b82f6; padding:6px; border-radius:4px; width:100%;">
+                <option value="Cisco AnyConnect / VPN Error 412">Cisco AnyConnect / VPN Error 412 (MTU/Tunnel)</option>
+                <option value="Citrix Workspace VDI Freeze">Citrix Workspace VDI Black Screen / Freeze</option>
+                <option value="NICE CXone MAX Audio / WebRTC Drop">NICE CXone MAX Audio Drop / Code 99 CTI Lockout</option>
+                <option value="CRM Cloud Database Latency">CRM Database Replication Latency</option>
+                <option value="USB Headset Buffer Distortion">Windows 11 USB Headset Buffer Distortion</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label style="font-size:11px; color:#94a3b8;">Error Code / Specific Symptoms:</label>
+              <input type="text" id="it-issue-details" placeholder="e.g. Lost audio stream on incoming call #90421" style="background:#090d16; color:#fff; border:1px solid #3b82f6; padding:6px; border-radius:4px; width:100%;" />
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
+            <input type="checkbox" id="it-notify-chk" checked style="cursor:pointer;" />
+            <label for="it-notify-chk" style="color:#f8fafc; font-size:11px; cursor:pointer;">
+              <strong>Auto-dispatch ticket to IT Support queue</strong> for rapid response
+            </label>
+          </div>
+        </div>
+
         <div class="form-group">
           <label class="section-label">Duration</label>
           <div class="duration-pills">
@@ -206,6 +239,24 @@
         <h3 id="decision-title">Evaluating ACD & Behavioral Forecast...</h3>
         <p id="decision-desc">Cross-checking ACD arrival forecast, queue depth, and agent adherence patterns...</p>
         
+        
+        <!-- CHECK BACK LATER BANNER (SHOWN ON REJECTION) -->
+        <div id="check-back-later-card" class="check-back-card hidden" style="background:rgba(245,158,11,0.12); border:1px solid #f59e0b; border-radius:8px; padding:12px; margin:12px 0; text-align:left;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <span style="font-size:24px;">⏳</span>
+            <div>
+              <strong style="color:#fbbf24; font-size:13px; display:block;">Check Back Later for AUX Availability</strong>
+              <p style="color:#cbd5e1; font-size:11px; margin-top:2px;">
+                ACD queue depth or staffing constraints are currently active. Discretionary AUX requests are temporarily held.
+              </p>
+              <div style="margin-top:6px; display:flex; gap:14px; font-size:11px; font-weight:700;">
+                <span style="color:#38bdf8;">Next Open Window: <span id="checkback-next-window">11:45 AM</span></span>
+                <span style="color:#a78bfa;">Status: <span id="checkback-countdown">Queue Busy - Hold</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div id="decision-metrics" class="decision-metrics">
           <!-- Filled dynamically -->
         </div>
@@ -215,6 +266,20 @@
         </div>
       </div>
     </div>
+  
+    <!-- BUSINESS CONTINUITY PLAN (BCP) CONTINGENCY FOOTER -->
+    <footer class="portal-bcp-footer" style="margin-top:20px; padding:12px; background:rgba(15,23,42,0.6); border:1px solid #1e293b; border-radius:8px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:18px;">🛡️</span>
+          <span style="color:#94a3b8; font-size:11px;">
+            <strong>Business Continuity Contingency Plan (BCP):</strong> In the event of system disruption, use the offline manual break voucher protocol.
+          </span>
+        </div>
+        <button id="btn-open-bcp-modal" class="btn btn-sm btn-outline" onclick="alert('📋 BCP Contingency Protocol Active:\n\nIn the event of network disruption or core CTI switch outage:\n1. Manually notify Floor Supervisor via radio or landline extension 4401.\n2. Log break start and end times in local offline clipboard.\n3. WFM will retroactively reconcile payroll variance upon link restoration.')">📋 View Contingency Protocol</button>
+      </div>
+    </footer>
+
   </div>
 
   <script src="portal.js"></script>
