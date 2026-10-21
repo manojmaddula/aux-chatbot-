@@ -38,6 +38,71 @@ const ivrDeflectionState = {
   ]
 };
 
+// Dynamic WFM Intraday Queue & Skill Rebalance State
+const wfmQueueBalanceState = {
+  isSurgeActive: false,
+  isRebalanced: false,
+  autoFlexEnabled: false,
+  queues: {
+    billing: {
+      id: 'SKILL-101',
+      name: 'Customer Billing & Retention',
+      callsWaiting: 42,
+      avgWaitSeconds: 35,
+      targetSla: 80,
+      currentSla: 86.4,
+      requiredAgents: 4,
+      assignedAgents: 4,
+      occupancyPct: 78,
+      status: 'NORMAL'
+    },
+    customerService: {
+      id: 'SKILL-102',
+      name: 'General Customer Service',
+      callsWaiting: 8,
+      avgWaitSeconds: 14,
+      targetSla: 80,
+      currentSla: 97.2,
+      requiredAgents: 2,
+      assignedAgents: 5,
+      occupancyPct: 34,
+      status: 'IDLE_SURPLUS'
+    },
+    techSupport: {
+      id: 'SKILL-103',
+      name: 'Tier-2 Tech Support',
+      callsWaiting: 15,
+      avgWaitSeconds: 32,
+      targetSla: 80,
+      currentSla: 88.0,
+      requiredAgents: 3,
+      assignedAgents: 3,
+      occupancyPct: 80,
+      status: 'NORMAL'
+    },
+    emergency: {
+      id: 'SKILL-104',
+      name: 'Emergency Inbound',
+      callsWaiting: 3,
+      avgWaitSeconds: 9,
+      targetSla: 95,
+      currentSla: 98.0,
+      requiredAgents: 2,
+      assignedAgents: 2,
+      occupancyPct: 65,
+      status: 'NORMAL'
+    }
+  },
+  reallocatedAgents: [],
+  historyLog: [
+    {
+      timestamp: new Date().toISOString(),
+      event: 'SYSTEM_STANDBY',
+      details: 'Dynamic WFM Queue Balancing Engine active. Telemetry linked to NICE CXone ACD.'
+    }
+  ]
+};
+
 const agentRequestLog = new Map(); // agentId -> array of timestamps
 
 const MIME_TYPES = {
@@ -178,6 +243,157 @@ const server = http.createServer((req, res) => {
       } catch (e) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ error: e.message }));
+      }
+    });
+    return;
+  }
+
+  // API ROUTE: Get WFM Queue Balancing Telemetry & Rebalance State
+  if (pathname === '/api/wfm/queue-balance' && req.method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify(wfmQueueBalanceState));
+    return;
+  }
+
+  // API ROUTE: Execute WFM Queue Rebalancing, Surge Simulation, & Restore
+  if (pathname === '/api/wfm/queue-balance' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+
+        function executeRebalance() {
+          wfmQueueBalanceState.isRebalanced = true;
+          wfmQueueBalanceState.reallocatedAgents = [
+            {
+              id: 'AGT-9102',
+              name: 'Samantha Vance',
+              baseSkill: 'General Customer Service',
+              flexSkill: 'Customer Billing & Retention (Flex Support)',
+              flexSchedule: '10:00 - 11:30 (Intraday Skill Flex)',
+              priorityRouting: 'P1: Billing (Surge) / P2: Cust Service',
+              status: 'ACTIVE_FLEX',
+              reassignedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            },
+            {
+              id: 'AGT-6512',
+              name: 'Rachel Green',
+              baseSkill: 'General Customer Service',
+              flexSkill: 'Customer Billing & Retention (Flex Support)',
+              flexSchedule: '10:00 - 11:30 (Intraday Skill Flex)',
+              priorityRouting: 'P1: Billing (Surge) / P2: Cust Service',
+              status: 'ACTIVE_FLEX',
+              reassignedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            },
+            {
+              id: 'AGT-8819',
+              name: 'Marcus Brody',
+              baseSkill: 'General Customer Service',
+              flexSkill: 'Customer Billing & Retention (Flex Support)',
+              flexSchedule: '10:00 - 11:30 (Intraday Skill Flex)',
+              priorityRouting: 'P1: Billing (Surge) / P2: Cust Service',
+              status: 'ACTIVE_FLEX',
+              reassignedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            }
+          ];
+
+          wfmQueueBalanceState.queues.billing.assignedAgents = 7;
+          wfmQueueBalanceState.queues.billing.callsWaiting = 64;
+          wfmQueueBalanceState.queues.billing.avgWaitSeconds = 58;
+          wfmQueueBalanceState.queues.billing.currentSla = 79.2;
+          wfmQueueBalanceState.queues.billing.occupancyPct = 85;
+          wfmQueueBalanceState.queues.billing.status = 'REBALANCED';
+
+          wfmQueueBalanceState.queues.customerService.assignedAgents = 2;
+          wfmQueueBalanceState.queues.customerService.occupancyPct = 76;
+          wfmQueueBalanceState.queues.customerService.status = 'FLEXED_DONOR';
+
+          wfmQueueBalanceState.historyLog.unshift({
+            timestamp: new Date().toISOString(),
+            event: 'REBALANCE_DISPATCHED',
+            details: 'WFM Dynamic Cross-Skill Rebalance executed: 3 Customer Service agents flexed to Billing. Billing SLA recovering (34.5% -> 79.2%). Discretionary AUX paused.'
+          });
+        }
+
+        if (payload.action === 'SURGE_BILLING') {
+          wfmQueueBalanceState.isSurgeActive = true;
+          wfmQueueBalanceState.queues.billing.callsWaiting = 318;
+          wfmQueueBalanceState.queues.billing.avgWaitSeconds = 540;
+          wfmQueueBalanceState.queues.billing.currentSla = 34.5;
+          wfmQueueBalanceState.queues.billing.requiredAgents = 8;
+          wfmQueueBalanceState.queues.billing.occupancyPct = 100;
+          wfmQueueBalanceState.queues.billing.status = 'SURGE_CRITICAL';
+
+          wfmQueueBalanceState.queues.customerService.callsWaiting = 6;
+          wfmQueueBalanceState.queues.customerService.avgWaitSeconds = 11;
+          wfmQueueBalanceState.queues.customerService.occupancyPct = 28;
+          wfmQueueBalanceState.queues.customerService.status = 'IDLE_SURPLUS';
+
+          wfmQueueBalanceState.historyLog.unshift({
+            timestamp: new Date().toISOString(),
+            event: 'SURGE_DETECTED',
+            details: 'Sudden Billing Call Volume Surge (+318 calls waiting, ASA 9m). Customer Service idle (5 agents, 28% occupancy). Queue load imbalance ratio: 53:1.'
+          });
+
+          if (wfmQueueBalanceState.autoFlexEnabled && !wfmQueueBalanceState.isRebalanced) {
+            executeRebalance();
+          }
+        } else if (payload.action === 'TRIGGER_REBALANCE') {
+          executeRebalance();
+        } else if (payload.action === 'RESTORE_BASE') {
+          wfmQueueBalanceState.isSurgeActive = false;
+          wfmQueueBalanceState.isRebalanced = false;
+          wfmQueueBalanceState.reallocatedAgents = [];
+
+          wfmQueueBalanceState.queues.billing.callsWaiting = 42;
+          wfmQueueBalanceState.queues.billing.avgWaitSeconds = 35;
+          wfmQueueBalanceState.queues.billing.currentSla = 86.4;
+          wfmQueueBalanceState.queues.billing.assignedAgents = 4;
+          wfmQueueBalanceState.queues.billing.requiredAgents = 4;
+          wfmQueueBalanceState.queues.billing.occupancyPct = 78;
+          wfmQueueBalanceState.queues.billing.status = 'NORMAL';
+
+          wfmQueueBalanceState.queues.customerService.callsWaiting = 8;
+          wfmQueueBalanceState.queues.customerService.avgWaitSeconds = 14;
+          wfmQueueBalanceState.queues.customerService.currentSla = 97.2;
+          wfmQueueBalanceState.queues.customerService.assignedAgents = 5;
+          wfmQueueBalanceState.queues.customerService.requiredAgents = 2;
+          wfmQueueBalanceState.queues.customerService.occupancyPct = 34;
+          wfmQueueBalanceState.queues.customerService.status = 'IDLE_SURPLUS';
+
+          wfmQueueBalanceState.historyLog.unshift({
+            timestamp: new Date().toISOString(),
+            event: 'RESTORED_BASE',
+            details: 'Volume normalized. Rebalanced agents successfully returned to base General Customer Service WFM schedule. Normal AUX permissions restored.'
+          });
+        } else if (payload.action === 'RESTORE_SINGLE_AGENT' && payload.agentId) {
+          wfmQueueBalanceState.reallocatedAgents = wfmQueueBalanceState.reallocatedAgents.filter(a => a.id !== payload.agentId);
+          if (wfmQueueBalanceState.reallocatedAgents.length === 0) {
+            wfmQueueBalanceState.isRebalanced = false;
+          }
+          wfmQueueBalanceState.historyLog.unshift({
+            timestamp: new Date().toISOString(),
+            event: 'AGENT_RESTORED',
+            details: `Agent ${payload.agentId} individually restored to base Customer Service WFM schedule.`
+          });
+        } else if (payload.action === 'TOGGLE_AUTOFLEX') {
+          wfmQueueBalanceState.autoFlexEnabled = !wfmQueueBalanceState.autoFlexEnabled;
+          wfmQueueBalanceState.historyLog.unshift({
+            timestamp: new Date().toISOString(),
+            event: 'AUTOFLEX_TOGGLED',
+            details: `Autonomous WFM Auto-Flex Mode set to ${wfmQueueBalanceState.autoFlexEnabled ? 'ENABLED' : 'DISABLED'}.`
+          });
+          if (wfmQueueBalanceState.autoFlexEnabled && wfmQueueBalanceState.isSurgeActive && !wfmQueueBalanceState.isRebalanced) {
+            executeRebalance();
+          }
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(wfmQueueBalanceState));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
       }
     });
     return;

@@ -1290,3 +1290,34 @@ body {
 }
 
 .training-assigned-banner.hidden { display: none; }
+
+.wfm-rebalance-banner {
+  background: linear-gradient(90deg, #1e3a5f, #0f172a);
+  border-bottom: 2px solid #38bdf8;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  animation: slide-down 0.3s ease;
+}
+
+.wfm-rebalance-banner.hidden { display: none; }
+
+.rebalance-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rebalance-banner-content strong {
+  color: #38bdf8;
+  display: block;
+}
+
+.rebalance-banner-content p {
+  color: #e2e8f0;
+  font-size: 10px;
+  margin-top: 2px;
+  line-height: 1.3;
+}

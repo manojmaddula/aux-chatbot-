@@ -107,6 +107,16 @@ An enterprise-grade desktop chatbot widget for contact center agents that stream
 - **Supervisor 1-Click Mandatory Coaching**: Immediate training module assignment for non-compliant or rude agents, automatically switching their status to `AUX: TRAINING`.
 - **CSV Audit Export**: Instant export of adherence, QA, and IVR satisfaction reports.
 
+### 11. Dynamic WFM Intraday Schedule & Queue Cross-Skill Balancing
+- **Sudden Volume Surge Detection**: When Billing calls spike (e.g. 318 calls waiting, ASA > 9m) while General Customer Service agents are idling (5 agents, 28% occupancy), the engine detects the 53:1 queue load imbalance.
+- **Dynamic Cross-Skilling Rebalance**:
+  - Automatically or with 1-click reallocates eligible cross-trained Customer Service agents (Samantha Vance, Rachel Green, Marcus Brody) to `Customer Billing & Retention (Flex Support)`.
+  - Injects a temporary `10:00 - 11:30 Intraday Skill Flex` interval into their WFM schedule.
+  - Updates NICE CXone ACD routing with Priority 1 (Billing) and Priority 2 (Customer Service).
+  - Temporarily pauses discretionary AUX breaks (Tea/Bio) during the surge window to protect queue SLAs.
+- **Agent Desktop Widget Synchronization**: Pushes immediate banner alert (`🔄 Dynamic WFM Skill Flex: Customer Billing Support`) and elevates Billing copilot replies.
+- **Autonomous Restoration**: When call volume normalizes back below threshold, agents are automatically returned to their base Customer Service shift and normal AUX permissions resume.
+
 ---
 
 ## 🤖 Assistant Branding & Name Candidates

@@ -78,6 +78,9 @@
       <button class="sup-tab-btn" data-tab="stab-qa">
         <span>🎓</span> QA, Customer Tone & Coaching (<span id="sup-qa-badge" style="color:#f87171; font-weight:800;">2 Flagged</span>)
       </button>
+            <button class="sup-tab-btn" data-tab="stab-rebalance">
+        <span>⚡</span> Dynamic WFM Rebalance (<span id="rebalance-status-tag" style="color:#34d399; font-weight:700;">Normal</span>)
+      </button>
       <button class="sup-tab-btn" data-tab="stab-limits">
         <span>⚙️</span> Agent Limits & Policy Setup
       </button>
@@ -88,6 +91,18 @@
 
     <!-- TAB 1: FLOOR WALLBOARD & TELEMETRY -->
     <section id="stab-wallboard" class="sup-tab-pane active">
+      <!-- LIVE SURGE & IMBALANCE ALERT BANNER ON WALLBOARD -->
+      <div id="wallboard-surge-alert" class="rebalance-banner-box hidden" style="margin-bottom:16px;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span style="font-size:24px;">⚡</span>
+          <div>
+            <strong style="color:#f87171; font-size:13px;">Sudden Queue Surge: Billing Queue Overloaded (318 Calls Waiting)!</strong>
+            <p style="color:#cbd5e1; font-size:11px;">Customer Service agents are underutilized. WFM recommends dynamic cross-skilling rebalance.</p>
+          </div>
+        </div>
+        <button id="btn-quick-rebalance-wallboard" class="btn btn-sm btn-primary">🔄 Reallocate 3 Agents Now</button>
+      </div>
+
       <div class="card">
         <div class="card-header">
           <div>
@@ -623,6 +638,187 @@
           </div>
         </div>
       </div>
+    </section>
+
+
+    <!-- TAB: DYNAMIC WFM QUEUE & SKILL REBALANCING -->
+    <section id="stab-rebalance" class="sup-tab-pane">
+      
+      <!-- TOP STATUS ALERT BANNER -->
+      <div id="rebalance-alert-banner" class="rebalance-banner-box normal">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span id="rebalance-banner-icon" style="font-size:26px;">🟢</span>
+          <div>
+            <h4 id="rebalance-banner-title" style="color:#34d399; font-size:14px; margin-bottom:2px;">ACD Queue Volumes Balanced across All Skills</h4>
+            <p id="rebalance-banner-desc" style="color:#cbd5e1; font-size:12px;">Customer Billing and General Customer Service queues are operating within standard SLA targets (&ge;80%).</p>
+          </div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button id="btn-toggle-autoflex" class="btn btn-sm btn-outline">⚙️ Auto-Flex: OFF</button>
+        </div>
+      </div>
+
+      <!-- QUEUE IMBALANCE SIDE-BY-SIDE TELEMETRY GRID -->
+      <div class="queue-telemetry-grid">
+        
+        <!-- CARD 1: CUSTOMER BILLING & RETENTION (SURGE / SPIKE QUEUE) -->
+        <div class="card queue-card" id="qcard-billing">
+          <div class="card-header" style="border-left: 4px solid #ef4444;">
+            <div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="status-tag approved" id="qtag-billing">NORMAL (SLA OK)</span>
+                <span style="color:#9ca3af; font-size:11px;">Skill ID: SKILL-101</span>
+              </div>
+              <h3 style="margin-top:4px;">💳 Customer Billing & Retention</h3>
+              <p>Primary queue for invoice disputes, subscription upgrades, and fee refunds.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="q-stats-grid">
+              <div class="q-stat">
+                <span class="q-label">Calls Waiting:</span>
+                <div class="q-val" id="q-billing-waiting" style="color:#f87171;">42</div>
+                <small class="text-muted" id="q-billing-sub">Target &le; 15</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label">Avg Speed Answer (ASA):</span>
+                <div class="q-val" id="q-billing-asa">00:35</div>
+                <small class="text-muted">Target &le; 30s</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label">Projected SLA %:</span>
+                <div class="q-val" id="q-billing-sla" style="color:#34d399;">86.4%</div>
+                <small class="text-muted">Target &ge; 80%</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label">Assigned Staffing:</span>
+                <div class="q-val" id="q-billing-agents">4 Logged-in</div>
+                <small class="text-muted" id="q-billing-req">Required: 4</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 2: GENERAL CUSTOMER SERVICE (DONOR QUEUE WITH SURPLUS CAPACITY) -->
+        <div class="card queue-card" id="qcard-cs">
+          <div class="card-header" style="border-left: 4px solid #10b981;">
+            <div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="status-tag approved" id="qtag-cs">IDLE SURPLUS</span>
+                <span style="color:#9ca3af; font-size:11px;">Skill ID: SKILL-102</span>
+              </div>
+              <h3 style="margin-top:4px;">🎧 General Customer Service</h3>
+              <p>Inquiry handling, address updates, store hours, and account onboarding.</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="q-stats-grid">
+              <div class="q-stat">
+                <span class="q-label">Calls Waiting:</span>
+                <div class="q-val" id="q-cs-waiting" style="color:#34d399;">8</div>
+                <small class="text-muted">Low queue depth</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label">Avg Speed Answer (ASA):</span>
+                <div class="q-val" id="q-cs-asa">00:14</div>
+                <small class="text-muted">Optimal pick-up</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label">Projected SLA %:</span>
+                <div class="q-val" id="q-cs-sla" style="color:#34d399;">97.2%</div>
+                <small class="text-muted">Surplus buffer</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label">Assigned Staffing:</span>
+                <div class="q-val" id="q-cs-agents">5 Logged-in</div>
+                <small class="text-muted" id="q-cs-idle">3 Idle / Underutilized</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SIMULATION & REBALANCE CONTROLS -->
+      <div class="card" style="margin-top: 20px;">
+        <div class="card-header">
+          <div>
+            <h3>⚡ Intraday WFM Skill Rebalance & Simulation Engine</h3>
+            <p>Simulate unexpected queue spikes (e.g. statement release), dynamically reassign idle Customer Service agents to Billing, and restore base shifts.</p>
+          </div>
+        </div>
+        <div class="card-body">
+          
+          <div class="sim-actions-bar">
+            <button id="btn-sim-billing-surge" class="btn btn-emergency sev1">
+              <span>⚡</span> 1. Simulate Sudden Billing Spike (+318 Calls)
+            </button>
+            <button id="btn-trigger-wfm-rebalance" class="btn btn-primary" style="background:#2563eb;">
+              <span>🔄</span> 2. Execute WFM Rebalance (Flex 3 CS Agents to Billing)
+            </button>
+            <button id="btn-restore-base-schedules" class="btn btn-success">
+              <span>🟢</span> 3. Normalize Volume & Restore Base WFM Schedules
+            </button>
+          </div>
+
+          <!-- WFM ALGORITHM EXPLANATION BANNER -->
+          <div class="rebalance-explainer-banner">
+            <strong style="color:#93c5fd; font-size:12px;">📐 How WFM Dynamic Cross-Skilling Works:</strong>
+            <ul style="color:#cbd5e1; font-size:11px; margin-top:6px; line-height:1.6; padding-left:18px;">
+              <li><strong>Intraday Surge Detection</strong>: When Billing calls exceed 150+ and ASA &gt; 3m while Customer Service agents have &lt;35% occupancy, the engine calculates the Erlang-C staffing deficit (+4 required).</li>
+              <li><strong>Eligible Agent Selection</strong>: Evaluates cross-trained agents in Customer Service (Samantha Vance, Rachel Green, Marcus Brody) with Billing certification.</li>
+              <li><strong>WFM Schedule Injection</strong>: Automatically inserts a temporary <code>10:00 - 11:30 Intraday Skill Flex</code> interval into their shift.</li>
+              <li><strong>ACD Dynamic Prioritization</strong>: Pushes P1 priority for Billing calls to their NICE CXone softphone while keeping Customer Service as P2 fallback.</li>
+              <li><strong>Break Policy Throttling</strong>: Discretionary AUX breaks (Tea/Bio) are temporarily restricted during the surge window to protect queue SLAs.</li>
+            </ul>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- LIVE REALLOCATED AGENTS ROSTER TABLE -->
+      <div class="card" style="margin-top: 20px;">
+        <div class="card-header">
+          <div>
+            <h3>👥 Dynamic Flex Staffing Roster (Intraday WFM Schedule)</h3>
+            <p>Real-time view of agents temporarily flexed from Customer Service to Billing queue to absorb call volume.</p>
+          </div>
+          <div class="header-actions">
+            <span id="reallocated-count-badge" class="sup-badge" style="background:rgba(16,185,129,0.2); color:#34d399; font-size:12px;">0 Agents Flexed</span>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Agent ID & Name</th>
+                <th>Base Shift & Skill</th>
+                <th>Dynamic WFM Flex Interval</th>
+                <th>Target Surge Skill Assigned</th>
+                <th>NICE CXone ACD Routing</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="rebalance-roster-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- REBALANCE EVENT AUDIT LOG -->
+      <div class="card" style="margin-top: 20px;">
+        <div class="card-header">
+          <h3>📝 Dynamic WFM Rebalance Audit Log</h3>
+        </div>
+        <div class="card-body">
+          <div id="rebalance-audit-log" class="deflection-log-list" style="max-height:160px; overflow-y:auto;">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </div>
+
     </section>
 
   </div>

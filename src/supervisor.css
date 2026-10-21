@@ -649,3 +649,103 @@ textarea:focus, select:focus {
 }
 .d-log-item.active { color: #f87171; font-weight: 700; }
 .d-log-item.disabled { color: #34d399; font-weight: 700; }
+
+/* DYNAMIC WFM QUEUE REBALANCING */
+.rebalance-banner-box {
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.rebalance-banner-box.normal {
+  border-left: 4px solid #10b981;
+}
+
+.rebalance-banner-box.surge {
+  background: rgba(239, 68, 68, 0.12);
+  border-left: 4px solid #ef4444;
+  border-color: rgba(239, 68, 68, 0.3);
+  animation: pulseSurge 2s infinite;
+}
+
+.rebalance-banner-box.rebalanced {
+  background: rgba(59, 130, 246, 0.12);
+  border-left: 4px solid #3b82f6;
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+@keyframes pulseSurge {
+  0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.2); }
+  70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+.queue-telemetry-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 16px;
+}
+
+.queue-card {
+  transition: all 0.3s ease;
+}
+
+.queue-card.surge-highlight {
+  border-color: #ef4444;
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.25);
+}
+
+.queue-card.flex-highlight {
+  border-color: #3b82f6;
+  box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+}
+
+.q-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.q-stat {
+  background: #090d16;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.q-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.q-val {
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+  font-family: monospace;
+}
+
+.sim-actions-bar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.rebalance-explainer-banner {
+  background: rgba(37, 99, 235, 0.08);
+  border: 1px dashed rgba(59, 130, 246, 0.4);
+  border-radius: 8px;
+  padding: 14px 18px;
+}

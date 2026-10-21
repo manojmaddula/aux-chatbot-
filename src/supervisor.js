@@ -66,6 +66,9 @@ supTabBtns.forEach(btn => {
     if (target === 'stab-qa') {
       renderQAScorecard();
     }
+    if (target === 'stab-rebalance') {
+      fetchQueueBalance();
+    }
   });
 });
 
@@ -945,3 +948,239 @@ if (btnTestAnnouncementAudio) {
 // Poll IVR deflection
 fetchIvrDeflection();
 setInterval(fetchIvrDeflection, 4000);
+
+
+// ==========================================
+// TAB 8: DYNAMIC WFM QUEUE REBALANCING
+// ==========================================
+
+let wfmRebalanceData = {
+  isSurgeActive: false,
+  isRebalanced: false,
+  autoFlexEnabled: false,
+  queues: {
+    billing: { callsWaiting: 42, avgWaitSeconds: 35, currentSla: 86.4, assignedAgents: 4, requiredAgents: 4, status: 'NORMAL' },
+    customerService: { callsWaiting: 8, avgWaitSeconds: 14, currentSla: 97.2, assignedAgents: 5, requiredAgents: 2, status: 'IDLE_SURPLUS' }
+  },
+  reallocatedAgents: [],
+  historyLog: []
+};
+
+async function fetchQueueBalance() {
+  try {
+    const res = await fetch('/api/wfm/queue-balance');
+    if (res.ok) {
+      wfmRebalanceData = await res.json();
+      renderQueueBalanceUI();
+    }
+  } catch (err) {
+    console.warn('Queue balance fetch error:', err);
+  }
+}
+
+function renderQueueBalanceUI() {
+  const statusTag = document.getElementById('rebalance-status-tag');
+  const alertBanner = document.getElementById('rebalance-alert-banner');
+  const bannerIcon = document.getElementById('rebalance-banner-icon');
+  const bannerTitle = document.getElementById('rebalance-banner-title');
+  const bannerDesc = document.getElementById('rebalance-banner-desc');
+  const wbSurgeAlert = document.getElementById('wallboard-surge-alert');
+  const btnToggleAutoflex = document.getElementById('btn-toggle-autoflex');
+
+  if (!wfmRebalanceData || !wfmRebalanceData.queues) return;
+
+  const b = wfmRebalanceData.queues.billing;
+  const cs = wfmRebalanceData.queues.customerService;
+
+  if (document.getElementById('q-billing-waiting')) {
+    document.getElementById('q-billing-waiting').textContent = b.callsWaiting;
+    const mins = Math.floor(b.avgWaitSeconds / 60);
+    const secs = b.avgWaitSeconds % 60;
+    document.getElementById('q-billing-asa').textContent = String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
+    document.getElementById('q-billing-sla').textContent = b.currentSla + '%';
+    document.getElementById('q-billing-agents').textContent = b.assignedAgents + ' Logged-in';
+    document.getElementById('q-billing-req').textContent = 'Required: ' + b.requiredAgents;
+
+    const bCard = document.getElementById('qcard-billing');
+    const bTag = document.getElementById('qtag-billing');
+    if (b.status === 'SURGE_CRITICAL') {
+      bTag.className = 'status-tag rejected';
+      bTag.textContent = 'SURGE CRITICAL';
+      if (bCard) bCard.className = 'card queue-card surge-highlight';
+    } else if (b.status === 'REBALANCED') {
+      bTag.className = 'status-tag approved';
+      bTag.textContent = 'REBALANCED (FLEX ACTIVE)';
+      if (bCard) bCard.className = 'card queue-card flex-highlight';
+    } else {
+      bTag.className = 'status-tag approved';
+      bTag.textContent = 'NORMAL (SLA OK)';
+      if (bCard) bCard.className = 'card queue-card';
+    }
+  }
+
+  if (document.getElementById('q-cs-waiting')) {
+    document.getElementById('q-cs-waiting').textContent = cs.callsWaiting;
+    const mins = Math.floor(cs.avgWaitSeconds / 60);
+    const secs = cs.avgWaitSeconds % 60;
+    document.getElementById('q-cs-asa').textContent = String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
+    document.getElementById('q-cs-sla').textContent = cs.currentSla + '%';
+    document.getElementById('q-cs-agents').textContent = cs.assignedAgents + ' Logged-in';
+    
+    const csTag = document.getElementById('qtag-cs');
+    if (csTag) {
+      if (cs.status === 'FLEXED_DONOR') {
+        csTag.className = 'status-tag aux';
+        csTag.textContent = 'DONOR (3 AGENTS FLEXED)';
+      } else {
+        csTag.className = 'status-tag approved';
+        csTag.textContent = 'IDLE SURPLUS';
+      }
+    }
+  }
+
+  // Banner & Wallboard alert
+  if (statusTag) {
+    if (wfmRebalanceData.isRebalanced) {
+      statusTag.textContent = 'Flex Active (3 Reallocated)';
+      statusTag.style.color = '#38bdf8';
+    } else if (wfmRebalanceData.isSurgeActive) {
+      statusTag.textContent = 'Surge Detected!';
+      statusTag.style.color = '#ef4444';
+    } else {
+      statusTag.textContent = 'Normal';
+      statusTag.style.color = '#34d399';
+    }
+  }
+
+  if (alertBanner) {
+    if (wfmRebalanceData.isRebalanced) {
+      alertBanner.className = 'rebalance-banner-box rebalanced';
+      if (bannerIcon) bannerIcon.textContent = '🔄';
+      if (bannerTitle) {
+        bannerTitle.style.color = '#38bdf8';
+        bannerTitle.textContent = 'Intraday WFM Skill Flex Active: 3 Agents Reallocated to Billing';
+      }
+      if (bannerDesc) {
+        bannerDesc.textContent = 'Billing Queue calls cleared down from 318 -> ' + b.callsWaiting + '. ASA recovered to ' + b.avgWaitSeconds + 's. Customer Service queue remains healthy (' + cs.currentSla + '% SLA).';
+      }
+      if (wbSurgeAlert) wbSurgeAlert.classList.add('hidden');
+    } else if (wfmRebalanceData.isSurgeActive) {
+      alertBanner.className = 'rebalance-banner-box surge';
+      if (bannerIcon) bannerIcon.textContent = '⚠️';
+      if (bannerTitle) {
+        bannerTitle.style.color = '#ef4444';
+        bannerTitle.textContent = 'Critical Queue Imbalance: Billing Overloaded (' + b.callsWaiting + ' Waiting) vs Customer Service Idle';
+      }
+      if (bannerDesc) {
+        bannerDesc.textContent = 'Billing SLA plunged to ' + b.currentSla + '%. 5 Customer Service agents are underutilized (28% occupancy). WFM recommends dynamic cross-skilling.';
+      }
+      if (wbSurgeAlert) wbSurgeAlert.classList.remove('hidden');
+    } else {
+      alertBanner.className = 'rebalance-banner-box normal';
+      if (bannerIcon) bannerIcon.textContent = '🟢';
+      if (bannerTitle) {
+        bannerTitle.style.color = '#34d399';
+        bannerTitle.textContent = 'ACD Queue Volumes Balanced across All Skills';
+      }
+      if (bannerDesc) {
+        bannerDesc.textContent = 'Customer Billing and General Customer Service queues are operating within standard SLA targets (>=80%).';
+      }
+      if (wbSurgeAlert) wbSurgeAlert.classList.add('hidden');
+    }
+  }
+
+  if (btnToggleAutoflex) {
+    btnToggleAutoflex.textContent = '⚙️ Auto-Flex: ' + (wfmRebalanceData.autoFlexEnabled ? 'ON (ACTIVE)' : 'OFF');
+    btnToggleAutoflex.className = wfmRebalanceData.autoFlexEnabled ? 'btn btn-sm btn-success' : 'btn btn-sm btn-outline';
+  }
+
+  // Roster table
+  const rosterBody = document.getElementById('rebalance-roster-body');
+  const countBadge = document.getElementById('reallocated-count-badge');
+  if (countBadge) {
+    countBadge.textContent = wfmRebalanceData.reallocatedAgents.length + ' Agents Flexed';
+  }
+
+  if (rosterBody) {
+    if (!wfmRebalanceData.reallocatedAgents || wfmRebalanceData.reallocatedAgents.length === 0) {
+      rosterBody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#9ca3af; padding:20px;">No agents currently flexed. All personnel operating on base WFM shift schedules.</td></tr>';
+    } else {
+      rosterBody.innerHTML = wfmRebalanceData.reallocatedAgents.map(ag => {
+        return '<tr>' +
+          '<td><strong style="color:#fff;">' + ag.name + '</strong><div style="font-family:monospace; color:#9ca3af; font-size:11px;">' + ag.id + '</div></td>' +
+          '<td><span class="status-tag approved">' + ag.baseSkill + '</span></td>' +
+          '<td><strong style="color:#38bdf8;">' + ag.flexSchedule + '</strong></td>' +
+          '<td><span class="status-tag aux">' + ag.flexSkill + '</span></td>' +
+          '<td><small style="color:#cbd5e1; font-family:monospace;">' + ag.priorityRouting + '</small></td>' +
+          '<td><span class="status-tag approved">ACTIVE FLEX</span></td>' +
+          '<td><button class="btn btn-xs btn-outline" onclick="restoreSingleAgent(\'' + ag.id + '\')">Restore Base</button></td>' +
+        '</tr>';
+      }).join('');
+    }
+  }
+
+  // Audit log
+  const auditLog = document.getElementById('rebalance-audit-log');
+  if (auditLog && wfmRebalanceData.historyLog) {
+    auditLog.innerHTML = wfmRebalanceData.historyLog.slice(0, 8).map(log => {
+      const timeStr = new Date(log.timestamp).toLocaleTimeString();
+      let cls = '';
+      if (log.event === 'SURGE_DETECTED') cls = 'active';
+      if (log.event === 'REBALANCE_DISPATCHED' || log.event === 'RESTORED_BASE') cls = 'disabled';
+      return '<div class="d-log-item ' + cls + '">[' + timeStr + '] <strong>' + log.event + ':</strong> ' + log.details + '</div>';
+    }).join('');
+  }
+}
+
+async function postQueueBalance(action, extraPayload = {}) {
+  try {
+    const res = await fetch('/api/wfm/queue-balance', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, ...extraPayload })
+    });
+    if (res.ok) {
+      wfmRebalanceData = await res.json();
+      renderQueueBalanceUI();
+
+      // Broadcast to agent widgets via wfm_aux_channel
+      if (bc) {
+        bc.postMessage({
+          type: 'WFM_REBALANCE_UPDATE',
+          payload: wfmRebalanceData
+        });
+      }
+    }
+  } catch (err) {
+    console.warn(err);
+  }
+}
+
+// Global action handlers
+window.restoreSingleAgent = function(agentId) {
+  postQueueBalance('RESTORE_SINGLE_AGENT', { agentId });
+};
+
+document.getElementById('btn-sim-billing-surge')?.addEventListener('click', () => {
+  postQueueBalance('SURGE_BILLING');
+});
+
+document.getElementById('btn-trigger-wfm-rebalance')?.addEventListener('click', () => {
+  postQueueBalance('TRIGGER_REBALANCE');
+});
+
+document.getElementById('btn-quick-rebalance-wallboard')?.addEventListener('click', () => {
+  postQueueBalance('TRIGGER_REBALANCE');
+});
+
+document.getElementById('btn-restore-base-schedules')?.addEventListener('click', () => {
+  postQueueBalance('RESTORE_BASE');
+});
+
+document.getElementById('btn-toggle-autoflex')?.addEventListener('click', () => {
+  postQueueBalance('TOGGLE_AUTOFLEX');
+});
+
+// Initialize WFM Queue Balance polling
+fetchQueueBalance();
+setInterval(fetchQueueBalance, 4000);

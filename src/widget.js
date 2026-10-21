@@ -250,6 +250,8 @@ try {
       showNotification('Policy Update', 'Supervisor updated break thresholds and rate limits.');
     } else if (data.type === 'IVR_DEFLECTION_UPDATE') {
       handleIvrDeflectionUpdate(data.payload);
+    } else if (data.type === 'WFM_REBALANCE_UPDATE') {
+      handleWfmRebalanceUpdate(data.payload);
     } else if (data.type === 'MANDATORY_TRAINING_ASSIGNED') {
       const banner = document.getElementById('training-assigned-banner');
       const titleEl = document.getElementById('training-banner-title');
@@ -328,6 +330,9 @@ function switchWidgetAgent(agentKey) {
   if (ivrFeedback && profile.ivrFeedback) ivrFeedback.textContent = profile.ivrFeedback;
 
   addSupervisorLog('AGENT_SWITCH', `Active persona switched to ${profile.name} (${profile.id}).`);
+  if (latestRebalanceData) {
+    handleWfmRebalanceUpdate(latestRebalanceData);
+  }
 }
 
 const btnAckTraining = document.getElementById('btn-ack-training');
@@ -964,3 +969,51 @@ async function pollAgentDeflection() {
 
 pollAgentDeflection();
 setInterval(pollAgentDeflection, 4000);
+
+
+// ==========================================
+// DYNAMIC WFM SKILL REBALANCE HANDLING
+// ==========================================
+
+let latestRebalanceData = null;
+
+function handleWfmRebalanceUpdate(data) {
+  latestRebalanceData = data;
+  const banner = document.getElementById('wfm-rebalance-banner');
+  const title = document.getElementById('wfm-rebalance-title');
+  const desc = document.getElementById('wfm-rebalance-desc');
+  if (!banner) return;
+
+  const isCurrentAgentFlexed = data && data.reallocatedAgents && data.reallocatedAgents.some(a => a.id === agentState.id);
+
+  if (isCurrentAgentFlexed) {
+    banner.classList.remove('hidden');
+    if (title) title.textContent = '🔄 Dynamic WFM Skill Flex: Customer Billing Support';
+    if (desc) desc.textContent = 'You have been dynamically flexed from Customer Service to absorb high Billing queue volume. Billing quick-replies boosted.';
+    playWarningChime();
+    addSupervisorLog('WFM_REBALANCE', 'Agent reallocated to Customer Billing & Retention due to sudden volume surge.');
+  } else {
+    banner.classList.add('hidden');
+  }
+}
+
+const btnAckRebalance = document.getElementById('btn-ack-rebalance');
+if (btnAckRebalance) {
+  btnAckRebalance.addEventListener('click', () => {
+    const banner = document.getElementById('wfm-rebalance-banner');
+    if (banner) banner.classList.add('hidden');
+  });
+}
+
+async function pollAgentRebalance() {
+  try {
+    const res = await fetch('/api/wfm/queue-balance');
+    if (res.ok) {
+      const data = await res.json();
+      handleWfmRebalanceUpdate(data);
+    }
+  } catch (e) {}
+}
+
+pollAgentRebalance();
+setInterval(pollAgentRebalance, 4000);
