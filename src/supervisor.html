@@ -109,12 +109,10 @@
           </div>
         </div>
         <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-          <button id="btn-wb-sim-surge" class="btn btn-sm btn-emergency sev1" style="background:#dc2626; color:#fff;">⚡ 1. Simulate Surge (+318)</button>
-          <button id="btn-quick-rebalance-wallboard" class="btn btn-sm btn-primary" style="background:#2563eb; color:#fff; font-weight:700;">🔄 2. Reallocate 3 Agents Now</button>
-          <button id="btn-wb-restore-base" class="btn btn-sm btn-success" style="background:#059669; color:#fff;">🟢 3. Restore Base</button>
+          <button id="btn-wb-sim-surge" class="btn btn-sm btn-emergency sev1" style="background:#dc2626; color:#fff; font-weight:700; cursor:pointer;" onclick="executeSurgeBilling()">⚡ 1. Simulate Surge (+318)</button>
+          <button id="btn-quick-rebalance-wallboard" class="btn btn-sm btn-primary" style="background:#2563eb; color:#fff; font-weight:700; cursor:pointer;" onclick="executeClientRebalance()">🔄 2. Reallocate 3 Agents Now</button>
+          <button id="btn-wb-restore-base" class="btn btn-sm btn-success" style="background:#059669; color:#fff; font-weight:700; cursor:pointer;" onclick="executeRestoreBase()">🟢 3. Restore Base</button>
         </div>
-      </div>
-        <button id="btn-quick-rebalance-wallboard" class="btn btn-sm btn-primary">🔄 Reallocate 3 Agents Now</button>
       </div>
 
       <div class="card">

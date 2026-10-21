@@ -296,7 +296,7 @@ window.overrideApprove = function(reqId, agentId) {
   fetchQueue();
 };
 
-document.getElementById('btn-refresh-queue').addEventListener('click', fetchQueue);
+document.getElementById('btn-refresh-queue')?.addEventListener('click', fetchQueue);
 document.getElementById('btn-clear-queue')?.addEventListener('click', () => {
   if (confirm('Clear audit queue history?')) {
     renderQueue([]);
@@ -370,23 +370,23 @@ window.retractBroadcast = function(id) {
   alert('Broadcast retracted from agent dashboard.');
 };
 
-document.getElementById('btn-bc-storm').addEventListener('click', () => {
+document.getElementById('btn-bc-storm')?.addEventListener('click', () => {
   dispatchSupervisorBroadcast('CRITICAL', 'TORNADO & SEVERE STORM WARNING', 'Severe storm/tornado advisory active for regional facility. Inbound call diverts enabled. Prepare for high call volumes.');
 });
 
-document.getElementById('btn-bc-outage').addEventListener('click', () => {
+document.getElementById('btn-bc-outage')?.addEventListener('click', () => {
   dispatchSupervisorBroadcast('CRITICAL', 'SEV-1 CRM DATABASE LATENCY OUTAGE', 'Cloud CRM replication latency high. Switch to offline wrap-up notes. Telephony queue remains active.');
 });
 
-document.getElementById('btn-bc-monday').addEventListener('click', () => {
+document.getElementById('btn-bc-monday')?.addEventListener('click', () => {
   dispatchSupervisorBroadcast('WARNING', 'MONDAY MORNING HIGH CALL VOLUME MODE', 'Queue depth threshold exceeded. Discretionary AUX breaks restricted. Maintain Available state in NICE CXone.');
 });
 
-document.getElementById('btn-bc-cxone').addEventListener('click', () => {
+document.getElementById('btn-bc-cxone')?.addEventListener('click', () => {
   dispatchSupervisorBroadcast('INFO', 'NICE CXONE PLATFORM UPDATE', 'Cluster maintenance window complete. All WebRTC endpoints report optimal latency (<20ms).');
 });
 
-document.getElementById('btn-send-custom-bc').addEventListener('click', () => {
+document.getElementById('btn-send-custom-bc')?.addEventListener('click', () => {
   const title = document.getElementById('custom-bc-title').value.trim() || 'SUPERVISOR OPERATIONAL ADVISORY';
   const text = document.getElementById('custom-bc-text').value.trim();
   const severity = document.getElementById('custom-bc-severity').value;
@@ -512,12 +512,12 @@ function loadReport(key) {
   }).join('');
 }
 
-document.getElementById('report-type-select').addEventListener('change', (e) => {
+document.getElementById('report-type-select')?.addEventListener('change', (e) => {
   loadReport(e.target.value);
 });
 
 // CSV Export Engine
-document.getElementById('btn-export-csv').addEventListener('click', () => {
+document.getElementById('btn-export-csv')?.addEventListener('click', () => {
   const rep = reportsData[currentReportKey];
   if (!rep) return;
 
@@ -819,7 +819,7 @@ document.getElementById('btn-qa-clear')?.addEventListener('click', () => {
 // TAB 6: AGENT LIMITS & POLICY SETUP
 // ==========================================
 
-document.getElementById('btn-save-policies').addEventListener('click', async () => {
+document.getElementById('btn-save-policies')?.addEventListener('click', async () => {
   policyLimits.maxTeaBreaks = parseInt(document.getElementById('limit-max-tea').value, 10) || 2;
   policyLimits.lunchVarianceThreshold = parseInt(document.getElementById('limit-lunch-variance').value, 10) || 10;
   policyLimits.frequencyWindow = document.getElementById('limit-freq-window') ? document.getElementById('limit-freq-window').value : '1_WEEK';
@@ -878,7 +878,7 @@ fetch('/api/policy')
 // TAB 7: NICE CXONE DIAGNOSTICS
 // ==========================================
 
-document.getElementById('btn-test-cxone').addEventListener('click', () => {
+document.getElementById('btn-test-cxone')?.addEventListener('click', () => {
   const consoleEl = document.getElementById('cxone-test-console');
   consoleEl.textContent = '> Initiating NICE CXone CTI WebSocket Handshake...\nConnecting wss://na1.niceincontact.com/cti/v2...\n[OK] TLS 1.3 Handshake completed.\n[OK] Authenticated Tenant ENT-NICE-CXONE-9941.\n[OK] WebRTC Media Gateway heartbeats active (18ms latency).\nAll 3 CXone ACD Skills online.';
 });
@@ -1325,6 +1325,7 @@ window.restoreSingleAgent = function(agentId) {
   postQueueBalance('RESTORE_SINGLE_AGENT', { agentId });
 };
 
+window.executeClientRebalance = executeClientRebalance;
 function executeClientRebalance() {
   wfmRebalanceData.isRebalanced = true;
   wfmRebalanceData.isSurgeActive = false;
@@ -1388,6 +1389,7 @@ function executeClientRebalance() {
   postQueueBalance('TRIGGER_REBALANCE');
 }
 
+window.executeRestoreBase = executeRestoreBase;
 function executeRestoreBase() {
   wfmRebalanceData.isSurgeActive = false;
   wfmRebalanceData.isRebalanced = false;
@@ -1425,8 +1427,10 @@ function executeRestoreBase() {
   postQueueBalance('RESTORE_BASE');
 }
 
+window.executeSurgeBilling = executeSurgeBilling;
 function executeSurgeBilling() {
   wfmRebalanceData.isSurgeActive = true;
+  wfmRebalanceData.isRebalanced = false;
   if (wfmRebalanceData.queues.billing) {
     wfmRebalanceData.queues.billing.callsWaiting = 318;
     wfmRebalanceData.queues.billing.avgWaitSeconds = 540;
@@ -1440,6 +1444,7 @@ function executeSurgeBilling() {
     details: 'Sudden Billing Call Volume Surge (+318 calls waiting, ASA 9m). Queue load imbalance ratio: 53:1.'
   });
   renderQueueBalanceUI();
+  renderWallboard();
   postQueueBalance('SURGE_BILLING');
 }
 
