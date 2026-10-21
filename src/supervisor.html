@@ -14,36 +14,27 @@
     <!-- TOP HEADER -->
     <header class="sup-header">
       <div class="header-left">
-        <div class="header-badge-row">
-          <span class="sup-badge">SUPERVISOR COMMAND CENTER</span>
-          <span class="cxone-cluster-badge">● NICE CXone: US-East Cluster (AWS 104) CONNECTED</span>
-        </div>
-        <h2>NICE CXone WFM Operations & Auxiliary Administration</h2>
-        <p>Live floor wallboard, Erlang-C break queue evaluation, multi-type reporting suite, policy limit administration, and emergency broadcasting</p>
+        <h2 style="font-size: 20px; font-weight: 800; color: #0f172a; margin: 0;">Supervisor Dashboard</h2>
       </div>
       <div class="header-right">
         <div class="sup-profile">
           <span class="sup-avatar" id="sup-avatar-icon">👩‍💼</span>
           <div>
-            <label style="font-size:10px; color:#93c5fd; font-weight:700; text-transform:uppercase; display:block;">Active Supervisor:</label>
             <select id="supervisor-select" class="supervisor-dropdown" title="Switch active supervisor account">
-              <option value="SUP-014">Sarah Jenkins (SUP-014) • Floor Lead & WFM Operations</option>
-              <option value="SUP-021">Michael Chang (SUP-021) • Billing Operations Manager</option>
-              <option value="SUP-035">Elena Rostova (SUP-035) • QA & Compliance Director</option>
-              <option value="SUP-042">David Sterling (SUP-042) • Emergency Inbound Director</option>
-              <option value="SUP-059">Priya Sharma (SUP-059) • Intraday WFM Architect</option>
+              <option value="SUP-014">Sarah Jenkins</option>
+              <option value="SUP-021">Michael Chang</option>
+              <option value="SUP-035">Elena Rostova</option>
+              <option value="SUP-042">David Sterling</option>
+              <option value="SUP-059">Priya Sharma</option>
             </select>
-            <span id="sup-role-subtext" style="font-size:11px; color:#9ca3af; display:block; margin-top:2px;">Floor Lead • All Queues & WFM</span>
           </div>
         </div>
-        <a href="/index.html" class="btn btn-sm btn-outline" style="text-decoration:none; display:flex; align-items:center; gap:6px; color:#93c5fd; border-color:#334155;">
+        <a href="/index.html" class="btn btn-sm btn-outline" style="text-decoration:none; display:flex; align-items:center; gap:6px; color:#2563eb; border-color:#cbd5e1; background:#ffffff;">
           <img src="/favicon.svg" style="width:14px; height:14px;" /> Home
         </a>
         <button id="btn-open-sup-bot-header" class="btn btn-sm btn-accent" onclick="window.openSupBot && window.openSupBot()" style="display:flex; align-items:center; gap:6px;">
           <span>🤖</span> Ask Supervisor Bot
         </button>
-        <a href="/widget.html" target="_blank" class="btn btn-outline-light">Open Agent Widget</a>
-        <a href="/portal.html" target="_blank" class="btn btn-primary">Open Break Portal</a>
       </div>
     </header>
 
@@ -99,10 +90,7 @@
       <button class="sup-tab-btn" data-tab="stab-limits">
         <span>⚙️</span> Agent Limits & Policy Setup
       </button>
-      <button class="sup-tab-btn" data-tab="stab-cxone">
-        <span>☁️</span> NICE CXone Integration
-      </button>
-    </nav>
+      </nav>
 
     <!-- TAB 1: FLOOR WALLBOARD & TELEMETRY -->
     <section id="stab-wallboard" class="sup-tab-pane active">
@@ -124,7 +112,12 @@
             <h3>Shift Telemetry & Remote Agent Administration</h3>
             <p>Live status synchronized with NICE CXone MAX CTI state engine. Supervisors can remotely recall or reassign agents.</p>
           </div>
-          <div class="header-actions">
+          <div class="header-actions" style="display:flex; align-items:center; gap:8px;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <input type="text" id="agent-search-input" placeholder="Search agent name, ID or skill..." style="padding:6px 10px; border-radius:6px; border:1px solid #cbd5e1; font-size:12px; width:220px;" />
+              <button id="btn-search-agents" class="btn btn-sm btn-primary">🔍 Search</button>
+              <button id="btn-clear-agent-search" class="btn btn-sm btn-outline">Clear</button>
+            </div>
             <button id="btn-refresh-wallboard" class="btn btn-sm btn-secondary">🔄 Refresh</button>
           </div>
         </div>
@@ -161,7 +154,6 @@
           </div>
           <div class="header-actions">
             <button id="btn-refresh-queue" class="btn btn-sm btn-secondary">🔄 Refresh</button>
-            <button id="btn-clear-queue" class="btn btn-sm btn-outline">Clear History</button>
           </div>
         </div>
         <div class="table-responsive">
@@ -188,6 +180,7 @@
 
     <!-- TAB 3: ALERT & BROADCAST SETUP (SUPERVISOR CONTROLS) -->
     <section id="stab-alerts" class="sup-tab-pane">
+      <p class="tab-tagline" style="color:#64748b; font-size:12px; margin-bottom:14px; margin-top:-4px;">Floor-wide emergency broadcasting, real-time agent notifications, and automated IVR deflection for high-volume call surges.</p>
 
       <!-- STORM OUTAGE & IVR AUTO-DEFLECTION ENGINE (1000 CALLS/MIN THRESHOLD) -->
       <div class="card deflection-card" style="margin-bottom: 20px;">
@@ -210,8 +203,11 @@
             </div>
             <div class="deflection-stat-box">
               <span class="d-label">Deflection Threshold:</span>
-              <div class="d-val highlight">1,000 calls / min</div>
-              <span class="d-sub text-muted">Triggers on call 1,001+</span>
+              <div style="display:flex; align-items:center; gap:6px; margin-top:4px;">
+                <input type="number" id="input-deflection-threshold" min="100" max="5000" step="50" value="1000" style="width:100px; padding:4px 8px; border-radius:4px; border:1px solid #cbd5e1; font-weight:700; font-size:13px; color:#0f172a; background:#fff;" />
+                <button id="btn-save-deflection-threshold" class="btn btn-xs btn-primary">Set</button>
+              </div>
+              <span class="d-sub text-muted" id="threshold-current-label">Triggers on call 1,001+</span>
             </div>
             <div class="deflection-stat-box">
               <span class="d-label">Storm Outage Mode:</span>
@@ -439,14 +435,27 @@
 
       <!-- AGENT QA SCORECARD TABLE -->
       <div class="card">
-        <div class="card-header">
+        <div class="card-header" style="flex-wrap:wrap; gap:12px;">
           <div>
             <h3>🎙️ Agent Interaction Quality & Customer Sentiment Scorecard</h3>
             <p>Monitors how agents speak with customers (Good, Neutral, Bad, Rudely), customer query resolution, security verification, and post-call IVR star ratings.</p>
           </div>
-          <div class="header-actions">
+          <div class="header-actions" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <input type="text" id="qa-search-input" placeholder="Search QA by agent, ID, or tone..." style="padding:6px 10px; border-radius:6px; border:1px solid #cbd5e1; font-size:12px; width:220px;" />
+              <button id="btn-qa-search" class="btn btn-sm btn-primary">🔍 Search</button>
+              <button id="btn-qa-clear" class="btn btn-sm btn-outline">Clear</button>
+            </div>
             <button id="btn-refresh-qa" class="btn btn-sm btn-secondary">🔄 Refresh QA</button>
           </div>
+        </div>
+        <div class="qa-filter-bar" style="padding:10px 20px; background:#f8fafc; border-bottom:1px solid #e2e8f0; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+          <span style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Quick Filters:</span>
+          <button class="btn btn-xs btn-primary qa-filter-btn active" data-filter="all">All Interactions</button>
+          <button class="btn btn-xs btn-outline qa-filter-btn" data-filter="flagged">⚠️ Flagged / Rude Tone</button>
+          <button class="btn btn-xs btn-outline qa-filter-btn" data-filter="low_score">📉 Low Score (&lt;70%)</button>
+          <button class="btn btn-xs btn-outline qa-filter-btn" data-filter="unresolved">❓ Unresolved Queries</button>
+          <button class="btn btn-xs btn-outline qa-filter-btn" data-filter="passing">✅ Passing (&ge;80%)</button>
         </div>
         <div class="table-responsive">
           <table class="data-table">
@@ -586,79 +595,7 @@
       </div>
     </section>
 
-    <!-- TAB 6: NICE CXONE INTEGRATION GATEWAY -->
-    <section id="stab-cxone" class="sup-tab-pane">
-      <div class="dashboard-layout">
-        <div class="card">
-          <div class="card-header">
-            <h3>☁️ NICE CXone CTI & Workforce Management Connectivity</h3>
-            <span class="badge-live">HEALTHY</span>
-          </div>
-          <div class="card-body">
-            <div class="cxone-spec-grid">
-              <div class="spec-row">
-                <span>CXone Tenant ID:</span>
-                <strong>ENT-NICE-CXONE-9941</strong>
-              </div>
-              <div class="spec-row">
-                <span>ACD Media Cluster:</span>
-                <strong>na1.niceincontact.com (US-East AWS 104)</strong>
-              </div>
-              <div class="spec-row">
-                <span>CTI WebSocket Stream:</span>
-                <strong class="text-ok">wss://na1.niceincontact.com/cti/v2 [ACTIVE]</strong>
-              </div>
-              <div class="spec-row">
-                <span>WebRTC Audio Gateway:</span>
-                <strong class="text-ok">Jitter: 0.8ms • Loss: 0.0% [OPTIMAL]</strong>
-              </div>
-              <div class="spec-row">
-                <span>WFM Erlang-C Telemetry:</span>
-                <strong>Interval: 15-min Rolling Window</strong>
-              </div>
-            </div>
-            
-            <div style="margin-top: 20px;">
-              <button id="btn-test-cxone" class="btn btn-secondary">
-                ⚡ Test NICE CXone API Handshake & CTI Heartbeat
-              </button>
-              <pre id="cxone-test-console" class="diag-console" style="margin-top: 10px; height: 90px;">NICE CXone Telemetry link ready...</pre>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <h3>NICE CXone Skill Mappings</h3>
-          </div>
-          <div class="card-body">
-            <div class="policy-list">
-              <div class="policy-item">
-                <div>
-                  <strong>Skill #104: Tier-2 Tech Support</strong>
-                  <p>Inbound Voice • Service Level Target: 80% in 20s</p>
-                </div>
-                <span class="policy-status active">ACTIVE</span>
-              </div>
-              <div class="policy-item">
-                <div>
-                  <strong>Skill #102: Customer Billing & Retention</strong>
-                  <p>Inbound Voice & Chat • SLA Target: 85% in 30s</p>
-                </div>
-                <span class="policy-status active">ACTIVE</span>
-              </div>
-              <div class="policy-item">
-                <div>
-                  <strong>Skill #101: Emergency Inbound</strong>
-                  <p>Priority Priority Routing • SLA Target: 95% in 10s</p>
-                </div>
-                <span class="policy-status active">ACTIVE</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+    
 
 
     <!-- TAB: DYNAMIC WFM QUEUE & SKILL REBALANCING -->
@@ -678,85 +615,9 @@
         </div>
       </div>
 
-      <!-- QUEUE IMBALANCE SIDE-BY-SIDE TELEMETRY GRID -->
-      <div class="queue-telemetry-grid">
-        
-        <!-- CARD 1: CUSTOMER BILLING & RETENTION (SURGE / SPIKE QUEUE) -->
-        <div class="card queue-card" id="qcard-billing">
-          <div class="card-header" style="border-left: 4px solid #ef4444;">
-            <div>
-              <div style="display:flex; align-items:center; gap:8px;">
-                <span class="status-tag approved" id="qtag-billing">NORMAL (SLA OK)</span>
-                <span style="color:#9ca3af; font-size:11px;">Skill ID: SKILL-101</span>
-              </div>
-              <h3 style="margin-top:4px;">💳 Customer Billing & Retention</h3>
-              <p>Primary queue for invoice disputes, subscription upgrades, and fee refunds.</p>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="q-stats-grid">
-              <div class="q-stat">
-                <span class="q-label">Calls Waiting:</span>
-                <div class="q-val" id="q-billing-waiting" style="color:#f87171;">42</div>
-                <small class="text-muted" id="q-billing-sub">Target &le; 15</small>
-              </div>
-              <div class="q-stat">
-                <span class="q-label">Avg Speed Answer (ASA):</span>
-                <div class="q-val" id="q-billing-asa">00:35</div>
-                <small class="text-muted">Target &le; 30s</small>
-              </div>
-              <div class="q-stat">
-                <span class="q-label">Projected SLA %:</span>
-                <div class="q-val" id="q-billing-sla" style="color:#34d399;">86.4%</div>
-                <small class="text-muted">Target &ge; 80%</small>
-              </div>
-              <div class="q-stat">
-                <span class="q-label">Assigned Staffing:</span>
-                <div class="q-val" id="q-billing-agents">4 Logged-in</div>
-                <small class="text-muted" id="q-billing-req">Required: 4</small>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- CARD 2: GENERAL CUSTOMER SERVICE (DONOR QUEUE WITH SURPLUS CAPACITY) -->
-        <div class="card queue-card" id="qcard-cs">
-          <div class="card-header" style="border-left: 4px solid #10b981;">
-            <div>
-              <div style="display:flex; align-items:center; gap:8px;">
-                <span class="status-tag approved" id="qtag-cs">IDLE SURPLUS</span>
-                <span style="color:#9ca3af; font-size:11px;">Skill ID: SKILL-102</span>
-              </div>
-              <h3 style="margin-top:4px;">🎧 General Customer Service</h3>
-              <p>Inquiry handling, address updates, store hours, and account onboarding.</p>
-            </div>
-          </div>
-          <div class="card-body">
-            <div class="q-stats-grid">
-              <div class="q-stat">
-                <span class="q-label">Calls Waiting:</span>
-                <div class="q-val" id="q-cs-waiting" style="color:#34d399;">8</div>
-                <small class="text-muted">Low queue depth</small>
-              </div>
-              <div class="q-stat">
-                <span class="q-label">Avg Speed Answer (ASA):</span>
-                <div class="q-val" id="q-cs-asa">00:14</div>
-                <small class="text-muted">Optimal pick-up</small>
-              </div>
-              <div class="q-stat">
-                <span class="q-label">Projected SLA %:</span>
-                <div class="q-val" id="q-cs-sla" style="color:#34d399;">97.2%</div>
-                <small class="text-muted">Surplus buffer</small>
-              </div>
-              <div class="q-stat">
-                <span class="q-label">Assigned Staffing:</span>
-                <div class="q-val" id="q-cs-agents">5 Logged-in</div>
-                <small class="text-muted" id="q-cs-idle">3 Idle / Underutilized</small>
-              </div>
-            </div>
-          </div>
-        </div>
-
+      <!-- QUEUE IMBALANCE TELEMETRY GRID (DYNAMIC) -->
+      <div class="queue-telemetry-grid" id="dynamic-queues-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:16px;">
+        <!-- Dynamically populated queues: Customer Billing, General CS, Tech Support, Emergency, Spanish Inbound, Outbound & Collections -->
       </div>
 
       <!-- SIMULATION & REBALANCE CONTROLS -->
@@ -774,7 +635,7 @@
               <span>⚡</span> 1. Simulate Sudden Billing Spike (+318 Calls)
             </button>
             <button id="btn-trigger-wfm-rebalance" class="btn btn-primary" style="background:#2563eb;">
-              <span>🔄</span> 2. Execute WFM Rebalance (Flex 3 CS Agents to Billing)
+              <span>🔄</span> 2. Reallocate Agents (Execute WFM Rebalance)
             </button>
             <button id="btn-restore-base-schedules" class="btn btn-success">
               <span>🟢</span> 3. Normalize Volume & Restore Base WFM Schedules
@@ -842,12 +703,7 @@
     </section>
 
   </div>
-<!-- FLOATING SUPERVISOR AI COPILOT LAUNCHER -->
-  <button id="btn-toggle-sup-bot" class="sup-bot-float-btn" onclick="window.toggleSupBot && window.toggleSupBot()" title="Open Supervisor AI Copilot">
-    <span class="bot-icon">🤖</span>
-    <span>Supervisor AI Copilot</span>
-    <span class="bot-status-pulse"></span>
-  </button>
+
 
   <!-- SUPERVISOR AI COPILOT DRAWER / MODAL -->
   <div id="sup-bot-drawer" class="sup-bot-drawer hidden">

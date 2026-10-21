@@ -127,11 +127,29 @@ supTabBtns.forEach(btn => {
 // TAB 1: WALLBOARD LOGIC
 // ==========================================
 
+let agentSearchQuery = '';
+
 function renderWallboard() {
   const tbody = document.getElementById('agent-wallboard-body');
+  if (!tbody) return;
+
   let overdueCount = 0;
 
-  tbody.innerHTML = activeAgents.map(ag => {
+  const filteredAgents = activeAgents.filter(ag => {
+    if (!agentSearchQuery) return true;
+    const q = agentSearchQuery.toLowerCase();
+    return ag.name.toLowerCase().includes(q) ||
+           ag.id.toLowerCase().includes(q) ||
+           ag.queue.toLowerCase().includes(q) ||
+           ag.state.toLowerCase().includes(q);
+  });
+
+  if (filteredAgents.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:#64748b;">No agents found matching "${agentSearchQuery}".</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filteredAgents.map(ag => {
     let stateTag = 'ready';
     if (ag.state.includes('AUX')) stateTag = 'aux';
     if (ag.state.includes('WORKING')) stateTag = 'ready';
@@ -142,21 +160,18 @@ function renderWallboard() {
 
     return `
       <tr>
-        <td style="font-family:monospace; color:#9ca3af;">${ag.id}</td>
-        <td><strong style="color:#fff;">${ag.name}</strong></td>
-        <td>${ag.queue}</td>
+        <td style="font-family:monospace; color:#64748b;">${ag.id}</td>
+        <td><strong style="color:#0f172a;">${ag.name}</strong></td>
+        <td style="color:#334155;">${ag.queue}</td>
         <td><span class="status-tag ${stateTag}">${ag.state}</span></td>
-        <td style="font-family:monospace; color:#38bdf8;">${ag.breakLeft}</td>
-        <td style="font-weight:700; color:${parseFloat(ag.adherence) >= policyLimits.targetAdherence ? '#34d399' : '#f87171'};">${ag.adherence}</td>
+        <td style="font-family:monospace; color:#2563eb; font-weight:700;">${ag.breakLeft}</td>
+        <td style="font-weight:700; color:${parseFloat(ag.adherence) >= policyLimits.targetAdherence ? '#10b981' : '#ef4444'};">${ag.adherence}</td>
         <td>${ag.teaCount} / ${policyLimits.maxTeaBreaks}</td>
         <td>${ag.lunchVar}</td>
         <td>
           <div style="display:flex; gap:6px;">
             <button class="btn btn-sm btn-outline" onclick="recallAgent('${ag.id}', '${ag.name}')" title="Place Automated Bot Voice Call">
               📞 Bot Recall
-            </button>
-            <button class="btn btn-sm btn-secondary" onclick="forceAvailable('${ag.id}')" title="Set Agent to Available">
-              🔄 Available
             </button>
           </div>
         </td>
@@ -200,7 +215,25 @@ window.forceAvailable = function(agentId) {
   alert(`Agent ${agentId} remotely switched to AVAILABLE state in NICE CXone.`);
 };
 
-document.getElementById('btn-refresh-wallboard').addEventListener('click', renderWallboard);
+document.getElementById('btn-refresh-wallboard')?.addEventListener('click', renderWallboard);
+
+document.getElementById('btn-search-agents')?.addEventListener('click', () => {
+  const input = document.getElementById('agent-search-input');
+  agentSearchQuery = input ? input.value.trim() : '';
+  renderWallboard();
+});
+
+document.getElementById('agent-search-input')?.addEventListener('keyup', (e) => {
+  agentSearchQuery = e.target.value.trim();
+  renderWallboard();
+});
+
+document.getElementById('btn-clear-agent-search')?.addEventListener('click', () => {
+  const input = document.getElementById('agent-search-input');
+  if (input) input.value = '';
+  agentSearchQuery = '';
+  renderWallboard();
+});
 
 // ==========================================
 // TAB 2: BREAK QUEUE LOGIC
@@ -264,7 +297,7 @@ window.overrideApprove = function(reqId, agentId) {
 };
 
 document.getElementById('btn-refresh-queue').addEventListener('click', fetchQueue);
-document.getElementById('btn-clear-queue').addEventListener('click', () => {
+document.getElementById('btn-clear-queue')?.addEventListener('click', () => {
   if (confirm('Clear audit queue history?')) {
     renderQueue([]);
   }
@@ -528,11 +561,38 @@ const qaScorecardData = [
   { agentId: 'AGT-2219', name: "Liam O'Connor", contactId: '#90468', tone: 'Bad / Hesitant', securityVerified: false, detailsRetrieved: false, queryResolved: false, ivrStars: 2.5, qaScore: 36, recommendedModule: 'MOD-103', flagReason: 'Failed resolution + Missing account history', trainingAssigned: false }
 ];
 
+let qaFilterState = 'all';
+let qaSearchQuery = '';
+
 function renderQAScorecard() {
   const tbody = document.getElementById('qa-scorecard-body');
   if (!tbody) return;
 
-  tbody.innerHTML = qaScorecardData.map(item => {
+  const filteredData = qaScorecardData.filter(item => {
+    const isRudeOrBad = item.tone.includes('Rudely') || item.tone.includes('Bad');
+    if (qaFilterState === 'flagged' && !isRudeOrBad) return false;
+    if (qaFilterState === 'low_score' && item.qaScore >= 70) return false;
+    if (qaFilterState === 'unresolved' && item.queryResolved) return false;
+    if (qaFilterState === 'passing' && item.qaScore < 80) return false;
+
+    if (qaSearchQuery) {
+      const q = qaSearchQuery.toLowerCase();
+      const match = item.name.toLowerCase().includes(q) ||
+                    item.agentId.toLowerCase().includes(q) ||
+                    item.contactId.toLowerCase().includes(q) ||
+                    item.tone.toLowerCase().includes(q) ||
+                    (item.flagReason && item.flagReason.toLowerCase().includes(q));
+      if (!match) return false;
+    }
+    return true;
+  });
+
+  if (filteredData.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:#64748b;">No interaction records found matching current filter/search.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filteredData.map(item => {
     const isRudeOrBad = item.tone.includes('Rudely') || item.tone.includes('Bad');
     const isFailed = item.qaScore < 70 || isRudeOrBad || !item.queryResolved;
     
@@ -566,17 +626,17 @@ function renderQAScorecard() {
     }
 
     return `
-      <tr>
+      <tr style="${isRudeOrBad ? 'background: rgba(239, 68, 68, 0.05);' : ''}">
         <td>
-          <div style="font-weight:600; color:#fff;">${item.name}</div>
-          <small style="color:#9ca3af; font-family:monospace;">${item.agentId}</small>
+          <div style="font-weight:600; color:#0f172a;">${item.name}</div>
+          <small style="color:#64748b; font-family:monospace;">${item.agentId}</small>
         </td>
-        <td style="font-family:monospace; color:#38bdf8;">${item.contactId}</td>
+        <td style="font-family:monospace; color:#2563eb;">${item.contactId}</td>
         <td><span class="status-tag ${toneBadgeClass}">${item.tone}</span></td>
         <td>${verifBadge}</td>
         <td>${detailsBadge}</td>
         <td>${resBadge}</td>
-        <td><strong style="color:#fbbf24;">★ ${item.ivrStars.toFixed(1)}</strong> / 5.0</td>
+        <td><strong style="color:#d97706;">★ ${item.ivrStars.toFixed(1)}</strong> / 5.0</td>
         <td><span class="status-tag ${scoreBadgeClass}">${item.qaScore}%</span></td>
         <td>${actionBtn}</td>
       </tr>
@@ -723,6 +783,38 @@ if (btnExportQaCsv) {
 const btnRefreshQa = document.getElementById('btn-refresh-qa');
 if (btnRefreshQa) btnRefreshQa.addEventListener('click', renderQAScorecard);
 
+// QA Filter Buttons
+document.querySelectorAll('.qa-filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.qa-filter-btn').forEach(b => {
+      b.classList.remove('active', 'btn-primary');
+      b.classList.add('btn-outline');
+    });
+    btn.classList.add('active', 'btn-primary');
+    btn.classList.remove('btn-outline');
+    qaFilterState = btn.getAttribute('data-filter') || 'all';
+    renderQAScorecard();
+  });
+});
+
+document.getElementById('btn-qa-search')?.addEventListener('click', () => {
+  const input = document.getElementById('qa-search-input');
+  qaSearchQuery = input ? input.value.trim() : '';
+  renderQAScorecard();
+});
+
+document.getElementById('qa-search-input')?.addEventListener('keyup', (e) => {
+  qaSearchQuery = e.target.value.trim();
+  renderQAScorecard();
+});
+
+document.getElementById('btn-qa-clear')?.addEventListener('click', () => {
+  const input = document.getElementById('qa-search-input');
+  if (input) input.value = '';
+  qaSearchQuery = '';
+  renderQAScorecard();
+});
+
 // ==========================================
 // TAB 6: AGENT LIMITS & POLICY SETUP
 // ==========================================
@@ -840,6 +932,15 @@ function renderIvrDeflectionUI() {
 
   if (slider) slider.value = ivrState.callVolumeRatePerMin;
   if (sliderLabel) sliderLabel.textContent = `${ivrState.callVolumeRatePerMin} calls / min`;
+  
+  const threshInput = document.getElementById('input-deflection-threshold');
+  if (threshInput && !threshInput.dataset.userEdited) {
+    threshInput.value = ivrState.thresholdLimitPerMin || 1000;
+  }
+  const threshLabel = document.getElementById('threshold-current-label');
+  if (threshLabel) {
+    threshLabel.textContent = `Triggers on call ${((ivrState.thresholdLimitPerMin || 1000) + 1).toLocaleString()}+`;
+  }
 
   rateDisplay.textContent = `${ivrState.callVolumeRatePerMin} calls / min`;
   countDisplay.textContent = `${ivrState.deflectedCallsCount.toLocaleString()} calls`;
@@ -968,8 +1069,12 @@ let wfmRebalanceData = {
   isRebalanced: false,
   autoFlexEnabled: false,
   queues: {
-    billing: { callsWaiting: 42, avgWaitSeconds: 35, currentSla: 86.4, assignedAgents: 4, requiredAgents: 4, status: 'NORMAL' },
-    customerService: { callsWaiting: 8, avgWaitSeconds: 14, currentSla: 97.2, assignedAgents: 5, requiredAgents: 2, status: 'IDLE_SURPLUS' }
+    billing: { id: 'SKILL-101', name: 'Customer Billing & Retention', callsWaiting: 42, avgWaitSeconds: 35, currentSla: 86.4, assignedAgents: 4, requiredAgents: 4, status: 'NORMAL' },
+    customerService: { id: 'SKILL-102', name: 'General Customer Service', callsWaiting: 8, avgWaitSeconds: 14, currentSla: 97.2, assignedAgents: 5, requiredAgents: 2, status: 'IDLE_SURPLUS' },
+    techSupport: { id: 'SKILL-103', name: 'Tier-2 Tech Support', callsWaiting: 15, avgWaitSeconds: 32, currentSla: 88.0, assignedAgents: 3, requiredAgents: 3, status: 'NORMAL' },
+    emergency: { id: 'SKILL-104', name: 'Emergency Inbound', callsWaiting: 3, avgWaitSeconds: 9, currentSla: 98.0, assignedAgents: 2, requiredAgents: 2, status: 'NORMAL' },
+    spanishSupport: { id: 'SKILL-105', name: 'Bilingual / Spanish Inbound', callsWaiting: 6, avgWaitSeconds: 19, currentSla: 94.5, assignedAgents: 2, requiredAgents: 2, status: 'NORMAL' },
+    collections: { id: 'SKILL-106', name: 'Outbound & Collections', callsWaiting: 12, avgWaitSeconds: 28, currentSla: 89.2, assignedAgents: 3, requiredAgents: 3, status: 'NORMAL' }
   },
   reallocatedAgents: [],
   historyLog: []
@@ -998,53 +1103,81 @@ function renderQueueBalanceUI() {
 
   if (!wfmRebalanceData || !wfmRebalanceData.queues) return;
 
-  const b = wfmRebalanceData.queues.billing;
-  const cs = wfmRebalanceData.queues.customerService;
+  const b = wfmRebalanceData.queues.billing || {};
+  const cs = wfmRebalanceData.queues.customerService || {};
 
-  if (document.getElementById('q-billing-waiting')) {
-    document.getElementById('q-billing-waiting').textContent = b.callsWaiting;
-    const mins = Math.floor(b.avgWaitSeconds / 60);
-    const secs = b.avgWaitSeconds % 60;
-    document.getElementById('q-billing-asa').textContent = String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
-    document.getElementById('q-billing-sla').textContent = b.currentSla + '%';
-    document.getElementById('q-billing-agents').textContent = b.assignedAgents + ' Logged-in';
-    document.getElementById('q-billing-req').textContent = 'Required: ' + b.requiredAgents;
+  // Render Dynamic Queues Grid (All 6 Queues)
+  const grid = document.getElementById('dynamic-queues-grid');
+  if (grid && wfmRebalanceData.queues) {
+    const queueEntries = Object.entries(wfmRebalanceData.queues);
+    grid.innerHTML = queueEntries.map(([key, q]) => {
+      let borderLeft = '#2563eb';
+      let tagClass = 'approved';
+      let tagText = q.status || 'NORMAL';
+      let cardClass = 'card queue-card';
 
-    const bCard = document.getElementById('qcard-billing');
-    const bTag = document.getElementById('qtag-billing');
-    if (b.status === 'SURGE_CRITICAL') {
-      bTag.className = 'status-tag rejected';
-      bTag.textContent = 'SURGE CRITICAL';
-      if (bCard) bCard.className = 'card queue-card surge-highlight';
-    } else if (b.status === 'REBALANCED') {
-      bTag.className = 'status-tag approved';
-      bTag.textContent = 'REBALANCED (FLEX ACTIVE)';
-      if (bCard) bCard.className = 'card queue-card flex-highlight';
-    } else {
-      bTag.className = 'status-tag approved';
-      bTag.textContent = 'NORMAL (SLA OK)';
-      if (bCard) bCard.className = 'card queue-card';
-    }
-  }
-
-  if (document.getElementById('q-cs-waiting')) {
-    document.getElementById('q-cs-waiting').textContent = cs.callsWaiting;
-    const mins = Math.floor(cs.avgWaitSeconds / 60);
-    const secs = cs.avgWaitSeconds % 60;
-    document.getElementById('q-cs-asa').textContent = String(mins).padStart(2,'0') + ':' + String(secs).padStart(2,'0');
-    document.getElementById('q-cs-sla').textContent = cs.currentSla + '%';
-    document.getElementById('q-cs-agents').textContent = cs.assignedAgents + ' Logged-in';
-    
-    const csTag = document.getElementById('qtag-cs');
-    if (csTag) {
-      if (cs.status === 'FLEXED_DONOR') {
-        csTag.className = 'status-tag aux';
-        csTag.textContent = 'DONOR (3 AGENTS FLEXED)';
-      } else {
-        csTag.className = 'status-tag approved';
-        csTag.textContent = 'IDLE SURPLUS';
+      if (q.status === 'SURGE_CRITICAL') {
+        borderLeft = '#ef4444';
+        tagClass = 'rejected';
+        tagText = 'SURGE CRITICAL';
+        cardClass += ' surge-highlight';
+      } else if (q.status === 'REBALANCED') {
+        borderLeft = '#2563eb';
+        tagClass = 'approved';
+        tagText = 'REBALANCED (FLEX ACTIVE)';
+        cardClass += ' flex-highlight';
+      } else if (q.status === 'FLEXED_DONOR') {
+        borderLeft = '#f59e0b';
+        tagClass = 'aux';
+        tagText = 'DONOR (3 FLEXED)';
+      } else if (q.status === 'IDLE_SURPLUS') {
+        borderLeft = '#10b981';
+        tagClass = 'approved';
+        tagText = 'IDLE SURPLUS';
       }
-    }
+
+      const mins = Math.floor((q.avgWaitSeconds || 0) / 60);
+      const secs = (q.avgWaitSeconds || 0) % 60;
+      const asaStr = String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+
+      return `
+        <div class="${cardClass}" id="qcard-${key}" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
+          <div class="card-header" style="border-left: 4px solid ${borderLeft}; background:#f8fafc; padding:12px 16px; border-bottom:1px solid #e2e8f0;">
+            <div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span class="status-tag ${tagClass}">${tagText}</span>
+                <span style="color:#64748b; font-size:11px;">${q.id || key}</span>
+              </div>
+              <h3 style="margin-top:4px; font-size:14px; color:#0f172a;">${q.name || key}</h3>
+            </div>
+          </div>
+          <div class="card-body" style="padding:16px;">
+            <div class="q-stats-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Calls Waiting:</span>
+                <div class="q-val" style="font-size:22px; font-weight:800; color:${q.callsWaiting > 50 ? '#ef4444' : '#0f172a'};">${q.callsWaiting}</div>
+                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 15</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Avg Speed Answer:</span>
+                <div class="q-val" style="font-size:22px; font-weight:800; color:#0f172a;">${asaStr}</div>
+                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 30s</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Projected SLA %:</span>
+                <div class="q-val" style="font-size:22px; font-weight:800; color:${q.currentSla >= 80 ? '#10b981' : '#ef4444'};">${q.currentSla}%</div>
+                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &ge; 80%</small>
+              </div>
+              <div class="q-stat">
+                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Assigned Staff:</span>
+                <div class="q-val" style="font-size:22px; font-weight:800; color:#2563eb;">${q.assignedAgents} Logged-in</div>
+                <small class="text-muted" style="font-size:10px; color:#64748b;">Required: ${q.requiredAgents || q.assignedAgents}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
   }
 
   // Banner & Wallboard alert
@@ -1170,21 +1303,128 @@ window.restoreSingleAgent = function(agentId) {
   postQueueBalance('RESTORE_SINGLE_AGENT', { agentId });
 };
 
-document.getElementById('btn-sim-billing-surge')?.addEventListener('click', () => {
-  postQueueBalance('SURGE_BILLING');
-});
+function executeClientRebalance() {
+  wfmRebalanceData.isRebalanced = true;
+  wfmRebalanceData.isSurgeActive = false;
+  wfmRebalanceData.reallocatedAgents = [
+    {
+      id: 'AGT-9102',
+      name: 'Samantha Vance',
+      baseSkill: 'General Customer Service',
+      flexSkill: 'Customer Billing & Retention (Flex Support)',
+      flexSchedule: '10:00 - 11:30 (Intraday Skill Flex)',
+      priorityRouting: 'P1: Billing (Surge) / P2: Cust Service',
+      status: 'ACTIVE_FLEX'
+    },
+    {
+      id: 'AGT-6512',
+      name: 'Rachel Green',
+      baseSkill: 'General Customer Service',
+      flexSkill: 'Customer Billing & Retention (Flex Support)',
+      flexSchedule: '10:00 - 11:30 (Intraday Skill Flex)',
+      priorityRouting: 'P1: Billing (Surge) / P2: Cust Service',
+      status: 'ACTIVE_FLEX'
+    },
+    {
+      id: 'AGT-8819',
+      name: 'Marcus Brody',
+      baseSkill: 'General Customer Service',
+      flexSkill: 'Customer Billing & Retention (Flex Support)',
+      flexSchedule: '10:00 - 11:30 (Intraday Skill Flex)',
+      priorityRouting: 'P1: Billing (Surge) / P2: Cust Service',
+      status: 'ACTIVE_FLEX'
+    }
+  ];
 
-document.getElementById('btn-trigger-wfm-rebalance')?.addEventListener('click', () => {
+  if (wfmRebalanceData.queues.billing) {
+    wfmRebalanceData.queues.billing.assignedAgents = 7;
+    wfmRebalanceData.queues.billing.callsWaiting = 48;
+    wfmRebalanceData.queues.billing.avgWaitSeconds = 42;
+    wfmRebalanceData.queues.billing.currentSla = 88.5;
+    wfmRebalanceData.queues.billing.status = 'REBALANCED';
+  }
+  if (wfmRebalanceData.queues.customerService) {
+    wfmRebalanceData.queues.customerService.assignedAgents = 2;
+    wfmRebalanceData.queues.customerService.status = 'FLEXED_DONOR';
+  }
+
+  // Update wallboard agents
+  activeAgents.forEach(a => {
+    if (['AGT-9102', 'AGT-6512', 'AGT-8819'].includes(a.id)) {
+      a.queue = 'Customer Billing & Retention (Flex)';
+    }
+  });
+
+  wfmRebalanceData.historyLog.unshift({
+    timestamp: new Date().toISOString(),
+    event: 'REBALANCE_DISPATCHED',
+    details: 'WFM Dynamic Cross-Skill Rebalance executed: 3 Customer Service agents flexed to Billing. Staffing: Billing 4 -> 7 agents, CS 5 -> 2 agents. Billing calls waiting reduced to 48.'
+  });
+
+  renderQueueBalanceUI();
+  renderWallboard();
   postQueueBalance('TRIGGER_REBALANCE');
-});
+}
 
-document.getElementById('btn-quick-rebalance-wallboard')?.addEventListener('click', () => {
-  postQueueBalance('TRIGGER_REBALANCE');
-});
+function executeRestoreBase() {
+  wfmRebalanceData.isSurgeActive = false;
+  wfmRebalanceData.isRebalanced = false;
+  wfmRebalanceData.reallocatedAgents = [];
 
-document.getElementById('btn-restore-base-schedules')?.addEventListener('click', () => {
+  if (wfmRebalanceData.queues.billing) {
+    wfmRebalanceData.queues.billing.callsWaiting = 42;
+    wfmRebalanceData.queues.billing.avgWaitSeconds = 35;
+    wfmRebalanceData.queues.billing.currentSla = 86.4;
+    wfmRebalanceData.queues.billing.assignedAgents = 4;
+    wfmRebalanceData.queues.billing.status = 'NORMAL';
+  }
+  if (wfmRebalanceData.queues.customerService) {
+    wfmRebalanceData.queues.customerService.callsWaiting = 8;
+    wfmRebalanceData.queues.customerService.avgWaitSeconds = 14;
+    wfmRebalanceData.queues.customerService.currentSla = 97.2;
+    wfmRebalanceData.queues.customerService.assignedAgents = 5;
+    wfmRebalanceData.queues.customerService.status = 'IDLE_SURPLUS';
+  }
+
+  activeAgents.forEach(a => {
+    if (['AGT-9102', 'AGT-6512', 'AGT-8819'].includes(a.id)) {
+      a.queue = 'General Customer Service';
+    }
+  });
+
+  wfmRebalanceData.historyLog.unshift({
+    timestamp: new Date().toISOString(),
+    event: 'RESTORED_BASE',
+    details: 'Volume normalized. Rebalanced agents successfully returned to base General Customer Service WFM schedule.'
+  });
+
+  renderQueueBalanceUI();
+  renderWallboard();
   postQueueBalance('RESTORE_BASE');
-});
+}
+
+function executeSurgeBilling() {
+  wfmRebalanceData.isSurgeActive = true;
+  if (wfmRebalanceData.queues.billing) {
+    wfmRebalanceData.queues.billing.callsWaiting = 318;
+    wfmRebalanceData.queues.billing.avgWaitSeconds = 540;
+    wfmRebalanceData.queues.billing.currentSla = 34.5;
+    wfmRebalanceData.queues.billing.requiredAgents = 8;
+    wfmRebalanceData.queues.billing.status = 'SURGE_CRITICAL';
+  }
+  wfmRebalanceData.historyLog.unshift({
+    timestamp: new Date().toISOString(),
+    event: 'SURGE_DETECTED',
+    details: 'Sudden Billing Call Volume Surge (+318 calls waiting, ASA 9m). Queue load imbalance ratio: 53:1.'
+  });
+  renderQueueBalanceUI();
+  postQueueBalance('SURGE_BILLING');
+}
+
+document.getElementById('btn-sim-billing-surge')?.addEventListener('click', executeSurgeBilling);
+document.getElementById('btn-trigger-wfm-rebalance')?.addEventListener('click', executeClientRebalance);
+document.getElementById('btn-quick-rebalance-wallboard')?.addEventListener('click', executeClientRebalance);
+document.getElementById('btn-restore-base-schedules')?.addEventListener('click', executeRestoreBase);
 
 document.getElementById('btn-toggle-autoflex')?.addEventListener('click', () => {
   postQueueBalance('TOGGLE_AUTOFLEX');
@@ -1461,3 +1701,17 @@ document.getElementById('btn-refresh-it-tickets')?.addEventListener('click', fet
 // Fetch IT tickets on init and periodic
 fetchItIncidents();
 setInterval(fetchItIncidents, 6000);
+
+document.getElementById('btn-save-deflection-threshold')?.addEventListener('click', () => {
+  const input = document.getElementById('input-deflection-threshold');
+  if (input) {
+    const val = parseInt(input.value, 10);
+    if (!isNaN(val) && val > 0) {
+      ivrState.thresholdLimitPerMin = val;
+      updateIvrDeflection({ thresholdLimitPerMin: val });
+      const currentLbl = document.getElementById('threshold-current-label');
+      if (currentLbl) currentLbl.textContent = `Triggers on call ${(val + 1).toLocaleString()}+`;
+      alert(`Deflection threshold successfully updated to ${val.toLocaleString()} calls/min.`);
+    }
+  }
+});

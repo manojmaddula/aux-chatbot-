@@ -91,6 +91,30 @@ const wfmQueueBalanceState = {
       assignedAgents: 2,
       occupancyPct: 65,
       status: 'NORMAL'
+    },
+    spanishSupport: {
+      id: 'SKILL-105',
+      name: 'Bilingual / Spanish Inbound',
+      callsWaiting: 6,
+      avgWaitSeconds: 19,
+      targetSla: 80,
+      currentSla: 94.5,
+      requiredAgents: 2,
+      assignedAgents: 2,
+      occupancyPct: 70,
+      status: 'NORMAL'
+    },
+    collections: {
+      id: 'SKILL-106',
+      name: 'Outbound & Collections',
+      callsWaiting: 12,
+      avgWaitSeconds: 28,
+      targetSla: 80,
+      currentSla: 89.2,
+      requiredAgents: 3,
+      assignedAgents: 3,
+      occupancyPct: 75,
+      status: 'NORMAL'
     }
   },
   reallocatedAgents: [],

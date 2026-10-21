@@ -334,6 +334,15 @@ tabBtns.forEach(btn => {
   });
 });
 
+const btnAgentHome = document.getElementById('btn-agent-home');
+if (btnAgentHome) {
+  btnAgentHome.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (tabBtns[0]) tabBtns[0].click();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
 // Broadcast Channel to sync with Web Portal & Supervisor Command Center
 try {
   const bc = new BroadcastChannel('wfm_aux_channel');
