@@ -1,29 +1,57 @@
-# NICE CXone Autonomous WFM & AI Copilot Platform
-## Enterprise Architecture & Technical Specification
+# ZEL: Autonomous WFM & AI Copilot Platform
+## System Architecture & Technical Specification
 
-> **Version**: 2.4  
-> **Status**: Production Architecture  
+> **Bot Name**: **ZEL**  
+> **Official Tagline**: *"Zero wait to leave, zero wait to return"*  
+> **Version**: 2.5 (Enterprise Architecture)  
 > **Target Platform**: NICE CXone CTI, Windows Electron Desktop, Web Telemetry Gateway  
-> **Artifacts Included**: `.pptx` (4-Slide Executive Deck), `.docx` (Full Spec), `architecture_diagram.svg`
+> **Deliverables Included**: `.pptx` (4-Slide Executive Deck), `.docx` (Full Spec), `architecture_diagram.svg`
 
 ---
 
-## 1. Executive Summary & Vision
+## 1. Executive Summary & Brand Identity
 
-The **NICE CXone Autonomous WFM & AI Copilot Platform** bridges front-line auxiliary (AUX) state governance with real-time intraday queue defense. Traditional contact center operations suffer from disconnected break rosters, sudden intraday queue starvation, and post-call ACW fatigue. 
+**ZEL** is an autonomous AI-powered Workforce Management (WFM) companion engineered for NICE CXone contact center environments. 
 
-This platform deploys a dual-persona intelligence architecture:
-1. **AUXY (Agent Desktop Copilot)**: A lightweight, always-on-top desktop companion providing automated ACW note summarization, real-time speech tone suggestions, and autonomous Erlang-C break capacity gating.
-2. **REMI (Supervisor Command Center)**: An executive telemetry hub featuring scoped team management, automated voice recalls, speech sentiment QA auditing, and 1-click dynamic cross-skilling rebalancing.
+Built around the core mission of **“Zero wait to leave, zero wait to return”**, ZEL solves the dual friction points of legacy call centers:
+1. **Zero Wait to Leave**: Agents no longer wait 15–20 minutes in supervisor chat queues asking for permission to take a tea, bio, or lunch break. With a single click inside the floating desktop companion, ZEL evaluates real-time Erlang-C staffing capacity (`<100ms`). If queue depth allows, the break is approved autonomously.
+2. **Zero Wait to Return**: During rest intervals, ZEL provides an on-screen visual countdown timer to maintain schedule adherence. If an intraday call surge occurs or when the interval concludes, ZEL prompts the agent or rings their softphone via automated text-to-speech desk recalls, ensuring prompt return without manual supervisor chasing.
 
 ---
 
-## 2. End-to-End System Architecture
+## 2. Frictionless 4-Step Operational Flow
+
+```mermaid
+flowchart LR
+    A["Step 1: 1-Click Request<br/>(Agent clicks Tea/Bio/Lunch)"] --> B["Step 2: Instant Gating<br/>(Erlang-C math checks queue)"]
+    B --> C["Step 3: Rest Interval<br/>(Widget countdown timer)"]
+    C --> D["Step 4: Prompt Return<br/>(Voice recall / 1-click Available)"]
+
+    style A fill:#2563eb,stroke:#1e3a8a,stroke-width:2px,color:#fff
+    style B fill:#059669,stroke:#047857,stroke-width:2px,color:#fff
+    style C fill:#0ea5e9,stroke:#0284c7,stroke-width:2px,color:#fff
+    style D fill:#1e3a8a,stroke:#0f172a,stroke-width:2px,color:#fff
+```
+
+### Traditional Process vs. ZEL Autonomous Experience
+
+| Feature | Legacy Contact Center | With ZEL Autonomous Copilot |
+| :--- | :--- | :--- |
+| **Break Request** | Form submission or chat message | **1-Click in floating desktop widget** |
+| **Approval Latency** | **10–20 minutes** (Supervisor delay) | **<100 ms (Zero wait to leave)** |
+| **Staffing Evaluation** | Manual spreadsheet estimation | **Real-time Erlang-C capacity gating** |
+| **Rest Interval Tracking** | None (Agents guess elapsed time) | **Live on-screen countdown timer** |
+| **Desk Return** | Manual floor chasing / Overages | **Automated voice bot desk recall** |
+| **Surge Response** | Panic, long hold times, SLA crash | **1-Click dynamic cross-skill rebalance** |
+
+---
+
+## 3. End-to-End System Architecture
 
 ```mermaid
 flowchart TD
     subgraph Tier1["Tier 1: Client & Presentation Layer (Dual-Persona UX)"]
-        A1["Windows Electron Client<br/>(Always-on-Top Floating Widget)"]
+        A1["ZEL Windows Desktop Client<br/>(Always-on-Top Floating Widget)"]
         A2["Agent Workstation Portal<br/>(/agent-home.html)"]
         A3["Discretionary Break Portal<br/>(/portal.html)"]
         A4["Supervisor Command Center<br/>(/supervisor.html)"]
@@ -37,14 +65,14 @@ flowchart TD
 
     subgraph Tier3["Tier 3: Analytical Core & Intelligence Engines"]
         C1["Autonomous Erlang-C Engine<br/>(Staffing Capacity & Imbalance Math)"]
-        C2["REMI Supervisor Copilot Engine<br/>(Agent 360° Profiles & Deep Analytics)"]
+        C2["ZEL Supervisor Copilot Engine<br/>(Agent 360° Profiles & Deep Analytics)"]
         C3["Speech Tone & Sentiment Model<br/>(Empathetic vs Rude Speech Detection)"]
         C4["Disaster IVR Auto-Deflection<br/>(1,000 Calls/Min Threshold)"]
     end
 
     subgraph Tier4["Tier 4: Telephony & CTI Integration"]
         D1["NICE CXone MAX Softphone<br/>(Available, Working, AUX, ACW)"]
-        D2["WebRTC Audio & TTS Gateway<br/>(Automated Voice Recalls & Announcements)"]
+        D2["WebRTC Audio & Voice Bot Gateway<br/>(Automated Voice Recalls & Announcements)"]
         D3["IT Incident Telemetry Gateway<br/>(Citrix, VPN, Packet Loss Logging)"]
     end
 
@@ -59,79 +87,26 @@ flowchart TD
 
 ---
 
-## 3. Core Architectural Subsystems
+## 4. Scoped Supervisor-to-Agent Governance Matrix
 
-### 3.1. Dual AI Copilot Engines
-* **Agent Copilot (AUXY)**:
-  * Embedded in a floating Electron desktop widget with Windows Taskbar `AppUserModelId` integration (`com.nicexone.auxcopilot.panda`).
-  * 1-Click ACW call summarizer parsing customer reason, steps taken, and agreed outcome.
-  * Live objection suggestions and compliance disclosures.
-* **Supervisor Copilot (REMI)**:
-  * Natural language telemetry queries for agent dossiers (`"agent jordan"`, `"who is in AUX"`).
-  * Out-of-dashboard analytical reports: Speech Tone vs CSAT Correlation, Burnout Risk Projections, Erlang-C Deficits, and Chronic Adherence Outliers.
+ZEL automatically scopes floor telemetry, break approvals, reports, and QA scorecards to each supervisor's assigned team:
 
-### 3.2. Scoped Supervisor-to-Agent Team Matrix
-
-The system dynamically scopes floor telemetry, break approvals, reports, and QA scorecards to the logged-in supervisor:
-
-| Supervisor | Supervisor ID | Queue Role | Assigned Team Agents |
+| Supervisor | Supervisor ID | Focus Area | Assigned Direct Report Agents |
 | :--- | :--- | :--- | :--- |
 | **Sarah Jenkins** | `SUP-014` | Floor Lead & Customer Service | Samantha Vance (`AGT-9102`), Rachel Green (`AGT-6512`), Marcus Brody (`AGT-8819`), Chloe Bennett (`AGT-3310`) |
 | **Michael Chang** | `SUP-021` | Billing & Retention Manager | Jordan Miller (`AGT-4092`), Lucas Wright (`AGT-5521`), Maya Patel (`AGT-7703`) |
-| **Elena Rostova** | `SUP-035` | QA & Tier-2 Tech Lead | Alex Morgan (`AGT-8842`), Carlos Mendez (`AGT-4491`) |
-| **David Sterling** | `SUP-042` | Emergency Inbound Director | David Chen (`AGT-7740`), Olivia Taylor (`AGT-6628`) |
+| **Elena Rostova** | `SUP-035` | QA & Tier-2 Tech Support Lead | Alex Morgan (`AGT-8842`), Carlos Mendez (`AGT-4491`) |
+| **David Sterling** | `SUP-042` | Emergency Inbound & Dispatch | David Chen (`AGT-7740`), Olivia Taylor (`AGT-6628`) |
 | **Priya Sharma** | `SUP-059` | WFM Scheduling & Trainee Lead | Liam O'Connor (`AGT-2219`) |
 
 ---
 
-### 3.3. Dynamic WFM Skill Flex & Surge Defense Algorithm
+## 5. Deliverables & Artifacts
 
-During unexpected queue spikes (e.g. Billing call volume surging by +318 calls waiting, ASA spiking to 9 minutes, and SLA dropping to 34.5%):
-1. **Surge Imbalance Detection**: The engine calculates an Erlang-C staffing deficit (+4 required) while Customer Service agents maintain underutilized occupancy (<35%).
-2. **Cross-Skill Flex Execution**: With 1-click (or automated Auto-Flex), 3 certified cross-skilled agents (`Samantha Vance`, `Rachel Green`, `Marcus Brody`) are dynamically reassigned to the Billing queue.
-3. **SLA Recovery**: Billing calls drop to 48 and SLA recovers to 88.5% within 180 seconds.
-4. **Volume Normalization**: Once billing queue depth returns to base, the supervisor clicks **"Restore Base"** to return agents to their regular shifts.
-
----
-
-### 3.4. Storm Disaster IVR Auto-Deflection Engine
-
-```mermaid
-sequenceDiagram
-    autonumber
-    actor Caller as Inbound Caller
-    participant IVR as NICE CXone IVR Gateway
-    participant Engine as Deflection Engine (1,000 calls/min)
-    participant Agent as Live Shift Agent
-
-    Caller->>IVR: Inbound Call Arrival
-    IVR->>Engine: Check Live Arrival Rate
-    alt Traffic Rate < 1,000 calls/min
-        Engine-->>IVR: Route Call to Live ACD Queue
-        IVR->>Agent: Connect to Available Agent
-    else Traffic Rate >= 1,000 calls/min (Call 1001+)
-        Engine-->>IVR: Trigger Disaster Deflection Script
-        IVR->>Caller: "Thank you for the call, we are having outages, field workers are on route..."
-        IVR-->>Caller: Polite Disconnect / SMS Courtesy Credit Callback
-    end
-```
-
----
-
-## 4. Key Performance Indicators & Business Impact
-
-| Metric Area | Legacy Operations | Autonomous Platform | Quantifiable Impact |
-| :--- | :--- | :--- | :--- |
-| **Schedule Adherence** | 76.2% | **94.6%** | **+18.4% Compliance Gain** |
-| **Post-Call ACW Duration** | 68 seconds | **34 seconds** | **50% Handle Time Reduction** |
-| **Intraday Surge Recovery** | 45-60 mins (Manual) | **< 3 minutes** | **Instant SLA Recovery (34% ➔ 89%)** |
-| **Disaster Outage Deflection** | Floor Overwhelmed | **Auto-Deflection at 1,000/min** | **Live Queue Protection** |
-| **Agent Fatigue Monitoring** | Reactive Post-Mortem | **Real-Time Burnout Alerts** | **Reduced Turnover & High Morale** |
-
----
-
-## 5. Artifact Directory & Deliverables
-
-* **PowerPoint Presentation (4 Slides)**: [`NICE_CXone_WFM_Copilot_Architecture_and_Overview.pptx`](file:///c:/Users/GenAIKOCVISUSR7/Desktop/aux-chatbot/NICE_CXone_WFM_Copilot_Architecture_and_Overview.pptx)
+* **PowerPoint Presentation (4 Slides)**: [`NICE_CXone_WFM_Copilot_Architecture_and_Overview.pptx`](file:///c:/Users/GenAIKOCVISUSR7/Desktop/aux-chatbot/NICE_CXone_WFM_Copilot_Architecture_and_Overview.pptx)  
+  * *Slide 1*: Cover featuring **ZEL**, tagline *"Zero wait to leave, zero wait to return"*, and mascot visual.
+  * *Slide 2*: 4-Step interactive pipeline flow with step cards and Before/After comparison.
+  * *Slide 3*: Dual-persona agent & supervisor visual workflow cards.
+  * *Slide 4*: Measurable ROI & 4 high-impact metric cards.
 * **Word Technical Specification**: [`NICE_CXone_WFM_Copilot_Architecture_and_System_Design.docx`](file:///c:/Users/GenAIKOCVISUSR7/Desktop/aux-chatbot/NICE_CXone_WFM_Copilot_Architecture_and_System_Design.docx)
-* **Architecture Diagram**: [`architecture_diagram.svg`](file:///c:/Users/GenAIKOCVISUSR7/Desktop/aux-chatbot/architecture_diagram.svg)
+* **High-Resolution Architecture Diagram**: [`architecture_diagram.svg`](file:///c:/Users/GenAIKOCVISUSR7/Desktop/aux-chatbot/architecture_diagram.svg)
