@@ -3,12 +3,18 @@ const { app, BrowserWindow, screen } = require('electron');
 const path = require('path');
 const { spawn } = require('child_process');
 
+// Ensure Windows taskbar correctly groups and displays custom Panda icon
+if (process.platform === 'win32') {
+  app.setAppUserModelId('com.nicexone.auxcopilot.panda');
+}
+
 let serverProcess = null;
 let mainWindow = null;
 
 function createWindow() {
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width, height } = primaryDisplay.workAreaSize;
+  const iconPath = path.join(__dirname, 'src', 'favicon.ico');
 
   mainWindow = new BrowserWindow({
     width: 440,
@@ -18,12 +24,14 @@ function createWindow() {
     resizable: true,
     alwaysOnTop: true, // Floats as a true contact center companion widget!
     title: "AUX WFM Agent Copilot",
-    icon: path.join(__dirname, 'src', 'favicon.ico'),
+    icon: iconPath,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true
     }
   });
+
+  mainWindow.setIcon(iconPath);
 
   mainWindow.loadURL('http://localhost:4000/widget.html');
 
