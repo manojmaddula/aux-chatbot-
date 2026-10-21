@@ -16,11 +16,11 @@ const AGENT_PERSONAS = {
     name: 'Jordan Miller',
     queue: 'Customer Billing & Retention',
     adherenceScore: 78.5,
-    recentBreaksToday: 4, // Flagged for tea pattern
+    recentBreaksToday: 4, // Flagged for aux pattern
     lunchOverageHistoryMinutes: 0,
-    auxDefault: 'AUX-2: Short Break / Tea',
+    auxDefault: 'AUX-2: Short Break / AUX',
     urgency: 'Normal',
-    note: '4 tea breaks already logged today. Triggers behavioral tea pattern rejection.'
+    note: '4 aux breaks already logged today. Triggers behavioral aux pattern rejection.'
   },
   'AGT-9102': {
     id: 'AGT-9102',
@@ -41,7 +41,7 @@ const AGENT_PERSONAS = {
     recentBreaksToday: 2,
     lunchOverageHistoryMinutes: 0,
     forceRateLimit: true,
-    auxDefault: 'AUX-2: Short Break / Tea',
+    auxDefault: 'AUX-2: Short Break / AUX',
     urgency: 'Normal',
     note: 'Rate limit spammer (3 requests in last 10m). Triggers frequency limiter rejection.'
   },
@@ -85,7 +85,7 @@ const AGENT_PERSONAS = {
     adherenceScore: 88.5,
     recentBreaksToday: 2,
     lunchOverageHistoryMinutes: 0,
-    auxDefault: 'AUX-2: Short Break / Tea',
+    auxDefault: 'AUX-2: Short Break / AUX',
     urgency: 'Normal',
     note: 'Billing specialist with 24s average handle time.'
   },
@@ -320,11 +320,11 @@ function runClientSideDecisionEngine(payload) {
       code: 'BEHAVIORAL_TEA_OVERAGE',
       checkBackLater: true,
       nextOpenInterval: 'Check Back Later with Supervisor Approval',
-      title: 'Auto-Rejected: Tea Break Frequency Pattern Exceeded',
-      description: `AI Behavioral Pattern Alert: Agent has already logged ${payload.agent.recentBreaksToday} short tea breaks today. Company policy allocates a maximum of 2 discretionary tea breaks per 8-hour shift.`,
+      title: 'Auto-Rejected: AUX Break Frequency Pattern Exceeded',
+      description: `AI Behavioral Pattern Alert: Agent has already logged ${payload.agent.recentBreaksToday} short aux breaks today. Company policy allocates a maximum of 2 discretionary aux breaks per 8-hour shift.`,
       metrics: {
         'Agent Daily Breaks Taken': `${payload.agent.recentBreaksToday} breaks`,
-        'Policy Limit': 'Max 2 Tea Breaks / shift',
+        'Policy Limit': 'Max 2 AUX Breaks / shift',
         'Recommended Action': 'Please request supervisor exception code'
       }
     };

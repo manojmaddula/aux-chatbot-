@@ -44,10 +44,7 @@
         <a href="/agent-home.html" id="btn-agent-home" class="btn-xs btn-outline" style="text-decoration:none; display:inline-flex; align-items:center; gap:5px; padding:5px 8px; font-weight:700;" title="Agent Bot Home">
           <img src="/favicon.svg?v=panda2" style="width:14px; height:14px;" /> Home
         </a>
-        <button id="btn-quick-break" class="btn-sm btn-accent" title="Launch Web Portal to Apply Break">
-          ☕ Apply Break
-        </button>
-      </div>
+        </div>
     </header>
 
     <!-- CRITICAL BROADCAST TICKER (SUPERVISOR DISPATCHED ONLY) -->
@@ -108,7 +105,7 @@
     <!-- ACTIVE BREAK COUNTDOWN & 2-MIN WARNING CARD -->
     <div id="break-active-card" class="break-active-card hidden">
       <div class="break-card-header">
-        <span id="active-aux-label" class="aux-title">AUX-2: Short Break / Tea</span>
+        <span id="active-aux-label" class="aux-title">AUX-2: Short Break / AUX</span>
         <span id="break-time-left" class="countdown-digits">14:59</span>
       </div>
       <div class="progress-bar-container">
@@ -129,21 +126,88 @@
     <!-- NAVIGATION TABS -->
     <nav class="widget-tabs">
       <button class="tab-btn active" data-tab="tab-copilot">
-        <span>💬</span> Copilot & ACW
+        <span>💬</span> Copilot
+      </button>
+      <button class="tab-btn" data-tab="tab-acw">
+        <span>📋</span> ACW
       </button>
       <button class="tab-btn" data-tab="tab-aux">
         <span>☕</span> AUX Breaks
       </button>
       <button class="tab-btn" data-tab="tab-troubleshoot">
-        <span>🔧</span> Articles & CXone
+        <span>🔧</span> KB Articles
       </button>
       <button class="tab-btn" data-tab="tab-alerts">
         <span>📢</span> Advisories (<span id="unread-alert-count">0</span>)
       </button>
     </nav>
 
-    <!-- TAB 1: COPILOT & AFTER CALL WORK (ACW) -->
+    <!-- TAB 1: COPILOT ASSISTANT -->
     <section id="tab-copilot" class="tab-pane active">
+      <!-- Real-Time AI Suggested Replies (Dynamic AI Reply Engine) -->
+      <div class="copilot-box">
+        <div class="copilot-header" style="display:flex; justify-content:space-between; align-items:center;">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <span class="sparkle">✨</span>
+            <span>AI Suggested Replies for Agent</span>
+          </div>
+          <button id="btn-refresh-replies" class="btn-xs btn-outline" style="font-size:10px; padding:2px 6px;" title="Refresh reply suggestions">🔄 Refresh</button>
+        </div>
+
+        <!-- Suggestion Filter Chips -->
+        <div class="suggestion-chips" style="display:flex; gap:4px; overflow-x:auto; padding:6px 0; margin-bottom:6px;">
+          <button class="reply-filter-chip active" data-topic="billing">💳 Billing</button>
+          <button class="reply-filter-chip" data-topic="security">🛡️ PIN / Security</button>
+          <button class="reply-filter-chip" data-topic="outage">⚡ Outage Deflection</button>
+          <button class="reply-filter-chip" data-topic="empathy">🤝 Empathy</button>
+        </div>
+
+        <div class="ai-suggestions-list" id="ai-suggestions">
+          <div class="suggestion-item" data-text="I apologize for the confusion regarding the $25 monthly surcharge. I have applied a one-time adjustment credit to your balance today.">
+            <span class="suggestion-tag">Empathy + Credit Approval</span>
+            <p>"I apologize for the confusion regarding the $25 monthly surcharge. I have applied a one-time adjustment credit to your balance today."</p>
+            <div style="display:flex; gap:6px; margin-top:6px;">
+              <button class="btn-copy">Copy</button>
+            </div>
+          </div>
+          <div class="suggestion-item" data-text="I have verified your account security PIN. Let me guide you to our self-service billing management portal to update your auto-pay method.">
+            <span class="suggestion-tag">Self-Service Link</span>
+            <p>"I have verified your account security PIN. Let me guide you to our self-service billing management portal to update your auto-pay method."</p>
+            <div style="display:flex; gap:6px; margin-top:6px;">
+              <button class="btn-copy">Copy</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Agent Copilot Chat Stream -->
+      <div class="chat-container">
+        <div class="chat-history" id="chat-history">
+          <div class="chat-msg ai">
+            <div class="msg-bubble">
+              👋 Hi Alex! I am your NICE CXone Agent Copilot trained on real-time telephony, queue traffic, and adherence telemetry. Ask me anything or select a live topic below:
+            </div>
+          </div>
+        </div>
+        
+        <!-- REAL-TIME COPILOT PROMPT CHIPS -->
+        <div class="copilot-chips-bar">
+          <button class="chat-chip" data-query="What is the current queue volume and traffic?">📊 Queue Volume</button>
+          <button class="chat-chip" data-query="What is my schedule adherence and break limit?">⏱️ My Adherence</button>
+          <button class="chat-chip" data-query="Is dynamic WFM skill rebalance active?">🔄 WFM Skill Flex</button>
+          <button class="chat-chip" data-query="What is the storm outage IVR deflection rate?">🌪️ Storm Deflection</button>
+          <button class="chat-chip" data-query="Show active IT system issue tickets">💻 Open IT Tickets</button>
+        </div>
+
+        <div class="chat-input-row">
+          <input type="text" id="chat-input" placeholder="Ask real-time Copilot (e.g. queue volume, my adherence, storm rate)..." />
+          <button id="btn-send-chat" class="btn-send">➤</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: AFTER CALL WORK (ACW) -->
+    <section id="tab-acw" class="tab-pane">
       <!-- Live Customer Call Bar -->
       <div id="active-call-bar" class="active-call-bar">
         <div class="call-meta">
@@ -231,72 +295,9 @@
           </div>
         </div>
       </div>
-
-      <!-- Real-Time AI Suggested Replies (Dynamic AI Reply Engine) -->
-      <div class="copilot-box">
-        <div class="copilot-header" style="display:flex; justify-content:space-between; align-items:center;">
-          <div style="display:flex; align-items:center; gap:6px;">
-            <span class="sparkle">✨</span>
-            <span>AI Suggested Replies for Agent</span>
-          </div>
-          <button id="btn-refresh-replies" class="btn-xs btn-outline" style="font-size:10px; padding:2px 6px;" title="Refresh reply suggestions">🔄 Refresh</button>
-        </div>
-
-        <!-- Suggestion Filter Chips -->
-        <div class="suggestion-chips" style="display:flex; gap:4px; overflow-x:auto; padding:6px 0; margin-bottom:6px;">
-          <button class="reply-filter-chip active" data-topic="billing">💳 Billing</button>
-          <button class="reply-filter-chip" data-topic="security">🛡️ PIN / Security</button>
-          <button class="reply-filter-chip" data-topic="outage">⚡ Outage Deflection</button>
-          <button class="reply-filter-chip" data-topic="empathy">🤝 Empathy</button>
-        </div>
-
-        <div class="ai-suggestions-list" id="ai-suggestions">
-          <div class="suggestion-item" data-text="I apologize for the confusion regarding the $25 monthly surcharge. I have applied a one-time adjustment credit to your balance today.">
-            <span class="suggestion-tag">Empathy + Credit Approval</span>
-            <p>"I apologize for the confusion regarding the $25 monthly surcharge. I have applied a one-time adjustment credit to your balance today."</p>
-            <div style="display:flex; gap:6px; margin-top:6px;">
-              <button class="btn-copy">Copy</button>
-              <button class="btn-insert-chat btn-xs btn-primary" style="padding:2px 6px;">Insert into Chat</button>
-            </div>
-          </div>
-          <div class="suggestion-item" data-text="I have verified your account security PIN. Let me guide you to our self-service billing management portal to update your auto-pay method.">
-            <span class="suggestion-tag">Self-Service Link</span>
-            <p>"I have verified your account security PIN. Let me guide you to our self-service billing management portal to update your auto-pay method."</p>
-            <div style="display:flex; gap:6px; margin-top:6px;">
-              <button class="btn-copy">Copy</button>
-              <button class="btn-insert-chat btn-xs btn-primary" style="padding:2px 6px;">Insert into Chat</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Live Agent Copilot Chat Stream -->
-      <div class="chat-container">
-        <div class="chat-history" id="chat-history">
-          <div class="chat-msg ai">
-            <div class="msg-bubble">
-              👋 Hi Alex! I am your NICE CXone Agent Copilot trained on real-time telephony, queue traffic, and adherence telemetry. Ask me anything or select a live topic below:
-            </div>
-          </div>
-        </div>
-        
-        <!-- REAL-TIME COPILOT PROMPT CHIPS -->
-        <div class="copilot-chips-bar">
-          <button class="chat-chip" data-query="What is the current queue volume and traffic?">📊 Queue Volume</button>
-          <button class="chat-chip" data-query="What is my schedule adherence and break limit?">⏱️ My Adherence</button>
-          <button class="chat-chip" data-query="Is dynamic WFM skill rebalance active?">🔄 WFM Skill Flex</button>
-          <button class="chat-chip" data-query="What is the storm outage IVR deflection rate?">🌪️ Storm Deflection</button>
-          <button class="chat-chip" data-query="Show active IT system issue tickets">💻 Open IT Tickets</button>
-        </div>
-
-        <div class="chat-input-row">
-          <input type="text" id="chat-input" placeholder="Ask real-time Copilot (e.g. queue volume, my adherence, storm rate)..." />
-          <button id="btn-send-chat" class="btn-send">➤</button>
-        </div>
-      </div>
     </section>
 
-    <!-- TAB 2: AUX BREAKS & ADHERENCE (READ-ONLY TELEMETRY) -->
+    <!-- TAB 3: AUX BREAKS & ADHERENCE (READ-ONLY TELEMETRY) -->
     <section id="tab-aux" class="tab-pane">
       <div class="aux-cta-banner">
         <h3>Need to Request a Break?</h3>
@@ -306,64 +307,38 @@
         </button>
       </div>
 
-      <!-- Behavioral Patterns & Adherence Card (READ ONLY) -->
+      <!-- 30-Day Break History Card -->
       <div class="card-section">
         <div class="card-title-row">
-          <h4>Agent Adherence & Behavioral Telemetry</h4>
-          <span class="badge-readonly">🔒 READ-ONLY</span>
+          <h4>🗓️ 30-Day Break History</h4>
+          <span class="badge-readonly" id="break-count-badge">30-Day Audit</span>
         </div>
-        <div class="behavior-grid">
-          <div class="metric-card">
-            <span class="m-title">Tea Breaks Logged</span>
-            <span class="m-val" id="b-tea-count">1 / 2</span>
-            <span class="m-sub text-ok" id="lbl-tea-sub">Policy Limit: Max 2</span>
-          </div>
-          <div class="metric-card">
-            <span class="m-title">Prior Lunch Variance</span>
-            <span class="m-val" id="b-lunch-overage">0 mins</span>
-            <span class="m-sub text-ok" id="lbl-lunch-sub">Threshold: &lt;10m</span>
-          </div>
-          <div class="metric-card">
-            <span class="m-title">CXone Schedule Adherence</span>
-            <span class="m-val highlight" id="b-adherence">96.4%</span>
-            <span class="m-sub text-ok" id="lbl-adh-sub">Target: &ge; 90%</span>
-          </div>
-          <div class="metric-card">
-            <span class="m-title" id="lbl-freq-title">Request Frequency (1-Wk)</span>
-            <span class="m-val" id="b-freq-count">1 / 5</span>
-            <span class="m-sub text-ok" id="lbl-freq-sub">Threshold: 5 / week</span>
-          </div>
-        </div>
-      </div>
 
-      <!-- WFM ACD Live Forecast Status -->
-      <div class="card-section">
-        <div class="card-title-row">
-          <h4>NICE CXone ACD & WFM Staffing Forecast</h4>
-          <span class="badge-live">● LIVE ACD</span>
+        <!-- Filter Chips for 30-Day History -->
+        <div class="break-filter-bar">
+          <button class="break-filter-chip active" data-filter="all">All (30D)</button>
+          <button class="break-filter-chip" data-filter="tea">☕ AUX Breaks</button>
+          <button class="break-filter-chip" data-filter="lunch">🍱 Lunch</button>
+          <button class="break-filter-chip" data-filter="other">🔧 Other AUX</button>
         </div>
-        <div class="forecast-row">
-          <div class="f-item">
-            <span>Forecast Arrivals:</span>
-            <strong>32 Calls / 15m</strong>
-          </div>
-          <div class="f-item">
-            <span>Logged-In Agents:</span>
-            <strong>24 Agents</strong>
-          </div>
-          <div class="f-item">
-            <span>Projected SLA:</span>
-            <strong class="text-ok">85.4%</strong>
-          </div>
+
+        <!-- 30-Day Summary Bar -->
+        <div id="break-30d-summary" class="break-summary-bar">
+          <span>30D Breaks: <strong id="sum-total-breaks">--</strong></span>
+          <span>Avg Duration: <strong id="sum-avg-duration">18m</strong></span>
+          <span>Adherence: <strong id="sum-compliance">96.4%</strong></span>
         </div>
-        <p class="forecast-note">✓ Staffing buffer healthy. Standard AUX requests eligible for auto-approval.</p>
+
+        <div id="break-history-list" class="break-history-list">
+          <!-- Dynamically populated 30-day items -->
+        </div>
       </div>
     </section>
 
-    <!-- TAB 3: TROUBLESHOOTING ARTICLES (NICE CXONE & SYSTEM) -->
+    <!-- TAB 4: KB ARTICLES (NICE CXONE & SYSTEM) -->
     <section id="tab-troubleshoot" class="tab-pane">
       <div class="search-box">
-        <input type="text" id="article-search" placeholder="Search NICE CXone MAX, WebRTC, VPN, VDI, Audio..." />
+        <input type="text" id="article-search" placeholder="Search KB articles, NICE CXone MAX, WebRTC, VPN, Audio..." />
       </div>
 
       <div class="kb-categories">
@@ -422,29 +397,6 @@
         <div id="advisories-list" class="advisories-list">
           <!-- Filled dynamically from active broadcasts -->
         </div>
-      </div>
-
-      <div class="card-section" style="margin-top: 10px;">
-        <h4>🛡️ Assigned Shift Adherence Policies</h4>
-        <div class="policy-agent-summary">
-          <div class="policy-row-agent">
-            <span>Max Discretionary Tea Breaks:</span>
-            <strong id="agent-policy-tea">2 breaks / shift</strong>
-          </div>
-          <div class="policy-row-agent">
-            <span>Lunch Variance Allowed:</span>
-            <strong id="agent-policy-lunch">Max +10 mins</strong>
-          </div>
-          <div class="policy-row-agent">
-            <span>Request Frequency Throttle:</span>
-            <strong id="agent-policy-freq">Max 5 requests / 1-Wk</strong>
-          </div>
-          <div class="policy-row-agent">
-            <span>Target CXone Adherence:</span>
-            <strong id="agent-policy-adh">&ge; 90.0%</strong>
-          </div>
-        </div>
-        <small class="text-muted" style="display:block; margin-top:8px;">*Limits are administered exclusively by the Operations Supervisor.</small>
       </div>
     </section>
 

@@ -289,7 +289,7 @@
           <strong id="agent-adh-stat" style="color:#10b981;">96.4%</strong>
         </div>
         <div class="s-stat">
-          <span>Tea Breaks Taken</span>
+          <span>AUX Breaks Taken</span>
           <strong id="agent-tea-stat">1 / 2</strong>
         </div>
         <div class="s-stat">
@@ -303,7 +303,7 @@
       </div>
     </section>
 
-    <!-- CORE AGENT BOT ACTION CARDS -->
+        <!-- CORE AGENT BOT ACTION CARDS -->
     <div class="cards-grid">
 
       <!-- CARD 1: AGENT AI COPILOT & ACW WIDGET -->
@@ -312,8 +312,8 @@
           <div class="card-top">
             <div class="card-icon">🤖</div>
             <div class="card-title">
-              <h3>Agent AI Copilot & ACW Widget</h3>
-              <p>Autonomous real-time assistant for call summaries, CRM notes, suggested replies, and compliance checks.</p>
+              <h3>Agent AI Copilot & ACW Assistant</h3>
+              <p>Autonomous real-time assistant for live ACD queue volume, schedule adherence, suggested replies, and CXone ACW telemetry.</p>
             </div>
           </div>
           <div class="card-details">
@@ -327,28 +327,7 @@
         </a>
       </div>
 
-      <!-- CARD 2: BREAK & AUX PORTAL -->
-      <div class="home-card">
-        <div>
-          <div class="card-top">
-            <div class="card-icon">☕</div>
-            <div class="card-title">
-              <h3>Discretionary Break Portal</h3>
-              <p>Apply for Tea, Bio, Lunch, or Training intervals with instant Erlang-C staffing capacity evaluation.</p>
-            </div>
-          </div>
-          <div class="card-details">
-            • <strong>Erlang-C Verification</strong>: Real-time traffic queue check<br/>
-            • <strong>Autonomous Grants</strong>: Instant 15-minute approval if staffing &ge;80%<br/>
-            • <strong>IT System Issue (AUX-5)</strong>: Report Citrix/VPN hardware errors
-          </div>
-        </div>
-        <a href="/portal.html" class="btn-launch btn-launch-secondary">
-          <span>☕</span> Open Break Portal
-        </a>
-      </div>
-
-      <!-- CARD 3: QA INTERACTION SCORECARD -->
+      <!-- CARD 2: QA INTERACTION SCORECARD -->
       <div class="home-card">
         <div>
           <div class="card-top">
@@ -364,34 +343,46 @@
             • <strong>Overall Weighted QA Score</strong>: <span id="agent-qa-score" style="color:#2563eb; font-weight:800;">96% (Top Tier)</span>
           </div>
         </div>
-        <a href="/widget.html" class="btn-launch btn-launch-secondary" onclick="sessionStorage.setItem('openTab', 'tab-qa')">
+        <a href="/widget.html" class="btn-launch btn-launch-secondary" onclick="sessionStorage.setItem('openTab', 'tab-copilot')">
           <span>📊</span> View Detailed QA Feedback
         </a>
       </div>
 
-      <!-- CARD 4: KNOWLEDGE BASE & QUICK REPLIES -->
+      <!-- CARD 3: ASSIGNED SHIFT ADHERENCE POLICIES (MOVED FROM ADVISORIES) -->
       <div class="home-card">
         <div>
           <div class="card-top">
-            <div class="card-icon">📚</div>
+            <div class="card-icon">🛡️</div>
             <div class="card-title">
-              <h3>Knowledge Base & Response Templates</h3>
-              <p>Instant search for 150+ operational SOPs, billing dispute flowcharts, and compliance disclosures.</p>
+              <h3>Assigned Shift Adherence Policies</h3>
+              <p>Operational schedule adherence limits and break allowances enforced by WFM Operations Supervisor.</p>
             </div>
           </div>
-          <div class="card-details">
-            • <strong>KB-101</strong>: Fiber-Optic Modem Red Flashing Light Protocol<br/>
-            • <strong>KB-102</strong>: Storm Disconnection & Courtesy Credit Approval<br/>
-            • <strong>KB-103</strong>: Payment Arrangement & Late Fee Waiver SOP
+          <div class="card-details" style="display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px dashed #e2e8f0; padding-bottom:5px;">
+              <span style="font-size:12px; color:#475569;">Max Discretionary AUX Breaks:</span>
+              <strong id="agent-policy-tea" style="color:#0f172a; font-size:12px;">2 breaks / shift</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px dashed #e2e8f0; padding-bottom:5px;">
+              <span style="font-size:12px; color:#475569;">Lunch Variance Allowed:</span>
+              <strong id="agent-policy-lunch" style="color:#0f172a; font-size:12px;">Max +10 mins</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px dashed #e2e8f0; padding-bottom:5px;">
+              <span style="font-size:12px; color:#475569;">Request Frequency Throttle:</span>
+              <strong id="agent-policy-freq" style="color:#0f172a; font-weight:700; font-size:12px;">Max 5 requests / 1-Wk</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:12px; color:#475569;">Target CXone Adherence:</span>
+              <strong id="agent-policy-adh" style="color:#10b981; font-size:12px;">≥ 90.0%</strong>
+            </div>
           </div>
         </div>
-        <a href="/widget.html" class="btn-launch btn-launch-secondary" onclick="sessionStorage.setItem('openTab', 'tab-kb')">
-          <span>🔍</span> Browse Knowledge Base
-        </a>
+        <div style="margin-top:14px; font-size:10px; color:#64748b; border-top:1px solid #f1f5f9; padding-top:8px;">
+          *Shift limits administered in real-time by Operations Supervisor.
+        </div>
       </div>
 
     </div>
-
   </main>
 
   <footer>
@@ -430,6 +421,23 @@
       updateAgentView(saved);
       agentSelect.addEventListener('change', (e) => updateAgentView(e.target.value));
     }
+  
+    // Fetch and populate Assigned Shift Adherence Policies on Home
+    fetch('/api/policy')
+      .then(r => r.json())
+      .then(p => {
+        if (p) {
+          const teaEl = document.getElementById('agent-policy-tea');
+          const lunchEl = document.getElementById('agent-policy-lunch');
+          const freqEl = document.getElementById('agent-policy-freq');
+          const adhEl = document.getElementById('agent-policy-adh');
+          const freqWindow = p.frequencyWindow === '2_WEEKS' ? '2-Wks' : '1-Wk';
+          if (teaEl) teaEl.textContent = `${p.maxTeaBreaks || 2} breaks / shift`;
+          if (lunchEl) lunchEl.textContent = `Max +${p.lunchVarianceThreshold || 10} mins`;
+          if (freqEl) freqEl.textContent = `Max ${p.maxFrequencyRequests || 5} requests / ${freqWindow}`;
+          if (adhEl) adhEl.textContent = `≥ ${p.targetAdherence || 90}.0%`;
+        }
+      }).catch(() => {});
   </script>
 </body>
 </html>

@@ -1398,3 +1398,368 @@ body {
   color: #ffffff;
   transform: translateY(-1px);
 }
+
+
+
+/* 30-DAY BREAK HISTORY */
+.break-filter-bar {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.break-filter-chip {
+  background: #f1f5f9;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.break-filter-chip:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.break-filter-chip.active {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+}
+
+.break-summary-bar {
+  background: #f1f5f9;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 10px;
+  color: #475569;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  border: 1px solid var(--border-color);
+}
+
+.break-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.break-history-item {
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 8px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+}
+
+.break-history-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.break-history-icon {
+  font-size: 16px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #eff6ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.break-history-meta strong {
+  display: block;
+  color: #0f172a;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.break-history-meta span {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.break-date-label {
+  display: inline-block;
+  color: #2563eb;
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+.break-history-right {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.break-duration-tag {
+  font-size: 11px;
+  font-weight: 700;
+  color: #334155;
+  font-family: monospace;
+}
+
+.break-status-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.break-status-badge.completed {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+
+.break-status-badge.active {
+  background: rgba(99, 102, 241, 0.15);
+  color: #4f46e5;
+}
+
+.break-status-badge.overdue {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
+}
+
+
+
+
+/* ==========================================
+   BIRTHDAY CALENDAR & CELEBRATIONS HUB
+   ========================================== */
+.birthday-calendar-card {
+  background: #ffffff;
+  border-radius: var(--radius);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.bday-tab-btn {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bday-tab-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.bday-tab-btn.active {
+  background: #ec4899;
+  color: #ffffff;
+  border-color: #db2777;
+}
+
+.birthday-card-item {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.birthday-card-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  border-color: #f472b6;
+}
+
+.birthday-card-item.is-today {
+  border: 2px solid #ec4899;
+  background: linear-gradient(135deg, rgba(236, 72, 153, 0.04), rgba(217, 70, 239, 0.08));
+  box-shadow: 0 4px 20px rgba(236, 72, 153, 0.2);
+}
+
+.birthday-card-item.is-tomorrow {
+  border: 1.5px solid #f59e0b;
+  background: rgba(245, 158, 11, 0.03);
+}
+
+.bday-avatar-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  background: #f1f5f9;
+  border: 2px solid #e2e8f0;
+  flex-shrink: 0;
+}
+
+.bday-avatar-circle.supervisor {
+  border-color: #3b82f6;
+  background: #eff6ff;
+}
+
+.bday-avatar-circle.today {
+  border-color: #ec4899;
+  background: #fdf2f8;
+  box-shadow: 0 0 10px rgba(236, 72, 153, 0.4);
+}
+
+.bday-badge-today {
+  background: #ec4899;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  animation: pulse-pink 1.8s infinite;
+}
+
+.bday-badge-tomorrow {
+  background: #f59e0b;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 12px;
+  text-transform: uppercase;
+}
+
+.bday-badge-upcoming {
+  background: #e2e8f0;
+  color: #475569;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 12px;
+}
+
+@keyframes pulse-pink {
+  0% { box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.5); }
+  70% { box-shadow: 0 0 0 8px rgba(236, 72, 153, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(236, 72, 153, 0); }
+}
+
+.btn-publish-bday {
+  background: #fdf2f8;
+  border: 1px solid #f472b6;
+  color: #db2777;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.btn-publish-bday:hover {
+  background: #ec4899;
+  color: #ffffff;
+  border-color: #db2777;
+}
+
+.btn-publish-bday.published {
+  background: #ecfdf5;
+  border-color: #10b981;
+  color: #059669;
+  cursor: default;
+}
+
+/* ==========================================
+   CALL TREND ANALYSIS DASHBOARD
+   ========================================== */
+.call-trends-card {
+  background: #ffffff;
+  border-radius: var(--radius);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.trend-range-btn {
+  background: #ffffff;
+  border: none;
+  color: #64748b;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.trend-range-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.trend-range-btn.active {
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.trend-hourly-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+}
+
+.trend-bar-track {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+}
+
+.trend-bar-baseline {
+  height: 100%;
+  background: #94a3b8;
+  border-radius: 4px;
+}
+
+.trend-bar-today {
+  height: 100%;
+  background: #2563eb;
+  border-radius: 4px;
+}
+
+.trend-bar-today.surge {
+  background: #ef4444;
+}
+
+/* CELEBRATION BROADCAST TICKER IN AGENT WIDGET */
+.broadcast-ticker.celebration {
+  background: linear-gradient(90deg, #ec4899, #8b5cf6, #3b82f6) !important;
+  border-bottom: 2px solid #f472b6 !important;
+  color: #ffffff !important;
+}

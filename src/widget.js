@@ -359,6 +359,11 @@ try {
     } else if (data.type === 'BROADCAST_ALERT') {
       // Received broadcast from supervisor
       broadcastTicker.classList.remove('hidden');
+      if (data.payload.severity === 'CELEBRATION' || (data.payload.title && data.payload.title.includes('Birthday'))) {
+        broadcastTicker.classList.add('celebration');
+      } else {
+        broadcastTicker.classList.remove('celebration');
+      }
       broadcastMessage.textContent = `${data.payload.title}: ${data.payload.message}`;
       playWarningChime();
       showNotification(data.payload.title, data.payload.message);
@@ -381,8 +386,8 @@ try {
     } else if (data.type === 'POLICY_UPDATE') {
       // Supervisor changed policies - sync immediately to agent bot
       applyPolicyUpdate(data.payload);
-      showNotification('Shift Policy Updated', `Supervisor updated shift policies: Max Tea Breaks: ${data.payload.maxTeaBreaks}, Target Adherence: ${data.payload.targetAdherence}%.`);
-      addChatMessage('ai', `🛡️ **Operations Shift Policy Updated by Floor Supervisor:**<br/>• Max Tea Breaks: <strong>${data.payload.maxTeaBreaks} / shift</strong><br/>• Lunch Variance Allowed: <strong>Max +${data.payload.lunchVarianceThreshold}m</strong><br/>• Request Frequency: <strong>Max ${data.payload.maxFrequencyRequests} requests / ${data.payload.frequencyWindow === '2_WEEKS' ? '2-Wks' : '1-Wk'}</strong><br/>• Target Adherence: <strong>≥ ${data.payload.targetAdherence}%</strong>`);
+      showNotification('Shift Policy Updated', `Supervisor updated shift policies: Max AUX Breaks: ${data.payload.maxTeaBreaks}, Target Adherence: ${data.payload.targetAdherence}%.`);
+      addChatMessage('ai', `🛡️ **Operations Shift Policy Updated by Floor Supervisor:**<br/>• Max AUX Breaks: <strong>${data.payload.maxTeaBreaks} / shift</strong><br/>• Lunch Variance Allowed: <strong>Max +${data.payload.lunchVarianceThreshold}m</strong><br/>• Request Frequency: <strong>Max ${data.payload.maxFrequencyRequests} requests / ${data.payload.frequencyWindow === '2_WEEKS' ? '2-Wks' : '1-Wk'}</strong><br/>• Target Adherence: <strong>≥ ${data.payload.targetAdherence}%</strong>`);
     } else if (data.type === 'IVR_DEFLECTION_UPDATE') {
       handleIvrDeflectionUpdate(data.payload);
     } else if (data.type === 'WFM_REBALANCE_UPDATE') {
@@ -416,7 +421,273 @@ window.addEventListener('storage', (e) => {
 });
 
 // Agent Persona Switcher
+
+
+// ==========================================
+// 30-DAY BREAK HISTORY ENGINE FOR AUX BREAKS TAB
+// ==========================================
+
+const AGENT_30DAY_CACHE = {};
+let currentBreakFilter = 'all';
+
+function getAuxIcon(auxCode) {
+  if (!auxCode) return '☕';
+  if (auxCode.includes('AUX-1') || auxCode.toLowerCase().includes('lunch')) return '🍱';
+  if (auxCode.includes('AUX-2') || auxCode.toLowerCase().includes('tea') || auxCode.toLowerCase().includes('short')) return '☕';
+  if (auxCode.includes('AUX-3') || auxCode.toLowerCase().includes('meeting')) return '👥';
+  if (auxCode.includes('AUX-4') || auxCode.toLowerCase().includes('training') || auxCode.toLowerCase().includes('coaching')) return '🎓';
+  if (auxCode.includes('AUX-5') || auxCode.toLowerCase().includes('tech') || auxCode.toLowerCase().includes('vpn')) return '💻';
+  if (auxCode.includes('AUX-6') || auxCode.toLowerCase().includes('bio') || auxCode.toLowerCase().includes('emergency')) return '🚹';
+  return '☕';
+}
+
+function getAuxCategory(auxCode) {
+  if (!auxCode) return 'tea';
+  if (auxCode.includes('AUX-1') || auxCode.toLowerCase().includes('lunch')) return 'lunch';
+  if (auxCode.includes('AUX-2') || auxCode.toLowerCase().includes('tea') || auxCode.toLowerCase().includes('short')) return 'tea';
+  return 'other';
+}
+
+function generate30DayBreakHistory(agentId) {
+  if (AGENT_30DAY_CACHE[agentId]) {
+    return AGENT_30DAY_CACHE[agentId];
+  }
+
+  const baseDate = new Date(2026, 9, 21); // Oct 21, 2026
+  const profile = AGENT_PROFILES[agentId] || AGENT_PROFILES['AGT-8842'];
+  const items = [];
+
+  // Today (Day 0) per agent:
+  if (agentId === 'AGT-4092') { // Jordan Miller (4 aux breaks today)
+    items.push(
+      { date: 'Today, Oct 21', auxCode: 'AUX-2: Short Break / AUX', icon: '☕', time: '01:30 PM - 01:45 PM', duration: '15 mins', status: 'Completed', statusClass: 'completed', category: 'tea' },
+      { date: 'Today, Oct 21', auxCode: 'AUX-2: Short Break / AUX', icon: '☕', time: '11:45 AM - 12:00 PM', duration: '15 mins', status: 'Completed', statusClass: 'completed', category: 'tea' },
+      { date: 'Today, Oct 21', auxCode: 'AUX-2: Short Break / AUX', icon: '☕', time: '10:15 AM - 10:30 AM', duration: '15 mins', status: 'Completed', statusClass: 'completed', category: 'tea' },
+      { date: 'Today, Oct 21', auxCode: 'AUX-2: Short Break / AUX', icon: '☕', time: '08:45 AM - 09:00 AM', duration: '15 mins', status: 'Completed', statusClass: 'completed', category: 'tea' }
+    );
+  } else if (agentId === 'AGT-9102') { // Samantha Vance (1 lunch overdue, 1 aux break)
+    items.push(
+      { date: 'Today, Oct 21', auxCode: 'AUX-1: Scheduled Lunch', icon: '🍱', time: '12:00 PM - 12:55 PM', duration: '55 mins', status: 'Overdue (+25m)', statusClass: 'overdue', category: 'lunch' },
+      { date: 'Today, Oct 21', auxCode: 'AUX-2: Short Break / AUX', icon: '☕', time: '09:15 AM - 09:30 AM', duration: '15 mins', status: 'Completed', statusClass: 'completed', category: 'tea' }
+    );
+  } else if (agentId === 'AGT-6628') {
+    // Olivia Taylor: 0 breaks taken today
+  } else if (agentId === 'AGT-7740') {
+    items.push(
+      { date: 'Today, Oct 21', auxCode: 'AUX-2: Short Break / AUX', icon: '☕', time: '01:45 PM - 02:00 PM', duration: '15 mins', status: 'Completed', statusClass: 'completed', category: 'tea' },
+      { date: 'Today, Oct 21', auxCode: 'AUX-2: Short Break / AUX', icon: '☕', time: '09:30 AM - 09:45 AM', duration: '15 mins', status: 'Completed', statusClass: 'completed', category: 'tea' }
+    );
+  } else if (agentId === 'AGT-4491') {
+    items.push(
+      { date: 'Today, Oct 21', auxCode: 'AUX-2: Short Break / AUX', icon: '☕', time: '02:30 PM - 02:45 PM', duration: '15 mins', status: 'Completed', statusClass: 'completed', category: 'tea' },
+      { date: 'Today, Oct 21', auxCode: 'AUX-2: Short Break / AUX', icon: '☕', time: '11:00 AM - 11:15 AM', duration: '15 mins', status: 'Completed', statusClass: 'completed', category: 'tea' },
+      { date: 'Today, Oct 21', auxCode: 'AUX-5: Technical / VPN Issue', icon: '💻', time: '08:30 AM - 09:10 AM', duration: '40 mins', status: 'Resolved', statusClass: 'completed', category: 'other' }
+    );
+  } else if (agentId === 'AGT-2219') {
+    items.push(
+      { date: 'Today, Oct 21', auxCode: 'AUX-2: Short Break / AUX', icon: '☕', time: '02:00 PM - 02:15 PM', duration: '15 mins', status: 'Completed', statusClass: 'completed', category: 'tea' },
+      { date: 'Today, Oct 21', auxCode: 'AUX-2: Short Break / AUX', icon: '☕', time: '11:15 AM - 11:30 AM', duration: '15 mins', status: 'Completed', statusClass: 'completed', category: 'tea' },
+      { date: 'Today, Oct 21', auxCode: 'AUX-4: Training / Coaching', icon: '🎓', time: '09:00 AM - 09:45 AM', duration: '45 mins', status: 'Completed', statusClass: 'completed', category: 'other' }
+    );
+  } else {
+    items.push(
+      { date: 'Today, Oct 21', auxCode: 'AUX-2: Short Break / AUX', icon: '☕', time: '10:30 AM - 10:45 AM', duration: '15 mins', status: 'Completed', statusClass: 'completed', category: 'tea' }
+    );
+  }
+
+  // Days 1 through 29 (Past 30 days)
+  for (let d = 1; d < 30; d++) {
+    const curDate = new Date(baseDate);
+    curDate.setDate(curDate.getDate() - d);
+    const dayOfWeek = curDate.getDay();
+    if (dayOfWeek === 0 || dayOfWeek === 6) continue; // Skip weekends
+
+    const monthStr = curDate.toLocaleString('default', { month: 'short' });
+    const dayNum = curDate.getDate();
+    const dateLabel = d === 1 ? ('Yesterday, ' + monthStr + ' ' + dayNum) : (monthStr + ' ' + dayNum + ', 2026');
+
+    // Scheduled Lunch
+    let lunchDur = '30 mins';
+    let lunchStatus = 'Completed';
+    let lunchClass = 'completed';
+    if (agentId === 'AGT-9102' && (d === 3 || d === 8 || d === 15)) {
+      lunchDur = '50 mins';
+      lunchStatus = 'Overdue (+20m)';
+      lunchClass = 'overdue';
+    }
+    items.push({
+      date: dateLabel,
+      auxCode: 'AUX-1: Scheduled Lunch',
+      icon: '🍱',
+      time: '12:30 PM - 01:00 PM',
+      duration: lunchDur,
+      status: lunchStatus,
+      statusClass: lunchClass,
+      category: 'lunch'
+    });
+
+    // AUX Break 1
+    items.push({
+      date: dateLabel,
+      auxCode: 'AUX-2: Short Break / AUX',
+      icon: '☕',
+      time: '10:30 AM - 10:45 AM',
+      duration: '15 mins',
+      status: 'Completed',
+      statusClass: 'completed',
+      category: 'tea'
+    });
+
+    // AUX Break 2 (or more for Jordan)
+    if (agentId === 'AGT-4092') {
+      items.push({
+        date: dateLabel,
+        auxCode: 'AUX-2: Short Break / AUX',
+        icon: '☕',
+        time: '02:15 PM - 02:30 PM',
+        duration: '15 mins',
+        status: 'Completed',
+        statusClass: 'completed',
+        category: 'tea'
+      });
+      items.push({
+        date: dateLabel,
+        auxCode: 'AUX-2: Short Break / AUX',
+        icon: '☕',
+        time: '04:00 PM - 04:15 PM',
+        duration: '15 mins',
+        status: 'Completed',
+        statusClass: 'completed',
+        category: 'tea'
+      });
+    } else if (d % 2 === 0) {
+      items.push({
+        date: dateLabel,
+        auxCode: 'AUX-2: Short Break / AUX',
+        icon: '☕',
+        time: '03:30 PM - 03:45 PM',
+        duration: '15 mins',
+        status: 'Completed',
+        statusClass: 'completed',
+        category: 'tea'
+      });
+    }
+
+    // Occasional training / tech issue
+    if (d === 4 || d === 12 || d === 20) {
+      if (agentId === 'AGT-4491') {
+        items.push({
+          date: dateLabel,
+          auxCode: 'AUX-5: Technical / VPN Issue',
+          icon: '💻',
+          time: '09:00 AM - 09:35 AM',
+          duration: '35 mins',
+          status: 'Resolved',
+          statusClass: 'completed',
+          category: 'other'
+        });
+      } else if (agentId === 'AGT-2219') {
+        items.push({
+          date: dateLabel,
+          auxCode: 'AUX-4: Training / Coaching',
+          icon: '🎓',
+          time: '09:00 AM - 09:45 AM',
+          duration: '45 mins',
+          status: 'Completed',
+          statusClass: 'completed',
+          category: 'other'
+        });
+      } else if (d === 12) {
+        items.push({
+          date: dateLabel,
+          auxCode: 'AUX-3: Shift Meeting',
+          icon: '👥',
+          time: '09:00 AM - 09:30 AM',
+          duration: '30 mins',
+          status: 'Completed',
+          statusClass: 'completed',
+          category: 'other'
+        });
+      }
+    }
+  }
+
+  AGENT_30DAY_CACHE[agentId] = items;
+  return items;
+}
+
+function renderBreakHistory(agentId, filter) {
+  const container = document.getElementById('break-history-list');
+  const countBadge = document.getElementById('break-count-badge');
+  const totalBreaksEl = document.getElementById('sum-total-breaks');
+  const avgDurationEl = document.getElementById('sum-avg-duration');
+  const complianceEl = document.getElementById('sum-compliance');
+  if (!container) return;
+
+  const currentAgent = agentId || (widgetAgentSelect ? widgetAgentSelect.value : (agentState?.id || 'AGT-8842'));
+  const profile = AGENT_PROFILES[currentAgent] || AGENT_PROFILES['AGT-8842'];
+  const allHistory = generate30DayBreakHistory(currentAgent);
+
+  const activeFilter = filter || currentBreakFilter || 'all';
+  currentBreakFilter = activeFilter;
+
+  // Filter items
+  const filtered = activeFilter === 'all' 
+    ? allHistory 
+    : allHistory.filter(item => item.category === activeFilter);
+
+  // Update header summary numbers
+  if (countBadge) {
+    countBadge.textContent = allHistory.length + ' in 30 Days';
+  }
+  if (totalBreaksEl) {
+    totalBreaksEl.textContent = allHistory.length + ' breaks';
+  }
+  if (complianceEl) {
+    complianceEl.textContent = profile.adherence || '95.0%';
+    complianceEl.style.color = parseFloat(profile.adherence) >= 90 ? '#10b981' : '#ef4444';
+  }
+  if (avgDurationEl) {
+    avgDurationEl.textContent = '19m';
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div style="text-align:center; padding:24px 10px; color:#94a3b8; font-size:11px;"><span style="font-size:24px; display:block; margin-bottom:6px;">☕</span>No breaks match the selected filter in the past 30 days.</div>';
+    return;
+  }
+
+  container.innerHTML = filtered.map(item => {
+    return '<div class="break-history-item">' +
+      '<div class="break-history-left">' +
+        '<div class="break-history-icon">' + (item.icon || '☕') + '</div>' +
+        '<div class="break-history-meta">' +
+          '<strong>' + item.auxCode + '</strong>' +
+          '<span><span class="break-date-label">' + item.date + '</span>• ' + item.time + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="break-history-right">' +
+        '<span class="break-duration-tag">' + item.duration + '</span>' +
+        '<span class="break-status-badge ' + item.statusClass + '">' + item.status + '</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+// Bind filter buttons
+function bindBreakFilters() {
+  document.querySelectorAll('.break-filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.break-filter-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      const f = chip.getAttribute('data-filter');
+      const currentAgent = widgetAgentSelect ? widgetAgentSelect.value : (agentState?.id || 'AGT-8842');
+      renderBreakHistory(currentAgent, f);
+    });
+  });
+}
+
 function switchWidgetAgent(agentKey) {
+  renderBreakHistory(agentKey);
   const profile = AGENT_PROFILES[agentKey] || AGENT_PROFILES['AGT-8842'];
   agentState.id = profile.id;
   agentState.name = profile.name;
@@ -495,7 +766,9 @@ function openBreakPortal(extraParam = '') {
   window.open(url, 'WFM_Break_Portal', `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes`);
 }
 
-btnQuickBreak.addEventListener('click', () => openBreakPortal());
+if (btnQuickBreak) {
+  btnQuickBreak.addEventListener('click', () => openBreakPortal());
+}
 btnOpenPortal.addEventListener('click', () => openBreakPortal());
 
 // Sound Synthesizer
@@ -568,6 +841,8 @@ btnEndCallAcw.addEventListener('click', () => {
 });
 
 function enterAcwMode() {
+  const acwTabBtn = document.querySelector('.tab-btn[data-tab="tab-acw"]');
+  if (acwTabBtn) acwTabBtn.click();
   agentState.status = 'ACW';
   agentStatusDot.className = 'status-indicator aux';
   agentStateLabel.className = 'state-label aux-mode';
@@ -688,12 +963,16 @@ btnCompleteAcw.addEventListener('click', async () => {
 // ==========================================
 
 function startBreak(breakData) {
-  agentState.status = 'AUX';
-  agentState.activeBreak = {
-    auxCode: breakData.auxCode,
-    durationMinutes: breakData.durationMinutes,
-    expiresAt: breakData.expiresAt || (Date.now() + (breakData.durationMinutes * 60 * 1000)),
-    totalMs: (breakData.durationMinutes * 60 * 1000)
+  // Record in 30-day break history
+  const agentKey = agentState.id || 'AGT-8842';
+  const history = generate30DayBreakHistory(agentKey);
+  if (history && history[0] && history[0].status === 'In Progress') {
+    const endTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const startTimeStr = history[0].time.split(' - ')[0];
+    history[0].time = `${startTimeStr} - ${endTime}`;
+    history[0].status = 'Completed';
+    history[0].statusClass = 'completed';
+    renderBreakHistory(agentKey);
   };
   twoMinuteWarningTriggered = false;
   botCallTriggered = false;
@@ -797,6 +1076,15 @@ btnEndBreak.addEventListener('click', () => {
 });
 
 function endBreakEarly() {
+  const agentKey = agentState.id || 'AGT-8842';
+  if (AGENT_BREAK_HISTORIES[agentKey] && AGENT_BREAK_HISTORIES[agentKey][0] && AGENT_BREAK_HISTORIES[agentKey][0].status === 'In Progress') {
+    const endTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const startTimeStr = AGENT_BREAK_HISTORIES[agentKey][0].timeRange.split(' - ')[0];
+    AGENT_BREAK_HISTORIES[agentKey][0].timeRange = `${startTimeStr} - ${endTime}`;
+    AGENT_BREAK_HISTORIES[agentKey][0].status = 'Completed';
+    AGENT_BREAK_HISTORIES[agentKey][0].statusClass = 'completed';
+    renderBreakHistory(agentKey);
+  }
   if (countdownInterval) clearInterval(countdownInterval);
   countdownInterval = null;
   agentState.status = 'READY';
@@ -894,7 +1182,6 @@ function renderSuggestedReplies(topic) {
         <p>"${item.text}"</p>
         <div style="display:flex; gap:6px; margin-top:6px;">
           <button class="btn-copy">Copy</button>
-          <button class="btn-insert-chat btn-xs btn-primary" style="padding:2px 6px;">Insert into Chat</button>
         </div>
       </div>
     `;
@@ -912,19 +1199,6 @@ function bindSuggestionButtons() {
         btn.textContent = '✓ Copied!';
         setTimeout(() => btn.textContent = 'Copy', 1500);
       });
-    });
-  });
-
-  document.querySelectorAll('.btn-insert-chat').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const parent = e.target.closest('.suggestion-item');
-      const text = parent.getAttribute('data-text');
-      if (chatInput) {
-        chatInput.value = text;
-        chatInput.focus();
-        btn.textContent = '✓ Inserted!';
-        setTimeout(() => btn.textContent = 'Insert into Chat', 1500);
-      }
     });
   });
 }
@@ -992,7 +1266,7 @@ async function handleUserChat() {
   chatHistory.appendChild(thinkingMsg);
   chatHistory.scrollTop = chatHistory.scrollHeight;
 
-  const currentAgentId = agentSelect ? agentSelect.value : 'AGT-8842';
+  const currentAgentId = (widgetAgentSelect && widgetAgentSelect.value) ? widgetAgentSelect.value : (agentState?.id || 'AGT-8842');
 
   try {
     const res = await fetch('/api/copilot/query', {
@@ -1030,10 +1304,10 @@ async function handleUserChat() {
       `• <strong>General Customer Service</strong>: 8 calls waiting | Avg Wait: 14s | SLA: 97.2%<br/>` +
       `• <strong>Tier-2 Tech Support</strong>: 15 calls waiting | Avg Wait: 32s | SLA: 88.0%<br/>` +
       `<small style="color:#94a3b8; display:block; margin-top:4px;">Inbound Rate: 420 calls/min. All skill queues operating normally.</small>`;
-  } else if (qLower.includes('adherence') || qLower.includes('tea break') || qLower.includes('my break') || qLower.includes('lunch') || qLower.includes('quota')) {
+  } else if (qLower.includes('adherence') || qLower.includes('aux break') || qLower.includes('my break') || qLower.includes('lunch') || qLower.includes('quota')) {
     response = `⏱️ <strong>Live Schedule Adherence for ${profile.name}:</strong><br/>` +
       `• <strong>CXone Adherence</strong>: <strong>${profile.adherence}</strong> (Target: &ge; 90%)<br/>` +
-      `• <strong>Tea Breaks Taken Today</strong>: <strong>${profile.teaBreaks}</strong> (Policy: Max 2)<br/>` +
+      `• <strong>AUX Breaks Taken Today</strong>: <strong>${profile.teaBreaks}</strong> (Policy: Max 2)<br/>` +
       `• <strong>Lunch Variance</strong>: <strong>${profile.lunchOverage}</strong> (Tolerance: &lt;15m)<br/>` +
       `• <strong>Frequency (30m)</strong>: <strong>${profile.freqCount}</strong> requests`;
   } else if (qLower.includes('storm') || qLower.includes('weather') || qLower.includes('deflection') || qLower.includes('outage')) {
@@ -1458,3 +1732,8 @@ fetch('/api/policy')
       } catch (e) {}
     }
   });
+
+// Initialize Break History on Startup
+renderBreakHistory("AGT-8842");
+
+bindBreakFilters();

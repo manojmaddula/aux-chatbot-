@@ -18,7 +18,7 @@ let activeAgents = [
   { id: 'AGT-4491', name: 'Carlos Mendez', queue: 'Tier-2 Tech Support', state: 'AVAILABLE', breakLeft: '-', adherence: '85.0%', teaCount: 2, lunchVar: '+6m', supervisorId: 'SUP-035', supervisorName: 'Elena Rostova' },
 
   // David Sterling (SUP-042) - Emergency Inbound Director
-  { id: 'AGT-7740', name: 'David Chen', queue: 'Emergency Inbound', state: 'AUX: TEA BREAK', breakLeft: '08:42', adherence: '82.0%', teaCount: 2, lunchVar: '0m', supervisorId: 'SUP-042', supervisorName: 'David Sterling' },
+  { id: 'AGT-7740', name: 'David Chen', queue: 'Emergency Inbound', state: 'AUX: AUX BREAK', breakLeft: '08:42', adherence: '82.0%', teaCount: 2, lunchVar: '0m', supervisorId: 'SUP-042', supervisorName: 'David Sterling' },
   { id: 'AGT-6628', name: 'Olivia Taylor', queue: 'Emergency Inbound', state: 'AVAILABLE', breakLeft: '-', adherence: '99.5%', teaCount: 1, lunchVar: '0m', supervisorId: 'SUP-042', supervisorName: 'David Sterling' },
 
   // Priya Sharma (SUP-059) - WFM Scheduling & Trainee Development Lead
@@ -120,7 +120,11 @@ supTabBtns.forEach(btn => {
     const target = btn.getAttribute('data-tab');
     document.getElementById(target).classList.add('active');
 
+    if (target === 'stab-alerts') {
+      renderBirthdayCalendar();
+    }
     if (target === 'stab-reports') {
+      renderCallTrendDashboard();
       loadReport(document.getElementById('report-type-select').value);
     }
     if (target === 'stab-qa') {
@@ -555,6 +559,426 @@ document.getElementById('btn-send-custom-bc')?.addEventListener('click', () => {
   document.getElementById('custom-bc-text').value = '';
 });
 
+
+// ==========================================
+// BIRTHDAY CALENDAR & CELEBRATIONS HUB
+// ==========================================
+
+const BIRTHDAY_ROSTER = [
+  // Agents (12)
+  { id: 'AGT-9102', name: 'Samantha Vance', role: 'Agent', queue: 'General Customer Service', birthMonth: 10, birthDay: 21, birthDateStr: 'Oct 21', avatar: '👩‍💼', isSupervisor: false, email: 'samantha.vance@nicecxone.internal' },
+  { id: 'AGT-6512', name: 'Rachel Green', role: 'Agent', queue: 'General Customer Service', birthMonth: 11, birthDay: 10, birthDateStr: 'Nov 10', avatar: '👩', isSupervisor: false, email: 'rachel.green@nicecxone.internal' },
+  { id: 'AGT-8819', name: 'Marcus Brody', role: 'Agent', queue: 'General Customer Service', birthMonth: 11, birthDay: 22, birthDateStr: 'Nov 22', avatar: '👨', isSupervisor: false, email: 'marcus.brody@nicecxone.internal' },
+  { id: 'AGT-3310', name: 'Chloe Bennett', role: 'Agent', queue: 'General Customer Service', birthMonth: 1, birthDay: 8, birthDateStr: 'Jan 08', avatar: '👩‍💻', isSupervisor: false, email: 'chloe.bennett@nicecxone.internal' },
+  { id: 'AGT-4092', name: 'Jordan Miller', role: 'Agent', queue: 'Customer Billing & Retention', birthMonth: 11, birthDay: 2, birthDateStr: 'Nov 02', avatar: '👨‍💼', isSupervisor: false, email: 'jordan.miller@nicecxone.internal' },
+  { id: 'AGT-5521', name: 'Lucas Wright', role: 'Agent', queue: 'Customer Billing & Retention', birthMonth: 12, birthDay: 18, birthDateStr: 'Dec 18', avatar: '👨‍🦰', isSupervisor: false, email: 'lucas.wright@nicecxone.internal' },
+  { id: 'AGT-7703', name: 'Maya Patel', role: 'Agent', queue: 'Customer Billing & Retention', birthMonth: 2, birthDay: 14, birthDateStr: 'Feb 14', avatar: '👩‍🦱', isSupervisor: false, email: 'maya.patel@nicecxone.internal' },
+  { id: 'AGT-8842', name: 'Alex Morgan', role: 'Agent', queue: 'Tier-2 Tech Support', birthMonth: 10, birthDay: 25, birthDateStr: 'Oct 25', avatar: '👨‍🔬', isSupervisor: false, email: 'alex.morgan@nicecxone.internal' },
+  { id: 'AGT-4491', name: 'Carlos Mendez', role: 'Agent', queue: 'Tier-2 Tech Support', birthMonth: 3, birthDay: 3, birthDateStr: 'Mar 03', avatar: '👨‍💻', isSupervisor: false, email: 'carlos.mendez@nicecxone.internal' },
+  { id: 'AGT-7740', name: 'David Chen', role: 'Agent', queue: 'Emergency Inbound', birthMonth: 4, birthDay: 12, birthDateStr: 'Apr 12', avatar: '👨‍⚕️', isSupervisor: false, email: 'david.chen@nicecxone.internal' },
+  { id: 'AGT-6628', name: 'Olivia Taylor', role: 'Agent', queue: 'Emergency Inbound', birthMonth: 5, birthDay: 27, birthDateStr: 'May 27', avatar: '👩‍⚕️', isSupervisor: false, email: 'olivia.taylor@nicecxone.internal' },
+  { id: 'AGT-2219', name: "Liam O'Connor", role: 'Agent', queue: 'General Customer Service', birthMonth: 6, birthDay: 15, birthDateStr: 'Jun 15', avatar: '👨‍🎓', isSupervisor: false, email: 'liam.oconnor@nicecxone.internal' },
+
+  // Supervisors (5)
+  { id: 'SUP-014', name: 'Sarah Jenkins', role: 'Floor Operations Lead', queue: 'Floor Lead & WFM Operations', birthMonth: 10, birthDay: 28, birthDateStr: 'Oct 28', avatar: '👩‍💼', isSupervisor: true, email: 'sarah.jenkins@nicecxone.internal' },
+  { id: 'SUP-021', name: 'Michael Chang', role: 'Billing Operations Manager', queue: 'Customer Billing & Retention', birthMonth: 10, birthDay: 22, birthDateStr: 'Oct 22', avatar: '👨‍💼', isSupervisor: true, email: 'michael.chang@nicecxone.internal' },
+  { id: 'SUP-035', name: 'Elena Rostova', role: 'QA & Compliance Director', queue: 'Quality Assurance & Speech Tone', birthMonth: 11, birthDay: 15, birthDateStr: 'Nov 15', avatar: '👩‍🔬', isSupervisor: true, email: 'elena.rostova@nicecxone.internal' },
+  { id: 'SUP-042', name: 'David Sterling', role: 'Emergency Operations Director', queue: 'Emergency Inbound & Outage Dispatch', birthMonth: 12, birthDay: 4, birthDateStr: 'Dec 04', avatar: '👨‍✈️', isSupervisor: true, email: 'david.sterling@nicecxone.internal' },
+  { id: 'SUP-059', name: 'Priya Sharma', role: 'WFM Scheduling Architect', queue: 'WFM Scheduling & Erlang-C Balancing', birthMonth: 1, birthDay: 19, birthDateStr: 'Jan 19', avatar: '👩‍💻', isSupervisor: true, email: 'priya.sharma@nicecxone.internal' }
+];
+
+let currentBirthdayFilter = 'upcoming';
+let currentBirthdaySearch = '';
+const publishedBirthdaysSet = new Set();
+
+function calculateDaysUntil(month, day) {
+  const today = new Date(2026, 9, 21); // Month 9 is October (0-indexed)
+  const currentYear = today.getFullYear();
+  let nextBday = new Date(currentYear, month - 1, day);
+  if (nextBday < today) {
+    nextBday = new Date(currentYear + 1, month - 1, day);
+  }
+  const diffTime = nextBday - today;
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+}
+
+window.setBirthdayFilter = function(filter) {
+  currentBirthdayFilter = filter;
+  const btns = document.querySelectorAll('.bday-tab-btn');
+  btns.forEach(btn => {
+    if (btn.getAttribute('data-filter') === filter) btn.classList.add('active');
+    else btn.classList.remove('active');
+  });
+  renderBirthdayCalendar();
+};
+
+window.handleBirthdaySearch = function(query) {
+  currentBirthdaySearch = (query || '').toLowerCase().trim();
+  renderBirthdayCalendar();
+};
+
+function renderBirthdayCalendar() {
+  const container = document.getElementById('birthday-grid');
+  if (!container) return;
+
+  const currentMonth = 10; // October
+  const currentDay = 21;
+
+  let list = BIRTHDAY_ROSTER.map(item => {
+    const daysUntil = calculateDaysUntil(item.birthMonth, item.birthDay);
+    const isToday = (item.birthMonth === currentMonth && item.birthDay === currentDay);
+    const isTomorrow = daysUntil === 1;
+    return { ...item, daysUntil, isToday, isTomorrow };
+  });
+
+  // Filter
+  if (currentBirthdayFilter === 'today') {
+    list = list.filter(item => item.isToday);
+  } else if (currentBirthdayFilter === 'upcoming') {
+    // Next 35 days
+    list = list.filter(item => item.daysUntil <= 35).sort((a, b) => a.daysUntil - b.daysUntil);
+  } else if (currentBirthdayFilter === 'agents') {
+    list = list.filter(item => !item.isSupervisor).sort((a, b) => a.daysUntil - b.daysUntil);
+  } else if (currentBirthdayFilter === 'supervisors') {
+    list = list.filter(item => item.isSupervisor).sort((a, b) => a.daysUntil - b.daysUntil);
+  } else {
+    // All 12 months sorted by calendar month/day
+    list = list.sort((a, b) => {
+      if (a.birthMonth !== b.birthMonth) return a.birthMonth - b.birthMonth;
+      return a.birthDay - b.birthDay;
+    });
+  }
+
+  // Search
+  if (currentBirthdaySearch) {
+    list = list.filter(item => {
+      return item.name.toLowerCase().includes(currentBirthdaySearch) ||
+             item.id.toLowerCase().includes(currentBirthdaySearch) ||
+             item.queue.toLowerCase().includes(currentBirthdaySearch) ||
+             item.role.toLowerCase().includes(currentBirthdaySearch);
+    });
+  }
+
+  if (list.length === 0) {
+    container.innerHTML = '<div style="grid-column: 1 / -1; text-align:center; padding:30px; color:#64748b;">No birthdays match your selected filter or search criteria.</div>';
+    return;
+  }
+
+  container.innerHTML = list.map(item => {
+    let cardClass = 'birthday-card-item';
+    let badgeHtml = '';
+    let countdownText = '';
+
+    if (item.isToday) {
+      cardClass += ' is-today';
+      badgeHtml = '<span class="bday-badge-today">🎉 TODAY!</span>';
+      countdownText = '<strong style="color:#ec4899;">🎂 Celebrating Today!</strong>';
+    } else if (item.isTomorrow) {
+      cardClass += ' is-tomorrow';
+      badgeHtml = '<span class="bday-badge-tomorrow">🎂 TOMORROW</span>';
+      countdownText = '<span style="color:#d97706; font-weight:700;">In 1 day</span>';
+    } else {
+      badgeHtml = '<span class="bday-badge-upcoming">🎈 ' + item.birthDateStr + '</span>';
+      countdownText = '<span style="color:#64748b;">In ' + item.daysUntil + ' days</span>';
+    }
+
+    const isPublished = publishedBirthdaysSet.has(item.id);
+    const pubBtnText = isPublished ? '✅ Published Just Now' : '📢 Publish Birthday Broadcast';
+    const pubBtnClass = isPublished ? 'btn-publish-bday published' : 'btn-publish-bday';
+
+    return '<div class="' + cardClass + '">' +
+      '<div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px;">' +
+        '<div style="display:flex; align-items:center; gap:10px;">' +
+          '<div class="bday-avatar-circle ' + (item.isSupervisor ? 'supervisor' : '') + ' ' + (item.isToday ? 'today' : '') + '">' + item.avatar + '</div>' +
+          '<div>' +
+            '<div style="display:flex; align-items:center; gap:6px;">' +
+              '<strong style="color:#0f172a; font-size:13px;">' + item.name + '</strong>' +
+              '<span class="status-tag ' + (item.isSupervisor ? 'approved' : 'aux') + '" style="font-size:9px; padding:2px 6px;">' + (item.isSupervisor ? 'Supervisor' : 'Agent') + '</span>' +
+            '</div>' +
+            '<div style="font-family:monospace; font-size:11px; color:#64748b;">' + item.id + ' • ' + item.queue + '</div>' +
+          '</div>' +
+        '</div>' +
+        badgeHtml +
+      '</div>' +
+
+      '<div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; padding:6px 10px; background:#f8fafc; border-radius:6px; margin-bottom:12px; border:1px solid #f1f5f9;">' +
+        '<div><span style="color:#64748b;">Birthday:</span> <strong style="color:#0f172a;">' + item.birthDateStr + '</strong></div>' +
+        '<div>' + countdownText + '</div>' +
+      '</div>' +
+
+      '<button id="btn-pub-bday-' + item.id + '" class="' + pubBtnClass + '" onclick="publishBirthdayBroadcast(\'' + item.id + '\')"' + (isPublished ? ' disabled' : '') + '>' +
+        pubBtnText +
+      '</button>' +
+    '</div>';
+  }).join('');
+}
+
+window.publishBirthdayBroadcast = function(personId, customGreeting = null) {
+  const person = BIRTHDAY_ROSTER.find(p => p.id === personId);
+  if (!person) return;
+
+  const defaultMsg = customGreeting || ('🎈 The entire floor leadership and operations team wish ' + person.name + ' (' + person.role + ' - ' + person.queue + ') a wonderful Happy Birthday! Thank you for your continued dedication, empathy, and stellar service!');
+  const title = '🎂 Happy Birthday ' + person.name + '! 🎉';
+
+  // 1. Dispatch via supervisor broadcast logic
+  dispatchSupervisorBroadcast('CELEBRATION', title, defaultMsg);
+
+  // 2. Mark as published
+  publishedBirthdaysSet.add(personId);
+  renderBirthdayCalendar();
+
+  // 3. Post to API for audit persistence
+  fetch('/api/broadcast', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      id: 'BC-BDAY-' + Date.now(),
+      severity: 'CELEBRATION',
+      title,
+      message: defaultMsg,
+      sender: 'Supervisor ' + currentSupervisor.name + ' (' + currentSupervisor.id + ')'
+    })
+  }).catch(() => {});
+
+  alert('🎉 Birthday Broadcast published successfully! Dispatched to all agent desktop widgets across the floor.');
+};
+
+window.autoPublishTodayBirthdays = function() {
+  const todaysBirthdays = BIRTHDAY_ROSTER.filter(p => p.birthMonth === 10 && p.birthDay === 21);
+  if (todaysBirthdays.length === 0) {
+    alert('No birthdays scheduled for today.');
+    return;
+  }
+  todaysBirthdays.forEach(person => {
+    publishBirthdayBroadcast(person.id);
+  });
+};
+
+window.openBirthdayBroadcastModal = function() {
+  const person = BIRTHDAY_ROSTER.find(p => p.birthMonth === 10 && p.birthDay === 21) || BIRTHDAY_ROSTER[0];
+  const customGreeting = prompt('Enter celebration broadcast message for ' + person.name + ':', '🎈 Happy Birthday ' + person.name + '! Wishing you an incredible year ahead from everyone on the contact center floor!');
+  if (customGreeting && customGreeting.trim()) {
+    publishBirthdayBroadcast(person.id, customGreeting.trim());
+  }
+};
+
+
+// ==========================================
+// PREVIOUS DAYS CALL TRENDS TELEMETRY & DASHBOARD
+// ==========================================
+
+const CALL_TRENDS_HISTORY = [
+  { date: '2026-10-21', day: 'Wednesday (Today)', offered: 4820, handled: 4492, deflected: 328, abandoned: 102, abandonRate: 2.1, asaSec: 24, ahtSec: 252, ahtStr: '4m 12s', sla: 88.6, peakSurge: '10:00 - 11:30 (Billing Spike +318)', status: 'OPTIMAL', queues: { billing: 1840, cs: 1210, tech: 890, emergency: 480, other: 400 } },
+  { date: '2026-10-20', day: 'Tuesday (Yesterday)', offered: 4310, handled: 4115, deflected: 0, abandoned: 195, abandonRate: 4.5, asaSec: 31, ahtSec: 270, ahtStr: '4m 30s', sla: 86.2, peakSurge: '14:00 - 15:00 (Afternoon Escalations)', status: 'NORMAL', queues: { billing: 1520, cs: 1240, tech: 860, emergency: 390, other: 300 } },
+  { date: '2026-10-19', day: 'Monday (High Traffic)', offered: 5140, handled: 4780, deflected: 0, abandoned: 360, abandonRate: 7.0, asaSec: 42, ahtSec: 288, ahtStr: '4m 48s', sla: 81.4, peakSurge: '09:30 - 11:30 (Monday Billing Influx)', status: 'WARNING', queues: { billing: 2010, cs: 1420, tech: 980, emergency: 410, other: 320 } },
+  { date: '2026-10-18', day: 'Sunday (Weekend)', offered: 2120, handled: 2055, deflected: 0, abandoned: 65, abandonRate: 3.1, asaSec: 15, ahtSec: 232, ahtStr: '3m 52s', sla: 94.8, peakSurge: '12:00 - 13:00 (Midday Orders)', status: 'EXCELLENT', queues: { billing: 680, cs: 620, tech: 450, emergency: 210, other: 160 } },
+  { date: '2026-10-17', day: 'Saturday (Weekend)', offered: 2450, handled: 2360, deflected: 0, abandoned: 90, abandonRate: 3.7, asaSec: 18, ahtSec: 238, ahtStr: '3m 58s', sla: 93.5, peakSurge: '13:00 - 14:00 (Weekend Technical Inquiries)', status: 'EXCELLENT', queues: { billing: 780, cs: 710, tech: 520, emergency: 240, other: 200 } },
+  { date: '2026-10-16', day: 'Friday', offered: 4180, handled: 3990, deflected: 0, abandoned: 190, abandonRate: 4.5, asaSec: 26, ahtSec: 260, ahtStr: '4m 20s', sla: 87.5, peakSurge: '11:00 - 12:00 (Pre-Weekend Wrapup)', status: 'NORMAL', queues: { billing: 1480, cs: 1190, tech: 840, emergency: 380, other: 290 } },
+  { date: '2026-10-15', day: 'Thursday (Storm Deflection)', offered: 5680, handled: 4210, deflected: 1470, abandoned: 110, abandonRate: 1.9, asaSec: 22, ahtSec: 255, ahtStr: '4m 15s', sla: 89.2, peakSurge: '13:30 - 15:30 (Regional Storm Outage)', status: 'OPTIMAL', queues: { billing: 1540, cs: 1220, tech: 880, emergency: 1650, other: 390 } },
+  { date: '2026-10-14', day: 'Wednesday', offered: 4050, handled: 3890, deflected: 0, abandoned: 160, abandonRate: 4.0, asaSec: 25, ahtSec: 264, ahtStr: '4m 24s', sla: 88.1, peakSurge: '10:30 - 11:30 (Midweek Standard)', status: 'NORMAL', queues: { billing: 1420, cs: 1160, tech: 810, emergency: 370, other: 290 } },
+  { date: '2026-10-13', day: 'Tuesday', offered: 4220, handled: 4040, deflected: 0, abandoned: 180, abandonRate: 4.3, asaSec: 28, ahtSec: 268, ahtStr: '4m 28s', sla: 87.0, peakSurge: '14:30 - 15:30', status: 'NORMAL', queues: { billing: 1490, cs: 1210, tech: 840, emergency: 390, other: 290 } },
+  { date: '2026-10-12', day: 'Monday', offered: 4950, handled: 4620, deflected: 0, abandoned: 330, abandonRate: 6.7, asaSec: 38, ahtSec: 282, ahtStr: '4m 42s', sla: 83.2, peakSurge: '09:00 - 11:00', status: 'WARNING', queues: { billing: 1920, cs: 1380, tech: 950, emergency: 400, other: 300 } },
+  { date: '2026-10-11', day: 'Sunday', offered: 2080, handled: 2015, deflected: 0, abandoned: 65, abandonRate: 3.1, asaSec: 14, ahtSec: 228, ahtStr: '3m 48s', sla: 95.2, peakSurge: '12:30 - 13:30', status: 'EXCELLENT', queues: { billing: 670, cs: 610, tech: 440, emergency: 210, other: 150 } },
+  { date: '2026-10-10', day: 'Saturday', offered: 2390, handled: 2310, deflected: 0, abandoned: 80, abandonRate: 3.3, asaSec: 17, ahtSec: 235, ahtStr: '3m 55s', sla: 94.0, peakSurge: '13:00 - 14:00', status: 'EXCELLENT', queues: { billing: 760, cs: 690, tech: 510, emergency: 240, other: 190 } },
+  { date: '2026-10-09', day: 'Friday', offered: 4120, handled: 3940, deflected: 0, abandoned: 180, abandonRate: 4.4, asaSec: 27, ahtSec: 262, ahtStr: '4m 22s', sla: 87.8, peakSurge: '11:30 - 12:30', status: 'NORMAL', queues: { billing: 1460, cs: 1180, tech: 830, emergency: 370, other: 280 } },
+  { date: '2026-10-08', day: 'Thursday', offered: 4010, handled: 3850, deflected: 0, abandoned: 160, abandonRate: 4.0, asaSec: 26, ahtSec: 260, ahtStr: '4m 20s', sla: 88.4, peakSurge: '10:00 - 11:00', status: 'NORMAL', queues: { billing: 1410, cs: 1150, tech: 800, emergency: 370, other: 280 } }
+];
+
+const HOURLY_CALL_COMPARISON = [
+  { hour: '08:00 - 09:00', prevDaysAvg: 280, todayActual: 295, peakNote: 'Shift Startup' },
+  { hour: '09:00 - 10:00', prevDaysAvg: 410, todayActual: 430, peakNote: 'Morning Inbound' },
+  { hour: '10:00 - 11:00', prevDaysAvg: 460, todayActual: 720, peakNote: '⚡ Billing Statement Release Spike (+260)' },
+  { hour: '11:00 - 12:00', prevDaysAvg: 440, todayActual: 680, peakNote: '⚡ WFM Flex Active (Surge Cleared)' },
+  { hour: '12:00 - 13:00', prevDaysAvg: 380, todayActual: 390, peakNote: 'Lunch Shift Rotation' },
+  { hour: '13:00 - 14:00', prevDaysAvg: 420, todayActual: 415, peakNote: 'Midday Operations' },
+  { hour: '14:00 - 15:00', prevDaysAvg: 450, todayActual: 460, peakNote: 'Afternoon Inbound' },
+  { hour: '15:00 - 16:00', prevDaysAvg: 430, todayActual: 440, peakNote: 'West Coast Influx' },
+  { hour: '16:00 - 17:00', prevDaysAvg: 360, todayActual: 375, peakNote: 'Pre-Close Processing' },
+  { hour: '17:00 - 18:00', prevDaysAvg: 290, todayActual: 310, peakNote: 'Evening Wrap-Up' }
+];
+
+let currentTrendRange = '7d';
+let currentTrendSkill = 'all';
+
+window.setTrendRange = function(range) {
+  currentTrendRange = range;
+  const btns = document.querySelectorAll('.trend-range-btn');
+  btns.forEach(b => {
+    if (b.getAttribute('data-range') === range) b.classList.add('active');
+    else b.classList.remove('active');
+  });
+  renderCallTrendDashboard();
+};
+
+window.handleTrendSkillChange = function(skill) {
+  currentTrendSkill = skill;
+  renderCallTrendDashboard();
+};
+
+function renderCallTrendDashboard() {
+  const daysCount = currentTrendRange === '14d' ? 14 : 7;
+  const dataSlice = CALL_TRENDS_HISTORY.slice(0, daysCount);
+  const today = dataSlice[0];
+  const yesterday = dataSlice[1];
+
+  // Multiplier for skill filtering
+  let skillMultiplier = 1.0;
+  if (currentTrendSkill === 'billing') skillMultiplier = 0.38;
+  if (currentTrendSkill === 'cs') skillMultiplier = 0.25;
+  if (currentTrendSkill === 'tech') skillMultiplier = 0.18;
+  if (currentTrendSkill === 'emergency') skillMultiplier = 0.10;
+
+  const todayOffered = Math.round(today.offered * skillMultiplier);
+  const yestOffered = Math.round(yesterday.offered * skillMultiplier);
+  const todayHandled = Math.round(today.handled * skillMultiplier);
+  const todayDeflected = Math.round(today.deflected * (currentTrendSkill === 'all' || currentTrendSkill === 'emergency' ? 1.0 : 0.2));
+
+  const dodDelta = +(((todayOffered - yestOffered) / yestOffered) * 100).toFixed(1);
+  const slaDelta = +(today.sla - yesterday.sla).toFixed(1);
+
+  // Update KPI Cards
+  const kOffered = document.getElementById('trend-kpi-offered');
+  const kOfferedDelta = document.getElementById('trend-kpi-offered-delta');
+  const kOfferedSub = document.getElementById('trend-kpi-offered-sub');
+  const kHandled = document.getElementById('trend-kpi-handled');
+  const kDeflectedBadge = document.getElementById('trend-kpi-deflected-badge');
+  const kAht = document.getElementById('trend-kpi-aht');
+  const kAhtDelta = document.getElementById('trend-kpi-aht-delta');
+  const kAsa = document.getElementById('trend-kpi-asa');
+  const kSla = document.getElementById('trend-kpi-sla');
+  const kSlaDelta = document.getElementById('trend-kpi-sla-delta');
+  const kAbandon = document.getElementById('trend-kpi-abandon');
+
+  if (kOffered) kOffered.textContent = todayOffered.toLocaleString();
+  if (kOfferedDelta) {
+    kOfferedDelta.textContent = (dodDelta >= 0 ? '▲ +' : '▼ ') + dodDelta + '% DoD';
+    kOfferedDelta.style.color = dodDelta >= 0 ? '#2563eb' : '#10b981';
+    kOfferedDelta.style.background = dodDelta >= 0 ? '#eff6ff' : '#ecfdf5';
+  }
+  if (kOfferedSub) kOfferedSub.textContent = 'vs Yesterday (' + yestOffered.toLocaleString() + ') | Skill: ' + (currentTrendSkill.toUpperCase());
+  if (kHandled) kHandled.textContent = todayHandled.toLocaleString();
+  if (kDeflectedBadge) kDeflectedBadge.textContent = '+' + todayDeflected + ' Deflected';
+  if (kAht) kAht.textContent = today.ahtStr;
+  if (kAhtDelta) kAhtDelta.textContent = '▼ -18s DoD (4m 12s vs 4m 30s)';
+  if (kAsa) kAsa.textContent = today.asaSec + ' sec';
+  if (kSla) kSla.textContent = today.sla + '%';
+  if (kSlaDelta) kSlaDelta.textContent = (slaDelta >= 0 ? '▲ +' : '▼ ') + slaDelta + '% DoD';
+  if (kAbandon) kAbandon.textContent = today.abandonRate + '%';
+
+  // Render SVG Trend Chart
+  renderTrendSvgChart(dataSlice, skillMultiplier);
+
+  // Render Peak Hourly Bars
+  renderTrendHourlyBars();
+}
+
+function renderTrendSvgChart(dataSlice, multiplier) {
+  const container = document.getElementById('trend-svg-container');
+  if (!container) return;
+
+  const w = 540;
+  const h = 200;
+  const padL = 40;
+  const padR = 20;
+  const padT = 20;
+  const padB = 30;
+
+  const chartW = w - padL - padR;
+  const chartH = h - padT - padB;
+
+  // Max volume for scaling
+  const maxVol = Math.max(...dataSlice.map(d => d.offered * multiplier)) * 1.15;
+  const colW = Math.min(32, (chartW / dataSlice.length) - 8);
+
+  // Reverse to show chronological left to right
+  const chronological = [...dataSlice].reverse();
+
+  let barsSvg = '';
+  let linePoints = [];
+
+  chronological.forEach((d, idx) => {
+    const x = padL + (idx * (chartW / chronological.length)) + ((chartW / chronological.length - colW) / 2);
+    const scaledOffered = d.offered * multiplier;
+    const scaledHandled = d.handled * multiplier;
+    const barH = (scaledOffered / maxVol) * chartH;
+    const handledH = (scaledHandled / maxVol) * chartH;
+
+    const yOffered = padT + chartH - barH;
+    const yHandled = padT + chartH - handledH;
+
+    // SLA point (scale 70% to 100%)
+    const slaY = padT + chartH - (((d.sla - 70) / 30) * chartH);
+    linePoints.push((x + colW / 2) + ',' + slaY);
+
+    const isTodayCol = (idx === chronological.length - 1);
+    const barColor = isTodayCol ? '#2563eb' : '#94a3b8';
+    const handledColor = isTodayCol ? '#10b981' : '#cbd5e1';
+
+    const shortDate = d.date.split('-').slice(1).join('/');
+
+    barsSvg += '<g class="chart-col" style="cursor:pointer;" onmouseenter="hoverTrendDay(' + (dataSlice.length - 1 - idx) + ')">' +
+      // Background hover area
+      '<rect x="' + (x - 4) + '" y="' + padT + '" width="' + (colW + 8) + '" height="' + chartH + '" fill="transparent" />' +
+      // Offered bar
+      '<rect x="' + x + '" y="' + yOffered + '" width="' + colW + '" height="' + barH + '" rx="3" fill="' + barColor + '" opacity="0.85" />' +
+      // Handled bar (nested or overlay)
+      '<rect x="' + (x + 2) + '" y="' + yHandled + '" width="' + (colW - 4) + '" height="' + handledH + '" rx="2" fill="' + handledColor + '" opacity="0.9" />' +
+      // Date label
+      '<text x="' + (x + colW / 2) + '" y="' + (h - 8) + '" font-size="10" fill="#64748b" text-anchor="middle" font-weight="' + (isTodayCol ? '700' : '400') + '">' + shortDate + '</text>' +
+    '</g>';
+  });
+
+  // Benchmark line for SLA (80%)
+  const benchmarkY = padT + chartH - (((80 - 70) / 30) * chartH);
+  const benchmarkLine = '<line x1="' + padL + '" y1="' + benchmarkY + '" x2="' + (w - padR) + '" y2="' + benchmarkY + '" stroke="#ef4444" stroke-dasharray="3,3" stroke-width="1.5" />' +
+    '<text x="' + (w - padR - 60) + '" y="' + (benchmarkY - 4) + '" font-size="9" fill="#ef4444" font-weight="700">80% Target SLA</text>';
+
+  // SLA Line
+  const slaPath = '<polyline points="' + linePoints.join(' ') + '" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />' +
+    linePoints.map(pt => '<circle cx="' + pt.split(',')[0] + '" cy="' + pt.split(',')[1] + '" r="3.5" fill="#f59e0b" stroke="#ffffff" stroke-width="1.5" />').join('');
+
+  container.innerHTML = '<svg viewBox="0 0 ' + w + ' ' + h + '" style="width:100%; height:100%; overflow:visible;">' +
+    // Grid lines
+    '<line x1="' + padL + '" y1="' + padT + '" x2="' + (w - padR) + '" y2="' + padT + '" stroke="#f1f5f9" />' +
+    '<line x1="' + padL + '" y1="' + (padT + chartH / 2) + '" x2="' + (w - padR) + '" y2="' + (padT + chartH / 2) + '" stroke="#f1f5f9" />' +
+    '<line x1="' + padL + '" y1="' + (padT + chartH) + '" x2="' + (w - padR) + '" y2="' + (padT + chartH) + '" stroke="#e2e8f0" />' +
+    benchmarkLine +
+    barsSvg +
+    slaPath +
+  '</svg>';
+}
+
+window.hoverTrendDay = function(idx) {
+  const d = CALL_TRENDS_HISTORY[idx];
+  const pill = document.getElementById('trend-day-details-pill');
+  if (!d || !pill) return;
+
+  pill.innerHTML = '<strong>📅 ' + d.day + ' (' + d.date + '):</strong> Inbound: <strong>' + d.offered.toLocaleString() + '</strong> | Handled: <strong>' + d.handled.toLocaleString() + '</strong> (' + ((d.handled / d.offered) * 100).toFixed(1) + '%) | Deflected: <strong>' + d.deflected + '</strong> | Abandon: <strong>' + d.abandonRate + '%</strong> | AHT: <strong>' + d.ahtStr + '</strong> | SLA: <strong style="color:' + (d.sla >= 80 ? '#10b981' : '#ef4444') + ';">' + d.sla + '%</strong> | Peak: <em>' + d.peakSurge + '</em>';
+};
+
+function renderTrendHourlyBars() {
+  const container = document.getElementById('trend-hourly-bars');
+  if (!container) return;
+
+  container.innerHTML = HOURLY_CALL_COMPARISON.map(h => {
+    const isSurgeHour = h.todayActual > 500;
+    const maxVal = 750;
+    const basePct = Math.round((h.prevDaysAvg / maxVal) * 100);
+    const todayPct = Math.round((h.todayActual / maxVal) * 100);
+
+    return '<div class="trend-hourly-row">' +
+      '<div style="display:flex; justify-content:space-between; font-size:11px;">' +
+        '<span><strong style="color:#0f172a;">' + h.hour + '</strong> <small style="color:#64748b;">(' + h.peakNote + ')</small></span>' +
+        '<span><span style="color:#64748b;">Base: ' + h.prevDaysAvg + '</span> vs <strong style="color:' + (isSurgeHour ? '#ef4444' : '#2563eb') + ';">' + h.todayActual + ' Today</strong></span>' +
+      '</div>' +
+      '<div class="trend-bar-track">' +
+        '<div class="trend-bar-baseline" style="width:' + basePct + '%;" title="Prev Days Baseline: ' + h.prevDaysAvg + '"></div>' +
+        '<div class="trend-bar-today ' + (isSurgeHour ? 'surge' : '') + '" style="width:' + Math.abs(todayPct - basePct) + '%; margin-left:2px;" title="Today: ' + h.todayActual + '"></div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
 // ==========================================
 // TAB 4: AGENT REPORTS & ANALYTICS
 // ==========================================
@@ -591,7 +1015,7 @@ const reportsData = {
     summary: '<strong>Total Logged Infractions Today:</strong> 3 incidents | <strong>Escalations Dispatched:</strong> 2',
     headers: ['Incident ID', 'Agent ID', 'Name', 'Violation Category', 'Recorded Overage', 'Severity', 'WFM Escalation'],
     rows: [
-      ['VIO-881', 'AGT-4092', 'Jordan Miller', 'Excessive Tea Breaks', '4 breaks taken (Limit: 2)', 'HIGH', '<span class="status-tag rejected">Supervisor Coaching</span>'],
+      ['VIO-881', 'AGT-4092', 'Jordan Miller', 'Excessive AUX Breaks', '4 breaks taken (Limit: 2)', 'HIGH', '<span class="status-tag rejected">Supervisor Coaching</span>'],
       ['VIO-882', 'AGT-9102', 'Samantha Vance', 'Chronic Lunch Overage', '+25 mins excess', 'CRITICAL', '<span class="status-tag rejected">Disciplinary Review</span>'],
       ['VIO-883', 'AGT-7740', 'David Chen', 'Request Throttling', '3 requests in 10 mins', 'MEDIUM', '<span class="status-tag aux">15m Cooldown</span>']
     ]
@@ -635,6 +1059,23 @@ const reportsData = {
       ['AGT-8819', 'Marcus Brody', '#90441', '<span class="status-tag aux">Neutral / Trainee</span>', 'Passed (25%)', 'Missing (0%)', 'Resolved (30%)', '81.0%', '<span class="status-tag aux">COACHING</span>']
     ]
   },
+  call_trends: {
+    title: 'Previous Days Call Volumes, AHT, SLA & Abandonment Trend Analysis',
+    summary: '<strong>14-Day Historical Trend:</strong> 53,880 Total Inbound Calls | <strong>Average SLA:</strong> 88.3% | <strong>Fleet AHT:</strong> 4m 24s | <strong>Total Deflected:</strong> 1,798',
+    headers: ['Date', 'Day of Week', 'Inbound Offered', 'Calls Handled', 'Deflected (IVR)', 'Abandonment %', 'Avg ASA', 'Avg AHT', 'SLA %', 'SLA Status'],
+    rows: CALL_TRENDS_HISTORY.map(d => [
+      d.date,
+      d.day,
+      d.offered.toLocaleString() + ' calls',
+      d.handled.toLocaleString() + ' calls',
+      d.deflected > 0 ? (d.deflected.toLocaleString() + ' deflected') : '0',
+      d.abandonRate + '% (' + d.abandoned + ')',
+      d.asaSec + 's',
+      d.ahtStr,
+      d.sla + '%',
+      d.sla >= 80 ? '<span class="status-tag approved">' + d.status + '</span>' : '<span class="status-tag rejected">' + d.status + '</span>'
+    ])
+  },
   ivr_csat: {
     title: 'Post-Call IVR Customer Rating & Query Resolution Audit',
     summary: '<strong>Average IVR Rating:</strong> 4.1 / 5.0 Stars | <strong>First Contact Resolution:</strong> 83.3% | <strong>Low CSAT Alerts (&le;2★):</strong> 2 Calls',
@@ -657,7 +1098,7 @@ function loadReport(key) {
   const rep = reportsData[key] || reportsData.adherence;
 
   let displayRows = rep.rows;
-  if (teamViewMode === 'my_team') {
+  if (teamViewMode === 'my_team' && key !== 'call_trends') {
     displayRows = rep.rows.filter(row => {
       const agId = row[0];
       const ag = activeAgents.find(a => a.id === agId);
@@ -1006,6 +1447,32 @@ document.getElementById('btn-qa-clear')?.addEventListener('click', () => {
 // TAB 6: AGENT LIMITS & POLICY SETUP
 // ==========================================
 
+
+function switchSupTab(targetId) {
+  const btn = document.querySelector(`.sup-tab-btn[data-tab="${targetId}"]`);
+  if (btn) btn.click();
+}
+window.switchSupTab = switchSupTab;
+
+function updateSupervisorHomePolicies(p) {
+  const policy = p || policyLimits;
+  const teaEl = document.getElementById('sup-home-policy-tea');
+  const lunchEl = document.getElementById('sup-home-policy-lunch');
+  const freqEl = document.getElementById('sup-home-policy-freq');
+  const adhEl = document.getElementById('sup-home-policy-adh');
+
+  const teaLimit = policy.maxTeaBreaks || 2;
+  const lunchLimit = policy.lunchVarianceThreshold || 10;
+  const freqLimit = policy.maxFrequencyRequests || 5;
+  const freqWindow = policy.frequencyWindow === '2_WEEKS' ? '2-Wks' : '1-Wk';
+  const targetAdh = policy.targetAdherence || 90;
+
+  if (teaEl) teaEl.textContent = `${teaLimit} breaks / shift`;
+  if (lunchEl) lunchEl.textContent = `Max +${lunchLimit} mins`;
+  if (freqEl) freqEl.textContent = `Max ${freqLimit} requests / ${freqWindow}`;
+  if (adhEl) adhEl.textContent = `≥ ${targetAdh}.0%`;
+}
+
 document.getElementById('btn-save-policies')?.addEventListener('click', async () => {
   policyLimits.maxTeaBreaks = parseInt(document.getElementById('limit-max-tea').value, 10) || 2;
   policyLimits.lunchVarianceThreshold = parseInt(document.getElementById('limit-lunch-variance').value, 10) || 10;
@@ -1044,6 +1511,7 @@ document.getElementById('btn-save-policies')?.addEventListener('click', async ()
   const msg = document.getElementById('policy-save-msg');
   msg.style.color = '#34d399';
   msg.textContent = '✓ Operational shift adherence policy limits deployed and synchronized across all agent widgets and bots!';
+  updateSupervisorHomePolicies(policyLimits);
   setTimeout(() => { msg.textContent = ''; }, 4500);
 });
 
@@ -1057,6 +1525,7 @@ fetch('/api/policy')
       if (document.getElementById('limit-freq-window') && p.frequencyWindow) document.getElementById('limit-freq-window').value = p.frequencyWindow;
       if (document.getElementById('limit-req-freq')) document.getElementById('limit-req-freq').value = p.maxFrequencyRequests;
       if (document.getElementById('limit-target-adh')) document.getElementById('limit-target-adh').value = p.targetAdherence;
+      updateSupervisorHomePolicies(p);
     }
   })
   .catch(() => {});
@@ -1299,12 +1768,14 @@ function renderQueueBalanceUI() {
   // Update All 6 Queue Cards Statically & Accurately
   const qMap = wfmRebalanceData.queues;
   for (const [key, q] of Object.entries(qMap)) {
-    const waitEl = document.getElementById(`q-${key}-waiting`);
-    const asaEl = document.getElementById(`q-${key}-asa`);
-    const slaEl = document.getElementById(`q-${key}-sla`);
-    const agEl = document.getElementById(`q-${key}-agents`);
-    const tagEl = document.getElementById(`qtag-${key}`);
-    const cardEl = document.getElementById(`qcard-${key}`);
+    const prefix = key === 'customerService' ? 'cs' : key;
+    const waitEl = document.getElementById('q-' + prefix + '-waiting') || document.getElementById('q-' + key + '-waiting');
+    const asaEl = document.getElementById('q-' + prefix + '-asa') || document.getElementById('q-' + key + '-asa');
+    const slaEl = document.getElementById('q-' + prefix + '-sla') || document.getElementById('q-' + key + '-sla');
+    const agEl = document.getElementById('q-' + prefix + '-agents') || document.getElementById('q-' + key + '-agents');
+    const reqEl = document.getElementById('q-' + prefix + '-req') || document.getElementById('q-' + key + '-req');
+    const tagEl = document.getElementById('qtag-' + prefix) || document.getElementById('qtag-' + key);
+    const cardEl = document.getElementById('qcard-' + prefix) || document.getElementById('qcard-' + key);
 
     const mins = Math.floor((q.avgWaitSeconds || 0) / 60);
     const secs = (q.avgWaitSeconds || 0) % 60;
@@ -1321,6 +1792,29 @@ function renderQueueBalanceUI() {
     }
     if (agEl) agEl.textContent = q.assignedAgents + ' Logged-in';
 
+    if (reqEl) {
+      if (key === 'billing') {
+        if (q.status === 'SURGE_CRITICAL') {
+          reqEl.textContent = 'Required: 8 (Deficit -4)';
+          reqEl.style.color = '#ef4444';
+        } else if (q.status === 'REBALANCED') {
+          reqEl.textContent = 'Required: 7 (Staffing Met)';
+          reqEl.style.color = '#10b981';
+        } else {
+          reqEl.textContent = 'Required: 4';
+          reqEl.style.color = '#64748b';
+        }
+      } else if (key === 'customerService') {
+        if (q.status === 'FLEXED_DONOR') {
+          reqEl.textContent = '3 Flexed to Billing';
+          reqEl.style.color = '#f59e0b';
+        } else {
+          reqEl.textContent = '3 Idle / Underutilized';
+          reqEl.style.color = '#64748b';
+        }
+      }
+    }
+
     if (tagEl) {
       if (q.status === 'SURGE_CRITICAL') {
         tagEl.className = 'status-tag rejected';
@@ -1334,6 +1828,10 @@ function renderQueueBalanceUI() {
         tagEl.className = 'status-tag aux';
         tagEl.textContent = 'DONOR (3 FLEXED)';
         if (cardEl) { cardEl.style.borderColor = '#f59e0b'; cardEl.style.boxShadow = 'none'; }
+      } else if (q.status === 'IDLE_SURPLUS') {
+        tagEl.className = 'status-tag approved';
+        tagEl.textContent = 'IDLE SURPLUS';
+        if (cardEl) { cardEl.style.borderColor = '#e2e8f0'; cardEl.style.boxShadow = 'none'; }
       } else {
         tagEl.className = 'status-tag approved';
         tagEl.textContent = 'NORMAL (SLA OK)';
@@ -1356,10 +1854,10 @@ function renderQueueBalanceUI() {
       }
       if (wbSurgeHeadline) {
         wbSurgeHeadline.style.color = '#2563eb';
-        wbSurgeHeadline.textContent = `WFM Rebalance Active: 3 CS Agents Flexed to Billing (Calls Cleared: ${b.callsWaiting})`;
+        wbSurgeHeadline.textContent = 'WFM Rebalance Active: 3 CS Agents Flexed to Billing (Calls Cleared: ' + (b.callsWaiting || 48) + ')';
       }
       if (wbSurgeSubtext) {
-        wbSurgeSubtext.textContent = `Samantha Vance, Rachel Green, and Marcus Brody reassigned to Billing queue. Customer Service SLA stable at ${cs.currentSla}%.`;
+        wbSurgeSubtext.textContent = 'Samantha Vance, Rachel Green, and Marcus Brody reassigned to Billing queue. Customer Service SLA stable at ' + (cs.currentSla || 97.2) + '%.';
       }
     } else if (wfmRebalanceData.isSurgeActive) {
       wbSurgeAlert.style.borderLeftColor = '#ef4444';
@@ -1370,7 +1868,7 @@ function renderQueueBalanceUI() {
       }
       if (wbSurgeHeadline) {
         wbSurgeHeadline.style.color = '#ef4444';
-        wbSurgeHeadline.textContent = `Sudden Queue Surge: Billing Queue Overloaded (${b.callsWaiting} Calls Waiting)!`;
+        wbSurgeHeadline.textContent = 'Sudden Queue Surge: Billing Queue Overloaded (' + (b.callsWaiting || 318) + ' Calls Waiting)!';
       }
       if (wbSurgeSubtext) {
         wbSurgeSubtext.textContent = 'Customer Service agents underutilized. WFM recommends dynamic cross-skilling rebalance.';
@@ -1384,7 +1882,7 @@ function renderQueueBalanceUI() {
       }
       if (wbSurgeHeadline) {
         wbSurgeHeadline.style.color = '#0f172a';
-        wbSurgeHeadline.textContent = `ACD Queues Balanced: Billing (${b.callsWaiting || 42} Calls) vs Customer Service (${cs.callsWaiting || 8} Calls)`;
+        wbSurgeHeadline.textContent = 'ACD Queues Balanced: Billing (' + (b.callsWaiting || 42) + ' Calls) vs Customer Service (' + (cs.callsWaiting || 8) + ' Calls)';
       }
       if (wbSurgeSubtext) {
         wbSurgeSubtext.textContent = 'Simulate unexpected queue spikes or reallocate idle Customer Service agents to Billing immediately.';
@@ -1415,17 +1913,17 @@ function renderQueueBalanceUI() {
         bannerTitle.textContent = 'Intraday WFM Skill Flex Active: 3 Agents Reallocated to Billing';
       }
       if (bannerDesc) {
-        bannerDesc.textContent = 'Billing Queue calls cleared down from 318 -> ' + b.callsWaiting + '. ASA recovered to ' + b.avgWaitSeconds + 's. Customer Service queue remains healthy (' + cs.currentSla + '% SLA).';
+        bannerDesc.textContent = 'Billing Queue calls cleared down from 318 -> ' + (b.callsWaiting || 48) + '. ASA recovered to ' + (b.avgWaitSeconds || 42) + 's. Customer Service queue remains healthy (' + (cs.currentSla || 97.2) + '% SLA).';
       }
     } else if (wfmRebalanceData.isSurgeActive) {
       alertBanner.className = 'rebalance-banner-box surge';
       if (bannerIcon) bannerIcon.textContent = '⚠️';
       if (bannerTitle) {
         bannerTitle.style.color = '#ef4444';
-        bannerTitle.textContent = 'Critical Queue Imbalance: Billing Overloaded (' + b.callsWaiting + ' Waiting) vs Customer Service Idle';
+        bannerTitle.textContent = 'Critical Queue Imbalance: Billing Overloaded (' + (b.callsWaiting || 318) + ' Waiting) vs Customer Service Idle';
       }
       if (bannerDesc) {
-        bannerDesc.textContent = 'Billing SLA plunged to ' + b.currentSla + '%. Customer Service agents underutilized. WFM recommends dynamic cross-skilling.';
+        bannerDesc.textContent = 'Billing SLA plunged to ' + (b.currentSla || 34.5) + '%. Customer Service agents underutilized. WFM recommends dynamic cross-skilling.';
       }
     } else {
       alertBanner.className = 'rebalance-banner-box normal';
@@ -1449,7 +1947,7 @@ function renderQueueBalanceUI() {
   const rosterBody = document.getElementById('rebalance-roster-body');
   const countBadge = document.getElementById('reallocated-count-badge');
   if (countBadge) {
-    countBadge.textContent = wfmRebalanceData.reallocatedAgents.length + ' Agents Flexed';
+    countBadge.textContent = ((wfmRebalanceData.reallocatedAgents || []).length) + ' Agents Flexed';
   }
 
   if (rosterBody) {
@@ -1458,11 +1956,11 @@ function renderQueueBalanceUI() {
     } else {
       rosterBody.innerHTML = wfmRebalanceData.reallocatedAgents.map(ag => {
         return '<tr>' +
-          '<td><strong style="color:#fff;">' + ag.name + '</strong><div style="font-family:monospace; color:#9ca3af; font-size:11px;">' + ag.id + '</div></td>' +
+          '<td><strong style="color:#0f172a;">' + ag.name + '</strong><div style="font-family:monospace; color:#64748b; font-size:11px;">' + ag.id + '</div></td>' +
           '<td><span class="status-tag approved">' + ag.baseSkill + '</span></td>' +
-          '<td><strong style="color:#38bdf8;">' + ag.flexSchedule + '</strong></td>' +
+          '<td><strong style="color:#2563eb;">' + (ag.flexSchedule || '10:00 - 11:30 (Intraday Skill Flex)') + '</strong></td>' +
           '<td><span class="status-tag aux">' + ag.flexSkill + '</span></td>' +
-          '<td><small style="color:#cbd5e1; font-family:monospace;">' + ag.priorityRouting + '</small></td>' +
+          '<td><small style="color:#475569; font-family:monospace;">' + ag.priorityRouting + '</small></td>' +
           '<td><span class="status-tag approved">ACTIVE FLEX</span></td>' +
           '<td><button class="btn btn-xs btn-outline" onclick="restoreSingleAgent(\'' + ag.id + '\')">Restore Base</button></td>' +
         '</tr>';
@@ -1618,13 +2116,28 @@ window.executeSurgeBilling = executeSurgeBilling;
 function executeSurgeBilling() {
   wfmRebalanceData.isSurgeActive = true;
   wfmRebalanceData.isRebalanced = false;
+  wfmRebalanceData.reallocatedAgents = [];
   if (wfmRebalanceData.queues.billing) {
     wfmRebalanceData.queues.billing.callsWaiting = 318;
     wfmRebalanceData.queues.billing.avgWaitSeconds = 540;
     wfmRebalanceData.queues.billing.currentSla = 34.5;
     wfmRebalanceData.queues.billing.requiredAgents = 8;
+    wfmRebalanceData.queues.billing.assignedAgents = 4;
     wfmRebalanceData.queues.billing.status = 'SURGE_CRITICAL';
   }
+  if (wfmRebalanceData.queues.customerService) {
+    wfmRebalanceData.queues.customerService.callsWaiting = 6;
+    wfmRebalanceData.queues.customerService.avgWaitSeconds = 11;
+    wfmRebalanceData.queues.customerService.assignedAgents = 5;
+    wfmRebalanceData.queues.customerService.status = 'IDLE_SURPLUS';
+  }
+
+  activeAgents.forEach(a => {
+    if (['AGT-9102', 'AGT-6512', 'AGT-8819'].includes(a.id)) {
+      a.queue = 'General Customer Service';
+    }
+  });
+
   wfmRebalanceData.historyLog.unshift({
     timestamp: new Date().toISOString(),
     event: 'SURGE_DETECTED',
@@ -2021,3 +2534,5 @@ document.getElementById('btn-save-deflection-threshold')?.addEventListener('clic
     }
   }
 });
+
+updateSupervisorHomePolicies();

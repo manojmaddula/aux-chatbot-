@@ -96,25 +96,6 @@
 
     <!-- TAB 1: FLOOR WALLBOARD & TELEMETRY -->
     <section id="stab-wallboard" class="sup-tab-pane active">
-      <!-- SUDDEN SURGE & DYNAMIC WFM REALLOCATION PANEL (FLOOR TELEMETRY) -->
-      <div id="wallboard-surge-alert" class="rebalance-banner-box normal" style="margin-bottom:16px; background:#ffffff; border:1px solid #e2e8f0; border-left:4px solid #10b981; padding:14px 18px; border-radius:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-        <div style="display:flex; align-items:center; gap:12px;">
-          <span id="wb-surge-icon" style="font-size:24px;">🟢</span>
-          <div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span id="wb-surge-status-badge" class="status-tag approved" style="font-size:10px;">NORMAL (SLA OK)</span>
-              <strong id="wb-surge-headline" style="color:#0f172a; font-size:13px;">ACD Queues Balanced: Billing (42 Calls) vs Customer Service (8 Calls)</strong>
-            </div>
-            <p id="wb-surge-subtext" style="color:#64748b; font-size:11px; margin:2px 0 0 0;">Simulate unexpected queue spikes or reallocate idle Customer Service agents to Billing immediately.</p>
-          </div>
-        </div>
-        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-          <button id="btn-wb-sim-surge" class="btn btn-sm btn-emergency sev1" style="background:#dc2626; color:#fff; font-weight:700; cursor:pointer;" onclick="executeSurgeBilling()">⚡ 1. Simulate Surge (+318)</button>
-          <button id="btn-quick-rebalance-wallboard" class="btn btn-sm btn-primary" style="background:#2563eb; color:#fff; font-weight:700; cursor:pointer;" onclick="executeClientRebalance()">🔄 2. Reallocate 3 Agents Now</button>
-          <button id="btn-wb-restore-base" class="btn btn-sm btn-success" style="background:#059669; color:#fff; font-weight:700; cursor:pointer;" onclick="executeRestoreBase()">🟢 3. Restore Base</button>
-        </div>
-      </div>
-
       <div class="card">
         <div class="card-header">
           <div>
@@ -145,7 +126,7 @@
                 <th>NICE CXone State</th>
                 <th>Break / ACW Remaining</th>
                 <th>Schedule Adherence</th>
-                <th>Tea Breaks Today</th>
+                <th>AUX Breaks Today</th>
                 <th>Lunch Variance</th>
                 <th>Supervisor Actions</th>
               </tr>
@@ -269,6 +250,52 @@
         </div>
       </div>
 
+      
+      <!-- TAB 3 SUBSECTION: BIRTHDAY CALENDAR & CELEBRATIONS HUB -->
+      <div class="card birthday-calendar-card" style="margin-bottom: 20px; border-top: 4px solid #ec4899;">
+        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:24px;">🎂</span>
+              <div>
+                <h3 style="margin:0; color:#0f172a;">Contact Center Birthday Calendar & Celebrations Hub</h3>
+                <p style="margin-top:2px; color:#64748b; font-size:12px;">
+                  All 12 agents and 5 supervisors. Track upcoming milestones and publish official floor-wide birthday broadcast greetings with 1-click.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <button id="btn-autopublish-today-birthdays" class="btn btn-sm" style="background:linear-gradient(135deg, #ec4899, #d946ef); color:#ffffff; font-weight:700; border:none; padding:7px 14px; border-radius:6px; cursor:pointer;" onclick="autoPublishTodayBirthdays()">
+              🎉 Auto-Publish Today's Birthday (Samantha Vance)
+            </button>
+            <button id="btn-custom-birthday-modal" class="btn btn-sm btn-outline" style="border-color:#ec4899; color:#db2777; font-weight:700; padding:7px 12px; border-radius:6px;" onclick="openBirthdayBroadcastModal()">
+              ✨ Custom Birthday Shoutout
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <!-- Filter Tabs & Search -->
+          <div class="birthday-filter-bar" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #f1f5f9;">
+            <div style="display:flex; gap:6px; flex-wrap:wrap;" id="birthday-filter-buttons">
+              <button class="btn btn-xs bday-tab-btn active" data-filter="upcoming" onclick="setBirthdayFilter('upcoming')">🌟 Upcoming & Today</button>
+              <button class="btn btn-xs bday-tab-btn" data-filter="today" onclick="setBirthdayFilter('today')">🎂 Today (Oct 21)</button>
+              <button class="btn btn-xs bday-tab-btn" data-filter="agents" onclick="setBirthdayFilter('agents')">👥 Agents (12)</button>
+              <button class="btn btn-xs bday-tab-btn" data-filter="supervisors" onclick="setBirthdayFilter('supervisors')">👔 Supervisors (5)</button>
+              <button class="btn btn-xs bday-tab-btn" data-filter="all" onclick="setBirthdayFilter('all')">📅 All 12 Months</button>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <input type="text" id="birthday-search-input" placeholder="Search person, ID, or skill..." onkeyup="handleBirthdaySearch(this.value)" style="padding:6px 12px; font-size:12px; border:1px solid #cbd5e1; border-radius:6px; width:210px; outline:none;" />
+            </div>
+          </div>
+
+          <!-- Birthday Roster Grid -->
+          <div id="birthday-grid" class="birthday-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap:14px;">
+            <!-- Populated dynamically via supervisor.js -->
+          </div>
+        </div>
+      </div>
+
       <div class="dashboard-layout">
         <!-- Broadcast Setup Form -->
         <div class="card">
@@ -281,6 +308,10 @@
             <div class="form-group">
               <label>Preset Operational Alerts (One-Click Dispatch):</label>
               <div class="quick-broadcast-grid">
+
+                <button class="btn btn-emergency" id="btn-bc-birthday" style="background:#831843; border-color:#be185d; color:#fdf2f8;" onclick="publishBirthdayBroadcast('AGT-9102')">
+                  <span>🎂</span> Today's Birthday Shoutout (Samantha Vance)
+                </button>
                 <button class="btn btn-emergency" id="btn-bc-storm">
                   <span>🌪️</span> Tornado / Storm Alert (Proactive Mode)
                 </button>
@@ -350,6 +381,127 @@
 
     <!-- TAB 4: AGENT REPORTS & ANALYTICS -->
     <section id="stab-reports" class="sup-tab-pane">
+
+      <!-- CALL TREND ANALYSIS DASHBOARD (PREVIOUS DAYS CALLS VS TODAY) -->
+      <div class="card call-trends-card" style="margin-bottom: 24px; border-top: 4px solid #2563eb;">
+        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:24px;">📈</span>
+              <div>
+                <h3 style="margin:0; color:#0f172a;">Call Volume, AHT & Service Level Trend Analysis</h3>
+                <p style="margin-top:2px; color:#64748b; font-size:12px;">
+                  Multi-day telemetry based on previous days' calls (Offered, Handled, IVR Deflected, Abandonment, ASA, and AHT).
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="trend-controls-bar" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <div style="display:flex; border:1px solid #cbd5e1; border-radius:6px; overflow:hidden;">
+              <button class="btn btn-xs trend-range-btn active" data-range="7d" onclick="setTrendRange('7d')" style="padding:6px 10px; font-weight:700;">Last 7 Days (DoD)</button>
+              <button class="btn btn-xs trend-range-btn" data-range="14d" onclick="setTrendRange('14d')" style="padding:6px 10px;">Last 14 Days</button>
+            </div>
+            <select id="trend-skill-select" onchange="handleTrendSkillChange(this.value)" style="padding:6px 10px; font-size:12px; border:1px solid #cbd5e1; border-radius:6px; background:#fff; font-weight:600;">
+              <option value="all">🌐 All ACD Skills Fleet</option>
+              <option value="billing">💳 Customer Billing & Retention</option>
+              <option value="cs">🎧 General Customer Service</option>
+              <option value="tech">💻 Tier-2 Tech Support</option>
+              <option value="emergency">🚨 Emergency Inbound Care</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <!-- 6 KEY DELTA KPI CARDS (TODAY VS PREVIOUS DAYS BASELINE) -->
+          <div class="trend-kpi-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-bottom:20px;">
+            <div class="trend-kpi-card" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px;">
+              <span style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:700; display:block;">Total Calls Offered</span>
+              <div style="display:flex; align-items:baseline; gap:6px; margin-top:4px;">
+                <span id="trend-kpi-offered" style="font-size:22px; font-weight:800; color:#0f172a;">4,820</span>
+                <span id="trend-kpi-offered-delta" style="font-size:11px; font-weight:700; color:#2563eb; background:#eff6ff; padding:2px 6px; border-radius:4px;">▲ +11.8% DoD</span>
+              </div>
+              <small id="trend-kpi-offered-sub" style="color:#64748b; font-size:10px; display:block; margin-top:2px;">vs Yesterday (4,310) | Avg: 4,288</small>
+            </div>
+
+            <div class="trend-kpi-card" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px;">
+              <span style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:700; display:block;">Handled & Deflected</span>
+              <div style="display:flex; align-items:baseline; gap:6px; margin-top:4px;">
+                <span id="trend-kpi-handled" style="font-size:22px; font-weight:800; color:#10b981;">4,492</span>
+                <span id="trend-kpi-deflected-badge" style="font-size:11px; font-weight:700; color:#0284c7; background:#e0f2fe; padding:2px 6px; border-radius:4px;">+328 Deflected</span>
+              </div>
+              <small style="color:#64748b; font-size:10px; display:block; margin-top:2px;">93.2% Handled rate | 0 Overload Drops</small>
+            </div>
+
+            <div class="trend-kpi-card" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px;">
+              <span style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:700; display:block;">Avg Handle Time (AHT)</span>
+              <div style="display:flex; align-items:baseline; gap:6px; margin-top:4px;">
+                <span id="trend-kpi-aht" style="font-size:22px; font-weight:800; color:#0f172a;">4m 12s</span>
+                <span id="trend-kpi-aht-delta" style="font-size:11px; font-weight:700; color:#10b981; background:#ecfdf5; padding:2px 6px; border-radius:4px;">▼ -18s DoD</span>
+              </div>
+              <small style="color:#64748b; font-size:10px; display:block; margin-top:2px;">Faster wrap-up vs Yesterday (4m 30s)</small>
+            </div>
+
+            <div class="trend-kpi-card" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px;">
+              <span style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:700; display:block;">Speed of Answer (ASA)</span>
+              <div style="display:flex; align-items:baseline; gap:6px; margin-top:4px;">
+                <span id="trend-kpi-asa" style="font-size:22px; font-weight:800; color:#0f172a;">24 sec</span>
+                <span id="trend-kpi-asa-delta" style="font-size:11px; font-weight:700; color:#10b981; background:#ecfdf5; padding:2px 6px; border-radius:4px;">▲ 7s Faster</span>
+              </div>
+              <small style="color:#64748b; font-size:10px; display:block; margin-top:2px;">Target &le; 30s | Yesterday: 31s</small>
+            </div>
+
+            <div class="trend-kpi-card" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px;">
+              <span style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:700; display:block;">Service Level (SLA %)</span>
+              <div style="display:flex; align-items:baseline; gap:6px; margin-top:4px;">
+                <span id="trend-kpi-sla" style="font-size:22px; font-weight:800; color:#10b981;">88.6%</span>
+                <span id="trend-kpi-sla-delta" style="font-size:11px; font-weight:700; color:#10b981; background:#ecfdf5; padding:2px 6px; border-radius:4px;">▲ +2.4%</span>
+              </div>
+              <small style="color:#64748b; font-size:10px; display:block; margin-top:2px;">Target &ge; 80% | Yesterday: 86.2%</small>
+            </div>
+
+            <div class="trend-kpi-card" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px;">
+              <span style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:700; display:block;">Abandonment Rate</span>
+              <div style="display:flex; align-items:baseline; gap:6px; margin-top:4px;">
+                <span id="trend-kpi-abandon" style="font-size:22px; font-weight:800; color:#0f172a;">2.1%</span>
+                <span id="trend-kpi-abandon-delta" style="font-size:11px; font-weight:700; color:#10b981; background:#ecfdf5; padding:2px 6px; border-radius:4px;">▼ -2.4%</span>
+              </div>
+              <small style="color:#64748b; font-size:10px; display:block; margin-top:2px;">Target &le; 5.0% | 102 abandoned calls</small>
+            </div>
+          </div>
+
+          <!-- TREND VISUALS: MULTI-DAY SVG CHART & HOURLY SURGE DISTRIBUTION -->
+          <div style="display:grid; grid-template-columns: 2fr 1.3fr; gap:16px;">
+            <!-- SVG Multi-Day Volume & SLA Chart -->
+            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:16px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <strong style="color:#0f172a; font-size:13px;">📊 Multi-Day Call Arrival vs SLA Trajectory (Previous Days Trend)</strong>
+                <div style="display:flex; gap:12px; font-size:11px;">
+                  <span style="display:flex; align-items:center; gap:4px;"><span style="width:10px; height:10px; background:#2563eb; border-radius:2px; display:inline-block;"></span> Calls Offered</span>
+                  <span style="display:flex; align-items:center; gap:4px;"><span style="width:10px; height:10px; background:#10b981; border-radius:2px; display:inline-block;"></span> Handled</span>
+                  <span style="display:flex; align-items:center; gap:4px;"><span style="width:12px; height:2px; background:#f59e0b; display:inline-block;"></span> SLA %</span>
+                </div>
+              </div>
+              <div id="trend-svg-container" style="width:100%; height:220px; position:relative;">
+                <!-- SVG dynamically rendered -->
+              </div>
+              <div id="trend-day-details-pill" style="margin-top:10px; font-size:11px; color:#475569; background:#f8fafc; padding:8px 12px; border-radius:6px; border:1px solid #e2e8f0;">
+                💡 <em>Hover over any daily column above to inspect granular day-over-day statistics.</em>
+              </div>
+            </div>
+
+            <!-- Peak Hours Arrival Comparison (Previous Days Baseline vs Today) -->
+            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:16px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <strong style="color:#0f172a; font-size:13px;">⚡ Peak Hourly Distribution: Today vs Previous Days</strong>
+              </div>
+              <div id="trend-hourly-bars" style="display:flex; flex-direction:column; gap:8px; max-height:240px; overflow-y:auto; padding-right:4px;">
+                <!-- Populated dynamically via supervisor.js -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="card">
         <div class="card-header">
           <div>
@@ -365,6 +517,7 @@
               <option value="acw">5. NICE CXone ACW Handle Time Report</option>
               <option value="qa_scorecard">6. Customer Interaction Tone, Empathy & QA Scorecard</option>
               <option value="ivr_csat">7. Post-Call IVR Customer Rating & Query Resolution Audit</option>
+              <option value="call_trends">8. Previous Days Call Volumes, AHT, SLA & Abandonment Trend Analysis</option>
             </select>
             <button id="btn-export-csv" class="btn btn-success btn-sm">
               📥 Export to CSV
@@ -553,9 +706,9 @@
           <form id="policy-form">
             <div class="form-grid">
               <div class="form-group">
-                <label>Max Discretionary Tea Breaks (per 8-hr shift):</label>
+                <label>Max Discretionary AUX Breaks (per 8-hr shift):</label>
                 <input type="number" id="limit-max-tea" min="1" max="5" value="2" />
-                <small class="text-muted">Exceeding this automatically flags behavioral tea break overage rejection.</small>
+                <small class="text-muted">Exceeding this automatically flags behavioral aux break overage rejection.</small>
               </div>
               <div class="form-group">
                 <label>Lunch Variance Overage Limit (minutes):</label>
@@ -858,13 +1011,13 @@
         <div class="card-body">
           
           <div class="sim-actions-bar">
-            <button id="btn-sim-billing-surge" class="btn btn-emergency sev1">
+            <button id="btn-sim-billing-surge" class="btn btn-emergency sev1" onclick="executeSurgeBilling()">
               <span>⚡</span> 1. Simulate Sudden Billing Spike (+318 Calls)
             </button>
-            <button id="btn-trigger-wfm-rebalance" class="btn btn-primary" style="background:#2563eb; font-weight:700;">
+            <button id="btn-trigger-wfm-rebalance" class="btn btn-primary" style="background:#2563eb; font-weight:700;" onclick="executeClientRebalance()">
               <span>🔄</span> 2. Reallocate Agents (Execute WFM Rebalance)
             </button>
-            <button id="btn-restore-base-schedules" class="btn btn-success">
+            <button id="btn-restore-base-schedules" class="btn btn-success" onclick="executeRestoreBase()">
               <span>🟢</span> 3. Normalize Volume & Restore Base WFM Schedules
             </button>
           </div>
