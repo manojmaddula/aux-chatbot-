@@ -830,27 +830,92 @@ chatInput.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') handleUserChat();
 });
 
-function handleUserChat() {
+// Wire real-time prompt chips
+document.querySelectorAll('.chat-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const q = chip.getAttribute('data-query');
+    chatInput.value = q;
+    handleUserChat();
+  });
+});
+
+async function handleUserChat() {
   const query = chatInput.value.trim();
   if (!query) return;
   addChatMessage('user', query);
   chatInput.value = '';
 
-  setTimeout(() => {
-    let response = "I've checked the NICE CXone telemetry and WFM operational parameters. All telephony circuits and queues are operational.";
-    const qLower = query.toLowerCase();
+  // Show thinking indicator
+  const thinkingId = 'thinking-' + Date.now();
+  const thinkingMsg = document.createElement('div');
+  thinkingMsg.className = 'chat-msg ai';
+  thinkingMsg.id = thinkingId;
+  thinkingMsg.innerHTML = '<div class="msg-bubble" style="opacity:0.7;">⚡ Querying live ACD telemetry, WFM forecast & IT logs...</div>';
+  chatHistory.appendChild(thinkingMsg);
+  chatHistory.scrollTop = chatHistory.scrollHeight;
 
-    if (qLower.includes('break') || qLower.includes('aux')) {
-      response = "To request an AUX break (Lunch, Tea, Meeting, etc.), click 'Apply Break' above. It will evaluate against real-time Erlang-C staffing and your schedule adherence.";
-    } else if (qLower.includes('cxone') || qLower.includes('max') || qLower.includes('webrtc') || qLower.includes('audio')) {
-      response = "For NICE CXone MAX softphone audio drops: ensure your browser has granted microphone permissions, disable exclusive audio mode in Windows Sound Settings, and click 'Ping CXone Cluster' under the Articles tab to verify WebSocket latency.";
-    } else if (qLower.includes('acw') || qLower.includes('summary') || qLower.includes('wrap')) {
-      response = "Click 'End Call' when ready to enter ACW mode. Then use 'Generate AI Call Summary' to produce enriched CRM wrap-up notes.";
-    } else if (qLower.includes('vpn')) {
-      response = "If your VPN disconnects during a CXone call: run the 'Flush DNS & Reset Route' utility under the Articles tab and verify your split-tunneling MTU is set to 1350.";
+  const currentAgentId = agentSelect ? agentSelect.value : 'AGT-8842';
+
+  try {
+    const res = await fetch('/api/copilot/query', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        query,
+        agentId: currentAgentId,
+        role: 'agent'
+      })
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      const thinkingEl = document.getElementById(thinkingId);
+      if (thinkingEl) thinkingEl.remove();
+      addChatMessage('ai', data.answer);
+      return;
     }
-    addChatMessage('ai', response);
-  }, 600);
+  } catch (err) {
+    console.warn('Backend copilot query offline, using local real-time telemetry engine:', err);
+  }
+
+  // Client-Side Real-Time Fallback Engine
+  const thinkingEl = document.getElementById(thinkingId);
+  if (thinkingEl) thinkingEl.remove();
+
+  const profile = AGENT_PROFILES[currentAgentId] || AGENT_PROFILES['AGT-8842'];
+  const qLower = query.toLowerCase();
+  let response = '';
+
+  if (qLower.includes('volume') || qLower.includes('queue') || qLower.includes('calls waiting') || qLower.includes('traffic')) {
+    response = `📊 <strong>Real-Time ACD Queue Telemetry:</strong><br/>` +
+      `• <strong>Billing & Payments</strong>: 42 calls waiting | Avg Wait: 35s | SLA: 86.4%<br/>` +
+      `• <strong>General Customer Service</strong>: 8 calls waiting | Avg Wait: 14s | SLA: 97.2%<br/>` +
+      `• <strong>Tier-2 Tech Support</strong>: 15 calls waiting | Avg Wait: 32s | SLA: 88.0%<br/>` +
+      `<small style="color:#94a3b8; display:block; margin-top:4px;">Inbound Rate: 420 calls/min. All skill queues operating normally.</small>`;
+  } else if (qLower.includes('adherence') || qLower.includes('tea break') || qLower.includes('my break') || qLower.includes('lunch') || qLower.includes('quota')) {
+    response = `⏱️ <strong>Live Schedule Adherence for ${profile.name}:</strong><br/>` +
+      `• <strong>CXone Adherence</strong>: <strong>${profile.adherence}</strong> (Target: &ge; 90%)<br/>` +
+      `• <strong>Tea Breaks Taken Today</strong>: <strong>${profile.teaBreaks}</strong> (Policy: Max 2)<br/>` +
+      `• <strong>Lunch Variance</strong>: <strong>${profile.lunchOverage}</strong> (Tolerance: &lt;15m)<br/>` +
+      `• <strong>Frequency (30m)</strong>: <strong>${profile.freqCount}</strong> requests`;
+  } else if (qLower.includes('storm') || qLower.includes('weather') || qLower.includes('deflection') || qLower.includes('outage')) {
+    response = `🌪️ <strong>Storm Outage IVR Telemetry:</strong><br/>` +
+      `• Current Call Rate: <strong>1,240 calls/min</strong> (Threshold: 1,000/min)<br/>` +
+      `• Deflection: <strong style="color:#38bdf8;">ACTIVE</strong> (Callers 1,001+ hearing outage broadcast).<br/>` +
+      `• Auto-clears when volume drops below 1,000/min.`;
+  } else if (qLower.includes('rebalance') || qLower.includes('flex')) {
+    response = `🔄 <strong>WFM Intraday Skill Rebalance:</strong><br/>` +
+      `Customer Service agents flexed to Billing queue to absorb surge. Billing quick-replies boosted.`;
+  } else if (qLower.includes('it') || qLower.includes('ticket') || qLower.includes('vpn') || qLower.includes('incident')) {
+    response = `💻 <strong>Active IT Incidents:</strong><br/>` +
+      `• INC-88102: Carlos Mendez - Cisco AnyConnect VPN MTU 1350 (In Progress)<br/>` +
+      `• INC-88103: Samantha Vance - Citrix Workspace Reconnect (Assigned)`;
+  } else {
+    response = `🤖 <strong>Live NICE CXone Telemetry Briefing:</strong><br/>` +
+      `All circuits operational. Your adherence: <strong>${profile.adherence}</strong>. Inbound rate: <strong>420 calls/min</strong>. ` +
+      `Ask about <em>queue volume</em>, <em>my adherence</em>, <em>storm deflection</em>, or <em>WFM skill flex</em>!`;
+  }
+  addChatMessage('ai', response);
 }
 
 // ==========================================

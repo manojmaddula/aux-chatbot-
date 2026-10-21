@@ -18,6 +18,7 @@ function createWindow() {
     resizable: true,
     alwaysOnTop: true, // Floats as a true contact center companion widget!
     title: "AUX WFM Agent Copilot",
+    icon: path.join(__dirname, 'src', 'favicon.ico'),
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true

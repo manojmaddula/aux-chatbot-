@@ -141,7 +141,8 @@ const MIME_TYPES = {
   '.json': 'application/json; charset=UTF-8',
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
-  '.svg': 'image/svg+xml'
+  '.svg': 'image/svg+xml',
+  '.ico': 'image/x-icon'
 };
 
 const server = http.createServer((req, res) => {
@@ -216,6 +217,24 @@ const server = http.createServer((req, res) => {
     req.on('end', () => {
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: true, message: 'Broadcast dispatched to all agent widgets.' }));
+    });
+    return;
+  }
+
+  // API ROUTE: Real-Time AI Copilot Query Engine (Live ACD, WFM, IT & Telephony Telemetry)
+  if (pathname === '/api/copilot/query' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const responseData = evaluateCopilotQuery(payload);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(responseData));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
     });
     return;
   }
@@ -468,7 +487,13 @@ const server = http.createServer((req, res) => {
   }
 
   // Serve static files from /src
-  let filePath = path.join(PUBLIC_DIR, pathname === '/' ? 'widget.html' : pathname);
+  let filePath = path.join(PUBLIC_DIR, pathname === '/' ? 'index.html' : pathname);
+
+  if (pathname === '/favicon.ico') {
+    filePath = path.join(PUBLIC_DIR, 'favicon.ico');
+  } else if (pathname === '/favicon.svg') {
+    filePath = path.join(PUBLIC_DIR, 'favicon.svg');
+  }
 
   // Security: prevent path traversal
   if (!filePath.startsWith(PUBLIC_DIR)) {
@@ -621,6 +646,125 @@ function evaluateBreak(payload) {
       'Supervisor Notification': 'Dispatched to Queue (SUP-014)'
     }
   };
+}
+
+// Real-Time Copilot Evaluation & Telemetry Synthesis
+const AGENT_ROSTER_TELEMETRY = {
+  'AGT-8842': { name: 'Alex Morgan', queue: 'Tier-2 Tech Support', adherence: '96.4%', teaBreaks: '1 / 2', lunchVariance: '0 mins', freq: '1 / 3', status: 'Healthy Adherence' },
+  'AGT-4092': { name: 'Jordan Miller', queue: 'Customer Billing & Retention', adherence: '78.5%', teaBreaks: '4 / 2', lunchVariance: '0 mins', freq: '2 / 3', status: 'Tea Overage Policy Flag' },
+  'AGT-9102': { name: 'Samantha Vance', queue: 'Customer Billing & Retention', adherence: '71.2%', teaBreaks: '1 / 2', lunchVariance: '+25 mins', freq: '1 / 3', status: 'Lunch Variance Escalation' },
+  'AGT-7740': { name: 'David Chen', queue: 'General Customer Service', adherence: '68.0%', teaBreaks: '3 / 2', lunchVariance: '+18 mins', freq: '3 / 3', status: 'Throttled / Rate Limit Flag' },
+  'AGT-6512': { name: 'Rachel Green', queue: 'Emergency Inbound', adherence: '98.1%', teaBreaks: '1 / 2', lunchVariance: '0 mins', freq: '1 / 3', status: 'Medical Exemption Active' },
+  'AGT-8819': { name: 'Marcus Brody', queue: 'General Customer Service', adherence: '82.0%', teaBreaks: '2 / 2', lunchVariance: '+5 mins', freq: '1 / 3', status: 'Trainee Coaching Active' },
+  'AGT-3310': { name: 'Chloe Bennett', queue: 'General Customer Service', adherence: '94.2%', teaBreaks: '1 / 2', lunchVariance: '0 mins', freq: '1 / 3', status: 'Senior Lead / Normal' },
+  'AGT-5521': { name: 'Lucas Wright', queue: 'Customer Billing & Retention', adherence: '88.5%', teaBreaks: '2 / 2', lunchVariance: '+8 mins', freq: '2 / 3', status: 'Billing Specialist' },
+  'AGT-7703': { name: 'Maya Patel', queue: 'General Customer Service', adherence: '97.0%', teaBreaks: '1 / 2', lunchVariance: '0 mins', freq: '1 / 3', status: 'VIP Lead 5.0★' },
+  'AGT-4491': { name: 'Carlos Mendez', queue: 'Tier-2 Tech Support', adherence: '85.0%', teaBreaks: '2 / 2', lunchVariance: '+10 mins', freq: '1 / 3', status: 'Hardware Specialist' },
+  'AGT-6628': { name: 'Olivia Taylor', queue: 'Emergency Inbound', adherence: '99.5%', teaBreaks: '0 / 2', lunchVariance: '0 mins', freq: '1 / 3', status: 'Disaster Lead 99%' },
+  'AGT-2219': { name: 'Liam O\'Connor', queue: 'General Customer Service', adherence: '76.5%', teaBreaks: '2 / 2', lunchVariance: '+12 mins', freq: '1 / 3', status: 'Care Trainee / Coaching' }
+};
+
+function evaluateCopilotQuery(payload) {
+  const query = (payload.query || '').trim();
+  const qLower = query.toLowerCase();
+  const agentId = payload.agentId || 'AGT-8842';
+  const role = payload.role || 'agent';
+  const agent = AGENT_ROSTER_TELEMETRY[agentId] || AGENT_ROSTER_TELEMETRY['AGT-8842'];
+
+  const billingQ = wfmQueueBalanceState.queues.billing;
+  const csQ = wfmQueueBalanceState.queues.customerService;
+  const techQ = wfmQueueBalanceState.queues.techSupport;
+  const emergQ = wfmQueueBalanceState.queues.emergency;
+  const isSurge = wfmQueueBalanceState.isSurgeActive;
+  const isRebalanced = wfmQueueBalanceState.isRebalanced;
+
+  // 1. ACD Queue Volume, Wait Times & Traffic Queries
+  if (qLower.includes('volume') || qLower.includes('queue') || qLower.includes('calls waiting') || qLower.includes('billing calls') || qLower.includes('traffic') || qLower.includes('wait time') || qLower.includes('how many calls') || qLower.includes('surge')) {
+    let text = `📊 <strong>Real-Time ACD Queue Telemetry:</strong><br/>` +
+      `• <strong>Billing & Payments</strong>: <strong>${billingQ.callsWaiting} calls waiting</strong> | Avg Wait: <strong>${billingQ.avgWaitSeconds}s</strong> | SLA: <strong>${billingQ.currentSla}%</strong> (${billingQ.status})<br/>` +
+      `• <strong>General Customer Service</strong>: <strong>${csQ.callsWaiting} calls waiting</strong> | Avg Wait: <strong>${csQ.avgWaitSeconds}s</strong> | SLA: <strong>${csQ.currentSla}%</strong> (${csQ.status})<br/>` +
+      `• <strong>Tier-2 Tech Support</strong>: <strong>${techQ.callsWaiting} calls waiting</strong> | Avg Wait: <strong>${techQ.avgWaitSeconds}s</strong> | SLA: <strong>${techQ.currentSla}%</strong><br/>` +
+      `• <strong>Emergency Inbound</strong>: <strong>${emergQ.callsWaiting} calls waiting</strong> | Avg Wait: <strong>${emergQ.avgWaitSeconds}s</strong><br/>` +
+      `<small style="color:#94a3b8; display:block; margin-top:6px;">Current Total Traffic Rate: <strong>${ivrDeflectionState.callVolumeRatePerMin} calls/min</strong>. ${isRebalanced ? '🔄 Dynamic WFM Skill Rebalance Active (3 CS agents flexed to Billing).' : (isSurge ? '⚠️ High Call Volume Surge Active.' : '✓ Queues within nominal limits.')}</small>`;
+    return { success: true, answer: text, category: 'queue_volume' };
+  }
+
+  // 2. Schedule Adherence & Breaks
+  if (qLower.includes('adherence') || qLower.includes('tea break') || qLower.includes('my break') || qLower.includes('lunch') || qLower.includes('can i take') || qLower.includes('breaks left') || qLower.includes('quota') || qLower.includes('policy')) {
+    let advice = '✓ Your adherence and break history are in good standing.';
+    if (agent.teaBreaks.startsWith('4')) {
+      advice = '⚠️ Behavioral Flag: You have logged 4 short tea breaks today (Shift limit is 2). Next requests will require supervisor override.';
+    } else if (agent.lunchVariance.includes('+25')) {
+      advice = '⚠️ Chronic Lunch Overage: Previous shift logged +25m unauthorized variance. Break grants require supervisor review.';
+    }
+
+    let text = `⏱️ <strong>Live Adherence & Schedule Parameters (${agent.name}):</strong><br/>` +
+      `• <strong>CXone Adherence</strong>: <strong style="color:${parseFloat(agent.adherence) >= 90 ? '#34d399' : '#f87171'};">${agent.adherence}</strong> (Target: &ge; 90%)<br/>` +
+      `• <strong>Tea Breaks Taken</strong>: <strong>${agent.teaBreaks}</strong> (Company Policy Limit: 2)<br/>` +
+      `• <strong>Lunch Variance</strong>: <strong>${agent.lunchVariance}</strong> (Tolerance: &lt;15m)<br/>` +
+      `• <strong>Request Frequency</strong>: <strong>${agent.freq}</strong> requests / 30m<br/>` +
+      `<p style="margin-top:6px; font-size:11px; color:#cbd5e1;">${advice}</p>`;
+    return { success: true, answer: text, category: 'adherence_telemetry' };
+  }
+
+  // 3. Storm & IVR Deflection Rate
+  if (qLower.includes('storm') || qLower.includes('weather') || qLower.includes('tornado') || qLower.includes('outage') || qLower.includes('deflection') || qLower.includes('1000') || qLower.includes('announcement') || qLower.includes('field workers')) {
+    const isAct = ivrDeflectionState.isDeflectionActive;
+    let text = `🌪️ <strong>Real-Time Storm & Outage Deflection Telemetry:</strong><br/>` +
+      `• <strong>Live Inbound Rate</strong>: <strong>${ivrDeflectionState.callVolumeRatePerMin} calls/min</strong> (Safety Ceiling: ${ivrDeflectionState.thresholdLimitPerMin}/min)<br/>` +
+      `• <strong>Deflection Status</strong>: <strong style="color:${isAct ? '#f87171' : '#34d399'};">${isAct ? '🚨 ACTIVE (Automated Deflection Running)' : '● STANDBY (Volume below 1,000/min)'}</strong><br/>` +
+      `• <strong>Deflected Inquiries</strong>: <strong>${ivrDeflectionState.deflectedCallsCount} calls</strong> routed to field outage message.<br/>` +
+      `• <strong>Caller IVR Message</strong>: <em>"${ivrDeflectionState.announcementText}"</em>`;
+    return { success: true, answer: text, category: 'storm_deflection' };
+  }
+
+  // 4. WFM Dynamic Skill Rebalance & Flex
+  if (qLower.includes('rebalance') || qLower.includes('flex') || qLower.includes('cross-skill') || qLower.includes('cross skill') || qLower.includes('why was i') || qLower.includes('schedule flex') || qLower.includes('flexed')) {
+    let text = `🔄 <strong>Dynamic WFM Intraday Skill Rebalance:</strong><br/>` +
+      `• <strong>Billing Queue Surge</strong>: ${billingQ.callsWaiting} calls waiting (${billingQ.occupancyPct}% occupancy)<br/>` +
+      `• <strong>Customer Service Surplus</strong>: ${csQ.callsWaiting} calls waiting (${csQ.occupancyPct}% occupancy)<br/>` +
+      `• <strong>WFM Flex Status</strong>: <strong style="color:${isRebalanced ? '#38bdf8' : '#f59e0b'};">${isRebalanced ? '✓ Active: 3 CS Agents Flexed to Billing' : 'Standby / Surge Monitoring'}</strong><br/>` +
+      `<small style="color:#94a3b8; display:block; margin-top:4px;">When Billing call arrival surges while General CS agents are idle, WFM automatically cross-skills CS agents to Billing to maintain SLA above 80% without overtime.</small>`;
+    return { success: true, answer: text, category: 'wfm_rebalance' };
+  }
+
+  // 5. IT System Incidents (AUX-5)
+  if (qLower.includes('it') || qLower.includes('ticket') || qLower.includes('vpn') || qLower.includes('citrix') || qLower.includes('vdi') || qLower.includes('system issue') || qLower.includes('incident') || qLower.includes('technical issue') || qLower.includes('aux-5')) {
+    let ticketList = itIncidents.slice(0, 3).map(t => `• <strong>${t.id} [${t.status}]</strong>: ${t.agentName} - ${t.category} (${t.severity})`).join('<br/>');
+    let text = `💻 <strong>Active IT System Issue Incidents (${itIncidents.length} logged):</strong><br/>` +
+      ticketList + `<br/>` +
+      `<small style="color:#94a3b8; display:block; margin-top:6px;">If experiencing VPN/Citrix drops, switch to AUX-5 System Issue in the Break Portal to auto-dispatch an IT ticket.</small>`;
+    return { success: true, answer: text, category: 'it_incidents' };
+  }
+
+  // 6. Supervisors On Duty & Floor Leadership
+  if (qLower.includes('supervisor') || qLower.includes('floor') || qLower.includes('leadership') || qLower.includes('on duty') || qLower.includes('sarah') || qLower.includes('who is')) {
+    let text = `🛡️ <strong>Floor Leadership & Shift Roster:</strong><br/>` +
+      `• <strong>Lead WFM Supervisor on Duty</strong>: SUP-014 Sarah Jenkins (Floor Ops Lead)<br/>` +
+      `• <strong>Floor Roster</strong>: 24 active agents logged in (12 personas active)<br/>` +
+      `• <strong>Current Distribution</strong>: ~14 In-Call, ~6 Available, ~4 AUX Break<br/>` +
+      `• <strong>Support Channels</strong>: Private 1-on-1 Supervisor Coach or floor broadcast.`;
+    return { success: true, answer: text, category: 'supervisor_info' };
+  }
+
+  // 7. Active Call, ACW & Disposition
+  if (qLower.includes('acw') || qLower.includes('summary') || qLower.includes('disposition') || qLower.includes('call') || qLower.includes('wrap') || qLower.includes('survey') || qLower.includes('rating') || qLower.includes('ivr')) {
+    let text = `✨ <strong>Live Interaction & ACW Intelligence:</strong><br/>` +
+      `• <strong>Active Call</strong>: Contact #90421 (Skill: Customer Billing & Retention)<br/>` +
+      `• <strong>Security PIN</strong>: Verified ✓<br/>` +
+      `• <strong>Customer Speech Sentiment</strong>: Empathetic / Constructive<br/>` +
+      `• <strong>Post-Call IVR Rating</strong>: ★★★★★ 5.0 / 5.0<br/>` +
+      `• <strong>Recommended Disposition</strong>: <code>RESOLVED_BILLING_CREDIT</code><br/>` +
+      `When the call concludes, click 'Generate AI Call Summary' to insert enriched notes into CRM.`;
+    return { success: true, answer: text, category: 'call_acw' };
+  }
+
+  // 8. General Telemetry Briefing (Default)
+  let text = `🤖 <strong>NICE CXone Telemetry Briefing:</strong><br/>` +
+    `Telephony switch is healthy. ACD inbound rate is <strong>${ivrDeflectionState.callVolumeRatePerMin} calls/min</strong>. ` +
+    `Your adherence is <strong>${agent.adherence}</strong>. Billing queue has <strong>${billingQ.callsWaiting} calls waiting</strong> (SLA ${billingQ.currentSla}%). ` +
+    `Ask me about <em>queue volume</em>, <em>my adherence</em>, <em>storm deflection rate</em>, <em>WFM skill flex</em>, or <em>open IT tickets</em>!`;
+  return { success: true, answer: text, category: 'general_brief' };
 }
 
 server.on('error', (err) => {

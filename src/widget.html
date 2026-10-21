@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>NICE CXone AI Copilot & AUX Assistant</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="alternate icon" href="/favicon.ico" />
   <link rel="stylesheet" href="widget.css?v=2.1" />
 </head>
 <body>
@@ -37,6 +39,9 @@
         </div>
       </div>
       <div class="header-tools">
+        <a href="/index.html" class="btn-xs btn-outline" style="text-decoration:none; display:inline-flex; align-items:center; gap:5px; padding:5px 8px; font-weight:700;" title="Operations Hub Home">
+          <img src="/favicon.svg" style="width:13px; height:13px;" /> Home
+        </a>
         <button id="btn-quick-break" class="btn-sm btn-accent" title="Launch Web Portal to Apply Break">
           ☕ Apply Break
         </button>
@@ -237,12 +242,22 @@
         <div class="chat-history" id="chat-history">
           <div class="chat-msg ai">
             <div class="msg-bubble">
-              👋 Hi Alex! I am your NICE CXone Agent Copilot. I can assist with customer answers, troubleshoot CXone MAX audio, verify schedule adherence, and auto-generate ACW summaries.
+              👋 Hi Alex! I am your NICE CXone Agent Copilot trained on real-time telephony, queue traffic, and adherence telemetry. Ask me anything or select a live topic below:
             </div>
           </div>
         </div>
+        
+        <!-- REAL-TIME COPILOT PROMPT CHIPS -->
+        <div class="copilot-chips-bar">
+          <button class="chat-chip" data-query="What is the current queue volume and traffic?">📊 Queue Volume</button>
+          <button class="chat-chip" data-query="What is my schedule adherence and break limit?">⏱️ My Adherence</button>
+          <button class="chat-chip" data-query="Is dynamic WFM skill rebalance active?">🔄 WFM Skill Flex</button>
+          <button class="chat-chip" data-query="What is the storm outage IVR deflection rate?">🌪️ Storm Deflection</button>
+          <button class="chat-chip" data-query="Show active IT system issue tickets">💻 Open IT Tickets</button>
+        </div>
+
         <div class="chat-input-row">
-          <input type="text" id="chat-input" placeholder="Ask AI Copilot (e.g. CXone WebRTC error, billing policy)..." />
+          <input type="text" id="chat-input" placeholder="Ask real-time Copilot (e.g. queue volume, my adherence, storm rate)..." />
           <button id="btn-send-chat" class="btn-send">➤</button>
         </div>
       </div>

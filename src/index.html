@@ -2,13 +2,461 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="refresh" content="0; url=widget.html" />
-  <title>Auxiliary Mode Assistant - Redirecting</title>
-  <script>
-    window.location.href = "widget.html";
-  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NICE CXone Operations Gateway - Home</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="alternate icon" href="/favicon.ico" />
+  <style>
+    :root {
+      --bg: #070b14;
+      --card-bg: #0f172a;
+      --card-hover: #1e293b;
+      --border: #1e293b;
+      --border-focus: #38bdf8;
+      --primary: #38bdf8;
+      --primary-glow: rgba(56, 189, 248, 0.25);
+      --success: #10b981;
+      --accent: #818cf8;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 32px 20px 24px;
+      background-image: 
+        radial-gradient(ellipse at 50% 0%, rgba(56, 189, 248, 0.08) 0%, transparent 60%),
+        radial-gradient(ellipse at 50% 100%, rgba(99, 102, 241, 0.05) 0%, transparent 60%);
+    }
+
+    .home-container {
+      width: 100%;
+      max-width: 960px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* HEADER */
+    .hero-header {
+      text-align: center;
+      margin-bottom: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .bot-avatar-badge {
+      width: 72px;
+      height: 72px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(99, 102, 241, 0.25));
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      box-shadow: 0 0 25px rgba(56, 189, 248, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .bot-avatar-badge img {
+      width: 46px;
+      height: 46px;
+    }
+
+    .live-pulse {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      width: 14px;
+      height: 14px;
+      background: var(--success);
+      border-radius: 50%;
+      border: 3px solid var(--bg);
+      box-shadow: 0 0 8px var(--success);
+    }
+
+    .hero-title {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #ffffff 30%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+
+    .hero-subtitle {
+      color: var(--text-muted);
+      font-size: 14px;
+      max-width: 520px;
+      line-height: 1.5;
+    }
+
+    .system-status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 4px 12px;
+      border-radius: 20px;
+      color: #34d399;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-top: 14px;
+    }
+
+    .system-status-pill .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 6px #10b981;
+    }
+
+    /* GATEWAY CARDS GRID */
+    .gateway-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      width: 100%;
+      margin-bottom: 36px;
+    }
+
+    @media (max-width: 820px) {
+      .gateway-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .gateway-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-decoration: none;
+      color: var(--text);
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gateway-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: transparent;
+      transition: background 0.2s ease;
+    }
+
+    .gateway-card:hover {
+      background: var(--card-hover);
+      border-color: rgba(56, 189, 248, 0.4);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 20px rgba(56, 189, 248, 0.1);
+    }
+
+    .gateway-card:hover::before {
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .card-icon {
+      font-size: 32px;
+      width: 52px;
+      height: 52px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .card-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .badge-agent {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+
+    .badge-portal {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+
+    .badge-sup {
+      background: rgba(168, 85, 247, 0.15);
+      color: #c084fc;
+      border: 1px solid rgba(168, 85, 247, 0.3);
+    }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+
+    .card-desc {
+      color: var(--text-muted);
+      font-size: 12px;
+      line-height: 1.5;
+      margin-bottom: 20px;
+      flex-grow: 1;
+    }
+
+    .card-action-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 700;
+      transition: all 0.2s ease;
+    }
+
+    .gateway-card:hover .card-action-btn {
+      background: #2563eb;
+      border-color: #3b82f6;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+
+    /* REAL-TIME TELEMETRY STRIP */
+    .telemetry-strip {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .telemetry-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .telemetry-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+    }
+
+    .telemetry-value {
+      font-size: 14px;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+
+    .telemetry-value.accent {
+      color: #38bdf8;
+    }
+
+    .telemetry-value.success {
+      color: #34d399;
+    }
+
+    /* FOOTER */
+    .home-footer {
+      text-align: center;
+      color: #64748b;
+      font-size: 11px;
+      margin-top: 24px;
+    }
+  </style>
 </head>
-<body style="background: #090d16; color: #fff; font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh;">
-  <p>Loading AUX WFM Copilot Widget... <a href="widget.html" style="color: #38bdf8;">Click here if not redirected</a></p>
+<body>
+
+  <div class="home-container">
+    
+    <!-- HERO HEADER -->
+    <header class="hero-header">
+      <div class="bot-avatar-badge">
+        <img src="/favicon.svg" alt="NICE CXone Bot" />
+        <span class="live-pulse" title="System Live"></span>
+      </div>
+      <h1 class="hero-title">NICE CXone Operations Gateway</h1>
+      <p class="hero-subtitle">
+        Intelligent Contact Center Operations, Autonomous WFM Copilot & Break Management Platform.
+      </p>
+      <div class="system-status-pill">
+        <span class="dot"></span> Telephony & Telemetry Online
+      </div>
+    </header>
+
+    <!-- 3 MINIMAL HIGH-VISIBILITY GATEWAY CARDS -->
+    <div class="gateway-grid">
+      
+      <!-- CARD 1: AGENT COPILOT WIDGET -->
+      <a href="/widget.html" class="gateway-card">
+        <div class="card-top">
+          <div class="card-icon">🤖</div>
+          <span class="card-badge badge-agent">Agent Desktop</span>
+        </div>
+        <h2 class="card-title">Agent AI Copilot Widget</h2>
+        <p class="card-desc">
+          Live call companion with real-time customer reply suggestions, automated ACW CRM notes, adherence tracking, and diagnostics.
+        </p>
+        <div class="card-action-btn">
+          <span>Launch Agent Copilot</span>
+          <span>→</span>
+        </div>
+      </a>
+
+      <!-- CARD 2: AUX BREAK PORTAL -->
+      <a href="/portal.html" class="gateway-card">
+        <div class="card-top">
+          <div class="card-icon">☕</div>
+          <span class="card-badge badge-portal">Self-Service WFM</span>
+        </div>
+        <h2 class="card-title">AUX & Break Portal</h2>
+        <p class="card-desc">
+          Erlang-C automated break evaluation, peak queue mitigation, "check back later" availability windows, and AUX-5 IT incident ticketing.
+        </p>
+        <div class="card-action-btn">
+          <span>Open Break Portal</span>
+          <span>→</span>
+        </div>
+      </a>
+
+      <!-- CARD 3: SUPERVISOR COMMAND CENTER -->
+      <a href="/supervisor.html" class="gateway-card">
+        <div class="card-top">
+          <div class="card-icon">🛡️</div>
+          <span class="card-badge badge-sup">Operations Lead</span>
+        </div>
+        <h2 class="card-title">Supervisor Command Center</h2>
+        <p class="card-desc">
+          REMI Autonomous Supervisor Copilot, floor monitoring, intraday WFM skill flex rebalance, emergency broadcasts, and QA scorecards.
+        </p>
+        <div class="card-action-btn">
+          <span>Open Supervisor Console</span>
+          <span>→</span>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- MINIMAL REAL-TIME TELEMETRY BAR -->
+    <div class="telemetry-strip">
+      <div class="telemetry-item">
+        <span class="telemetry-label">ACD Inbound Traffic</span>
+        <span class="telemetry-value accent" id="home-acd-rate">420 Calls / Min</span>
+      </div>
+      <div class="telemetry-item">
+        <span class="telemetry-label">Active Floor Staff</span>
+        <span class="telemetry-value" id="home-active-staff">24 Logged In</span>
+      </div>
+      <div class="telemetry-item">
+        <span class="telemetry-label">Current Service Level</span>
+        <span class="telemetry-value success" id="home-sla">86.4% (Target 80%)</span>
+      </div>
+      <div class="telemetry-item">
+        <span class="telemetry-label">Storm Outage Mode</span>
+        <span class="telemetry-value" id="home-storm-status">Standby (< 1,000/min)</span>
+      </div>
+      <div class="telemetry-item">
+        <span class="telemetry-label">WFM Skill Rebalance</span>
+        <span class="telemetry-value" id="home-wfm-status">Balanced</span>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="home-footer">
+    NICE CXone™ & WFM Operations Hub • Enterprise Auxiliary Code Management • NiSource / Columbia Gas
+  </footer>
+
+  <script>
+    // Live update telemetry strip from backend
+    async function refreshHomeTelemetry() {
+      try {
+        const [wfmRes, stormRes] = await Promise.all([
+          fetch('/api/wfm/queue-balance').then(r => r.json()).catch(() => null),
+          fetch('/api/cxone/ivr-deflection').then(r => r.json()).catch(() => null)
+        ]);
+
+        if (wfmRes && wfmRes.state) {
+          const s = wfmRes.state;
+          document.getElementById('home-sla').textContent = s.queues.billing.currentSla + '% (Billing)';
+          document.getElementById('home-wfm-status').textContent = s.isRebalanced ? 'Flex Active (CS -> Billing)' : (s.isSurgeActive ? 'Surge Warning' : 'Balanced');
+          if (s.isSurgeActive) {
+            document.getElementById('home-wfm-status').style.color = '#f87171';
+          } else {
+            document.getElementById('home-wfm-status').style.color = '#34d399';
+          }
+        }
+
+        if (stormRes) {
+          document.getElementById('home-acd-rate').textContent = (stormRes.callVolumeRatePerMin || 420) + ' Calls / Min';
+          const stormEl = document.getElementById('home-storm-status');
+          if (stormRes.isDeflectionActive) {
+            stormEl.textContent = 'DEFLECTION ACTIVE (' + stormRes.callVolumeRatePerMin + '/min)';
+            stormEl.style.color = '#f87171';
+          } else {
+            stormEl.textContent = stormRes.stormOutageMode ? 'Storm Mode (Rate Normal)' : 'Standby (< 1,000/min)';
+            stormEl.style.color = '#94a3b8';
+          }
+        }
+      } catch (e) {
+        console.warn('Telemetry polling fallback active');
+      }
+    }
+    refreshHomeTelemetry();
+    setInterval(refreshHomeTelemetry, 5000);
+  </script>
 </body>
 </html>
