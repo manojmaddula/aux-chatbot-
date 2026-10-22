@@ -1007,25 +1007,53 @@ btnCompleteAcw.addEventListener('click', async () => {
 // ==========================================
 
 function startBreak(breakData) {
+  const durMins = parseInt(breakData.durationMinutes, 10) || 15;
+  const now = Date.now();
+  const totalMs = durMins * 60 * 1000;
+  const expiresAt = breakData.expiresAt || (now + totalMs);
+  const startedAt = breakData.approvedAt || (expiresAt - totalMs);
+
+  agentState.status = 'AUX';
+  agentState.activeBreak = {
+    auxCode: breakData.auxCode || 'AUX-2: Short Break / AUX',
+    durationMinutes: durMins,
+    totalMs: totalMs,
+    startedAt: startedAt,
+    expiresAt: expiresAt
+  };
+
   // Record in 30-day break history
   const agentKey = agentState.id || 'AGT-8842';
   const history = generate30DayBreakHistory(agentKey);
-  if (history && history[0] && history[0].status === 'In Progress') {
-    const endTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const startTimeStr = history[0].time.split(' - ')[0];
-    history[0].time = `${startTimeStr} - ${endTime}`;
-    history[0].status = 'Completed';
-    history[0].statusClass = 'completed';
+  if (history) {
+    if (history[0] && history[0].status === 'In Progress') {
+      const endTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const startTimeStr = history[0].time.split(' - ')[0];
+      history[0].time = startTimeStr + ' - ' + endTime;
+      history[0].status = 'Completed';
+      history[0].statusClass = 'completed';
+    }
+    const startTime = new Date(startedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    history.unshift({
+      date: 'Today, Just Now',
+      auxCode: agentState.activeBreak.auxCode,
+      icon: getAuxIcon(agentState.activeBreak.auxCode),
+      time: startTime + ' - (in progress)',
+      duration: durMins + ' mins',
+      status: 'In Progress',
+      statusClass: 'in-progress',
+      category: getAuxCategory(agentState.activeBreak.auxCode)
+    });
     renderBreakHistory(agentKey);
-  };
+  }
   twoMinuteWarningTriggered = false;
   botCallTriggered = false;
 
   agentStatusDot.className = 'status-indicator aux';
   agentStateLabel.className = 'state-label aux-mode';
-  agentStateLabel.textContent = `NICE CXone: ${breakData.auxCode}`;
+  agentStateLabel.textContent = 'NICE CXone: ' + agentState.activeBreak.auxCode;
 
-  activeAuxLabel.textContent = breakData.auxCode;
+  activeAuxLabel.textContent = agentState.activeBreak.auxCode;
   breakActiveCard.classList.remove('hidden');
   twoMinAlert.classList.add('hidden');
   breakTimeLeft.classList.remove('overdue');
@@ -1121,12 +1149,13 @@ btnEndBreak.addEventListener('click', () => {
 
 function endBreakEarly() {
   const agentKey = agentState.id || 'AGT-8842';
-  if (AGENT_BREAK_HISTORIES[agentKey] && AGENT_BREAK_HISTORIES[agentKey][0] && AGENT_BREAK_HISTORIES[agentKey][0].status === 'In Progress') {
+  const history = generate30DayBreakHistory(agentKey);
+  if (history && history[0] && history[0].status === 'In Progress') {
     const endTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const startTimeStr = AGENT_BREAK_HISTORIES[agentKey][0].timeRange.split(' - ')[0];
-    AGENT_BREAK_HISTORIES[agentKey][0].timeRange = `${startTimeStr} - ${endTime}`;
-    AGENT_BREAK_HISTORIES[agentKey][0].status = 'Completed';
-    AGENT_BREAK_HISTORIES[agentKey][0].statusClass = 'completed';
+    const startTimeStr = history[0].time.split(' - ')[0];
+    history[0].time = startTimeStr + ' - ' + endTime;
+    history[0].status = 'Completed';
+    history[0].statusClass = 'completed';
     renderBreakHistory(agentKey);
   }
   if (countdownInterval) clearInterval(countdownInterval);
@@ -1781,3 +1810,18 @@ fetch('/api/policy')
 renderBreakHistory("AGT-8842");
 
 bindBreakFilters();
+
+// Restore active break if still ongoing
+try {
+  const savedBreak = localStorage.getItem('wfm_active_break');
+  if (savedBreak) {
+    const parsed = JSON.parse(savedBreak);
+    if (parsed && parsed.expiresAt && parsed.expiresAt > Date.now()) {
+      startBreak(parsed);
+    } else {
+      localStorage.removeItem('wfm_active_break');
+    }
+  }
+} catch (e) {
+  console.warn('Error restoring active break:', e);
+}

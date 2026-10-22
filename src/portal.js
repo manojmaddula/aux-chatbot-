@@ -159,6 +159,39 @@ const decisionDesc = document.getElementById('decision-desc');
 const decisionMetrics = document.getElementById('decision-metrics');
 const btnSyncChatbot = document.getElementById('btn-sync-chatbot');
 
+const AUX_DEFAULT_DURATIONS = {
+  'AUX-1: Scheduled Lunch': 45,
+  'AUX-2: Short Break / AUX': 15,
+  'AUX-3: Meeting / 1-on-1': 30,
+  'AUX-4: Training / Coaching': 45,
+  'AUX-5: Technical / VPN Issue': 30,
+  'AUX-6: Bio / Emergency': 10
+};
+
+function setDurationMinutes(minutes) {
+  selectedMinutes = parseInt(minutes, 10) || 15;
+  let matchedPill = false;
+  durationPills.forEach(pill => {
+    if (parseInt(pill.getAttribute('data-minutes'), 10) === selectedMinutes) {
+      pill.classList.add('active');
+      matchedPill = true;
+    } else {
+      pill.classList.remove('active');
+    }
+  });
+
+  if (!matchedPill) {
+    if (customMinutesInput) customMinutesInput.value = selectedMinutes;
+  } else {
+    if (customMinutesInput) customMinutesInput.value = '';
+  }
+}
+
+function selectDurationForAux(auxCode) {
+  const defaultMinutes = AUX_DEFAULT_DURATIONS[auxCode] || 15;
+  setDurationMinutes(defaultMinutes);
+}
+
 // Apply agent persona selection
 function applyAgentPersona(agentKey) {
   const profile = AGENT_PERSONAS[agentKey] || AGENT_PERSONAS['AGT-8842'];
@@ -171,7 +204,11 @@ function applyAgentPersona(agentKey) {
 
   // Auto select default AUX radio if present
   const radio = document.querySelector(`input[name="aux-code"][value="${profile.auxDefault}"]`);
-  if (radio) radio.checked = true;
+  if (radio) {
+    radio.checked = true;
+    selectDurationForAux(profile.auxDefault);
+  }
+  syncItIssueBoxVisibility();
 
   if (profile.forceRateLimit) {
     const history = [Date.now(), Date.now() - 30000, Date.now() - 60000];
@@ -536,12 +573,23 @@ function syncItIssueBoxVisibility() {
 
 // Initial sync on load
 syncItIssueBoxVisibility();
+const initialCheckedAux = document.querySelector('input[name="aux-code"]:checked');
+if (initialCheckedAux) {
+  selectDurationForAux(initialCheckedAux.value);
+}
 
 document.querySelectorAll('input[name="aux-code"]').forEach(radio => {
-  radio.addEventListener('change', syncItIssueBoxVisibility);
+  radio.addEventListener('change', () => {
+    syncItIssueBoxVisibility();
+    selectDurationForAux(radio.value);
+  });
 });
 document.querySelectorAll('.aux-option').forEach(opt => {
   opt.addEventListener('click', () => {
-    setTimeout(syncItIssueBoxVisibility, 50);
+    setTimeout(() => {
+      syncItIssueBoxVisibility();
+      const checkedRadio = document.querySelector('input[name="aux-code"]:checked');
+      if (checkedRadio) selectDurationForAux(checkedRadio.value);
+    }, 50);
   });
 });
