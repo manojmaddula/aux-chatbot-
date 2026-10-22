@@ -1,7 +1,7 @@
-# ZEL: Autonomous WFM & AI Copilot Platform — Project Handover & Context Summary
+# ZEL: Autonomous WFM & Ask Shankar Platform — Project Handover & Context Summary
 
 ## 1. Project Overview & Identity
-* **Project Name**: ZEL (Autonomous WFM & AI Copilot Platform for NICE CXone)
+* **Project Name**: ZEL (Autonomous WFM & Ask Shankar Platform for NICE CXone)
 * **Official Tagline**: *"Zero wait to leave, zero wait to return"*
 * **GitHub Repository**: https://github.com/manojmaddula/aux-chatbot-.git
 * **Primary Branch**: `main`
@@ -46,7 +46,7 @@
   * `⚡ 1. Simulate Surge (+318)`: Simulates sudden billing queue spike (ASA 9m, SLA drops to 34.5%).
   * `🔄 2. Reallocate 3 Agents Now`: Flexes 3 idle CS agents to Billing; calls collapse to 48 and SLA recovers to 88.5%.
   * `🟢 3. Restore Base`: Normalizes volume and returns agents to regular shift schedules.
-* **REMI Supervisor AI Copilot (Drawer)**: Provides 360° agent dossiers and deep analytical reports (Speech Tone vs CSAT Correlation, Burnout Risk, Erlang-C Deficits, Chronic Adherence Outliers).
+* **REMI Supervisor Assistant (Ask Shankar Drawer)**: Provides 360° agent dossiers and deep analytical reports (Speech Tone vs CSAT Correlation, Burnout Risk, Erlang-C Deficits, Chronic Adherence Outliers).
 
 ---
 
@@ -63,7 +63,7 @@
 
 ## 5. Quick Verification Commands
 * Start background server: `node server.js` (runs on `http://localhost:4000`)
-* Agent Copilot Home: `http://localhost:4000/agent-home.html`
+* Agent Ask Shankar Home: `http://localhost:4000/agent-home.html`
 * Agent Floating Widget: `http://localhost:4000/widget.html`
 * Break Portal: `http://localhost:4000/portal.html`
 * Supervisor Command Center: `http://localhost:4000/supervisor.html`

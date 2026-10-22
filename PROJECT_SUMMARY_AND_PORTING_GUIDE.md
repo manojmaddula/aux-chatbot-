@@ -1,4 +1,4 @@
-# Contact Center AI Auxiliary Mode & Operations Copilot System
+# Contact Center AI Auxiliary Mode & Operations Ask Shankar System
 ## Complete Project Summary & Multi-Device Deployment Guide
 
 ---
@@ -7,7 +7,7 @@
 
 Contact centers require dynamic, automated workforce management (WFM) to manage Auxiliary (AUX) modes, schedule adherence, and agent support. This solution replaces slow, manual supervisor communications with a centralized ecosystem combining:
 
-1. **A Floating Desktop Chatbot Widget (Agent Copilot)**: Stays accessible during customer interactions to provide live adherence tracking, real-time suggested customer replies, instant CRM call summaries, system/VPN troubleshooting, and emergency broadcast alerts.
+1. **A Floating Desktop Chatbot Widget (Agent Ask Shankar)**: Stays accessible during customer interactions to provide live adherence tracking, real-time suggested customer replies, instant CRM call summaries, system/VPN troubleshooting, and emergency broadcast alerts.
 2. **A Dedicated Web Portal (Authentication & AUX Application)**: When an agent requests a break, they are redirected to a secure web portal (`/portal.html`) where they authenticate via SSO, pick their AUX code, duration, backup agent, and submit to the automated WFM engine.
 3. **A Supervisor Operations Command Center (`/supervisor.html`)**: Real-time queue audit of all break requests, live agent adherence telemetry wallboard, and an emergency broadcasting control station.
 4. **An Autonomous WFM Decision Engine (`server.js`)**: Evaluates real-time Erlang-C staffing capacity, projected ACD arrival surges, agent adherence history, and submission frequency.
@@ -72,7 +72,7 @@ Contact centers require dynamic, automated workforce management (WFM) to manage 
 | **5. Request Frequency Limiter** | Rate-limits submissions (max 3 requests within 30 minutes). Rejects excess attempts with a 15-minute cooldown. | Select `David Chen (AGT-7740)` (3 requests in history) and submit break $\rightarrow$ **Auto-Rejected (Frequency Limit)**. |
 | **6. Emergency Broadcasting System** | Supervisor can broadcast emergency tickers (Severe Storm, SEV-1 Outage, Monday Peak) with warning sound chimes and desktop notification banners. | In Supervisor Portal (`/supervisor.html`), click `🌪️ Tornado / Storm Warning` $\rightarrow$ Instantly appears on agent widget! |
 | **7. Countdown, 2-Min Warning & Overdue Bot Voice Call** | • Real-time countdown timer with progress bar.<br>• **2-Minute Warning**: Plays an alert chime & displays warning notice at 02:00 remaining.<br>• **Overdue Bot Voice Call**: If break exceeds scheduled time, plays ringing audio and speaks aloud via Web Speech API (`SpeechSynthesisUtterance`). | Open **🚨 Alerts & Sim** tab. Click `⏱️ Trigger 2-Min Break End Alert` or `📞 Trigger Overdue Bot Call Alert`. |
-| **Customer Copilot & Instant Summary** | Live customer call timer, suggested replies with 1-click "Copy to Chat", and "Generate Instant Call Summary (ACW)" for CRM. | Open **💬 Copilot** tab in widget. Click "Copy to Chat" or click "Generate Instant Call Summary (ACW)". |
+| **Customer Ask Shankar & Instant Summary** | Live customer call timer, suggested replies with 1-click "Copy to Chat", and "Generate Instant Call Summary (ACW)" for CRM. | Open **💬 Ask Shankar** tab in widget. Click "Copy to Chat" or click "Generate Instant Call Summary (ACW)". |
 
 ---
 

@@ -2252,7 +2252,7 @@ function addSupBotMessage(sender, text, htmlContent = '') {
 
 // Initial Greeting
 if (supBotMessages) {
-  addSupBotMessage('bot', '👋 Welcome ' + currentSupervisor.name + '! I am REMI, your Autonomous Supervisor Copilot. I can run floor audits, detect queue surges, trigger cross-skilling rebalances, and recall overdue agents. How can I assist you?');
+  addSupBotMessage('bot', '👋 Welcome ' + currentSupervisor.name + '! I am REMI, your Autonomous Supervisor Assistant (Ask Shankar). I can run floor audits, detect queue surges, trigger cross-skilling rebalances, and recall overdue agents. How can I assist you?');
 }
 
 // Quick Chip Handlers

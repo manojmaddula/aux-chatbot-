@@ -3,7 +3,7 @@ title NICE CXone ZEL Panda Desktop Widget Launcher
 cd /d "%~dp0"
 
 echo ======================================================================
-echo    Starting NICE CXone ZEL Copilot Desktop Widget and System Tray
+echo    Starting NICE CXone ZEL Ask Shankar Desktop Widget and System Tray
 echo ======================================================================
 
 :: 1. Check if Node.js server is already active on port 4000
@@ -25,7 +25,7 @@ echo ======================================================================
 echo  [SUCCESS] Panda Floating Widget is now active on your laptop screen!
 echo  - Look at the bottom-right of your screen for the floating Panda.
 echo  - Look in your Windows Taskbar "Hidden Icons" area for the Panda icon.
-echo  - Left-click the Panda to open Copilot; drag it anywhere on screen!
+echo  - Left-click the Panda to open Ask Shankar; drag it anywhere on screen!
 echo  - Right-click either icon for quick menu (Portal, Supervisor, Home).
 echo ======================================================================
 ping -n 3 127.0.0.1 >nul

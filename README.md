@@ -1,6 +1,6 @@
-# Contact Center AI Auxiliary Mode & Operations Copilot Widget
+# Contact Center AI Auxiliary Mode & Operations Ask Shankar Widget
 
-An enterprise-grade desktop chatbot widget for contact center agents that streamlines auxiliary (AUX) mode management, schedule adherence, real-time customer co-pilot assistance, and automated workforce management (WFM) workflows.
+An enterprise-grade desktop chatbot widget for contact center agents that streamlines auxiliary (AUX) mode management, schedule adherence, real-time customer Ask Shankar assistance, and automated workforce management (WFM) workflows.
 
 ---
 
@@ -12,7 +12,7 @@ An enterprise-grade desktop chatbot widget for contact center agents that stream
 |  - Live Status (READY / AUX / OVERDUE / IN CALL)           |
 |  - 2-Minute Pre-Expiration Notice & Sound Chimes          |
 |  - Automated Voice Bot Call on Break Overage               |
-|  - Real-Time Suggested Customer Replies & AI Copilot Chat |
+|  - Real-Time Suggested Customer Replies & Ask Shankar Chat |
 |  - Post-Call CRM Summary Generator                        |
 |  - Interactive Troubleshooting KB (VPN, VDI, VoIP)        |
 |  - Emergency Broadcast Ticker & Proactive Outage Alerts   |
@@ -87,7 +87,7 @@ An enterprise-grade desktop chatbot widget for contact center agents that stream
     > *"Attention Agent Alex Morgan: Your scheduled auxiliary break duration has ended and is now exceeding adherence limits. You are required to immediately return to your workstation and resume ready state. Supervisor has been alerted."*
   - Agent clicks **"Acknowledge & Return to Workstation"** to silence the call and reset status to `READY`.
 
-### 8. Live Customer Interaction Copilot & ACW Call Summary
+### 8. Live Customer Interaction Ask Shankar & ACW Call Summary
 - Live active call timer and customer info bar.
 - Real-time suggested context-aware responses with one-click **"Copy to Chat"**.
 - One-click **"Generate Instant Call Summary (ACW)"** to produce CRM-ready notes (Intent, Action, Disposition Code, Sentiment).
@@ -114,11 +114,11 @@ An enterprise-grade desktop chatbot widget for contact center agents that stream
   - Injects a temporary `10:00 - 11:30 Intraday Skill Flex` interval into their WFM schedule.
   - Updates NICE CXone ACD routing with Priority 1 (Billing) and Priority 2 (Customer Service).
   - Temporarily pauses discretionary AUX breaks (Tea/Bio) during the surge window to protect queue SLAs.
-- **Agent Desktop Widget Synchronization**: Pushes immediate banner alert (`🔄 Dynamic WFM Skill Flex: Customer Billing Support`) and elevates Billing copilot replies.
+- **Agent Desktop Widget Synchronization**: Pushes immediate banner alert (`🔄 Dynamic WFM Skill Flex: Customer Billing Support`) and elevates Billing Ask Shankar replies.
 - **Autonomous Restoration**: When call volume normalizes back below threshold, agents are automatically returned to their base Customer Service shift and normal AUX permissions resume.
 
-### 12. Supervisor AI Operations Copilot Bot & Multi-Account Administration
-- **REMI Supervisor Copilot Bot**: A floating interactive AI assistant embedded directly inside the Supervisor Command Center.
+### 12. Supervisor AI Operations Assistant (Ask Shankar) & Multi-Account Administration
+- **REMI Supervisor Assistant (Ask Shankar)**: A floating interactive AI assistant embedded directly inside the Supervisor Command Center.
   - **Natural Language Floor Audit**: Supervisors can query floor health, check queue surges, review non-compliant QA agents, or dispatch emergency broadcasts.
   - **1-Click Execution within Chat**: Rebalances queues, assigns coaching modules, and places automated voice recalls directly from AI chat response bubbles.
   - **Speech Synthesis Voice Briefing**: Reads real-time shift status briefings aloud via the Web Speech API.

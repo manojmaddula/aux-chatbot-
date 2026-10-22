@@ -1396,7 +1396,7 @@ async function handleUserChat() {
       `• INC-88102: Carlos Mendez - Cisco AnyConnect VPN MTU 1350 (In Progress)<br/>` +
       `• INC-88103: Samantha Vance - Citrix Workspace Reconnect (Assigned)`;
   } else {
-    response = `🤖 <strong>Live NICE CXone Telemetry Briefing:</strong><br/>` +
+    response = `🤖 <strong>Live NICE CXone (Ask Shankar) Telemetry Briefing:</strong><br/>` +
       `All circuits operational. Your adherence: <strong>${profile.adherence}</strong>. Inbound rate: <strong>420 calls/min</strong>. ` +
       `Ask about <em>queue volume</em>, <em>my adherence</em>, <em>storm deflection</em>, or <em>WFM skill flex</em>!`;
   }

@@ -24,7 +24,7 @@ function createWindow() {
     y: Math.max(40, height - 780),
     resizable: true,
     alwaysOnTop: true, // Floats as desktop companion widget over any app!
-    title: "NICE CXone ZEL Copilot & AUX Assistant",
+    title: "NICE CXone ZEL Ask Shankar & AUX Assistant",
     icon: iconPath,
     webPreferences: {
       nodeIntegration: false,
@@ -42,8 +42,8 @@ function createWindow() {
       if (tray && tray.displayBalloon) {
         try {
           tray.displayBalloon({
-            title: "ZEL Copilot Minimized",
-            content: "Copilot is running in your taskbar hidden icons. Click the Panda icon anytime to restore it!"
+            title: "ZEL Ask Shankar Minimized",
+            content: "Ask Shankar is running in your taskbar hidden icons. Click the Panda icon anytime to restore it!"
           });
         } catch (e) {}
       }
@@ -58,11 +58,11 @@ function createWindow() {
 function createTray() {
   const iconPath = path.join(__dirname, 'src', 'favicon.ico');
   tray = new Tray(iconPath);
-  tray.setToolTip('NICE CXone ZEL Copilot & AUX Assistant');
+  tray.setToolTip('NICE CXone ZEL Ask Shankar & AUX Assistant');
 
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: '🐼 Show / Hide Copilot Widget',
+      label: '🐼 Show / Hide Ask Shankar Widget',
       click: () => {
         if (!mainWindow) {
           createWindow();
@@ -87,7 +87,7 @@ function createTray() {
       }
     },
     {
-      label: '💬 Open AI Copilot & ACW Assistant',
+      label: '💬 Open Ask Shankar & ACW Assistant',
       click: () => {
         if (mainWindow) {
           mainWindow.loadURL('http://localhost:4000/widget.html');

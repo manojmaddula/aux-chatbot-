@@ -1117,7 +1117,7 @@ function evaluateCopilotQuery(payload) {
   }
 
   // 8. General Telemetry Briefing (Default)
-  let text = `🤖 <strong>NICE CXone Telemetry Briefing:</strong><br/>` +
+  let text = `🤖 <strong>NICE CXone (Ask Shankar) Telemetry Briefing:</strong><br/>` +
     `Telephony switch is healthy. ACD inbound rate is <strong>${ivrDeflectionState.callVolumeRatePerMin} calls/min</strong>. ` +
     `Your adherence is <strong>${agent.adherence}</strong>. Billing queue has <strong>${billingQ.callsWaiting} calls waiting</strong> (SLA ${billingQ.currentSla}%). ` +
     `Ask me about <em>queue volume</em>, <em>my adherence</em>, <em>storm deflection rate</em>, <em>WFM skill flex</em>, or <em>open IT tickets</em>!`;

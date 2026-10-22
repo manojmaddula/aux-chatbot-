@@ -1,7 +1,7 @@
 {
-  "name": "NICE CXone ZEL Copilot & AUX Assistant",
-  "short_name": "ZEL Copilot",
-  "description": "Autonomous AI Copilot, Break Management & Operational Workstation",
+  "name": "NICE CXone ZEL Ask Shankar & AUX Assistant",
+  "short_name": "Ask Shankar",
+  "description": "Autonomous Ask Shankar, Break Management & Operational Workstation",
   "start_url": "/agent-home.html",
   "display": "standalone",
   "background_color": "#ffffff",

@@ -1,6 +1,6 @@
 /**
  * floating-widget.js - Global Floating Panda Widget Component
- * NICE CXone AI Copilot & AUX Assistant Launcher
+ * NICE CXone Ask Shankar & AUX Assistant Launcher
  */
 
 (function () {
@@ -30,13 +30,13 @@
     launcher.id = 'floating-panda-launcher';
     launcher.className = 'floating-panda-launcher';
     launcher.setAttribute('role', 'button');
-    launcher.setAttribute('aria-label', 'Toggle NICE CXone AI Copilot & AUX Assistant');
+    launcher.setAttribute('aria-label', 'Toggle NICE CXone Ask Shankar & AUX Assistant');
     launcher.setAttribute('tabindex', '0');
     launcher.innerHTML = `
-      <img src="/favicon.svg?v=panda2" alt="Panda Copilot" class="floating-panda-img" />
+      <img src="/favicon.svg?v=panda2" alt="Ask Shankar" class="floating-panda-img" />
       <span class="floating-panda-status-dot" title="NICE CXone Telephony Live"></span>
       <div class="floating-panda-tooltip">
-        <span>🐼</span> <strong>AI Copilot & AUX Assistant</strong>
+        <span>🐼</span> <strong>Ask Shankar & AUX Assistant</strong>
       </div>
     `;
 
@@ -51,7 +51,7 @@
             <img src="/favicon.svg?v=panda2" alt="Panda Logo" />
           </div>
           <div class="fp-header-title-box">
-            <span class="fp-header-title">ZEL AI Copilot & AUX Assistant</span>
+            <span class="fp-header-title">ZEL Ask Shankar & AUX Assistant</span>
             <span class="fp-header-subtitle">
               <span class="dot"></span> Connected to NICE CXone MAX CTI
             </span>
@@ -64,7 +64,7 @@
         </div>
       </div>
       <div class="floating-panda-panel-body">
-        <iframe id="floating-panda-iframe" class="floating-panda-iframe" src="/widget.html" title="Agent AI Copilot & AUX Assistant"></iframe>
+        <iframe id="floating-panda-iframe" class="floating-panda-iframe" src="/widget.html" title="Agent Ask Shankar & AUX Assistant"></iframe>
       </div>
     `;
 
@@ -122,7 +122,7 @@
       const top = Math.max(0, (window.screen.availHeight - height - 60));
       window.open(
         `/widget.html?agent=${activeAgent}`,
-        'ZEL_Copilot_Desktop_Widget',
+        'ZEL_Ask_Shankar_Desktop_Widget',
         `width=${width},height=${height},top=${top},left=${left},resizable=yes,scrollbars=yes,status=no,toolbar=no,menubar=no`
       );
       closePanel();

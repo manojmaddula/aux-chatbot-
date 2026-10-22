@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    NICE CXone ZEL Copilot & AUX Assistant - Native Windows Desktop Floating Widget & System Tray Companion
+    NICE CXone ZEL Ask Shankar & AUX Assistant - Native Windows Desktop Floating Widget & System Tray Companion
 .DESCRIPTION
     Creates a native, transparent, draggable floating Panda widget on the user's laptop screen,
     and installs a Panda System Tray icon into the Windows Taskbar Notification Area ("Toolbar Hidden Icons").
@@ -87,7 +87,7 @@ $initialTop = [Math]::Max(50, $screenBounds.Bottom - 110)
 $xaml = @"
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ZEL Panda Copilot"
+        Title="ZEL Ask Shankar"
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
@@ -98,7 +98,7 @@ $xaml = @"
         WindowStartupLocation="Manual"
         Left="$initialLeft"
         Top="$initialTop">
-    <Grid Margin="5" Cursor="Hand" ToolTip="🐼 ZEL Copilot&#x0a;• Left-click: Open Copilot&#x0a;• Drag: Move anywhere on screen&#x0a;• Right-click: Menu">
+    <Grid Margin="5" Cursor="Hand" ToolTip="🐼 ZEL Ask Shankar&#x0a;• Left-click: Open Ask Shankar&#x0a;• Drag: Move anywhere on screen&#x0a;• Right-click: Menu">
         <!-- Floating Circular Container with Outer Ring & Glow Shadow -->
         <Border x:Name="OuterBorder"
                 Width="68" Height="68"
@@ -179,7 +179,7 @@ $global:floatingWindow.Add_MouseLeftButtonDown({
     $endPos = [System.Windows.Forms.Cursor]::Position
     $dist = [Math]::Sqrt([Math]::Pow($endPos.X - $startPos.X, 2) + [Math]::Pow($endPos.Y - $startPos.Y, 2))
     
-    # If moved less than 6 pixels, it is a click! Open Copilot Companion Widget
+    # If moved less than 6 pixels, it is a click! Open Ask Shankar Companion Widget
     if ($dist -lt 6) {
         Open-AppWindow "http://localhost:4000/widget.html" 460 760
     }
@@ -189,7 +189,7 @@ $global:floatingWindow.Add_MouseLeftButtonDown({
 $widgetMenu = New-Object System.Windows.Controls.ContextMenu
 
 $wItemCopilot = New-Object System.Windows.Controls.MenuItem
-$wItemCopilot.Header = "💬 Open AI Copilot & ACW Assistant"
+$wItemCopilot.Header = "💬 Open Ask Shankar & ACW Assistant"
 $wItemCopilot.FontWeight = [System.Windows.FontWeights]::Bold
 $wItemCopilot.Add_Click({ Open-AppWindow "http://localhost:4000/widget.html" 460 760 })
 $widgetMenu.Items.Add($wItemCopilot) | Out-Null
@@ -216,7 +216,7 @@ $wItemHide.Header = "👁️ Hide to Taskbar Hidden Icons"
 $wItemHide.Add_Click({
     $global:floatingWindow.Hide()
     if ($global:notifyIcon) {
-        $global:notifyIcon.ShowBalloonTip(3000, "ZEL Panda Copilot", "Panda widget hidden. Click the Panda icon in taskbar hidden icons anytime to show it!", [System.Windows.Forms.ToolTipIcon]::Info)
+        $global:notifyIcon.ShowBalloonTip(3000, "ZEL Ask Shankar", "Panda widget hidden. Click the Panda icon in taskbar hidden icons anytime to show it!", [System.Windows.Forms.ToolTipIcon]::Info)
     }
 })
 $widgetMenu.Items.Add($wItemHide) | Out-Null
@@ -237,7 +237,7 @@ if (Test-Path $icoPath) {
 } else {
     $global:notifyIcon.Icon = [System.Drawing.SystemIcons]::Application
 }
-$global:notifyIcon.Text = "NICE CXone ZEL Copilot & AUX Assistant"
+$global:notifyIcon.Text = "NICE CXone ZEL Ask Shankar & AUX Assistant"
 $global:notifyIcon.Visible = $true
 
 # System Tray Right-Click Context Menu
@@ -256,7 +256,7 @@ $trayToggle.Add_Click({
 
 $trayMenu.Items.Add("-") | Out-Null
 
-$trayCopilot = $trayMenu.Items.Add("💬 Open AI Copilot & ACW Assistant")
+$trayCopilot = $trayMenu.Items.Add("💬 Open Ask Shankar & ACW Assistant")
 $trayCopilot.Add_Click({ Open-AppWindow "http://localhost:4000/widget.html" 460 760 })
 
 $trayHome = $trayMenu.Items.Add("🤖 Open Agent Bot Workstation")
@@ -304,7 +304,7 @@ $global:notifyIcon.Add_Click({
 
 # Show startup balloon notification in system tray
 try {
-    $global:notifyIcon.ShowBalloonTip(3000, "🐼 ZEL Copilot Active", "Floating Panda widget is active on your screen! Find it in toolbar hidden icons anytime.", [System.Windows.Forms.ToolTipIcon]::Info)
+    $global:notifyIcon.ShowBalloonTip(3000, "🐼 ZEL Ask Shankar Active", "Floating Panda widget is active on your screen! Find it in toolbar hidden icons anytime.", [System.Windows.Forms.ToolTipIcon]::Info)
 } catch {}
 
 # Show floating window on screen and start message pump

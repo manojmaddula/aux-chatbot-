@@ -3,7 +3,7 @@ title Stop NICE CXone ZEL Panda Desktop Widget
 cd /d "%~dp0"
 
 echo ======================================================================
-echo    Stopping NICE CXone ZEL Copilot Desktop Widget and Services
+echo    Stopping NICE CXone ZEL Ask Shankar Desktop Widget and Services
 echo ======================================================================
 
 :: 1. Terminate PowerShell desktop widget processes

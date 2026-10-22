@@ -1,4 +1,4 @@
-# ZEL: Autonomous WFM & AI Copilot Platform
+# ZEL: Autonomous WFM & Ask Shankar Platform
 ## System Architecture & Technical Specification
 
 > **Bot Name**: **ZEL**  
@@ -35,7 +35,7 @@ flowchart LR
 
 ### Traditional Process vs. ZEL Autonomous Experience
 
-| Feature | Legacy Contact Center | With ZEL Autonomous Copilot |
+| Feature | Legacy Contact Center | With ZEL Ask Shankar Platform |
 | :--- | :--- | :--- |
 | **Break Request** | Form submission or chat message | **1-Click in floating desktop widget** |
 | **Approval Latency** | **10–20 minutes** (Supervisor delay) | **<100 ms (Zero wait to leave)** |
@@ -65,7 +65,7 @@ flowchart TD
 
     subgraph Tier3["Tier 3: Analytical Core & Intelligence Engines"]
         C1["Autonomous Erlang-C Engine<br/>(Staffing Capacity & Imbalance Math)"]
-        C2["ZEL Supervisor Copilot Engine<br/>(Agent 360° Profiles & Deep Analytics)"]
+        C2["ZEL Supervisor Assistant Engine (Ask Shankar)<br/>(Agent 360° Profiles & Deep Analytics)"]
         C3["Speech Tone & Sentiment Model<br/>(Empathetic vs Rude Speech Detection)"]
         C4["Disaster IVR Auto-Deflection<br/>(1,000 Calls/Min Threshold)"]
     end
