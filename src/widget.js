@@ -337,7 +337,21 @@ tabBtns.forEach(btn => {
 const btnAgentHome = document.getElementById('btn-agent-home');
 if (btnAgentHome) {
   btnAgentHome.addEventListener('click', (e) => {
-    // Navigate to dedicated Agent Bot Home page
+    e.preventDefault();
+    if (window.self !== window.top) {
+      // Inside floating widget iframe
+      try {
+        if (window.parent && window.parent.location.pathname.includes('agent-home.html')) {
+          // Already on agent-home! Simply close the floating widget panel
+          window.parent.postMessage({ type: 'CLOSE_WIDGET' }, '*');
+          return;
+        } else if (window.parent) {
+          window.parent.location.href = '/agent-home.html';
+          return;
+        }
+      } catch (err) {}
+    }
+    // Standalone widget page navigation
     window.location.href = '/agent-home.html';
   });
 }
@@ -739,6 +753,14 @@ function switchWidgetAgent(agentKey) {
   if (latestRebalanceData) {
     handleWfmRebalanceUpdate(latestRebalanceData);
   }
+
+  // Sync active agent to localStorage and parent window
+  try {
+    localStorage.setItem('activeAgentId', agentKey);
+    if (window.self !== window.top && window.parent) {
+      window.parent.postMessage({ type: 'AGENT_CHANGED', agentId: agentKey }, '*');
+    }
+  } catch (err) {}
 }
 
 const btnAckTraining = document.getElementById('btn-ack-training');
@@ -754,6 +776,28 @@ if (widgetAgentSelect) {
     switchWidgetAgent(e.target.value);
   });
 }
+
+// Initialize active agent from URL params or localStorage
+try {
+  const urlParams = new URLSearchParams(window.location.search);
+  const requestedAgent = urlParams.get('agent') || localStorage.getItem('activeAgentId');
+  if (requestedAgent && AGENT_PROFILES[requestedAgent] && widgetAgentSelect) {
+    if (widgetAgentSelect.value !== requestedAgent) {
+      widgetAgentSelect.value = requestedAgent;
+      switchWidgetAgent(requestedAgent);
+    }
+  }
+} catch (err) {}
+
+// Listen for sync messages from parent window
+window.addEventListener('message', (e) => {
+  if (e.data && e.data.type === 'SYNC_AGENT' && e.data.agentId) {
+    if (widgetAgentSelect && widgetAgentSelect.value !== e.data.agentId && AGENT_PROFILES[e.data.agentId]) {
+      widgetAgentSelect.value = e.data.agentId;
+      switchWidgetAgent(e.data.agentId);
+    }
+  }
+});
 
 // Open Break Application Web Portal
 function openBreakPortal(extraParam = '') {

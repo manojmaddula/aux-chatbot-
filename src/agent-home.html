@@ -8,7 +8,9 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=panda2" />
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=panda2" />
   <link rel="shortcut icon" href="/favicon.ico?v=panda2" />
+  <link rel="manifest" href="/manifest.json" />
   <link rel="stylesheet" href="widget.css?v=2.2" />
+  <link rel="stylesheet" href="floating-widget.css?v=2.5" />
   <style>
     :root {
       --bg: #f8fafc;
@@ -260,7 +262,10 @@
         <option value="AGT-3310">Chloe Bennett (AGT-3310) • Customer Service</option>
         <option value="AGT-7703">Maya Patel (AGT-7703) • VIP Customer Care</option>
       </select>
-      
+      <button onclick="window.toggleFloatingWidget && window.toggleFloatingWidget()" class="btn-launch btn-launch-primary" style="padding: 6px 14px; font-size: 12px; gap: 6px; box-shadow: 0 2px 8px rgba(37,99,235,0.25);" title="Toggle Floating Panda Widget">
+        <img src="/favicon.svg?v=panda2" style="width:16px; height:16px;" />
+        <span>Panda Copilot</span>
+      </button>
     </div>
   </header>
 
@@ -322,9 +327,14 @@
             • <strong>Disposition Sync</strong>: Directly logs call results to NICE CXone
           </div>
         </div>
-        <a href="/widget.html" class="btn-launch btn-launch-primary">
-          <span>🚀</span> Open Agent AI Widget
-        </a>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button type="button" onclick="window.openFloatingWidget && window.openFloatingWidget()" class="btn-launch btn-launch-primary" style="flex:1; border:none;">
+            <img src="/favicon.svg?v=panda2" style="width:16px; height:16px;" /> Launch Floating Widget
+          </button>
+          <a href="/widget.html" class="btn-launch btn-launch-secondary" style="flex:1;" title="Open in dedicated tab">
+            <span>⤢</span> Full Tab
+          </a>
+        </div>
       </div>
 
       <!-- CARD 2: QA INTERACTION SCORECARD -->
@@ -413,7 +423,12 @@
       document.getElementById('agent-qa-csat').textContent = p.csat;
       document.getElementById('agent-qa-score').textContent = p.qa;
       localStorage.setItem('activeAgentId', id);
+      const iframe = document.getElementById('floating-panda-iframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({ type: 'SYNC_AGENT', agentId: id }, '*');
+      }
     }
+    window.updateAgentView = updateAgentView;
 
     if (agentSelect) {
       const saved = localStorage.getItem('activeAgentId') || 'AGT-8842';
@@ -439,5 +454,6 @@
         }
       }).catch(() => {});
   </script>
+  <script src="floating-widget.js?v=2.5"></script>
 </body>
 </html>
