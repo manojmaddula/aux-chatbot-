@@ -388,9 +388,11 @@ function showSupervisorToast(msg, isSuccess = true) {
       display: flex;
       align-items: center;
       gap: 12px;
+      pointer-events: none; /* NEVER BLOCK CLICKS */
     `;
     document.body.appendChild(toast);
   }
+  toast.style.display = 'flex';
   toast.style.borderLeftColor = isSuccess ? '#10b981' : '#ef4444';
   const icon = (msg.includes('Voice') || msg.includes('Recall') || msg.includes('Bot')) ? '📞' : '🚨';
   toast.innerHTML = `<div style="font-size:26px;">${icon}</div><div><strong style="display:block; font-size:12px; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px;">Floor Adherence Action</strong><div style="font-weight:600;">${msg}</div></div>`;
@@ -401,7 +403,8 @@ function showSupervisorToast(msg, isSuccess = true) {
   window._toastTimer = setTimeout(() => {
     toast.style.opacity = '0';
     toast.style.transform = 'translateY(-10px)';
-  }, 4500);
+    setTimeout(() => { if (toast) toast.style.display = 'none'; }, 350);
+  }, 4000);
 }
 
 window.ringAgentAlarm = async function(agentId, agentName) {
@@ -487,18 +490,6 @@ window.recallAgent = async function(agentId, agentName) {
           agentId: agentId,
           agentName: agentName,
           device: effectiveDev,
-          force: true,
-          message: customMessage
-        }
-      });
-      bc.postMessage({
-        type: 'TRIGGER_ALARM',
-        payload: {
-          agentId: agentId,
-          agentName: agentName,
-          device: effectiveDev,
-          soundStyle: 'voice',
-          triggeredBy: 'SUPERVISOR_RECALL',
           force: true,
           message: customMessage
         }

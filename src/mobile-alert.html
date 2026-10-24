@@ -1064,7 +1064,13 @@
     }
 
     // SHOW INCOMING CALL MODAL
+    let lastAlarmScreenTrigger = 0;
     function triggerIncomingCallScreen(alarmData = {}) {
+      const nowTs = Date.now();
+      if (nowTs - lastAlarmScreenTrigger < 1000 && isAlarmActive) {
+        return; // Debounce duplicate triggers within 1s
+      }
+      lastAlarmScreenTrigger = nowTs;
       const isSupervisor = alarmData && (
         alarmData.triggeredBy === 'SUPERVISOR_WALLBOARD' ||
         alarmData.triggeredBy === 'SUPERVISOR_RECALL' ||
@@ -1105,8 +1111,9 @@
     }
 
     // DISMISS / ACKNOWLEDGE
-    async function acknowledgeAlarm() {
+    async function acknowledgeAlarm(fromRemote = false) {
       isAlarmActive = false;
+      isSilenced = false;
       stopAlarmSound();
       callOverlay.classList.add('hidden');
 
@@ -1114,6 +1121,9 @@
       localStorage.removeItem('wfm_active_break');
       activeBreak = null;
       renderBreakUI();
+
+      // If triggered by remote event (SSE / BroadcastChannel), NEVER ECHO BACK to prevent infinite loops!
+      if (fromRemote) return;
 
       // Send to server
       try {
@@ -1305,13 +1315,7 @@
           localStorage.setItem('wfm_active_break', JSON.stringify(data.payload));
           renderBreakUI();
         } else if (data.type === 'ALARM_ACKNOWLEDGED' || data.type === 'BREAK_ENDED') {
-          isSilenced = false;
-          activeBreak = null;
-          localStorage.removeItem('wfm_active_break');
-          stopAlarmSound();
-          callOverlay.classList.add('hidden');
-          isAlarmActive = false;
-          renderBreakUI();
+          acknowledgeAlarm(true);
         } else if (data.type === 'TRIGGER_ALARM') {
           const isSup = data.payload && (data.payload.triggeredBy === 'SUPERVISOR_WALLBOARD' || data.payload.triggeredBy === 'SUPERVISOR_RECALL' || data.payload.force);
           if (!data.payload || data.payload.agentId === currentAgentId || isSup) {
@@ -1367,7 +1371,7 @@
           try {
             const data = JSON.parse(e.data);
             if (data.agentId === currentAgentId) {
-              acknowledgeAlarm();
+              acknowledgeAlarm(true);
             }
           } catch (err) {}
         });

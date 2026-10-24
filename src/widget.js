@@ -380,7 +380,7 @@ try {
     } else if (data.type === 'ALARM_ACKNOWLEDGED' || data.type === 'BREAK_ENDED') {
       // Alarm acknowledged / break ended on mobile companion or supervisor desk
       if (!data.payload || !data.payload.agentId || data.payload.agentId === agentState.id) {
-        endBreakEarly();
+        endBreakEarly(true);
         addSupervisorLog('ALARM_ACKNOWLEDGED', `Break ended & acknowledged via ${data.payload.from || 'Mobile'}. Resumed AVAILABLE state.`);
         showNotification('Break Resumed', 'Resumed AVAILABLE state in NICE CXone.');
       }
@@ -1310,7 +1310,15 @@ async function dispatchMobileThresholdAlarm(overMins = 1, overSecs = 0) {
   } catch (e) {}
 }
 
+let lastBotCallTriggerTime = 0;
 function triggerBotCallModal(overMins = 1, overSecs = 0, customMsg = '', force = false) {
+  // Debounce duplicate triggers within 1.2s to prevent double modal/audio queue
+  const nowTs = Date.now();
+  if (nowTs - lastBotCallTriggerTime < 1200 && botCallTriggered) {
+    return;
+  }
+  lastBotCallTriggerTime = nowTs;
+
   // STRICT DEVICE GUARD: If target device is Mobile Only, never show modal or ring on laptop unless forced
   if (!force && agentAlertPrefs.device === 'mobile') {
     console.log('[Widget] Alert routed to Mobile Only. Suppressing laptop modal.');
@@ -1327,55 +1335,64 @@ function triggerBotCallModal(overMins = 1, overSecs = 0, customMsg = '', force =
   startPhoneRingtone(agentAlertPrefs.soundStyle || 'phone_ring', force);
   addSupervisorLog('OVERDUE_CALL', `Automated bot voice call placed to agent for adherence violation.`);
 
+  // Cancel any pending speech synthesis timeouts cleanly
+  if (window._botSpeechTimeout) {
+    clearTimeout(window._botSpeechTimeout);
+    window._botSpeechTimeout = null;
+  }
+
   if ('speechSynthesis' in window && agentAlertPrefs.soundStyle !== 'siren') {
-    window.speechSynthesis.cancel();
-    setTimeout(() => {
-      stopPhoneRingtone();
-      const utterance = new SpeechSynthesisUtterance(speechMessage);
-      utterance.rate = 1.0;
-      utterance.pitch = 1.0;
-      window.speechSynthesis.speak(utterance);
+    try {
+      window.speechSynthesis.cancel();
+    } catch (e) {}
+    window._botSpeechTimeout = setTimeout(() => {
+      try {
+        stopPhoneRingtone();
+        const utterance = new SpeechSynthesisUtterance(speechMessage);
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        utterance.onerror = (err) => console.warn('[Widget] Speech error:', err);
+        utterance.onend = () => {};
+        window.speechSynthesis.speak(utterance);
+      } catch (err) {
+        console.warn('[Widget] Speech speak failed:', err);
+      }
     }, 1800);
   }
 }
 
-document.getElementById('btn-accept-bot-call')?.addEventListener('click', async () => {
-  stopPhoneRingtone();
-  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-  document.getElementById('bot-call-overlay')?.classList.add('hidden');
-  endBreakEarly();
+document.getElementById('btn-accept-bot-call')?.addEventListener('click', () => {
+  endBreakEarly(false);
   addSupervisorLog('RESUMED', 'Agent acknowledged bot call and resumed AVAILABLE state in NICE CXone.');
+});
 
-  // Notify server & mobile companion
-  try {
-    await fetch('/api/alerts/acknowledge', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        agentId: agentState.id || 'AGT-8842',
-        acknowledgedBy: 'AGENT_LAPTOP',
-        deviceSource: 'LAPTOP_WIDGET'
-      })
-    });
-  } catch (e) {}
-
-  try {
-    const bc = new BroadcastChannel('wfm_aux_channel');
-    bc.postMessage({
-      type: 'ALARM_ACKNOWLEDGED',
-      payload: { agentId: agentState.id || 'AGT-8842', from: 'laptop' }
-    });
-  } catch (e) {}
+document.getElementById('btn-close-bot-call')?.addEventListener('click', () => {
+  stopPhoneRingtone();
+  if (window._botSpeechTimeout) {
+    clearTimeout(window._botSpeechTimeout);
+    window._botSpeechTimeout = null;
+  }
+  if ('speechSynthesis' in window) {
+    try { window.speechSynthesis.cancel(); } catch (e) {}
+  }
+  const botOverlay = document.getElementById('bot-call-overlay');
+  if (botOverlay) botOverlay.classList.add('hidden');
 });
 
 btnEndBreak.addEventListener('click', () => {
-  endBreakEarly();
+  endBreakEarly(false);
 });
 
-function endBreakEarly() {
+function endBreakEarly(fromRemote = false) {
   try {
     stopPhoneRingtone();
-    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    if (window._botSpeechTimeout) {
+      clearTimeout(window._botSpeechTimeout);
+      window._botSpeechTimeout = null;
+    }
+    if ('speechSynthesis' in window) {
+      try { window.speechSynthesis.cancel(); } catch (e) {}
+    }
 
     // Hide any modal overlays completely so screen is NEVER stuck
     const botOverlay = document.getElementById('bot-call-overlay');
@@ -1428,6 +1445,9 @@ function endBreakEarly() {
     } catch (err) {}
 
     try { playTone(440, 'sine', 0.15); } catch (e) {}
+
+    // If triggered from remote SSE or BroadcastChannel, DO NOT RE-BROADCAST to avoid infinite ping-pong loop!
+    if (fromRemote) return;
 
     // Broadcast break ended to mobile companion and sync server
     try {
@@ -2319,7 +2339,7 @@ function initWidgetAlertSSE() {
       try {
         const ack = JSON.parse(e.data);
         if (!ack.agentId || ack.agentId === agentState.id) {
-          endBreakEarly();
+          endBreakEarly(true);
         }
       } catch (err) {}
     });

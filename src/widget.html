@@ -510,7 +510,8 @@
 
     <!-- INTERACTIVE INCOMING BOT CALL OVERLAY (WHEN BREAK EXCEEDED) -->
     <div id="bot-call-overlay" class="bot-call-overlay hidden">
-      <div class="call-dialog">
+      <div class="call-dialog" style="position:relative;">
+        <button id="btn-close-bot-call" style="position:absolute; top:12px; right:14px; background:transparent; border:none; color:#94a3b8; font-size:22px; line-height:1; cursor:pointer;" title="Dismiss">&times;</button>
         <div class="call-pulse-animation">
           <div class="call-icon-holder">📞</div>
         </div>
