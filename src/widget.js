@@ -1420,6 +1420,31 @@ function endBreakEarly() {
     } catch (err) {}
 
     try { playTone(440, 'sine', 0.15); } catch (e) {}
+
+    // Broadcast break ended to mobile companion and sync server
+    try {
+      fetch('/api/alerts/acknowledge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          agentId: agentState.id || 'AGT-8842',
+          acknowledgedBy: 'AGENT_LAPTOP',
+          deviceSource: 'LAPTOP_WORKSTATION'
+        })
+      }).catch(() => {});
+    } catch (e) {}
+
+    try {
+      const bc = new BroadcastChannel('wfm_aux_channel');
+      bc.postMessage({
+        type: 'ALARM_ACKNOWLEDGED',
+        payload: { agentId: agentState.id || 'AGT-8842', from: 'laptop' }
+      });
+      bc.postMessage({
+        type: 'BREAK_ENDED',
+        payload: { agentId: agentState.id || 'AGT-8842' }
+      });
+    } catch (e) {}
   } catch (err) {
     console.error('[Widget] Error in endBreakEarly:', err);
   }
