@@ -335,8 +335,8 @@ function renderWallboard() {
             <button class="btn btn-sm btn-outline" onclick="recallAgent('${ag.id}', '${ag.name}')" title="Place Automated Bot Voice Call">
               📞 Bot Recall
             </button>
-            <button class="btn btn-sm btn-outline" style="border-color:#ef4444; color:#ef4444;" onclick="ringAgentAlarm('${ag.id}', '${ag.name}')" title="Trigger Automated Calling Alarm to Laptop &amp; Mobile">
-              🚨 Ring Device
+            <button class="btn btn-sm btn-outline" style="border-color:#ef4444; color:#ef4444;" onclick="ringAgentAlarm('${ag.id}', '${ag.name}')" title="Trigger Calling Alarm &amp; Vibration to Mobile Phone Only">
+              📱 Ring Mobile
             </button>
           </div>
         </td>
@@ -409,9 +409,11 @@ function showSupervisorToast(msg, isSuccess = true) {
 
 window.ringAgentAlarm = async function(agentId, agentName) {
   const ag = activeAgents.find(a => a.id === agentId) || {};
-  const targetDevice = ag.alertDevice || 'both';
   const threshold = ag.thresholdMins !== undefined ? ag.thresholdMins : 2;
   const customMessage = `Supervisor ${currentSupervisor.name} issued an urgent floor adherence alert. Your break threshold has been exceeded. Please return to your workstation immediately.`;
+
+  // Explicitly route to Mobile Only (leaving laptop silent) as requested
+  const targetDevice = 'mobile';
 
   let alarmData = null;
   try {
@@ -421,7 +423,7 @@ window.ringAgentAlarm = async function(agentId, agentName) {
       body: JSON.stringify({
         agentId: agentId,
         agentName: agentName,
-        device: targetDevice,
+        device: targetDevice, // Mobile Only
         thresholdMins: threshold,
         triggeredBy: 'SUPERVISOR_WALLBOARD',
         soundStyle: 'phone_ring',
@@ -434,8 +436,6 @@ window.ringAgentAlarm = async function(agentId, agentName) {
     console.warn('Backend trigger failed:', err);
   }
 
-  const effectiveDev = (alarmData && alarmData.alarm && alarmData.alarm.device) ? alarmData.alarm.device : targetDevice;
-
   if (bc) {
     try {
       bc.postMessage({
@@ -443,7 +443,7 @@ window.ringAgentAlarm = async function(agentId, agentName) {
         payload: {
           agentId: agentId,
           agentName: agentName,
-          device: effectiveDev,
+          device: targetDevice, // Mobile Only
           triggeredBy: 'SUPERVISOR_WALLBOARD',
           force: true,
           message: customMessage
@@ -452,7 +452,7 @@ window.ringAgentAlarm = async function(agentId, agentName) {
     } catch (e) {}
   }
 
-  showSupervisorToast(`Calling & Alarm dispatched to ${agentName} (${agentId})! Target: [${effectiveDev.toUpperCase()}]. Workstation & phone ringing now.`);
+  showSupervisorToast(`Remote Ring dispatched to ${agentName} (${agentId})! Target: [MOBILE ONLY]. Laptop remains silent.`);
 };
 
 window.recallAgent = async function(agentId, agentName) {
