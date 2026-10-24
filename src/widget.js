@@ -2461,3 +2461,18 @@ window.addEventListener('storage', (e) => {
     });
   }
 })();
+
+// Auto activate all-screen when iframe or window is wide (>= 600px)
+function checkAutoAllScreen() {
+  if (window.innerWidth >= 600) {
+    document.body.classList.add('all-screen');
+    const c = document.querySelector('.widget-container');
+    if (c) c.classList.add('all-screen');
+  } else {
+    document.body.classList.remove('all-screen');
+    const c = document.querySelector('.widget-container');
+    if (c) c.classList.remove('all-screen');
+  }
+}
+window.addEventListener('resize', checkAutoAllScreen);
+setTimeout(checkAutoAllScreen, 100);

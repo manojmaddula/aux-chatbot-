@@ -58,8 +58,7 @@
           </div>
         </div>
         <div class="fp-header-actions">
-          <button id="fp-btn-popout" class="fp-action-btn" title="Open in standalone desktop window">↗</button>
-          <button id="fp-btn-expand" class="fp-action-btn" title="Toggle wider view">🗖</button>
+          <button id="fp-btn-expand" class="fp-action-btn" title="Toggle full screen view">🗖</button>
           <button id="fp-btn-close" class="fp-action-btn btn-close" title="Close panel">✕</button>
         </div>
       </div>
@@ -84,10 +83,13 @@
     let isExpanded = false;
 
     // Toggle panel visibility
-    function openPanel() {
+    function openPanel(full = false) {
       isOpen = true;
       panel.classList.add('open');
       launcher.classList.add('panel-open');
+      if (full) {
+        setFullScreen(true);
+      }
       syncAgentToIframe();
     }
 
@@ -105,17 +107,29 @@
       }
     }
 
-    function toggleExpand() {
-      isExpanded = !isExpanded;
+    function setFullScreen(full) {
+      isExpanded = full;
       if (isExpanded) {
-        panel.classList.add('expanded');
+        panel.classList.add('fullscreen');
+        panel.classList.remove('expanded');
         btnExpand.textContent = '🗗';
-        btnExpand.title = 'Restore standard size';
+        btnExpand.title = 'Restore compact view';
+        if (iframe && iframe.contentWindow) {
+          iframe.contentWindow.postMessage({ type: 'SET_ALL_SCREEN', enable: true }, '*');
+        }
       } else {
+        panel.classList.remove('fullscreen');
         panel.classList.remove('expanded');
         btnExpand.textContent = '🗖';
-        btnExpand.title = 'Toggle wider view';
+        btnExpand.title = 'Toggle full screen view';
+        if (iframe && iframe.contentWindow) {
+          iframe.contentWindow.postMessage({ type: 'SET_ALL_SCREEN', enable: false }, '*');
+        }
       }
+    }
+
+    function toggleExpand() {
+      setFullScreen(!isExpanded);
     }
 
     function popoutWindow() {
@@ -277,7 +291,12 @@
     });
 
     // Expose Global API
-    window.openFloatingWidget = openPanel;
+    window.openFloatingWidget = function (full = false) {
+    if (typeof openPanel === 'function') openPanel(full);
+  };
+  window.openFullApp = function () {
+    if (typeof openPanel === 'function') openPanel(true);
+  };
     window.closeFloatingWidget = closePanel;
     window.toggleFloatingWidget = togglePanel;
     window.popoutFloatingWidget = popoutWindow;

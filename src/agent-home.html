@@ -128,6 +128,7 @@
       color: #0f172a;
     }
     .cards-grid {
+      display: grid !important;
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 20px;
@@ -553,9 +554,9 @@
           </div>
         </div>
         <div style="display:flex; flex-direction:column; gap:8px;">
-          <a href="/widget.html?mode=full" target="_blank" class="btn-launch btn-launch-primary" style="text-decoration:none; border:none; cursor:pointer; width:100%; display:inline-flex; align-items:center; justify-content:center; gap:8px; box-sizing:border-box;">
-            <span>🖥️</span> Open in Full Tab (All Screen)
-          </a>
+          <button type="button" onclick="if(window.openFullApp) window.openFullApp(); else if(window.openFloatingWidget) window.openFloatingWidget(true);" class="btn-launch btn-launch-primary" style="border:none; cursor:pointer; width:100%; display:inline-flex; align-items:center; justify-content:center; gap:8px;">
+            <span>🖥️</span> Open App Full Screen
+          </button>
           <button type="button" onclick="if(window.openFloatingWidget) window.openFloatingWidget(); else window.open('/widget.html', 'ZELWidget', 'width=460,height=780');" class="btn-launch btn-launch-secondary" style="border:1px solid #cbd5e1; cursor:pointer; width:100%; display:inline-flex; align-items:center; justify-content:center; gap:6px; background:#ffffff;">
             <img src="/favicon.svg?v=panda2" style="width:16px; height:16px;" /> Launch Floating Widget
           </button>
