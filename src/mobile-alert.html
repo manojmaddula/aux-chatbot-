@@ -652,6 +652,26 @@
       padding: 20px;
       animation: fadeIn 0.25s ease;
     }
+    /* Universal Hidden Display Overrides */
+    .hidden, [hidden] {
+      display: none !important;
+    }
+    .emergency-confirmed-box.hidden,
+    .emergency-confirmed-box[hidden] {
+      display: none !important;
+    }
+    .emergency-btn-row.hidden,
+    .emergency-btn-row[hidden] {
+      display: none !important;
+    }
+    .emergency-confirmed-box {
+      text-align: center;
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 16px;
+      animation: scaleUp 0.2s ease;
+    }
     .emergency-mobile-overlay.hidden {
       display: none !important;
     }
@@ -1035,8 +1055,8 @@
         There is an emergency situation. High call volume surge detected and your availability is requested to balance the queue. If you are available please join, or select NO.
       </p>
 
-      <!-- Action Choice Buttons -->
-      <div id="emergency-action-buttons" class="emergency-btn-row">
+      <!-- Action Choice Buttons (Shown initially until agent responds) -->
+      <div id="emergency-action-buttons" class="emergency-btn-row" style="display: flex;">
         <button type="button" id="btn-emergency-yes" class="btn-emergency-accept">
           <span>✅</span> YES, I Can Join
         </button>
@@ -1045,8 +1065,8 @@
         </button>
       </div>
 
-      <!-- Post-response Confirmed Screen (If YES) -->
-      <div id="emergency-confirmed-yes" class="emergency-confirmed-box hidden">
+      <!-- Post-response Confirmed Screen (ONLY shown if YES) -->
+      <div id="emergency-confirmed-yes" class="emergency-confirmed-box hidden" hidden style="display: none !important;">
         <div style="font-size:36px; margin-bottom:6px;">🎉</div>
         <h3 style="color:#34d399; font-size:17px; font-weight:800; margin-bottom:4px;">Availability Confirmed!</h3>
         <p style="font-size:12px; color:#cbd5e1; margin-bottom:12px;">Your acceptance has been transmitted to the floor supervisor. Your assigned shift timings:</p>
@@ -1080,7 +1100,7 @@
       </div>
 
       <!-- Post-response Declined Screen (If NO) -->
-      <div id="emergency-confirmed-no" class="emergency-confirmed-box hidden">
+      <div id="emergency-confirmed-no" class="emergency-confirmed-box hidden" hidden style="display: none !important;">
         <div style="font-size:32px; margin-bottom:6px;">ℹ️</div>
         <h3 style="color:#f87171; font-size:16px; font-weight:800; margin-bottom:4px;">Response Logged: Unavailable</h3>
         <p style="font-size:12px; color:#cbd5e1; margin-bottom:14px;">
@@ -1736,6 +1756,29 @@
 
     let activeEmergencyCampaign = null;
 
+    function setEmergencyModalState(mode, shift, queue) {
+      if (mode === 'YES') {
+        if (emActions) { emActions.classList.add('hidden'); emActions.style.setProperty('display', 'none', 'important'); emActions.hidden = true; }
+        if (emConfNo) { emConfNo.classList.add('hidden'); emConfNo.style.setProperty('display', 'none', 'important'); emConfNo.hidden = true; }
+        if (emConfYes) { emConfYes.classList.remove('hidden'); emConfYes.style.setProperty('display', 'block', 'important'); emConfYes.hidden = false; }
+        if (confShiftTimings) confShiftTimings.textContent = shift || '15:30 - 18:30 (Surge Window)';
+        if (confShiftQueue) confShiftQueue.textContent = queue || 'Emergency Inbound & Tier-2';
+      } else if (mode === 'NO') {
+        if (emActions) { emActions.classList.add('hidden'); emActions.style.setProperty('display', 'none', 'important'); emActions.hidden = true; }
+        if (emConfYes) { emConfYes.classList.add('hidden'); emConfYes.style.setProperty('display', 'none', 'important'); emConfYes.hidden = true; }
+        if (emConfNo) { emConfNo.classList.remove('hidden'); emConfNo.style.setProperty('display', 'block', 'important'); emConfNo.hidden = false; }
+      } else {
+        // PENDING / INITIAL PROMPT: STRICTLY SHOW YES/NO BUTTONS ONLY!
+        // BOTH POST-RESPONSE CONFIRMATION SCREENS MUST REMAIN COMPLETELY HIDDEN!
+        if (emActions) { emActions.classList.remove('hidden'); emActions.style.setProperty('display', 'flex', 'important'); emActions.hidden = false; }
+        if (emConfYes) { emConfYes.classList.add('hidden'); emConfYes.style.setProperty('display', 'none', 'important'); emConfYes.hidden = true; }
+        if (emConfNo) { emConfNo.classList.add('hidden'); emConfNo.style.setProperty('display', 'none', 'important'); emConfNo.hidden = true; }
+      }
+    }
+    // Initialize immediately to pending (hidden confirmed boxes)
+    setEmergencyModalState('PENDING');
+
+
     function checkAndShowEmergencyRecall(campaign) {
       if (!campaign || !campaign.active) {
         if (emOverlay) emOverlay.classList.add('hidden');
@@ -1754,21 +1797,13 @@
       if (emQueue) emQueue.textContent = campaign.queueTarget || 'Emergency Inbound & Tier-2 Support';
       if (emShift) emShift.textContent = campaign.shiftTimings || '15:30 - 18:30 (Surge Shift • 3 hrs)';
 
-      // Check current agent response state
+      // Check current agent response state via strict state switcher
       if (targetAgent && targetAgent.response === 'YES') {
-        if (emActions) emActions.classList.add('hidden');
-        if (emConfNo) emConfNo.classList.add('hidden');
-        if (emConfYes) emConfYes.classList.remove('hidden');
-        if (confShiftTimings) confShiftTimings.textContent = targetAgent.shiftTimings || campaign.shiftTimings;
-        if (confShiftQueue) confShiftQueue.textContent = targetAgent.queueTarget || campaign.queueTarget;
+        setEmergencyModalState('YES', targetAgent.shiftTimings || campaign.shiftTimings, targetAgent.queueTarget || campaign.queueTarget);
       } else if (targetAgent && targetAgent.response === 'NO') {
-        if (emActions) emActions.classList.add('hidden');
-        if (emConfYes) emConfYes.classList.add('hidden');
-        if (emConfNo) emConfNo.classList.remove('hidden');
+        setEmergencyModalState('NO');
       } else {
-        if (emActions) emActions.classList.remove('hidden');
-        if (emConfYes) emConfYes.classList.add('hidden');
-        if (emConfNo) emConfNo.classList.add('hidden');
+        setEmergencyModalState('PENDING');
       }
 
       if (emOverlay) emOverlay.classList.remove('hidden');
@@ -1798,15 +1833,9 @@
         const data = await res.json();
         if (data.success) {
           if (choice === 'YES') {
-            if (emActions) emActions.classList.add('hidden');
-            if (emConfNo) emConfNo.classList.add('hidden');
-            if (emConfYes) emConfYes.classList.remove('hidden');
-            if (confShiftTimings) confShiftTimings.textContent = data.shiftTimings || '15:30 - 18:30 (Surge Shift • 3 hrs)';
-            if (confShiftQueue) confShiftQueue.textContent = data.queueTarget || 'Emergency Inbound & Tier-2';
+            setEmergencyModalState('YES', data.shiftTimings || '15:30 - 18:30 (Surge Shift • 3 hrs)', data.queueTarget || 'Emergency Inbound & Tier-2');
           } else {
-            if (emActions) emActions.classList.add('hidden');
-            if (emConfYes) emConfYes.classList.add('hidden');
-            if (emConfNo) emConfNo.classList.remove('hidden');
+            setEmergencyModalState('NO');
           }
         }
       } catch (e) {
