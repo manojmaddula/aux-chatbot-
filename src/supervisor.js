@@ -304,9 +304,18 @@ function renderWallboard() {
         <td>${ag.teaCount} / ${policyLimits.maxTeaBreaks}</td>
         <td>${ag.lunchVar}</td>
         <td>
+          <span style="display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; color:#1e293b; background:#f8fafc; padding:3px 8px; border-radius:6px; border:1px solid #cbd5e1;">
+            ${(ag.alertDevice || (ag.id === 'AGT-4491' ? 'mobile' : 'both')) === 'both' ? '💻+📱 Both' : ((ag.alertDevice || (ag.id === 'AGT-4491' ? 'mobile' : 'both')) === 'mobile' ? '📱 Mobile' : '💻 Laptop')}
+            <span style="color:#d97706;">(+${ag.thresholdMins || 2}m)</span>
+          </span>
+        </td>
+        <td>
           <div style="display:flex; gap:6px;">
             <button class="btn btn-sm btn-outline" onclick="recallAgent('${ag.id}', '${ag.name}')" title="Place Automated Bot Voice Call">
               📞 Bot Recall
+            </button>
+            <button class="btn btn-sm btn-outline" style="border-color:#ef4444; color:#ef4444;" onclick="ringAgentAlarm('${ag.id}', '${ag.name}')" title="Trigger Automated Calling Alarm to Laptop &amp; Mobile">
+              🚨 Ring Device
             </button>
           </div>
         </td>
@@ -333,6 +342,39 @@ function updateAgentState(agentId, newState, breakLeft = '-') {
     renderWallboard();
   }
 }
+
+
+window.ringAgentAlarm = async function(agentId, agentName) {
+  try {
+    const res = await fetch('/api/alerts/trigger-alarm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        agentId: agentId,
+        agentName: agentName,
+        triggeredBy: 'SUPERVISOR_WALLBOARD',
+        message: `Supervisor ${currentSupervisor.name} issued an urgent floor adherence alert. Your break threshold has been exceeded. Please return to your workstation immediately.`
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      alert(`🚨 Alarm & Calling Dispatched to ${agentName} (${agentId})!\nTarget Device: [${(data.alarm.device || 'BOTH').toUpperCase()}].\nRinging and vibrating their device now.`);
+    }
+  } catch (err) {
+    alert(`Dispatched alarm to ${agentName}.`);
+  }
+
+  if (bc) {
+    bc.postMessage({
+      type: 'TRIGGER_ALARM',
+      payload: {
+        agentId: agentId,
+        agentName: agentName,
+        message: `Supervisor ${currentSupervisor.name} issued an immediate workstation recall.`
+      }
+    });
+  }
+};
 
 window.recallAgent = function(agentId, agentName) {
   const customMessage = `Attention Agent ${agentName}: Supervisor Sarah Jenkins has issued an immediate workstation recall. Please return to your desk and switch to Available status.`;

@@ -273,6 +273,16 @@ let twoMinuteWarningTriggered = false;
 let botCallTriggered = false;
 let ringAudioContext = null;
 let ringOscillator = null;
+let ringLoopInterval = null;
+let ringSirenInterval = null;
+
+// Break Overdue Calling & Device Alert Preferences
+let agentAlertPrefs = {
+  device: 'both', // 'laptop' | 'mobile' | 'both'
+  thresholdMins: 2, // Variance threshold over break applied duration
+  soundStyle: 'phone_ring', // 'phone_ring' | 'siren' | 'voice'
+  mobilePhone: '+1 (555) 019-8842'
+};
 
 // ACW State
 let acwInterval = null;
@@ -367,6 +377,21 @@ try {
     } else if (data.type === 'BREAK_REJECTED') {
       addSupervisorLog('REJECTED', `${data.payload.auxCode} rejected: ${data.payload.reason}`);
       showNotification('AUX Break Rejected', data.payload.reason);
+    } else if (data.type === 'ALARM_ACKNOWLEDGED') {
+      // Alarm acknowledged on mobile companion or supervisor desk
+      if (!data.payload || !data.payload.agentId || data.payload.agentId === agentState.id) {
+        stopPhoneRingtone();
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        const overlay = document.getElementById('bot-call-overlay');
+        if (overlay) overlay.classList.add('hidden');
+        endBreakEarly();
+        addSupervisorLog('ALARM_ACKNOWLEDGED', `Break alarm acknowledged via ${data.payload.from || 'Mobile Companion'}. Resumed AVAILABLE state.`);
+        showNotification('Break Resumed', 'Alarm acknowledged and silenced on Mobile. Resumed AVAILABLE state in NICE CXone.');
+      }
+    } else if (data.type === 'TRIGGER_ALARM') {
+      if (!data.payload || !data.payload.agentId || data.payload.agentId === agentState.id) {
+        triggerBotCallModal(data.payload.overdueMins || 1, data.payload.overdueSecs || 0, data.payload.message);
+      }
     } else if (data.type === 'SUPERVISOR_RECALL') {
       triggerBotCallModal(1, 0, data.payload.message);
       addSupervisorLog('RECALL', `Supervisor Sarah Jenkins dispatched a bot voice recall to workstation.`);
@@ -839,29 +864,91 @@ function playWarningChime() {
   setTimeout(() => playTone(880, 'triangle', 0.4), 220);
 }
 
-function startPhoneRingtone() {
+function startPhoneRingtone(soundType = (agentAlertPrefs.soundStyle || 'phone_ring')) {
+  stopPhoneRingtone();
   try {
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     ringAudioContext = new AudioCtx();
-    ringOscillator = ringAudioContext.createOscillator();
-    const gain = ringAudioContext.createGain();
-    
-    ringOscillator.type = 'sawtooth';
-    ringOscillator.frequency.setValueAtTime(440, ringAudioContext.currentTime);
-    gain.gain.setValueAtTime(0.15, ringAudioContext.currentTime);
-    ringOscillator.connect(gain);
-    gain.connect(ringAudioContext.destination);
-    ringOscillator.start();
-  } catch (e) {}
+
+    if (soundType === 'siren') {
+      // Sweeping emergency floor siren (600Hz -> 1200Hz)
+      ringOscillator = ringAudioContext.createOscillator();
+      const gain = ringAudioContext.createGain();
+      ringOscillator.type = 'sawtooth';
+      gain.gain.setValueAtTime(0.2, ringAudioContext.currentTime);
+      ringOscillator.connect(gain);
+      gain.connect(ringAudioContext.destination);
+
+      let freq = 600;
+      let dir = 1;
+      ringSirenInterval = setInterval(() => {
+        freq += dir * 45;
+        if (freq >= 1200) dir = -1;
+        if (freq <= 550) dir = 1;
+        if (ringOscillator && ringAudioContext) {
+          ringOscillator.frequency.setValueAtTime(freq, ringAudioContext.currentTime);
+        }
+      }, 40);
+      ringOscillator.start();
+    } else {
+      // Dual-tone realistic contact center phone ring (440Hz + 480Hz) with 1.4s ring, 1.6s pause
+      const playPhoneCadence = () => {
+        if (!ringAudioContext) return;
+        try {
+          const now = ringAudioContext.currentTime;
+          const osc1 = ringAudioContext.createOscillator();
+          const osc2 = ringAudioContext.createOscillator();
+          const gain = ringAudioContext.createGain();
+
+          osc1.type = 'sine';
+          osc2.type = 'sine';
+          osc1.frequency.setValueAtTime(440, now);
+          osc2.frequency.setValueAtTime(480, now);
+
+          gain.gain.setValueAtTime(0.22, now);
+          gain.gain.setValueAtTime(0.22, now + 1.35);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 1.45);
+
+          osc1.connect(gain);
+          osc2.connect(gain);
+          gain.connect(ringAudioContext.destination);
+
+          osc1.start(now);
+          osc2.start(now);
+          osc1.stop(now + 1.45);
+          osc2.stop(now + 1.45);
+        } catch (e) {}
+      };
+
+      playPhoneCadence();
+      ringLoopInterval = setInterval(playPhoneCadence, 3000);
+    }
+  } catch (e) {
+    console.warn('Audio ringtone error:', e);
+  }
 }
 
 function stopPhoneRingtone() {
+  if (ringLoopInterval) {
+    clearInterval(ringLoopInterval);
+    ringLoopInterval = null;
+  }
+  if (ringSirenInterval) {
+    clearInterval(ringSirenInterval);
+    ringSirenInterval = null;
+  }
   if (ringOscillator) {
     try {
       ringOscillator.stop();
       ringOscillator.disconnect();
     } catch (e) {}
     ringOscillator = null;
+  }
+  if (ringAudioContext) {
+    try {
+      ringAudioContext.close();
+    } catch (e) {}
+    ringAudioContext = null;
   }
 }
 
@@ -1077,9 +1164,14 @@ function updateBreakCountdown() {
   const seconds = Math.floor((absDiff % (1000 * 60)) / 1000);
   const formatted = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
+  const thresholdMins = agentAlertPrefs.thresholdMins !== undefined ? agentAlertPrefs.thresholdMins : 2;
+  const thresholdMs = thresholdMins * 60 * 1000;
+  const overdueMs = now - agentState.activeBreak.expiresAt;
+
   if (!isOverdue) {
     breakTimeLeft.textContent = formatted;
     breakTimeLeft.classList.remove('overdue');
+    breakTimeLeft.classList.remove('grace');
     const pct = Math.max(0, Math.min(100, (diffMs / agentState.activeBreak.totalMs) * 100));
     breakProgressBar.style.width = `${pct}%`;
     breakProgressBar.style.background = '#6366f1';
@@ -1093,22 +1185,84 @@ function updateBreakCountdown() {
       addSupervisorLog('ALERT', '2-minute pre-expiration notification dispatched to agent.');
     }
   } else {
-    // BREAK EXCEEDED / OVERDUE
-    agentState.status = 'OVERDUE';
-    agentStatusDot.className = 'status-indicator overdue';
-    agentStateLabel.className = 'state-label overdue-mode';
-    agentStateLabel.textContent = `OVERDUE (+${formatted})`;
-
-    breakTimeLeft.textContent = `+${formatted}`;
-    breakTimeLeft.classList.add('overdue');
-    breakProgressBar.style.width = '100%';
-    breakProgressBar.style.background = '#ef4444';
+    // BREAK EXCEEDED
     twoMinAlert.classList.add('hidden');
+    breakProgressBar.style.width = '100%';
 
-    if (!botCallTriggered && minutes >= 0 && seconds >= 3) {
-      triggerBotCallModal(minutes, seconds);
+    if (overdueMs < thresholdMs) {
+      // IN GRACE BUFFER PERIOD (OVERDUE BUT WITHIN VARIANCE THRESHOLD)
+      agentState.status = 'OVERDUE_GRACE';
+      agentStatusDot.className = 'status-indicator warning';
+      agentStateLabel.className = 'state-label warning-mode';
+      agentStateLabel.textContent = `GRACE BUFFER (+${formatted} / +0${thresholdMins}:00)`;
+
+      breakTimeLeft.textContent = `+${formatted}`;
+      breakTimeLeft.className = 'countdown-digits grace';
+      breakProgressBar.style.background = '#f59e0b';
+    } else {
+      // THRESHOLD IS EXCEEDED!
+      agentState.status = 'OVERDUE';
+      agentStatusDot.className = 'status-indicator overdue';
+      agentStateLabel.className = 'state-label overdue-mode';
+      agentStateLabel.textContent = `🚨 THRESHOLD EXCEEDED (+${formatted})`;
+
+      breakTimeLeft.textContent = `+${formatted}`;
+      breakTimeLeft.className = 'countdown-digits overdue';
+      breakProgressBar.style.background = '#ef4444';
+
+      if (!botCallTriggered) {
+        botCallTriggered = true;
+
+        const targetDevice = agentAlertPrefs.device || 'both';
+
+        // 1. Alert on Laptop if laptop or both
+        if (targetDevice === 'laptop' || targetDevice === 'both') {
+          triggerBotCallModal(minutes, seconds);
+        }
+
+        // 2. Alert on Mobile if mobile or both
+        if (targetDevice === 'mobile' || targetDevice === 'both') {
+          dispatchMobileThresholdAlarm(minutes, seconds);
+        }
+
+        addSupervisorLog('THRESHOLD_ALARM', `Threshold (+${thresholdMins}m) exceeded! Dispatched calling alarm to [${targetDevice.toUpperCase()}].`);
+      }
     }
   }
+}
+
+async function dispatchMobileThresholdAlarm(overMins = 1, overSecs = 0) {
+  const alarmPayload = {
+    agentId: agentState.id || 'AGT-8842',
+    agentName: agentState.name || 'Alex Morgan',
+    auxCode: agentState.activeBreak ? agentState.activeBreak.auxCode : 'AUX-2: Short Break / AUX',
+    durationMinutes: agentState.activeBreak ? agentState.activeBreak.durationMinutes : 15,
+    thresholdMins: agentAlertPrefs.thresholdMins !== undefined ? agentAlertPrefs.thresholdMins : 2,
+    overdueMins: overMins,
+    overdueSecs: overSecs,
+    device: agentAlertPrefs.device || 'both',
+    soundStyle: agentAlertPrefs.soundStyle || 'phone_ring',
+    mobilePhone: agentAlertPrefs.mobilePhone || '+1 (555) 019-8842'
+  };
+
+  try {
+    await fetch('/api/alerts/trigger-alarm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(alarmPayload)
+    });
+  } catch (err) {
+    console.warn('Failed to dispatch mobile alarm:', err);
+  }
+
+  // Cross-tab broadcast
+  try {
+    const bc = new BroadcastChannel('wfm_aux_channel');
+    bc.postMessage({
+      type: 'TRIGGER_ALARM',
+      payload: alarmPayload
+    });
+  } catch (e) {}
 }
 
 function triggerBotCallModal(overMins = 1, overSecs = 0, customMsg = '') {
@@ -1116,14 +1270,14 @@ function triggerBotCallModal(overMins = 1, overSecs = 0, customMsg = '') {
   const overlay = document.getElementById('bot-call-overlay');
   const speechTextEl = document.getElementById('bot-call-speech-text');
 
-  const speechMessage = customMsg || `Attention Agent ${agentState.name}: Your scheduled auxiliary break duration has ended and is now exceeding adherence limits by ${overMins || 1} minute. You are required to immediately return to your workstation and switch to available status. Your supervisor has been notified.`;
-  speechTextEl.textContent = `"${speechMessage}"`;
+  const speechMessage = customMsg || `Attention Agent ${agentState.name}: Your scheduled auxiliary break duration has ended and is now exceeding adherence threshold limits by ${overMins || 1} minute. You are required to immediately return to your workstation and switch to available status. Your supervisor has been notified.`;
+  if (speechTextEl) speechTextEl.textContent = `"${speechMessage}"`;
 
-  overlay.classList.remove('hidden');
-  startPhoneRingtone();
+  if (overlay) overlay.classList.remove('hidden');
+  startPhoneRingtone(agentAlertPrefs.soundStyle || 'phone_ring');
   addSupervisorLog('OVERDUE_CALL', `Automated bot voice call placed to agent for adherence violation.`);
 
-  if ('speechSynthesis' in window) {
+  if ('speechSynthesis' in window && agentAlertPrefs.soundStyle !== 'siren') {
     window.speechSynthesis.cancel();
     setTimeout(() => {
       stopPhoneRingtone();
@@ -1135,12 +1289,33 @@ function triggerBotCallModal(overMins = 1, overSecs = 0, customMsg = '') {
   }
 }
 
-document.getElementById('btn-accept-bot-call').addEventListener('click', () => {
+document.getElementById('btn-accept-bot-call')?.addEventListener('click', async () => {
   stopPhoneRingtone();
   if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-  document.getElementById('bot-call-overlay').classList.add('hidden');
+  document.getElementById('bot-call-overlay')?.classList.add('hidden');
   endBreakEarly();
   addSupervisorLog('RESUMED', 'Agent acknowledged bot call and resumed AVAILABLE state in NICE CXone.');
+
+  // Notify server & mobile companion
+  try {
+    await fetch('/api/alerts/acknowledge', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        agentId: agentState.id || 'AGT-8842',
+        acknowledgedBy: 'AGENT_LAPTOP',
+        deviceSource: 'LAPTOP_WIDGET'
+      })
+    });
+  } catch (e) {}
+
+  try {
+    const bc = new BroadcastChannel('wfm_aux_channel');
+    bc.postMessage({
+      type: 'ALARM_ACKNOWLEDGED',
+      payload: { agentId: agentState.id || 'AGT-8842', from: 'laptop' }
+    });
+  } catch (e) {}
 });
 
 btnEndBreak.addEventListener('click', () => {
@@ -1825,3 +2000,143 @@ try {
 } catch (e) {
   console.warn('Error restoring active break:', e);
 }
+
+
+// ========================================================
+// BREAK THRESHOLD CALLING & DEVICE SETTINGS CONTROLLER
+// ========================================================
+function initAlertSettingsModal() {
+  const modal = document.getElementById('alert-settings-modal');
+  const btnHeader = document.getElementById('btn-header-alert-settings');
+  const btnCard = document.getElementById('btn-open-alert-settings');
+  const btnPairMobile = document.getElementById('btn-pair-mobile-modal');
+  const btnClose = document.getElementById('btn-close-alert-modal');
+  const btnSave = document.getElementById('btn-save-alert-settings');
+  const btnTest = document.getElementById('btn-test-alert-sound');
+
+  const devLabel = document.getElementById('widget-alert-device-label');
+  const threshLabel = document.getElementById('widget-alert-thresh-label');
+  const pillLabel = document.getElementById('header-alert-pill');
+  const compLink = document.getElementById('mobile-companion-link');
+
+  // Load from LocalStorage if present
+  try {
+    const raw = localStorage.getItem('wfm_alert_prefs');
+    if (raw) {
+      agentAlertPrefs = { ...agentAlertPrefs, ...JSON.parse(raw) };
+    }
+  } catch (e) {}
+
+  function updateUiLabels() {
+    const devText = agentAlertPrefs.device === 'both' ? 'Both' : (agentAlertPrefs.device === 'mobile' ? 'Mobile' : 'Laptop');
+    if (devLabel) devLabel.textContent = agentAlertPrefs.device === 'both' ? '💻+📱 Both' : (agentAlertPrefs.device === 'mobile' ? '📱 Mobile' : '💻 Laptop');
+    if (threshLabel) threshLabel.textContent = `+${agentAlertPrefs.thresholdMins}m`;
+    if (pillLabel) pillLabel.textContent = `${devText} (+${agentAlertPrefs.thresholdMins}m)`;
+
+    // Update active classes in modal
+    document.querySelectorAll('.dev-choice-card').forEach(c => {
+      c.classList.toggle('selected', c.dataset.device === agentAlertPrefs.device);
+    });
+    document.querySelectorAll('.thresh-choice-btn').forEach(b => {
+      b.classList.toggle('selected', parseInt(b.dataset.threshold, 10) === agentAlertPrefs.thresholdMins);
+    });
+    document.querySelectorAll('.sound-choice-btn').forEach(b => {
+      b.classList.toggle('selected', b.dataset.sound === agentAlertPrefs.soundStyle);
+    });
+
+    if (compLink) {
+      const host = window.location.host || 'localhost:4000';
+      const url = `http://${host}/mobile-alert.html?agentId=${agentState.id || 'AGT-8842'}`;
+      compLink.href = url;
+      compLink.textContent = `Open Mobile Companion (${url}) ↗`;
+    }
+  }
+
+  // Fetch from server
+  fetch(`/api/alerts/preferences?agentId=${agentState.id || 'AGT-8842'}`)
+    .then(r => r.json())
+    .then(data => {
+      if (data.success && data.preferences) {
+        agentAlertPrefs = { ...agentAlertPrefs, ...data.preferences };
+        updateUiLabels();
+      }
+    })
+    .catch(() => updateUiLabels());
+
+  // Open / Close Modal
+  const openModal = () => {
+    updateUiLabels();
+    if (modal) modal.classList.remove('hidden');
+  };
+  const closeModal = () => {
+    if (modal) modal.classList.add('hidden');
+  };
+
+  btnHeader?.addEventListener('click', openModal);
+  btnCard?.addEventListener('click', openModal);
+  btnPairMobile?.addEventListener('click', openModal);
+  btnClose?.addEventListener('click', closeModal);
+
+  // Device selection clicks
+  document.querySelectorAll('.dev-choice-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.dev-choice-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      agentAlertPrefs.device = card.dataset.device;
+    });
+  });
+
+  // Threshold selection clicks
+  document.querySelectorAll('.thresh-choice-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.thresh-choice-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      agentAlertPrefs.thresholdMins = parseInt(btn.dataset.threshold, 10);
+    });
+  });
+
+  // Sound style selection clicks
+  document.querySelectorAll('.sound-choice-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.sound-choice-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      agentAlertPrefs.soundStyle = btn.dataset.sound;
+    });
+  });
+
+  // Test Alarm Button
+  btnTest?.addEventListener('click', () => {
+    startPhoneRingtone(agentAlertPrefs.soundStyle || 'phone_ring');
+    // Also dispatch test ring to mobile companion
+    dispatchMobileThresholdAlarm(agentAlertPrefs.thresholdMins, 30);
+    setTimeout(() => {
+      stopPhoneRingtone();
+    }, 5000);
+  });
+
+  // Save Settings Button
+  btnSave?.addEventListener('click', () => {
+    localStorage.setItem('wfm_alert_prefs', JSON.stringify(agentAlertPrefs));
+    updateUiLabels();
+
+    // Send to backend
+    fetch('/api/alerts/preferences', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        agentId: agentState.id || 'AGT-8842',
+        device: agentAlertPrefs.device,
+        thresholdMins: agentAlertPrefs.thresholdMins,
+        soundStyle: agentAlertPrefs.soundStyle
+      })
+    }).catch(e => console.warn('Alert save failed:', e));
+
+    closeModal();
+    showNotification('Alert Settings Saved', `Device: ${agentAlertPrefs.device.toUpperCase()}, Threshold: +${agentAlertPrefs.thresholdMins}m, Sound: ${agentAlertPrefs.soundStyle}.`);
+  });
+
+  updateUiLabels();
+}
+
+// Initialize on load
+initAlertSettingsModal();

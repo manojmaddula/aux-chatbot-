@@ -233,6 +233,49 @@
           </div>
         </div>
 
+                <!-- THRESHOLD CALLING & DEVICE SELECTION -->
+        <div class="alert-config-box" style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:12px; padding:14px; margin-top:14px; margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h4 style="font-size:13px; font-weight:800; color:#0f172a; margin:0; display:flex; align-items:center; gap:6px;">
+              <span>🚨</span> Break Threshold Calling &amp; Alert Device Selection
+            </h4>
+            <span style="font-size:10px; font-weight:700; color:#2563eb; background:#eff6ff; padding:2px 8px; border-radius:99px; border:1px solid #bfdbfe;">
+              Adherence Guard
+            </span>
+          </div>
+          <p style="font-size:11px; color:#64748b; margin-bottom:12px;">
+            Configure where you wish to receive an automated call/alarm if your break exceeds the applied time plus threshold limit.
+          </p>
+
+          <div class="form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div class="form-group">
+              <label style="font-size:11px; font-weight:700; color:#334155;">Alert Destination Device:</label>
+              <select id="portal-alert-device" style="width:100%; border-radius:6px; padding:7px; border:1px solid #cbd5e1; font-size:12px; font-weight:600;">
+                <option value="both" selected>💻 + 📱 Both Laptop &amp; Mobile Phone</option>
+                <option value="laptop">💻 Laptop / Workstation Only</option>
+                <option value="mobile">📱 Mobile Phone Only</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label style="font-size:11px; font-weight:700; color:#334155;">Variance Threshold Buffer:</label>
+              <select id="portal-alert-threshold" style="width:100%; border-radius:6px; padding:7px; border:1px solid #cbd5e1; font-size:12px; font-weight:600;">
+                <option value="0">0m (Immediate Alarm once break ends)</option>
+                <option value="1">+1 min Grace Buffer</option>
+                <option value="2" selected>+2 mins (Recommended Standard)</option>
+                <option value="5">+5 mins Grace Buffer</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:8px; border-top:1px dashed #cbd5e1; font-size:11px;">
+            <span style="color:#64748b;">Companion Mobile Companion:</span>
+            <a href="/mobile-alert.html" target="_blank" style="color:#2563eb; font-weight:700; text-decoration:underline;">
+              📱 Open Mobile Companion Companion (/mobile-alert.html) ↗
+            </a>
+          </div>
+        </div>
+
         <div class="submit-actions">
           <button id="btn-submit-break" class="btn btn-success btn-large">
             <span>🚀</span> Submit AUX Mode Request to WFM Engine

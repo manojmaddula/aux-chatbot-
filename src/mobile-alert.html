@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>ZEL Mobile Alert Companion • AUX Break Threshold Alarm</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=panda2" />
+  <meta name="theme-color" content="#090d16" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <style>
+    :root {
+      --bg-dark: #0a0f1d;
+      --bg-card: rgba(18, 26, 47, 0.85);
+      --border-card: rgba(255, 255, 255, 0.08);
+      --primary: #3b82f6;
+      --primary-glow: rgba(59, 130, 246, 0.35);
+      --danger: #ef4444;
+      --danger-glow: rgba(239, 68, 68, 0.45);
+      --success: #10b981;
+      --warning: #f59e0b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #090d16;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.18) 0%, transparent 60%),
+        radial-gradient(circle at 100% 100%, rgba(239, 68, 68, 0.12) 0%, transparent 50%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      padding-bottom: 30px;
+    }
+
+    /* TOP APP BAR */
+    .mobile-header {
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10, 15, 29, 0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-card);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #1e293b;
+      padding: 3px;
+      border: 1.5px solid rgba(59, 130, 246, 0.4);
+      box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .brand-title {
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title span {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-muted);
+    }
+
+    .connection-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .connection-badge.offline {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      animation: pulse 1.6s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.5; }
+    }
+
+    /* MAIN CONTAINER */
+    .mobile-container {
+      padding: 16px;
+      max-width: 480px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* CARD STYLES */
+    .m-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(16px);
+    }
+
+    .agent-selector-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .agent-meta h2 {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .agent-meta p {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    select.agent-picker {
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 12px;
+      outline: none;
+    }
+
+    /* BREAK STATUS CARD */
+    .status-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(30, 41, 59, 0.6);
+      margin-bottom: 12px;
+    }
+
+    .status-tag {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(59, 130, 246, 0.2);
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.4);
+    }
+
+    .status-tag.on-break {
+      background: rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.4);
+    }
+
+    .status-tag.overdue {
+      background: rgba(239, 68, 68, 0.25);
+      color: #f87171;
+      border-color: rgba(239, 68, 68, 0.5);
+      animation: pulse 1.2s infinite;
+    }
+
+    .timer-display {
+      text-align: center;
+      padding: 16px 0 10px;
+    }
+
+    .timer-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .timer-clock {
+      font-size: 44px;
+      font-weight: 900;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      letter-spacing: -1px;
+      color: #ffffff;
+      text-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+    }
+
+    .timer-clock.overdue {
+      color: #ef4444;
+      text-shadow: 0 0 24px rgba(239, 68, 68, 0.5);
+    }
+
+    .timer-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-top: 14px;
+      text-align: center;
+    }
+
+    .metric-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 8px;
+    }
+
+    .metric-val {
+      font-size: 13px;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+
+    .metric-lbl {
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* DEVICE SETTINGS SECTION */
+    .section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .device-pills {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .dev-btn {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1.5px solid rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+      border-radius: 12px;
+      padding: 12px 8px;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .dev-btn.active {
+      background: rgba(59, 130, 246, 0.18);
+      border-color: #3b82f6;
+      color: #ffffff;
+      box-shadow: 0 0 16px rgba(59, 130, 246, 0.25);
+    }
+
+    .dev-btn span.icon {
+      font-size: 20px;
+    }
+
+    /* THRESHOLD SELECTION */
+    .threshold-pills {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    .thresh-btn {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+      border-radius: 8px;
+      padding: 8px 4px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .thresh-btn.active {
+      background: rgba(245, 158, 11, 0.2);
+      border-color: #f59e0b;
+      color: #fbbf24;
+    }
+
+    /* SOUND SELECTOR */
+    .sound-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .sound-btn {
+      flex: 1;
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #94a3b8;
+      border-radius: 8px;
+      padding: 9px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .sound-btn.active {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: #10b981;
+      color: #34d399;
+    }
+
+    /* ACTION BUTTONS */
+    .btn-test {
+      width: 100%;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      border: none;
+      color: #ffffff;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+      transition: all 0.15s ease;
+    }
+
+    .btn-test:active {
+      transform: scale(0.98);
+    }
+
+    .btn-end-break {
+      width: 100%;
+      background: rgba(16, 185, 129, 0.18);
+      border: 1.5px solid #10b981;
+      color: #34d399;
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    /* FULLSCREEN INCOMING CALL / THRESHOLD ALARM MODAL */
+    .incoming-call-overlay {
+      position: fixed;
+      inset: 0;
+      background: #090a10;
+      background: radial-gradient(circle at center, #1e1022 0%, #080309 85%);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 40px 24px 30px;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .incoming-call-overlay.hidden {
+      display: none !important;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .call-top-area {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+    }
+
+    .caller-org {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #f87171;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .caller-name {
+      font-size: 26px;
+      font-weight: 900;
+      color: #ffffff;
+      margin-bottom: 6px;
+      letter-spacing: -0.5px;
+    }
+
+    .caller-subtitle {
+      font-size: 14px;
+      color: #fca5a5;
+      font-weight: 600;
+      margin-bottom: 24px;
+    }
+
+    .radar-pulse-wrap {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+
+    .radar-circle {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      border: 2px solid rgba(239, 68, 68, 0.7);
+      animation: ripple 2s infinite ease-out;
+    }
+
+    .radar-circle:nth-child(2) {
+      animation-delay: 0.6s;
+    }
+
+    .radar-circle:nth-child(3) {
+      animation-delay: 1.2s;
+    }
+
+    @keyframes ripple {
+      0% { transform: scale(0.6); opacity: 1; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+
+    .call-avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: #111827;
+      border: 3px solid #ef4444;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 2;
+      box-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
+    }
+
+    .call-avatar img {
+      width: 58px;
+      height: 58px;
+    }
+
+    .call-stats-card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 14px;
+      width: 100%;
+      max-width: 340px;
+      display: flex;
+      justify-content: space-around;
+      margin-top: 10px;
+    }
+
+    .call-stat-item {
+      text-align: center;
+    }
+
+    .call-stat-item strong {
+      display: block;
+      font-size: 16px;
+      color: #ffffff;
+    }
+
+    .call-stat-item span {
+      font-size: 11px;
+      color: #94a3b8;
+    }
+
+    .unmute-notice {
+      background: rgba(245, 158, 11, 0.2);
+      border: 1px solid #f59e0b;
+      color: #fde68a;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-top: 12px;
+      cursor: pointer;
+    }
+
+    /* ACTION CALL BUTTONS */
+    .call-actions-area {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+      max-width: 340px;
+      margin: 0 auto;
+    }
+
+    .btn-call-accept {
+      background: linear-gradient(135deg, #10b981, #059669);
+      border: none;
+      color: #ffffff;
+      border-radius: 999px;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      box-shadow: 0 0 25px rgba(16, 185, 129, 0.5);
+      animation: pulse 1.5s infinite;
+    }
+
+    .btn-call-silence {
+      background: rgba(239, 68, 68, 0.2);
+      border: 1.5px solid rgba(239, 68, 68, 0.6);
+      color: #fca5a5;
+      border-radius: 999px;
+      padding: 14px;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .footer-note {
+      text-align: center;
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- MOBILE HEADER -->
+  <header class="mobile-header">
+    <div class="brand-wrap">
+      <img src="/favicon.svg?v=panda2" alt="ZEL" class="brand-logo" />
+      <div class="brand-title">
+        ZEL Copilot
+        <span>Mobile Alert Companion</span>
+      </div>
+    </div>
+    <div id="conn-badge" class="connection-badge">
+      <div class="pulse-dot"></div>
+      <span id="conn-text">Live Sync</span>
+    </div>
+  </header>
+
+  <!-- MAIN SCROLLABLE BODY -->
+  <main class="mobile-container">
+
+    <!-- AGENT IDENTIFIER -->
+    <section class="m-card">
+      <div class="agent-selector-row">
+        <div class="agent-meta">
+          <h2 id="agent-name-display">Alex Morgan</h2>
+          <p id="agent-id-display">AGT-8842 • Tier-2 Tech Support</p>
+        </div>
+        <select id="agent-select" class="agent-picker">
+          <option value="AGT-8842">Alex Morgan (AGT-8842)</option>
+          <option value="AGT-9102">Samantha Vance (AGT-9102)</option>
+          <option value="AGT-4491">Carlos Mendez (AGT-4491)</option>
+        </select>
+      </div>
+
+      <div class="status-banner">
+        <span style="font-size:12px; color:var(--text-muted);">Current Telemetry State:</span>
+        <span id="status-tag" class="status-tag">AVAILABLE</span>
+      </div>
+
+      <!-- TIMER SECTION -->
+      <div class="timer-display">
+        <div id="timer-label" class="timer-title">STANDBY • READY FOR BREAK</div>
+        <div id="timer-digits" class="timer-clock">00:00</div>
+        
+        <div class="timer-metrics">
+          <div class="metric-box">
+            <div id="metric-applied" class="metric-val">15m</div>
+            <div class="metric-lbl">Applied Break</div>
+          </div>
+          <div class="metric-box">
+            <div id="metric-threshold" class="metric-val">+2m</div>
+            <div class="metric-lbl">Variance Buffer</div>
+          </div>
+          <div class="metric-box">
+            <div id="metric-device" class="metric-val">Both</div>
+            <div class="metric-lbl">Alert Target</div>
+          </div>
+        </div>
+      </div>
+
+      <button id="btn-manual-end" class="btn-end-break" style="display:none;">
+        ✓ End Break & Switch to Available
+      </button>
+    </section>
+
+    <!-- DEVICE & THRESHOLD CONTROLS -->
+    <section class="m-card">
+      <div class="section-title">
+        <span>📲</span> Alert Target Device Selection
+      </div>
+
+      <div class="device-pills">
+        <button type="button" class="dev-btn" data-device="laptop">
+          <span class="icon">💻</span>
+          Laptop Only
+        </button>
+        <button type="button" class="dev-btn" data-device="mobile">
+          <span class="icon">📱</span>
+          Mobile Only
+        </button>
+        <button type="button" class="dev-btn active" data-device="both">
+          <span class="icon">💻+📱</span>
+          Both Devices
+        </button>
+      </div>
+
+      <div class="section-title">
+        <span>⏱️</span> Variance Threshold (Grace Limit)
+      </div>
+      <div class="threshold-pills">
+        <button type="button" class="thresh-btn" data-threshold="0">0m (Inst.)</button>
+        <button type="button" class="thresh-btn" data-threshold="1">+1 min</button>
+        <button type="button" class="thresh-btn active" data-threshold="2">+2 mins</button>
+        <button type="button" class="thresh-btn" data-threshold="5">+5 mins</button>
+      </div>
+
+      <div class="section-title">
+        <span>🔔</span> Ringtone / Sound Style
+      </div>
+      <div class="sound-row">
+        <button type="button" class="sound-btn active" data-sound="phone_ring">📞 Phone Ring</button>
+        <button type="button" class="sound-btn" data-sound="siren">🚨 Urgent Siren</button>
+        <button type="button" class="sound-btn" data-sound="voice">🗣️ Voice Bot</button>
+      </div>
+
+      <button id="btn-test-alarm" class="btn-test">
+        <span>🔔</span> Test Calling Alarm & Vibration (5s)
+      </button>
+    </section>
+
+    <div class="footer-note">
+      ZEL Floor Automation Engine • Connected to NICE CXone WFM Telemetry
+    </div>
+
+  </main>
+
+  <!-- FULLSCREEN INCOMING CALL / THRESHOLD ALARM SCREEN -->
+  <div id="call-overlay" class="incoming-call-overlay hidden">
+    <div class="call-top-area">
+      <div class="caller-org">
+        <span>🚨</span> NICE CXone WFM Floor Desk
+      </div>
+      <h1 class="caller-name">Incoming WFM Call</h1>
+      <p id="call-reason" class="caller-subtitle">AUX BREAK THRESHOLD EXCEEDED</p>
+
+      <div class="radar-pulse-wrap">
+        <div class="radar-circle"></div>
+        <div class="radar-circle"></div>
+        <div class="radar-circle"></div>
+        <div class="call-avatar">
+          <img src="/favicon.svg?v=panda2" alt="ZEL" />
+        </div>
+      </div>
+
+      <div class="call-stats-card">
+        <div class="call-stat-item">
+          <strong id="call-stat-applied">15m</strong>
+          <span>Break Applied</span>
+        </div>
+        <div class="call-stat-item">
+          <strong id="call-stat-threshold">+2m</strong>
+          <span>Threshold Limit</span>
+        </div>
+        <div class="call-stat-item">
+          <strong id="call-stat-overdue" style="color:#ef4444;">+02:15</strong>
+          <span>Current Overage</span>
+        </div>
+      </div>
+
+      <div id="unmute-tip" class="unmute-notice" style="display:none;">
+        🔊 Tap here to unmute audio ringtone
+      </div>
+    </div>
+
+    <div class="call-actions-area">
+      <button id="btn-call-accept" class="btn-call-accept">
+        <span>📞</span> Acknowledge & Return to Ready
+      </button>
+      <button id="btn-call-silence" class="btn-call-silence">
+        <span>🔕</span> Silence Ringtone (Logged)
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // ========================================================
+    // ZEL MOBILE ALERT COMPANION JAVASCRIPT ENGINE
+    // ========================================================
+
+    const agentSelect = document.getElementById('agent-select');
+    const agentNameDisplay = document.getElementById('agent-name-display');
+    const agentIdDisplay = document.getElementById('agent-id-display');
+    const statusTag = document.getElementById('status-tag');
+    const timerLabel = document.getElementById('timer-label');
+    const timerDigits = document.getElementById('timer-digits');
+    const metricApplied = document.getElementById('metric-applied');
+    const metricThreshold = document.getElementById('metric-threshold');
+    const metricDevice = document.getElementById('metric-device');
+    const btnManualEnd = document.getElementById('btn-manual-end');
+    const btnTestAlarm = document.getElementById('btn-test-alarm');
+    const callOverlay = document.getElementById('call-overlay');
+    const btnCallAccept = document.getElementById('btn-call-accept');
+    const btnCallSilence = document.getElementById('btn-call-silence');
+    const callStatApplied = document.getElementById('call-stat-applied');
+    const callStatThreshold = document.getElementById('call-stat-threshold');
+    const callStatOverdue = document.getElementById('call-stat-overdue');
+    const unmuteTip = document.getElementById('unmute-tip');
+
+    // Parse agentId from query param if available
+    const urlParams = new URLSearchParams(window.location.search);
+    let currentAgentId = urlParams.get('agentId') || 'AGT-8842';
+    if (agentSelect) {
+      agentSelect.value = currentAgentId;
+    }
+
+    let alertPrefs = {
+      device: 'both',
+      thresholdMins: 2,
+      soundStyle: 'phone_ring'
+    };
+
+    let activeBreak = null;
+    let isAlarmActive = false;
+    let audioCtx = null;
+    let alarmOsc1 = null;
+    let alarmOsc2 = null;
+    let alarmInterval = null;
+    let vibrationInterval = null;
+
+    // Load active break from localStorage or API
+    function checkLocalStorageBreak() {
+      try {
+        const raw = localStorage.getItem('wfm_active_break');
+        if (raw) {
+          activeBreak = JSON.parse(raw);
+        } else {
+          activeBreak = null;
+        }
+      } catch (e) {
+        activeBreak = null;
+      }
+      renderBreakUI();
+    }
+
+    // Agent dropdown changer
+    agentSelect.addEventListener('change', (e) => {
+      currentAgentId = e.target.value;
+      const opt = e.target.options[e.target.selectedIndex].text;
+      agentNameDisplay.textContent = opt.split(' (')[0];
+      agentIdDisplay.textContent = `${currentAgentId} • Tier-2 Tech Support`;
+      fetchAlertPreferences();
+    });
+
+    // Device selection buttons
+    document.querySelectorAll('.dev-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.dev-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        alertPrefs.device = btn.dataset.device;
+        metricDevice.textContent = btn.dataset.device === 'both' ? 'Both' : (btn.dataset.device === 'mobile' ? 'Mobile' : 'Laptop');
+        saveAlertPreferences();
+      });
+    });
+
+    // Threshold buttons
+    document.querySelectorAll('.thresh-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.thresh-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        alertPrefs.thresholdMins = parseInt(btn.dataset.threshold, 10);
+        metricThreshold.textContent = `+${alertPrefs.thresholdMins}m`;
+        saveAlertPreferences();
+      });
+    });
+
+    // Sound style buttons
+    document.querySelectorAll('.sound-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.sound-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        alertPrefs.soundStyle = btn.dataset.sound;
+        saveAlertPreferences();
+      });
+    });
+
+    // Fetch initial preferences from server
+    async function fetchAlertPreferences() {
+      try {
+        const res = await fetch(`/api/alerts/preferences?agentId=${currentAgentId}`);
+        const data = await res.json();
+        if (data.success && data.preferences) {
+          alertPrefs = data.preferences;
+          // Sync UI
+          document.querySelectorAll('.dev-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.device === alertPrefs.device);
+          });
+          document.querySelectorAll('.thresh-btn').forEach(b => {
+            b.classList.toggle('active', parseInt(b.dataset.threshold, 10) === alertPrefs.thresholdMins);
+          });
+          document.querySelectorAll('.sound-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.sound === alertPrefs.soundStyle);
+          });
+          metricThreshold.textContent = `+${alertPrefs.thresholdMins}m`;
+          metricDevice.textContent = alertPrefs.device === 'both' ? 'Both' : (alertPrefs.device === 'mobile' ? 'Mobile' : 'Laptop');
+        }
+      } catch (e) {
+        console.warn('Preferences fetch error:', e);
+      }
+    }
+
+    async function saveAlertPreferences() {
+      try {
+        await fetch('/api/alerts/preferences', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            agentId: currentAgentId,
+            device: alertPrefs.device,
+            thresholdMins: alertPrefs.thresholdMins,
+            soundStyle: alertPrefs.soundStyle
+          })
+        });
+      } catch (e) {
+        console.warn('Preferences save error:', e);
+      }
+    }
+
+    // AUDIO & VIBRATION SYNTHESIZER
+    function startAlarmSound(soundType = 'phone_ring') {
+      stopAlarmSound();
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioCtx();
+        if (audioCtx.state === 'suspended') {
+          unmuteTip.style.display = 'block';
+        }
+
+        if (soundType === 'siren') {
+          // Sweeping emergency siren
+          alarmOsc1 = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          alarmOsc1.type = 'sawtooth';
+          gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+          alarmOsc1.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          let freq = 600;
+          let dir = 1;
+          alarmInterval = setInterval(() => {
+            freq += dir * 40;
+            if (freq >= 1200) dir = -1;
+            if (freq <= 550) dir = 1;
+            if (alarmOsc1 && audioCtx) {
+              alarmOsc1.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            }
+          }, 40);
+          alarmOsc1.start();
+        } else {
+          // Realistic dual-tone telephone ring (440Hz + 480Hz) with 1.5s ring / 1.5s pause cadence
+          const playRingCadence = () => {
+            if (!isAlarmActive && !alarmOsc1) return;
+            try {
+              const now = audioCtx.currentTime;
+              const oscA = audioCtx.createOscillator();
+              const oscB = audioCtx.createOscillator();
+              const gainNode = audioCtx.createGain();
+
+              oscA.type = 'sine';
+              oscB.type = 'sine';
+              oscA.frequency.setValueAtTime(440, now);
+              oscB.frequency.setValueAtTime(480, now);
+
+              gainNode.gain.setValueAtTime(0.2, now);
+              gainNode.gain.setValueAtTime(0.2, now + 1.4);
+              gainNode.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+
+              oscA.connect(gainNode);
+              oscB.connect(gainNode);
+              gainNode.connect(audioCtx.destination);
+
+              oscA.start(now);
+              oscB.start(now);
+              oscA.stop(now + 1.5);
+              oscB.stop(now + 1.5);
+            } catch (err) {}
+          };
+
+          playRingCadence();
+          alarmInterval = setInterval(playRingCadence, 3000);
+        }
+      } catch (e) {
+        console.warn('Audio start failed:', e);
+      }
+
+      // Continuous Physical Vibration for Mobile
+      if ('vibrate' in navigator) {
+        try {
+          navigator.vibrate([1000, 400, 1000, 400, 1200]);
+          vibrationInterval = setInterval(() => {
+            navigator.vibrate([1000, 400, 1000, 400, 1200]);
+          }, 3500);
+        } catch (e) {}
+      }
+    }
+
+    function stopAlarmSound() {
+      if (alarmInterval) clearInterval(alarmInterval);
+      if (vibrationInterval) clearInterval(vibrationInterval);
+      alarmInterval = null;
+      vibrationInterval = null;
+      if ('vibrate' in navigator) {
+        try { navigator.vibrate(0); } catch (e) {}
+      }
+      if (alarmOsc1) {
+        try { alarmOsc1.stop(); alarmOsc1.disconnect(); } catch (e) {}
+        alarmOsc1 = null;
+      }
+      if (audioCtx) {
+        try { audioCtx.close(); } catch (e) {}
+        audioCtx = null;
+      }
+      unmuteTip.style.display = 'none';
+    }
+
+    // SHOW INCOMING CALL MODAL
+    function triggerIncomingCallScreen(alarmData) {
+      isAlarmActive = true;
+      callOverlay.classList.remove('hidden');
+
+      const appliedMins = alarmData.durationMinutes || (activeBreak ? activeBreak.durationMinutes : 15);
+      const threshMins = alarmData.thresholdMins !== undefined ? alarmData.thresholdMins : alertPrefs.thresholdMins;
+      const overMins = alarmData.overdueMins || 1;
+      const overSecs = alarmData.overdueSecs || 0;
+
+      callStatApplied.textContent = `${appliedMins}m`;
+      callStatThreshold.textContent = `+${threshMins}m`;
+      callStatOverdue.textContent = `+${String(overMins).padStart(2, '0')}:${String(overSecs).padStart(2, '0')}`;
+
+      startAlarmSound(alertPrefs.soundStyle || 'phone_ring');
+    }
+
+    // DISMISS / ACKNOWLEDGE
+    async function acknowledgeAlarm() {
+      isAlarmActive = false;
+      stopAlarmSound();
+      callOverlay.classList.add('hidden');
+
+      // Clear local break
+      localStorage.removeItem('wfm_active_break');
+      activeBreak = null;
+      renderBreakUI();
+
+      // Send to server
+      try {
+        await fetch('/api/alerts/acknowledge', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            agentId: currentAgentId,
+            acknowledgedBy: 'AGENT_MOBILE',
+            deviceSource: 'MOBILE_COMPANION'
+          })
+        });
+      } catch (e) {}
+
+      // BroadcastChannel notification to desktop widget
+      try {
+        const bc = new BroadcastChannel('wfm_aux_channel');
+        bc.postMessage({
+          type: 'ALARM_ACKNOWLEDGED',
+          payload: { agentId: currentAgentId, from: 'mobile' }
+        });
+      } catch (e) {}
+    }
+
+    btnCallAccept.addEventListener('click', acknowledgeAlarm);
+    btnCallSilence.addEventListener('click', () => {
+      stopAlarmSound();
+      callOverlay.classList.add('hidden');
+    });
+
+    btnManualEnd.addEventListener('click', acknowledgeAlarm);
+
+    // TEST BUTTON
+    btnTestAlarm.addEventListener('click', () => {
+      triggerIncomingCallScreen({
+        agentId: currentAgentId,
+        durationMinutes: 15,
+        thresholdMins: alertPrefs.thresholdMins,
+        overdueMins: alertPrefs.thresholdMins,
+        overdueSecs: 30
+      });
+      setTimeout(() => {
+        if (isAlarmActive) {
+          stopAlarmSound();
+          callOverlay.classList.add('hidden');
+          isAlarmActive = false;
+        }
+      }, 5000);
+    });
+
+    // Unmute helper
+    unmuteTip.addEventListener('click', () => {
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+        unmuteTip.style.display = 'none';
+      }
+    });
+
+    // PERIODIC COUNTDOWN & OVERDUE THRESHOLD EVALUATION
+    function renderBreakUI() {
+      if (!activeBreak) {
+        statusTag.className = 'status-tag';
+        statusTag.textContent = 'AVAILABLE';
+        timerLabel.textContent = 'STANDBY • READY FOR BREAK';
+        timerDigits.className = 'timer-clock';
+        timerDigits.textContent = '00:00';
+        metricApplied.textContent = '15m';
+        btnManualEnd.style.display = 'none';
+        return;
+      }
+
+      btnManualEnd.style.display = 'flex';
+      metricApplied.textContent = `${activeBreak.durationMinutes}m`;
+
+      const now = Date.now();
+      const diffMs = activeBreak.expiresAt - now;
+      const isOverdue = diffMs < 0;
+
+      const absDiff = Math.abs(diffMs);
+      const mins = Math.floor(absDiff / 60000);
+      const secs = Math.floor((absDiff % 60000) / 1000);
+      const timeStr = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+
+      const thresholdMs = (alertPrefs.thresholdMins || 2) * 60 * 1000;
+      const overdueMs = now - activeBreak.expiresAt;
+
+      if (!isOverdue) {
+        statusTag.className = 'status-tag on-break';
+        statusTag.textContent = 'ON AUX BREAK';
+        timerLabel.textContent = `${activeBreak.auxCode || 'AUX BREAK'} • TIME REMAINING`;
+        timerDigits.className = 'timer-clock';
+        timerDigits.textContent = timeStr;
+      } else {
+        // BREAK IS OVERDUE
+        if (overdueMs < thresholdMs) {
+          // In Grace Buffer
+          statusTag.className = 'status-tag overdue';
+          statusTag.textContent = 'OVERDUE (IN GRACE)';
+          timerLabel.textContent = `GRACE BUFFER (+${timeStr} / +0${alertPrefs.thresholdMins}:00)`;
+          timerDigits.className = 'timer-clock overdue';
+          timerDigits.textContent = `+${timeStr}`;
+        } else {
+          // THRESHOLD IS EXCEEDED!
+          statusTag.className = 'status-tag overdue';
+          statusTag.textContent = '🚨 THRESHOLD EXCEEDED';
+          timerLabel.textContent = 'VIOLATION LIMIT EXCEEDED • ALARM ACTIVE';
+          timerDigits.className = 'timer-clock overdue';
+          timerDigits.textContent = `+${timeStr}`;
+
+          // If alert preference includes mobile, trigger screen
+          if ((alertPrefs.device === 'mobile' || alertPrefs.device === 'both') && !isAlarmActive) {
+            triggerIncomingCallScreen({
+              agentId: currentAgentId,
+              durationMinutes: activeBreak.durationMinutes,
+              thresholdMins: alertPrefs.thresholdMins,
+              overdueMins: mins,
+              overdueSecs: secs
+            });
+          }
+        }
+      }
+    }
+
+    // Live 1-second interval
+    setInterval(() => {
+      checkLocalStorageBreak();
+    }, 1000);
+
+    // BROADCAST CHANNEL LISTENER
+    try {
+      const bc = new BroadcastChannel('wfm_aux_channel');
+      bc.onmessage = (event) => {
+        const data = event.data;
+        if (!data) return;
+
+        if (data.type === 'BREAK_APPROVED') {
+          activeBreak = data.payload;
+          localStorage.setItem('wfm_active_break', JSON.stringify(data.payload));
+          renderBreakUI();
+        } else if (data.type === 'ALARM_ACKNOWLEDGED' || data.type === 'BREAK_ENDED') {
+          activeBreak = null;
+          localStorage.removeItem('wfm_active_break');
+          stopAlarmSound();
+          callOverlay.classList.add('hidden');
+          isAlarmActive = false;
+          renderBreakUI();
+        } else if (data.type === 'TRIGGER_ALARM') {
+          if (data.payload.agentId === currentAgentId) {
+            triggerIncomingCallScreen(data.payload);
+          }
+        }
+      };
+    } catch (e) {}
+
+    // SERVER-SENT EVENTS (SSE) STREAM FOR REAL-TIME MOBILE CALLING
+    function initSSE() {
+      const connBadge = document.getElementById('conn-badge');
+      const connText = document.getElementById('conn-text');
+
+      try {
+        const es = new EventSource('/api/alerts/stream');
+        es.onopen = () => {
+          connBadge.className = 'connection-badge';
+          connText.textContent = 'Live Sync';
+        };
+
+        es.addEventListener('ALARM_TRIGGERED', (e) => {
+          try {
+            const alarm = JSON.parse(e.data);
+            if (alarm.agentId === currentAgentId && (alertPrefs.device === 'mobile' || alertPrefs.device === 'both')) {
+              triggerIncomingCallScreen(alarm);
+            }
+          } catch (err) {}
+        });
+
+        es.addEventListener('ALARM_ACKNOWLEDGED', (e) => {
+          try {
+            const data = JSON.parse(e.data);
+            if (data.agentId === currentAgentId) {
+              acknowledgeAlarm();
+            }
+          } catch (err) {}
+        });
+
+        es.onerror = () => {
+          connBadge.className = 'connection-badge offline';
+          connText.textContent = 'Polling...';
+        };
+      } catch (e) {
+        console.warn('SSE not supported, fallback polling active.');
+      }
+    }
+
+    // Fallback polling for active alarms every 2s
+    setInterval(async () => {
+      try {
+        const res = await fetch('/api/alerts/active');
+        const data = await res.json();
+        if (data.success && data.alarms) {
+          const myAlarm = data.alarms.find(a => a.agentId === currentAgentId);
+          if (myAlarm && !isAlarmActive && (alertPrefs.device === 'mobile' || alertPrefs.device === 'both')) {
+            triggerIncomingCallScreen(myAlarm);
+          } else if (!myAlarm && isAlarmActive) {
+            // Alarm was cleared on supervisor or laptop desk
+            stopAlarmSound();
+            callOverlay.classList.add('hidden');
+            isAlarmActive = false;
+            activeBreak = null;
+            renderBreakUI();
+          }
+        }
+      } catch (e) {}
+    }, 2000);
+
+    // INITIALIZE
+    fetchAlertPreferences();
+    checkLocalStorageBreak();
+    initSSE();
+  </script>
+</body>
+</html>

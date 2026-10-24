@@ -474,6 +474,23 @@ btnSubmitBreak.addEventListener('click', async () => {
       decisionTitle.textContent = decision.title;
       decisionDesc.textContent = decision.description;
 
+      // Read selected device and threshold preferences
+      const selectedDevice = document.getElementById('portal-alert-device')?.value || 'both';
+      const selectedThresh = parseInt(document.getElementById('portal-alert-threshold')?.value || '2', 10);
+      const alertPrefs = {
+        agentId: agentData.id,
+        agentName: agentData.name,
+        device: selectedDevice,
+        thresholdMins: selectedThresh,
+        soundStyle: 'phone_ring'
+      };
+      localStorage.setItem('wfm_alert_prefs', JSON.stringify(alertPrefs));
+      fetch('/api/alerts/preferences', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(alertPrefs)
+      }).catch(() => {});
+
       // Broadcast approved break to Desktop Chatbot Widget via BroadcastChannel & LocalStorage
       const breakEvent = {
         type: 'BREAK_APPROVED',
@@ -482,6 +499,8 @@ btnSubmitBreak.addEventListener('click', async () => {
           agent: agentData,
           auxCode: payload.auxCode,
           durationMinutes: payload.durationMinutes,
+          thresholdMins: selectedThresh,
+          alertDevice: selectedDevice,
           approvedAt: Date.now(),
           expiresAt: Date.now() + (payload.durationMinutes * 60 * 1000)
         }

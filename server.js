@@ -3,6 +3,21 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const url = require('url');
+const os = require('os');
+
+function getLocalNetworkIp() {
+  try {
+    const interfaces = os.networkInterfaces();
+    for (const name of Object.keys(interfaces)) {
+      for (const iface of interfaces[name]) {
+        if (iface.family === 'IPv4' && !iface.internal) {
+          return iface.address;
+        }
+      }
+    }
+  } catch (e) {}
+  return 'localhost';
+}
 
 const PORT = 4000;
 const PUBLIC_DIR = path.join(__dirname, 'src');
@@ -26,6 +41,54 @@ const AGENT_SUPERVISOR_MAP = {
 
   'AGT-2219': { supervisorId: 'SUP-059', supervisorName: 'Priya Sharma' }
 };
+
+
+// ==========================================
+// BREAK OVERDUE CALLING & DEVICE ALERTS STATE
+// ==========================================
+const agentAlertPreferences = {
+  'AGT-8842': {
+    agentId: 'AGT-8842',
+    agentName: 'Alex Morgan',
+    device: 'both', // 'laptop' | 'mobile' | 'both'
+    thresholdMins: 2, // Variance threshold over break applied duration
+    soundStyle: 'phone_ring', // 'phone_ring' | 'siren' | 'voice'
+    mobilePhone: '+1 (555) 019-8842',
+    updatedAt: new Date().toISOString()
+  },
+  'AGT-9102': {
+    agentId: 'AGT-9102',
+    agentName: 'Samantha Vance',
+    device: 'both',
+    thresholdMins: 2,
+    soundStyle: 'phone_ring',
+    mobilePhone: '+1 (555) 019-9102',
+    updatedAt: new Date().toISOString()
+  },
+  'AGT-4491': {
+    agentId: 'AGT-4491',
+    agentName: 'Carlos Mendez',
+    device: 'mobile',
+    thresholdMins: 1,
+    soundStyle: 'siren',
+    mobilePhone: '+1 (555) 019-4491',
+    updatedAt: new Date().toISOString()
+  }
+};
+
+const activeBreakAlarms = {};
+const sseAlertClients = [];
+
+function broadcastAlertEvent(eventType, payload) {
+  const eventMsg = `event: ${eventType}\ndata: ${JSON.stringify(payload)}\n\n`;
+  for (let i = sseAlertClients.length - 1; i >= 0; i--) {
+    try {
+      sseAlertClients[i].write(eventMsg);
+    } catch (e) {
+      sseAlertClients.splice(i, 1);
+    }
+  }
+}
 
 // In-memory supervisor queue & state
 const supervisorQueue = [
@@ -380,6 +443,202 @@ const server = http.createServer((req, res) => {
       history: CALL_TRENDS_HISTORY,
       hourlyComparison: HOURLY_CALL_COMPARISON
     }));
+    return;
+  }
+
+
+  // ==========================================
+  // API ROUTES: BREAK OVERDUE CALLING & ALERTS
+  // ==========================================
+
+  // Server Info & Mobile Pairing Link
+  if (pathname === '/api/server-info' && req.method === 'GET') {
+    const localIp = getLocalNetworkIp();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      success: true,
+      port: PORT,
+      localIp: localIp,
+      mobileUrl: `http://${localIp}:${PORT}/mobile-alert.html`,
+      serverTime: new Date().toISOString()
+    }));
+    return;
+  }
+
+  // Get Alert Preferences for Agent
+  if (pathname === '/api/alerts/preferences' && req.method === 'GET') {
+    const aId = parsedUrl.query.agentId || 'AGT-8842';
+    const prefs = agentAlertPreferences[aId] || {
+      agentId: aId,
+      agentName: 'Agent',
+      device: 'both',
+      thresholdMins: 2,
+      soundStyle: 'phone_ring',
+      mobilePhone: '+1 (555) 019-8842',
+      updatedAt: new Date().toISOString()
+    };
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({ success: true, preferences: prefs }));
+    return;
+  }
+
+  // Update Alert Preferences (Laptop / Mobile / Both, Threshold, Sound)
+  if (pathname === '/api/alerts/preferences' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const aId = payload.agentId || 'AGT-8842';
+        const existing = agentAlertPreferences[aId] || {};
+        agentAlertPreferences[aId] = {
+          ...existing,
+          ...payload,
+          agentId: aId,
+          device: payload.device || existing.device || 'both', // 'laptop' | 'mobile' | 'both'
+          thresholdMins: typeof payload.thresholdMins === 'number' ? payload.thresholdMins : (existing.thresholdMins !== undefined ? existing.thresholdMins : 2),
+          soundStyle: payload.soundStyle || existing.soundStyle || 'phone_ring',
+          mobilePhone: payload.mobilePhone || existing.mobilePhone || '+1 (555) 019-8842',
+          updatedAt: new Date().toISOString()
+        };
+        broadcastAlertEvent('PREFERENCES_UPDATED', agentAlertPreferences[aId]);
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, preferences: agentAlertPreferences[aId] }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // Trigger Automated Calling / Alarm (From Widget Countdown or Supervisor Wallboard)
+  if (pathname === '/api/alerts/trigger-alarm' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const aId = payload.agentId || 'AGT-8842';
+        const prefs = agentAlertPreferences[aId] || { device: 'both', thresholdMins: 2, soundStyle: 'phone_ring' };
+
+        const alarmData = {
+          id: 'ALM-' + Date.now(),
+          agentId: aId,
+          agentName: payload.agentName || prefs.agentName || 'Alex Morgan',
+          auxCode: payload.auxCode || 'AUX-2: Short Break / AUX',
+          durationMinutes: payload.durationMinutes || 15,
+          thresholdMins: payload.thresholdMins !== undefined ? payload.thresholdMins : prefs.thresholdMins,
+          overdueMins: payload.overdueMins !== undefined ? payload.overdueMins : 1,
+          overdueSecs: payload.overdueSecs || 0,
+          device: payload.device || prefs.device || 'both', // 'laptop' | 'mobile' | 'both'
+          soundStyle: payload.soundStyle || prefs.soundStyle || 'phone_ring',
+          mobilePhone: prefs.mobilePhone || '+1 (555) 019-8842',
+          triggeredBy: payload.triggeredBy || 'WFM_AUTOMATION_THRESHOLD',
+          message: payload.message || `Attention Agent ${payload.agentName || 'Alex Morgan'}: Your AUX break duration and variance threshold of ${prefs.thresholdMins}m have been exceeded. Please return to your workstation immediately and resume AVAILABLE status.`,
+          triggeredAt: new Date().toISOString(),
+          status: 'ACTIVE'
+        };
+
+        activeBreakAlarms[aId] = alarmData;
+
+        // Push to supervisor audit queue
+        supervisorQueue.unshift({
+          id: alarmData.id,
+          timestamp: alarmData.triggeredAt,
+          agentId: aId,
+          agentName: alarmData.agentName,
+          supervisorId: (AGENT_SUPERVISOR_MAP[aId] || {}).supervisorId || 'SUP-014',
+          supervisorName: (AGENT_SUPERVISOR_MAP[aId] || {}).supervisorName || 'Sarah Jenkins',
+          auxCode: alarmData.auxCode,
+          durationMinutes: alarmData.durationMinutes,
+          status: 'THRESHOLD_ALARM',
+          reason: `Adherence limit + ${alarmData.thresholdMins}m threshold exceeded. Alarm dispatched to [${alarmData.device.toUpperCase()}].`
+        });
+
+        // Broadcast to mobile devices & web clients via SSE
+        broadcastAlertEvent('ALARM_TRIGGERED', alarmData);
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, alarm: alarmData }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // Get Active Overdue Alarms
+  if (pathname === '/api/alerts/active' && req.method === 'GET') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      success: true,
+      count: Object.keys(activeBreakAlarms).length,
+      alarms: Object.values(activeBreakAlarms)
+    }));
+    return;
+  }
+
+  // Acknowledge & Clear Alarm (Silences laptop & mobile)
+  if (pathname === '/api/alerts/acknowledge' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const aId = payload.agentId || 'AGT-8842';
+        const existing = activeBreakAlarms[aId];
+        delete activeBreakAlarms[aId];
+
+        broadcastAlertEvent('ALARM_ACKNOWLEDGED', {
+          agentId: aId,
+          acknowledgedBy: payload.acknowledgedBy || 'AGENT',
+          deviceSource: payload.deviceSource || 'MOBILE',
+          timestamp: new Date().toISOString()
+        });
+
+        if (existing) {
+          supervisorQueue.unshift({
+            id: 'ACK-' + Date.now(),
+            timestamp: new Date().toISOString(),
+            agentId: aId,
+            agentName: existing.agentName,
+            supervisorId: (AGENT_SUPERVISOR_MAP[aId] || {}).supervisorId || 'SUP-014',
+            supervisorName: (AGENT_SUPERVISOR_MAP[aId] || {}).supervisorName || 'Sarah Jenkins',
+            auxCode: existing.auxCode,
+            durationMinutes: existing.durationMinutes,
+            status: 'ALARM_CLEARED',
+            reason: `Agent acknowledged alarm via ${payload.deviceSource || 'Device'}. Resumed AVAILABLE state.`
+          });
+        }
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, message: 'Alarm acknowledged and silenced.' }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // Server-Sent Events (SSE) Stream for Mobile & Desktop Real-Time Calling/Alerts
+  if (pathname === '/api/alerts/stream' && req.method === 'GET') {
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache, no-transform',
+      'Connection': 'keep-alive',
+      'Access-Control-Allow-Origin': '*'
+    });
+    res.write('retry: 3000\n');
+    res.write(`event: INIT\ndata: ${JSON.stringify({ time: new Date().toISOString(), activeAlarms: Object.values(activeBreakAlarms) })}\n\n`);
+
+    sseAlertClients.push(res);
+    req.on('close', () => {
+      const idx = sseAlertClients.indexOf(res);
+      if (idx !== -1) sseAlertClients.splice(idx, 1);
+    });
     return;
   }
 

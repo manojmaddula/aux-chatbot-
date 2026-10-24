@@ -42,6 +42,9 @@
         </div>
       </div>
       <div class="header-tools">
+        <button id="btn-header-alert-settings" class="btn-xs btn-outline" style="font-weight:700; display:inline-flex; align-items:center; gap:4px; padding:5px 8px;" title="Break Threshold Alarm &amp; Device Settings">
+          🔔 <span id="header-alert-pill">Both (+2m)</span>
+        </button>
         <a href="/agent-home.html" id="btn-agent-home" class="btn-xs btn-outline" style="text-decoration:none; display:inline-flex; align-items:center; gap:5px; padding:5px 8px; font-weight:700;" title="Agent Bot Home">
           <img src="/favicon.svg?v=panda2" style="width:14px; height:14px;" /> Home
         </a>
@@ -113,6 +116,12 @@
         <div id="break-progress-bar" class="progress-bar-fill"></div>
       </div>
       
+      <div class="break-alert-meta" style="display:flex; justify-content:space-between; align-items:center; font-size:11px; margin-top:8px; margin-bottom:6px; color:#475569; background:rgba(0,0,0,0.03); padding:6px 10px; border-radius:6px; border:1px solid #e2e8f0;">
+        <span>🚨 Alert: <strong id="widget-alert-device-label" style="color:#2563eb;">💻+📱 Both</strong></span>
+        <span>Threshold: <strong id="widget-alert-thresh-label" style="color:#d97706;">+2m</strong></span>
+        <button id="btn-open-alert-settings" class="btn-xs btn-outline" style="font-size:10px; padding:1px 6px;">⚙️ Settings</button>
+      </div>
+
       <!-- 2-MIN WARNING ALERT -->
       <div id="two-min-alert" class="two-min-alert hidden">
         <span class="bell-icon">🔔</span>
@@ -121,6 +130,7 @@
 
       <div class="break-card-actions">
         <button id="btn-end-break" class="btn-xs btn-outline">End Break & Return to Available</button>
+        <button id="btn-pair-mobile-modal" class="btn-xs btn-outline" style="border-color:#3b82f6; color:#2563eb;" title="Open Mobile Alert Companion or QR Code">📱 Mobile Sync</button>
       </div>
     </div>
 
@@ -400,6 +410,103 @@
         </div>
       </div>
     </section>
+
+    
+    <!-- BREAK OVERDUE CALLING & DEVICE SETTINGS MODAL -->
+    <div id="alert-settings-modal" class="alert-settings-modal hidden">
+      <div class="settings-dialog">
+        <div class="settings-header">
+          <h3><span>🔔</span> Break Threshold Calling &amp; Alert Settings</h3>
+          <button id="btn-close-alert-modal" class="btn-xs btn-outline" style="font-size:12px; padding:2px 8px;">✕</button>
+        </div>
+
+        <div>
+          <label class="setting-row-label"><span>📲</span> Alert Device Destination</label>
+          <div class="device-picker-grid">
+            <div class="dev-choice-card" data-device="laptop">
+              <span class="dev-icon">💻</span>
+              <span class="dev-title">Laptop Only</span>
+              <span class="dev-desc">Browser &amp; Audio</span>
+            </div>
+            <div class="dev-choice-card" data-device="mobile">
+              <span class="dev-icon">📱</span>
+              <span class="dev-title">Mobile Only</span>
+              <span class="dev-desc">Phone Call &amp; Vibrate</span>
+            </div>
+            <div class="dev-choice-card selected" data-device="both">
+              <span class="dev-icon">💻+📱</span>
+              <span class="dev-title">Both Devices</span>
+              <span class="dev-desc">Simultaneous Ring</span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="setting-row-label"><span>⏱️</span> Threshold Over Break Time Applied</label>
+          <div class="thresh-selector">
+            <button type="button" class="thresh-choice-btn" data-threshold="0">0m (Inst.)</button>
+            <button type="button" class="thresh-choice-btn" data-threshold="1">+1 min</button>
+            <button type="button" class="thresh-choice-btn selected" data-threshold="2">+2 mins</button>
+            <button type="button" class="thresh-choice-btn" data-threshold="5">+5 mins</button>
+          </div>
+          <p style="font-size:10px; color:#64748b; margin-top:4px;">Alarm &amp; bot call will fire once break elapsed time exceeds duration + threshold.</p>
+        </div>
+
+        <div>
+          <label class="setting-row-label"><span>🔊</span> Ringtone / Sound Style</label>
+          <div class="sound-selector">
+            <button type="button" class="sound-choice-btn selected" data-sound="phone_ring">📞 Phone Ring</button>
+            <button type="button" class="sound-choice-btn" data-sound="siren">🚨 Urgent Siren</button>
+            <button type="button" class="sound-choice-btn" data-sound="voice">🗣️ Voice Bot</button>
+          </div>
+        </div>
+
+        <div class="qr-pair-box">
+          <div class="qr-img-wrap" id="qr-code-container">
+            <svg viewBox="0 0 100 100" width="68" height="68">
+              <!-- Crisp Simulated QR Pattern -->
+              <rect width="100" height="100" fill="#ffffff"/>
+              <rect x="5" y="5" width="28" height="28" fill="#0f172a" rx="4"/>
+              <rect x="9" y="9" width="20" height="20" fill="#ffffff" rx="2"/>
+              <rect x="13" y="13" width="12" height="12" fill="#2563eb" rx="1"/>
+              
+              <rect x="67" y="5" width="28" height="28" fill="#0f172a" rx="4"/>
+              <rect x="71" y="9" width="20" height="20" fill="#ffffff" rx="2"/>
+              <rect x="75" y="13" width="12" height="12" fill="#2563eb" rx="1"/>
+              
+              <rect x="5" y="67" width="28" height="28" fill="#0f172a" rx="4"/>
+              <rect x="9" y="71" width="20" height="20" fill="#ffffff" rx="2"/>
+              <rect x="13" y="75" width="12" height="12" fill="#2563eb" rx="1"/>
+
+              <rect x="40" y="10" width="8" height="8" fill="#0f172a"/>
+              <rect x="52" y="10" width="6" height="14" fill="#2563eb"/>
+              <rect x="40" y="24" width="14" height="6" fill="#0f172a"/>
+              <rect x="40" y="40" width="20" height="20" fill="#0f172a"/>
+              <rect x="44" y="44" width="12" height="12" fill="#ef4444" rx="2"/>
+              <rect x="10" y="42" width="12" height="14" fill="#2563eb"/>
+              <rect x="70" y="42" width="18" height="8" fill="#0f172a"/>
+              <rect x="68" y="56" width="10" height="14" fill="#2563eb"/>
+              <rect x="42" y="70" width="18" height="18" fill="#0f172a"/>
+              <rect x="70" y="78" width="20" height="12" fill="#0f172a"/>
+            </svg>
+          </div>
+          <div class="qr-info-wrap">
+            <h4>📱 Scan to Pair Phone Companion</h4>
+            <p>Scan with your phone camera or open the Mobile Companion companion:</p>
+            <a id="mobile-companion-link" href="/mobile-alert.html" target="_blank">Open Mobile Companion (/mobile-alert.html) ↗</a>
+          </div>
+        </div>
+
+        <div class="settings-footer">
+          <button id="btn-test-alert-sound" class="btn-xs btn-outline" style="padding:7px 12px; font-weight:700;">
+            🔊 Test Alarm (5s)
+          </button>
+          <button id="btn-save-alert-settings" class="btn btn-sm btn-primary" style="padding:7px 16px; font-weight:700;">
+            ✓ Save Settings
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- INTERACTIVE INCOMING BOT CALL OVERLAY (WHEN BREAK EXCEEDED) -->
     <div id="bot-call-overlay" class="bot-call-overlay hidden">
