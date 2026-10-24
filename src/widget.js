@@ -2044,12 +2044,28 @@ function initAlertSettingsModal() {
       b.classList.toggle('selected', b.dataset.sound === agentAlertPrefs.soundStyle);
     });
 
-    if (compLink) {
-      const host = window.location.host || 'localhost:4000';
-      const url = `http://${host}/mobile-alert.html?agentId=${agentState.id || 'AGT-8842'}`;
-      compLink.href = url;
-      compLink.textContent = `Open Mobile Companion (${url}) ↗`;
-    }
+    const qrContainer = document.getElementById('qr-code-container');
+    fetch('/api/server-info')
+      .then(r => r.json())
+      .then(sInfo => {
+        const targetHost = sInfo.localIp ? `${sInfo.localIp}:${sInfo.port || 4000}` : (window.location.host || 'localhost:4000');
+        const mobileUrl = `http://${targetHost}/mobile-alert.html?agentId=${agentState.id || 'AGT-8842'}`;
+        if (compLink) {
+          compLink.href = mobileUrl;
+          compLink.textContent = `Open Mobile Companion (${mobileUrl}) ↗`;
+        }
+        if (qrContainer) {
+          qrContainer.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(mobileUrl)}" alt="Scan QR" style="width:68px; height:68px; border-radius:4px; object-fit:contain;" />`;
+        }
+      })
+      .catch(() => {
+        const host = window.location.host || 'localhost:4000';
+        const url = `http://${host}/mobile-alert.html?agentId=${agentState.id || 'AGT-8842'}`;
+        if (compLink) {
+          compLink.href = url;
+          compLink.textContent = `Open Mobile Companion (${url}) ↗`;
+        }
+      });
   }
 
   // Fetch from server
