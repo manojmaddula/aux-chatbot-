@@ -1,6 +1,6 @@
 /**
  * floating-widget.js - Global Floating Panda Widget Component
- * NICE CXone Ask Shankar & AUX Assistant Launcher
+ * Ask Shankar & AUX Assistant Launcher
  */
 
 (function () {
@@ -30,7 +30,7 @@
     launcher.id = 'floating-panda-launcher';
     launcher.className = 'floating-panda-launcher';
     launcher.setAttribute('role', 'button');
-    launcher.setAttribute('aria-label', 'Toggle NICE CXone Ask Shankar & AUX Assistant');
+    launcher.setAttribute('aria-label', 'Toggle Ask Shankar & AUX Assistant');
     launcher.setAttribute('tabindex', '0');
     launcher.innerHTML = `
       <img src="/favicon.svg?v=panda2" alt="Ask Shankar" class="floating-panda-img" />
@@ -53,7 +53,7 @@
           <div class="fp-header-title-box">
             <span class="fp-header-title">ZEL Ask Shankar & AUX Assistant</span>
             <span class="fp-header-subtitle">
-              <span class="dot"></span> Connected to NICE CXone MAX CTI
+              <span class="dot"></span> Connected to Telephony CTI
             </span>
           </div>
         </div>
@@ -68,6 +68,10 @@
       </div>
     `;
 
+    // Hide launcher button on agent-home (since page has dedicated Launch button)
+    if (window.location.pathname.includes('agent-home.html')) {
+      launcher.style.display = 'none';
+    }
     document.body.appendChild(launcher);
     document.body.appendChild(panel);
 

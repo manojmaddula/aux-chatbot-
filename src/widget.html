@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NICE CXone Ask Shankar & AUX Assistant</title>
+  <title>Ask Shankar & AUX Assistant</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=panda2" />
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=panda2" />
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=panda2" />
@@ -37,13 +37,13 @@
             <option value="AGT-2219">Liam O'Connor (AGT-2219) • Care Trainee</option>
           </select>
           <div class="status-text-row">
-            <span id="agent-state-label" class="state-label">NICE CXone: AVAILABLE</span>
+            <span id="agent-state-label" class="state-label">STATUS: AVAILABLE</span>
           </div>
         </div>
       </div>
       <div class="header-tools">
-        <button id="btn-header-alert-settings" class="btn-xs btn-outline" style="font-weight:700; display:inline-flex; align-items:center; gap:4px; padding:4px 7px;" title="Break Alert Threshold Settings">
-          ⚙️ <span id="header-alert-pill">+2m</span>
+        <button id="btn-header-alert-settings" class="btn-xs btn-outline" style="font-weight:700; display:inline-flex; align-items:center; justify-content:center; padding:4px 8px; font-size:13px;" title="Break Alert &amp; Mobile Settings">
+          ⚙️<span id="header-alert-pill" style="display:none;"></span>
         </button>
         <a href="/agent-home.html" id="btn-agent-home" class="btn-xs btn-outline" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px; padding:4px 7px; font-weight:700;" title="Agent Bot Home">
           <img src="/favicon.svg?v=panda2" style="width:14px; height:14px;" /> Home
@@ -118,7 +118,7 @@
       
       <div class="break-alert-meta" style="display:flex; justify-content:space-between; align-items:center; font-size:11px; margin-top:8px; margin-bottom:6px; color:#475569; background:rgba(0,0,0,0.03); padding:6px 10px; border-radius:6px; border:1px solid #e2e8f0;">
         <span>🚨 Alert: <strong id="widget-alert-device-label" style="color:#2563eb;">💻+📱 Both</strong></span>
-        <span>Threshold: <strong id="widget-alert-thresh-label" style="color:#d97706;">+2m</strong></span>
+        <span>Threshold: <strong id="widget-alert-thresh-label" style="color:#d97706;">2m</strong></span>
         <button id="btn-open-alert-settings" class="btn-xs btn-outline" style="font-size:10px; padding:1px 6px;">⚙️ Settings</button>
       </div>
 
@@ -229,7 +229,7 @@
         <div class="call-meta">
           <span class="live-dot"></span>
           <div>
-            <span>NICE CXone Call: <strong id="call-contact-id">Contact #90421 (Billing)</strong></span>
+            <span>Live Call: <strong id="call-contact-id">Contact #90421 (Billing)</strong></span>
             <small class="call-subtext">Skill: Tier-2 Retention • ANI: +1 (555) 019-4821</small>
           </div>
         </div>
@@ -275,7 +275,7 @@
         </div>
         
         <div class="acw-form-group">
-          <label>NICE CXone Disposition Code:</label>
+          <label>Call Disposition Code:</label>
           <select id="cxone-disposition-select">
             <option value="RESOLVED_BILLING_CREDIT">Resolved: Billing Adjustment / Credit Issued</option>
             <option value="RESOLVED_EXPLANATION">Resolved: Charge Clarified / No Adjustment</option>
@@ -286,17 +286,15 @@
         </div>
         
         <div class="acw-actions-row">
-          <button id="btn-gen-summary" class="btn btn-primary btn-sm">
-            <span>✨</span> Generate AI Call Summary
+          <button id="btn-complete-acw" class="btn btn-success btn-sm" style="width:100%;">
+            <span>✓</span> Complete ACW &amp; Set Available
           </button>
-          <button id="btn-complete-acw" class="btn btn-success btn-sm">
-            <span>✓</span> Complete ACW & Set Available
-          </button>
+          <button id="btn-gen-summary" style="display:none;"></button>
         </div>
 
-        <div id="summary-result" class="summary-result hidden">
+        <div id="summary-result" class="summary-result" style="display:block;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <span class="summary-badge">NICE CXONE AI SUMMARY</span>
+            <span class="summary-badge">AI CALL SUMMARY</span>
             <span style="font-size:10px; color:#2563eb; font-weight:700;">✏️ Agent Editable</span>
           </div>
           <div id="summary-content-block">
@@ -354,12 +352,12 @@
     <!-- TAB 4: KB ARTICLES (NICE CXONE & SYSTEM) -->
     <section id="tab-troubleshoot" class="tab-pane">
       <div class="search-box">
-        <input type="text" id="article-search" placeholder="Search KB articles, NICE CXone MAX, WebRTC, VPN, Audio..." />
+        <input type="text" id="article-search" placeholder="Search KB articles, WebRTC, Softphone, VPN, Audio..." />
       </div>
 
       <div class="kb-categories">
         <button class="kb-pill active" data-cat="all">All</button>
-        <button class="kb-pill" data-cat="cxone">NICE CXone / MAX</button>
+        <button class="kb-pill" data-cat="cxone">Softphone / WebRTC</button>
         <button class="kb-pill" data-cat="vpn">VPN / Network</button>
         <button class="kb-pill" data-cat="vdi">Citrix / VDI</button>
         <button class="kb-pill" data-cat="audio">Headset & Audio</button>
@@ -368,7 +366,7 @@
       <!-- INLINE FULL ARTICLE READER (STAYS ON TAB 3, NO REDIRECT) -->
       <div id="article-detail-view" class="article-detail-view hidden" style="display:none; background:var(--card-bg); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:14px; margin-bottom:12px; animation: slide-down 0.2s ease;">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
-          <span id="article-detail-cat" class="card-badge badge-agent" style="font-size:10px; font-weight:700;">NICE CXone</span>
+          <span id="article-detail-cat" class="card-badge badge-agent" style="font-size:10px; font-weight:700;">Softphone</span>
           <button id="btn-close-article" class="btn-xs btn-outline" style="font-size:10px; padding:2px 8px;" onclick="const dv=document.getElementById('article-detail-view'); if(dv){ dv.classList.add('hidden'); dv.style.display='none'; }">✕ Close Guide</button>
         </div>
         <h3 id="article-detail-title" style="font-size:13px; font-weight:700; margin-bottom:6px; color:var(--text-main);">Article Title</h3>
@@ -449,9 +447,9 @@
           <label class="setting-row-label"><span>⏱️</span> Threshold Over Break Time Applied</label>
           <div class="thresh-selector">
             <button type="button" class="thresh-choice-btn" data-threshold="0">0m (Inst.)</button>
-            <button type="button" class="thresh-choice-btn" data-threshold="1">+1 min</button>
-            <button type="button" class="thresh-choice-btn selected" data-threshold="2">+2 mins</button>
-            <button type="button" class="thresh-choice-btn" data-threshold="5">+5 mins</button>
+            <button type="button" class="thresh-choice-btn" data-threshold="1">1 min</button>
+            <button type="button" class="thresh-choice-btn selected" data-threshold="2">2 mins</button>
+            <button type="button" class="thresh-choice-btn" data-threshold="5">5 mins</button>
           </div>
           <p style="font-size:10px; color:#64748b; margin-top:4px;">Alarm &amp; bot call will fire once break elapsed time exceeds duration + threshold.</p>
         </div>

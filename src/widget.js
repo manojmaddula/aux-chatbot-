@@ -382,7 +382,7 @@ try {
       if (!data.payload || !data.payload.agentId || data.payload.agentId === agentState.id) {
         endBreakEarly(true);
         addSupervisorLog('ALARM_ACKNOWLEDGED', `Break ended & acknowledged via ${data.payload.from || 'Mobile'}. Resumed AVAILABLE state.`);
-        showNotification('Break Resumed', 'Resumed AVAILABLE state in NICE CXone.');
+        showNotification('Break Resumed', 'Resumed AVAILABLE state.');
       }
     } else if (data.type === 'ALARM_SILENCED') {
       if (!data.payload || !data.payload.agentId || data.payload.agentId === agentState.id) {
@@ -1002,12 +1002,14 @@ function enterAcwMode() {
   agentState.status = 'ACW';
   agentStatusDot.className = 'status-indicator aux';
   agentStateLabel.className = 'state-label aux-mode';
-  agentStateLabel.textContent = 'NICE CXone: AFTER CALL WORK (ACW)';
+  agentStateLabel.textContent = 'STATUS: AFTER CALL WORK (ACW)';
 
   // Hide live call bar and reveal ACW card
   activeCallBar.classList.add('hidden');
   acwCard.classList.remove('hidden');
-  summaryResult.classList.add('hidden');
+
+  // INSTANT CALL SUMMARY
+  populateInstantAcwSummary();
 
   acwSecondsRemaining = 45;
   updateAcwDisplay();
@@ -1027,13 +1029,48 @@ function enterAcwMode() {
     }
   }, 1000);
 
-  addSupervisorLog('ACW_ENTER', 'Customer call completed. Entered NICE CXone ACW state.');
+  addSupervisorLog('ACW_ENTER', 'Customer call completed. Entered ACW state.');
 }
 
 function updateAcwDisplay() {
   const m = Math.floor(Math.max(0, acwSecondsRemaining) / 60);
   const s = Math.max(0, acwSecondsRemaining) % 60;
   acwTimerEl.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+
+function populateInstantAcwSummary() {
+  if (!summaryResult) return;
+  summaryResult.classList.remove('hidden');
+  summaryResult.style.display = 'block';
+
+  const selectedDisp = cxoneDispositionSelect ? cxoneDispositionSelect.value : 'RESOLVED_BILLING_CREDIT';
+  const contentBlock = document.getElementById('summary-content-block');
+  if (contentBlock) {
+    contentBlock.innerHTML = `
+      <div class="summary-body">
+        <strong>• Contact ID:</strong> #90421 (Inbound Tier-2 Billing)<br>
+        <strong>• Customer:</strong> Jordan Miller (+1-555-019-4821)<br>
+        <strong>• Verified Intent:</strong> Inquired regarding recurring promotional discount expiration on fiber plan.<br>
+        <strong>• Actions Executed:</strong> Validated CTI ledger, restored promotional code RET-2026, issued $25 credit.<br>
+        <strong>• Call Disposition:</strong> ${selectedDisp}<br>
+        <strong>• Sentiment Score:</strong> +0.82 (De-escalated / Satisfied)<br>
+        <strong>• Follow-up Task:</strong> Automated SMS confirmation queued (No callback required).
+      </div>
+    `;
+  }
+
+  const editNotes = document.getElementById('acw-edit-summary');
+  if (editNotes && !editNotes.value.trim()) {
+    editNotes.value = 'Verified security PIN with customer Jordan Miller. Approved one-time promotional discount credit of $25 on Fiber Account. Customer satisfied, no further escalation needed.';
+  }
+}
+
+// Auto-update summary whenever disposition changes
+if (cxoneDispositionSelect) {
+  cxoneDispositionSelect.addEventListener('change', () => {
+    populateInstantAcwSummary();
+  });
 }
 
 // Generate Instant AI Call Summary for ACW (With Full Agent Edit Capability)
@@ -1049,7 +1086,7 @@ btnGenSummary.addEventListener('click', () => {
         <strong>• Customer:</strong> Jordan Miller (+1-555-019-4821)<br>
         <strong>• Verified Intent:</strong> Inquired regarding recurring promotional discount expiration on fiber plan.<br>
         <strong>• Actions Executed:</strong> Validated CTI ledger, restored promotional code RET-2026, issued $25 credit.<br>
-        <strong>• CXone Disposition:</strong> ${selectedDisp}<br>
+        <strong>• Call Disposition:</strong> ${selectedDisp}<br>
         <strong>• Sentiment Score:</strong> +0.82 (De-escalated / Satisfied)<br>
         <strong>• Follow-up Task:</strong> Automated SMS confirmation queued (No callback required).
       </div>
@@ -1107,7 +1144,7 @@ btnCompleteAcw.addEventListener('click', async () => {
   agentState.status = 'READY';
   agentStatusDot.className = 'status-indicator ready';
   agentStateLabel.className = 'state-label';
-  agentStateLabel.textContent = 'NICE CXone: AVAILABLE';
+  agentStateLabel.textContent = 'STATUS: AVAILABLE';
 
   addSupervisorLog('ACW_COMPLETE', `ACW finalized with disposition "${payload.disposition}" & agent wrap notes saved.`);
   showNotification('ACW Complete', `Summary and wrap notes saved to CRM record #90421.`);
@@ -1415,7 +1452,7 @@ function endBreakEarly(fromRemote = false) {
     if (agentStatusDot) agentStatusDot.className = 'status-indicator ready';
     if (agentStateLabel) {
       agentStateLabel.className = 'state-label';
-      agentStateLabel.textContent = 'NICE CXone: AVAILABLE';
+      agentStateLabel.textContent = 'STATUS: AVAILABLE';
     }
 
     if (breakActiveCard) breakActiveCard.classList.add('hidden');
@@ -2181,9 +2218,9 @@ function initAlertSettingsModal() {
     window.updateAlertUiLabels = updateUiLabels;
     const devText = agentAlertPrefs.device === 'both' ? 'Both' : (agentAlertPrefs.device === 'mobile' ? 'Mobile' : 'Laptop');
     if (devLabel) devLabel.textContent = agentAlertPrefs.device === 'both' ? '💻+📱 Both' : (agentAlertPrefs.device === 'mobile' ? '📱 Mobile' : '💻 Laptop');
-    if (threshLabel) threshLabel.textContent = `+${agentAlertPrefs.thresholdMins}m`;
-    if (pillLabel) pillLabel.textContent = `+${agentAlertPrefs.thresholdMins}m`;
-    if (btnHeader) btnHeader.title = `Break Alert Threshold Settings (+${agentAlertPrefs.thresholdMins}m, ${devText})`;
+    if (threshLabel) threshLabel.textContent = `${agentAlertPrefs.thresholdMins}m`;
+    if (pillLabel) pillLabel.textContent = '';
+    if (btnHeader) btnHeader.title = `Break Alert Settings (${devText}, ${agentAlertPrefs.thresholdMins}m)`;
 
     // Update active classes in modal
     document.querySelectorAll('.dev-choice-card').forEach(c => {

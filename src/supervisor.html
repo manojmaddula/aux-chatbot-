@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NICE CXone Supervisor Command Center & WFM Operations</title>
+  <title>Supervisor Command Center & WFM Operations</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=panda2" />
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=panda2" />
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=panda2" />
@@ -49,7 +49,7 @@
         <span class="kpi-sub text-ok">✓ Erlang-C surplus (+4)</span>
       </div>
       <div class="kpi-card">
-        <span class="kpi-title">CXone ACD Queue</span>
+        <span class="kpi-title">Live ACD Queue</span>
         <div class="kpi-val" id="kpi-queue">18 Calls</div>
         <span class="kpi-sub text-muted">Avg wait: 34s</span>
       </div>
@@ -124,7 +124,7 @@
                 <th>Agent Name</th>
                 <th>Assigned Skill / Queue</th>
                 <th>Assigned Supervisor</th>
-                <th>NICE CXone State</th>
+                <th>Agent Work State</th>
                 <th>Break / ACW Remaining</th>
                 <th>Schedule Adherence</th>
                 <th>AUX Breaks Today</th>
@@ -324,7 +324,7 @@
                   <span>📈</span> Monday Peak High Call Volume Mode
                 </button>
                 <button class="btn btn-emergency cxone-maint" id="btn-bc-cxone">
-                  <span>☁️</span> NICE CXone Maintenance Notice
+                  <span>☁️</span> System Maintenance Notice
                 </button>
               </div>
             </div>
@@ -516,7 +516,7 @@
               <option value="aux_dist">2. AUX Code Time Distribution Report</option>
               <option value="violations">3. Break Violations & Overage Audit Report</option>
               <option value="frequency">4. Request Frequency & Throttling Report</option>
-              <option value="acw">5. NICE CXone ACW Handle Time Report</option>
+              <option value="acw">5. ACW Handle Time Report</option>
               <option value="qa_scorecard">6. Customer Interaction Tone, Empathy & QA Scorecard</option>
               <option value="ivr_csat">7. Post-Call IVR Customer Rating & Query Resolution Audit</option>
               <option value="call_trends">8. Previous Days Call Volumes, AHT, SLA & Abandonment Trend Analysis</option>
@@ -733,7 +733,7 @@
                 <small class="text-muted">Adherence below this percentage triggers supervisory flag.</small>
               </div>
               <div class="form-group">
-                <label>NICE CXone Target ACW Duration (seconds):</label>
+                <label>Target ACW Duration (seconds):</label>
                 <input type="number" id="limit-acw-sec" min="15" max="180" value="45" />
                 <small class="text-muted">After Call Work timer ceiling before escalation.</small>
               </div>
@@ -1058,7 +1058,7 @@
                 <th>Base Shift & Skill</th>
                 <th>Dynamic WFM Flex Interval</th>
                 <th>Target Surge Skill Assigned</th>
-                <th>NICE CXone ACD Routing</th>
+                <th>ACD Routing</th>
                 <th>Status</th>
                 <th>Action</th>
               </tr>

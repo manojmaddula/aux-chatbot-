@@ -237,6 +237,169 @@
       border-top: 1px solid var(--border);
       background: #ffffff;
     }
+  
+    /* Hide floating shortcut button on home page */
+    #floating-panda-launcher {
+      display: none !important;
+    }
+
+    /* QA Feedback Modal Styles */
+    .qa-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .qa-modal.hidden {
+      display: none !important;
+    }
+    .qa-modal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+    }
+    .qa-modal-content {
+      position: relative;
+      background: #ffffff;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 520px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      border: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      animation: modal-pop 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes modal-pop {
+      0% { opacity: 0; transform: scale(0.95); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    .qa-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 18px;
+      border-bottom: 1px solid #e2e8f0;
+      background: #f8fafc;
+      border-top-left-radius: 14px;
+      border-top-right-radius: 14px;
+    }
+    .qa-modal-close {
+      background: transparent;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      color: #64748b;
+      cursor: pointer;
+      font-size: 14px;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+    .qa-modal-close:hover {
+      background: #fee2e2;
+      border-color: #f87171;
+      color: #dc2626;
+    }
+    .qa-modal-body {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .qa-score-banner {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .qa-tier-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 800;
+      padding: 3px 8px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+    }
+    .qa-tier-badge.top-tier {
+      background: #dcfce7;
+      color: #15803d;
+    }
+    .qa-tier-badge.review-tier {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+    .qa-tier-badge.standard-tier {
+      background: #fef3c7;
+      color: #b45309;
+    }
+    .qa-metrics-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .qa-metric-card {
+      background: #ffffff;
+      border: 1px solid #f1f5f9;
+      border-radius: 8px;
+      padding: 8px 12px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+    .qa-metric-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11.5px;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+    .qa-prog-bar {
+      height: 6px;
+      background: #e2e8f0;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .qa-prog-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+    .qa-call-sample {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px;
+    }
+    .qa-coach-note {
+      background: #eff6ff;
+      border-left: 3px solid #3b82f6;
+      border-radius: 4px;
+      padding: 8px 10px;
+      font-size: 11px;
+      color: #1e3a8a;
+      line-height: 1.4;
+      margin-top: 8px;
+    }
+    .qa-modal-footer {
+      padding: 12px 18px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      justify-content: flex-end;
+      background: #f8fafc;
+      border-bottom-left-radius: 14px;
+      border-bottom-right-radius: 14px;
+    }
   </style>
 </head>
 <body>
@@ -248,7 +411,7 @@
         <img src="/favicon.svg?v=panda2" style="width:22px; height:22px;" />
       </div>
       <div class="brand-title">
-        <h1>NICE CXone Agent Bot Workstation</h1>
+        <h1>Agent Bot Workstation</h1>
         <p>Autonomous Ask Shankar, Break Management & Operational Workspace</p>
       </div>
     </div>
@@ -278,7 +441,7 @@
     <div class="ticker-bar">
       <span style="font-size:18px;">📢</span>
       <span style="font-weight:700;">Active Operational Advisory:</span>
-      <span id="active-advisory-text">All systems nominal. NICE CXone MAX softphone connected. Emergency IVR deflection standing by.</span>
+      <span id="active-advisory-text">All systems nominal. Agent softphone connected. Emergency IVR deflection standing by.</span>
     </div>
 
     <!-- AGENT SHIFT ADHERENCE & STATUS BANNER -->
@@ -327,38 +490,16 @@
           <div class="card-details">
             • <strong>Live Speech Suggestions</strong>: Fast customer objection handling<br/>
             • <strong>Instant CRM Summarizer</strong>: Auto-generates structured ACW notes<br/>
-            • <strong>Disposition Sync</strong>: Directly logs call results to NICE CXone
+            • <strong>Disposition Sync</strong>: Directly logs call results to telephony & CRM
           </div>
         </div>
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
           <button type="button" onclick="window.openFloatingWidget && window.openFloatingWidget()" class="btn-launch btn-launch-primary" style="flex:1; border:none;">
             <img src="/favicon.svg?v=panda2" style="width:16px; height:16px;" /> Launch Floating Widget
           </button>
-          <a href="/widget.html" class="btn-launch btn-launch-secondary" style="flex:1;" title="Open in dedicated tab">
-            <span>⤢</span> Full Tab
-          </a>
-        </div>
-      </div>
-
-      <!-- CARD 2: QA INTERACTION SCORECARD -->
-      <div class="home-card">
-        <div>
-          <div class="card-top">
-            <div class="card-icon">🎙️</div>
-            <div class="card-title">
-              <h3>My Interaction Quality & Tone</h3>
-              <p>Track your speech sentiment ratings, post-call customer CSAT stars, and review coaching feedback.</p>
-            </div>
-          </div>
-          <div class="card-details">
-            • <strong>Customer Interaction Tone</strong>: <span id="agent-qa-tone" style="color:#059669; font-weight:700;">Good / Empathetic</span><br/>
-            • <strong>Post-Call IVR Rating</strong>: <span id="agent-qa-csat" style="font-weight:700;">★ 5.0 / 5.0</span><br/>
-            • <strong>Overall Weighted QA Score</strong>: <span id="agent-qa-score" style="color:#2563eb; font-weight:800;">96% (Top Tier)</span>
-          </div>
-        </div>
-        <a href="/widget.html" class="btn-launch btn-launch-secondary" onclick="sessionStorage.setItem('openTab', 'tab-copilot')">
+          <button type="button" id="btn-open-qa-modal" class="btn-launch btn-launch-secondary" style="border:none; cursor:pointer; width:100%; display:inline-flex; align-items:center; justify-content:center; gap:6px;">
           <span>📊</span> View Detailed QA Feedback
-        </a>
+        </button>
       </div>
 
       <!-- CARD 3: ASSIGNED SHIFT ADHERENCE POLICIES (MOVED FROM ADVISORIES) -->
@@ -385,7 +526,7 @@
               <strong id="agent-policy-freq" style="color:#0f172a; font-weight:700; font-size:12px;">Max 5 requests / 1-Wk</strong>
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="font-size:12px; color:#475569;">Target CXone Adherence:</span>
+              <span style="font-size:12px; color:#475569;">Target Schedule Adherence:</span>
               <strong id="agent-policy-adh" style="color:#10b981; font-size:12px;">≥ 90.0%</strong>
             </div>
           </div>
@@ -399,7 +540,7 @@
   </main>
 
   <footer>
-    NICE CXone Autonomous Agent Workforce Management Platform • Enterprise Telemetry Connected
+    Autonomous Agent Workforce Management Platform • Enterprise Telemetry Connected
   </footer>
 
   <script>
@@ -458,5 +599,211 @@
       }).catch(() => {});
   </script>
   <script src="floating-widget.js?v=2.5"></script>
+
+  <!-- DETAILED QA FEEDBACK MODAL -->
+  <div id="qa-feedback-modal" class="qa-modal hidden">
+    <div class="qa-modal-backdrop" id="qa-modal-backdrop"></div>
+    <div class="qa-modal-content">
+      <div class="qa-modal-header">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:20px;">🎙️</span>
+          <div>
+            <h3 style="margin:0; font-size:14px; color:#0f172a;">Interaction Quality & Performance Scorecard</h3>
+            <span id="qa-modal-agent-name" style="font-size:11px; color:#64748b;">Alex Morgan (AGT-8842)</span>
+          </div>
+        </div>
+        <button id="btn-close-qa-modal" class="qa-modal-close" title="Close">✕</button>
+      </div>
+
+      <div class="qa-modal-body">
+        <!-- Top Score Banner -->
+        <div class="qa-score-banner">
+          <div>
+            <span style="font-size:10px; color:#64748b; text-transform:uppercase; font-weight:700;">Overall Weighted QA Score</span>
+            <div id="qa-modal-overall-score" style="font-size:24px; font-weight:800; color:#2563eb;">96%</div>
+          </div>
+          <div style="text-align:right;">
+            <span id="qa-modal-tier-badge" class="qa-tier-badge top-tier">TOP TIER</span>
+            <div id="qa-modal-sample-size" style="font-size:10px; color:#64748b; margin-top:4px;">12 Evaluated Calls (Current Month)</div>
+          </div>
+        </div>
+
+        <!-- Metric Breakdown -->
+        <div class="qa-metrics-grid">
+          <div class="qa-metric-card">
+            <div class="qa-metric-header">
+              <span>🛡️ Security PIN &amp; Identity Verification</span>
+              <strong id="qa-metric-pin">100%</strong>
+            </div>
+            <div class="qa-prog-bar"><div class="qa-prog-fill" id="qa-bar-pin" style="width:100%; background:#10b981;"></div></div>
+          </div>
+          <div class="qa-metric-card">
+            <div class="qa-metric-header">
+              <span>🤝 Speech Sentiment &amp; Empathy</span>
+              <strong id="qa-metric-tone">96%</strong>
+            </div>
+            <div class="qa-prog-bar"><div class="qa-prog-fill" id="qa-bar-tone" style="width:96%; background:#2563eb;"></div></div>
+          </div>
+          <div class="qa-metric-card">
+            <div class="qa-metric-header">
+              <span>⏱️ AHT &amp; ACW Compliance (&le; 45s)</span>
+              <strong id="qa-metric-acw">94%</strong>
+            </div>
+            <div class="qa-prog-bar"><div class="qa-prog-fill" id="qa-bar-acw" style="width:94%; background:#10b981;"></div></div>
+          </div>
+          <div class="qa-metric-card">
+            <div class="qa-metric-header">
+              <span>✓ First Contact Resolution (FCR)</span>
+              <strong id="qa-metric-fcr">92%</strong>
+            </div>
+            <div class="qa-prog-bar"><div class="qa-prog-fill" id="qa-bar-fcr" style="width:92%; background:#10b981;"></div></div>
+          </div>
+        </div>
+
+        <!-- Recent Call Interaction Details -->
+        <div class="qa-call-sample">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <strong style="font-size:11.5px; color:#1e293b;">📋 Recent Evaluated Interaction: Contact #90421</strong>
+            <span id="qa-call-stars" style="color:#d97706; font-weight:700; font-size:11px;">★★★★★ 5.0 CSAT</span>
+          </div>
+          <p id="qa-call-summary" style="font-size:11px; color:#475569; margin-bottom:6px; line-height:1.4;">
+            Customer inquired regarding promotional discount expiration on fiber plan. Agent verified CTI ledger, issued $25 credit adjustment, and de-escalated call calmly.
+          </p>
+          <div class="qa-coach-note" id="qa-supervisor-feedback">
+            <strong>Supervisor Coaching Note:</strong> Outstanding tone and professional composure. Customer reported immediate satisfaction on post-call IVR survey.
+          </div>
+        </div>
+      </div>
+
+      <div class="qa-modal-footer">
+        <button id="btn-ack-qa" class="btn-primary" style="padding:6px 14px; font-size:11.5px; cursor:pointer;">Got It</button>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    // QA Scorecard Data per Agent
+    const QA_DETAILS = {
+      'AGT-8842': {
+        score: '96%',
+        tier: 'TOP TIER',
+        tierClass: 'top-tier',
+        pin: '100%',
+        tone: '96%',
+        acw: '94%',
+        fcr: '92%',
+        stars: '★★★★★ 5.0 CSAT',
+        callNotes: 'Customer inquired regarding promotional discount expiration on fiber plan. Agent verified CTI ledger, issued $25 credit adjustment, and de-escalated call calmly.',
+        coachNotes: 'Outstanding tone and professional composure. Customer reported immediate satisfaction on post-call survey.'
+      },
+      'AGT-4092': {
+        score: '48%',
+        tier: 'COACHING REQUIRED',
+        tierClass: 'review-tier',
+        pin: '60%',
+        tone: '40%',
+        acw: '45%',
+        fcr: '50%',
+        stars: '★☆☆☆☆ 1.0 CSAT',
+        callNotes: 'Customer dispute over billing charge. Agent displayed impatience and exceeded allowable hold time limit.',
+        coachNotes: 'Assigned to Module 101: De-escalation & Tone Mastery. Needs to review mandatory verification protocol.'
+      },
+      'AGT-9102': {
+        score: '32%',
+        tier: 'CRITICAL REVIEW',
+        tierClass: 'review-tier',
+        pin: '45%',
+        tone: '35%',
+        acw: '30%',
+        fcr: '40%',
+        stars: '★★☆☆☆ 2.0 CSAT',
+        callNotes: 'Customer requested account cancellation. Agent failed to pitch retention discounts and disconnected abruptly.',
+        coachNotes: 'Urgent 1-on-1 supervisor coaching required regarding customer retention procedures.'
+      },
+      'AGT-6512': {
+        score: '98%',
+        tier: 'TOP TIER',
+        tierClass: 'top-tier',
+        pin: '100%',
+        tone: '98%',
+        acw: '96%',
+        fcr: '95%',
+        stars: '★★★★★ 5.0 CSAT',
+        callNotes: 'Emergency queue caller handled with extreme poise and speed. Protocol followed with zero errors.',
+        coachNotes: 'Exemplary handling during severe weather outage call surge. Recognized by floor lead.'
+      }
+    };
+
+    function updateQaModalData(agentId) {
+      const q = QA_DETAILS[agentId] || QA_DETAILS['AGT-8842'];
+      const p = AGENT_PROFILES[agentId] || AGENT_PROFILES['AGT-8842'];
+      const nameEl = document.getElementById('qa-modal-agent-name');
+      if (nameEl && p) nameEl.textContent = p.name + ' (' + agentId + ') • ' + p.queue;
+
+      const scoreEl = document.getElementById('qa-modal-overall-score');
+      if (scoreEl) scoreEl.textContent = q.score;
+
+      const tierEl = document.getElementById('qa-modal-tier-badge');
+      if (tierEl) {
+        tierEl.textContent = q.tier;
+        tierEl.className = 'qa-tier-badge ' + q.tierClass;
+      }
+
+      const pEl = document.getElementById('qa-metric-pin');
+      if (pEl) pEl.textContent = q.pin;
+      const bPin = document.getElementById('qa-bar-pin');
+      if (bPin) bPin.style.width = q.pin;
+
+      const tEl = document.getElementById('qa-metric-tone');
+      if (tEl) tEl.textContent = q.tone;
+      const bTone = document.getElementById('qa-bar-tone');
+      if (bTone) bTone.style.width = q.tone;
+
+      const aEl = document.getElementById('qa-metric-acw');
+      if (aEl) aEl.textContent = q.acw;
+      const bAcw = document.getElementById('qa-bar-acw');
+      if (bAcw) bAcw.style.width = q.acw;
+
+      const fEl = document.getElementById('qa-metric-fcr');
+      if (fEl) fEl.textContent = q.fcr;
+      const bFcr = document.getElementById('qa-bar-fcr');
+      if (bFcr) bFcr.style.width = q.fcr;
+
+      const sEl = document.getElementById('qa-call-stars');
+      if (sEl) sEl.textContent = q.stars;
+      const sumEl = document.getElementById('qa-call-summary');
+      if (sumEl) sumEl.textContent = q.callNotes;
+      const fbkEl = document.getElementById('qa-supervisor-feedback');
+      if (fbkEl) fbkEl.innerHTML = '<strong>Supervisor Coaching Note:</strong> ' + q.coachNotes;
+    }
+
+    const btnOpenQa = document.getElementById('btn-open-qa-modal');
+    const qaModal = document.getElementById('qa-feedback-modal');
+    const btnCloseQa = document.getElementById('btn-close-qa-modal');
+    const btnAckQa = document.getElementById('btn-ack-qa');
+    const qaBackdrop = document.getElementById('qa-modal-backdrop');
+
+    function openQaModal() {
+      const currentAgent = (agentSelect && agentSelect.value) || localStorage.getItem('activeAgentId') || 'AGT-8842';
+      updateQaModalData(currentAgent);
+      if (qaModal) qaModal.classList.remove('hidden');
+    }
+
+    function closeQaModal() {
+      if (qaModal) qaModal.classList.add('hidden');
+    }
+
+    if (btnOpenQa) btnOpenQa.addEventListener('click', openQaModal);
+    if (btnCloseQa) btnCloseQa.addEventListener('click', closeQaModal);
+    if (btnAckQa) btnAckQa.addEventListener('click', closeQaModal);
+    if (qaBackdrop) qaBackdrop.addEventListener('click', closeQaModal);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && qaModal && !qaModal.classList.contains('hidden')) {
+        closeQaModal();
+      }
+    });
+  </script>
+
 </body>
 </html>
