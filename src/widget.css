@@ -2201,3 +2201,11 @@ body.all-screen #summary-result {
 body.all-screen .diagnostic-box {
   margin-top: 20px;
 }
+
+#qr-code-container canvas,
+#qr-code-container img {
+  display: block;
+  margin: 0 auto;
+  border-radius: 6px;
+  max-width: 100%;
+}

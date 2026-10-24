@@ -485,9 +485,9 @@
         <option value="AGT-3310">Chloe Bennett (AGT-3310) • Customer Service</option>
         <option value="AGT-7703">Maya Patel (AGT-7703) • VIP Customer Care</option>
       </select>
-            <a href="/mobile-alert.html" class="btn-launch btn-launch-secondary" style="padding: 6px 14px; font-size: 12px; gap: 6px; text-decoration:none;" title="Mobile Alert Companion">
+            <button type="button" id="btn-open-mobile-modal" class="btn-launch btn-launch-secondary" style="padding: 6px 14px; font-size: 12px; gap: 6px; cursor:pointer; border:1px solid #cbd5e1; background:#ffffff;" title="Pair Phone Companion">
         <span>📱</span> Mobile Alert
-      </a>
+      </button>
       <button onclick="window.toggleFloatingWidget && window.toggleFloatingWidget()" class="btn-launch btn-launch-primary" style="padding: 6px 14px; font-size: 12px; gap: 6px; box-shadow: 0 2px 8px rgba(37,99,235,0.25);" title="Toggle Floating Panda Widget">
         <img src="/favicon.svg?v=panda2" style="width:16px; height:16px;" />
         <span>Ask Shankar</span>
@@ -794,6 +794,65 @@
     </div>
   </div>
 
+  <!-- MOBILE COMPANION PAIRING MODAL -->
+  <div id="mobile-pairing-modal" class="qa-modal hidden">
+    <div class="qa-modal-backdrop" id="mobile-pairing-backdrop"></div>
+    <div class="qa-modal-content" style="max-width: 440px;">
+      <div class="qa-modal-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="width:36px; height:36px; border-radius:10px; background:linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); display:flex; align-items:center; justify-content:center; font-size:18px;">
+            📱
+          </div>
+          <div>
+            <h3 style="font-size:15px; font-weight:800; color:#0f172a; margin:0;">Pair Mobile Companion</h3>
+            <span id="mobile-modal-agent-name" style="font-size:11px; color:#64748b;">Alex Morgan (AGT-8842)</span>
+          </div>
+        </div>
+        <button id="btn-close-mobile-modal" class="qa-modal-close" title="Close">✕</button>
+      </div>
+
+      <div class="qa-modal-body" style="display:flex; flex-direction:column; gap:12px; padding:18px;">
+        <p style="font-size:12px; color:#475569; line-height:1.4; margin:0;">
+          Scan with your iPhone or Android camera to receive live break countdowns and overdue call alerts on your phone.
+        </p>
+
+        <!-- Network Selector Tabs -->
+        <div style="display:flex; gap:6px;">
+          <button type="button" id="home-qr-tab-cloud" style="flex:1; padding:7px 10px; font-size:11px; font-weight:700; border-radius:6px; border:1.5px solid #3b82f6; background:#eff6ff; color:#1d4ed8; cursor:pointer;">
+            🌐 Cloud (4G/5G/Wi-Fi)
+          </button>
+          <button type="button" id="home-qr-tab-local" style="flex:1; padding:7px 10px; font-size:11px; font-weight:700; border-radius:6px; border:1.5px solid #cbd5e1; background:#ffffff; color:#64748b; cursor:pointer;">
+            📶 Local Wi-Fi
+          </button>
+        </div>
+
+        <!-- Scannable QR Container -->
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:14px; background:#f8fafc; border-radius:12px; border:1px solid #e2e8f0;">
+          <div id="home-qr-code-container" style="width:180px; height:180px; background:#ffffff; border-radius:8px; padding:8px; box-shadow:0 2px 8px rgba(0,0,0,0.06); display:flex; align-items:center; justify-content:center;">
+            <span style="color:#94a3b8; font-size:11px;">Generating QR...</span>
+          </div>
+          <div id="home-qr-guide" style="margin-top:10px; font-size:11px; color:#059669; font-weight:700; display:flex; align-items:center; gap:5px;">
+            <span>📸</span> Point your camera at code to open companion
+          </div>
+        </div>
+
+        <!-- URL and Copy -->
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:6px; padding:6px 10px; display:flex; align-items:center; justify-content:space-between; gap:6px;">
+            <span id="home-qr-url-text" style="font-family:monospace; font-size:10px; color:#334155; word-break:break-all; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:260px;">loading...</span>
+            <button type="button" id="btn-copy-home-qr" style="padding:4px 10px; font-size:11px; font-weight:700; background:#2563eb; color:#ffffff; border:none; border-radius:4px; cursor:pointer; flex-shrink:0;">📋 Copy</button>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:11px;">
+            <a id="home-mobile-link" href="/mobile-alert.html" target="_blank" style="font-weight:700; color:#2563eb; text-decoration:underline;">
+              Open Companion on this PC ↗
+            </a>
+            <span id="home-qr-network-desc" style="color:#64748b; font-size:10px;">Works on any carrier & Wi-Fi</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
   <script>
     // QA Scorecard Data per Agent
@@ -912,11 +971,134 @@
     if (btnAckQa) btnAckQa.addEventListener('click', closeQaModal);
     if (qaBackdrop) qaBackdrop.addEventListener('click', closeQaModal);
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && qaModal && !qaModal.classList.contains('hidden')) {
-        closeQaModal();
+      if (e.key === 'Escape') {
+        if (qaModal && !qaModal.classList.contains('hidden')) closeQaModal();
+        if (mobileModal && !mobileModal.classList.contains('hidden')) closeMobileModal();
       }
     });
+
+    // Mobile Pairing Controller
+    let homeCachedServerInfo = null;
+    let homeActiveQrMode = 'cloud';
+    const mobileModal = document.getElementById('mobile-pairing-modal');
+    const btnOpenMobile = document.getElementById('btn-open-mobile-modal');
+    const btnCloseMobile = document.getElementById('btn-close-mobile-modal');
+    const mobileBackdrop = document.getElementById('mobile-pairing-backdrop');
+    const homeTabCloud = document.getElementById('home-qr-tab-cloud');
+    const homeTabLocal = document.getElementById('home-qr-tab-local');
+    const btnCopyHome = document.getElementById('btn-copy-home-qr');
+
+    function renderHomeQrCode() {
+      const qrContainer = document.getElementById('home-qr-code-container');
+      const compLink = document.getElementById('home-mobile-link');
+      const urlText = document.getElementById('home-qr-url-text');
+      const netDesc = document.getElementById('home-qr-network-desc');
+      const agentNameEl = document.getElementById('mobile-modal-agent-name');
+
+      if (!qrContainer) return;
+      const currentAgentId = (agentSelect && agentSelect.value) || localStorage.getItem('activeAgentId') || 'AGT-8842';
+      const agentObj = (typeof AGENT_PROFILES !== 'undefined' && AGENT_PROFILES[currentAgentId]) ? AGENT_PROFILES[currentAgentId] : { name: 'Alex Morgan' };
+      if (agentNameEl) agentNameEl.textContent = `${agentObj.name} (${currentAgentId})`;
+
+      let targetUrl = '';
+      if (homeActiveQrMode === 'cloud' && homeCachedServerInfo && homeCachedServerInfo.tunnelUrl) {
+        targetUrl = `${homeCachedServerInfo.tunnelUrl}/mobile-alert.html?agentId=${encodeURIComponent(currentAgentId)}`;
+        if (netDesc) netDesc.textContent = 'Works on any carrier (4G/5G/Wi-Fi) via HTTPS';
+      } else {
+        const host = homeCachedServerInfo && homeCachedServerInfo.localIp 
+          ? `${homeCachedServerInfo.localIp}:${homeCachedServerInfo.port || 4000}` 
+          : (window.location.host || '127.0.0.1:4000');
+        targetUrl = `http://${host}/mobile-alert.html?agentId=${encodeURIComponent(currentAgentId)}`;
+        if (netDesc) netDesc.textContent = 'Requires phone on same Wi-Fi (192.168.0.142)';
+      }
+
+      if (homeTabCloud) {
+        homeTabCloud.style.border = homeActiveQrMode === 'cloud' ? '1.5px solid #3b82f6' : '1.5px solid #cbd5e1';
+        homeTabCloud.style.background = homeActiveQrMode === 'cloud' ? '#eff6ff' : '#ffffff';
+        homeTabCloud.style.color = homeActiveQrMode === 'cloud' ? '#1d4ed8' : '#64748b';
+      }
+      if (homeTabLocal) {
+        homeTabLocal.style.border = homeActiveQrMode === 'local' ? '1.5px solid #3b82f6' : '1.5px solid #cbd5e1';
+        homeTabLocal.style.background = homeActiveQrMode === 'local' ? '#eff6ff' : '#ffffff';
+        homeTabLocal.style.color = homeActiveQrMode === 'local' ? '#1d4ed8' : '#64748b';
+      }
+
+      if (urlText) urlText.textContent = targetUrl;
+      if (compLink) compLink.href = targetUrl;
+
+      qrContainer.innerHTML = '';
+      try {
+        if (typeof QRCode !== 'undefined') {
+          new QRCode(qrContainer, {
+            text: targetUrl,
+            width: 172,
+            height: 172,
+            colorDark: '#0f172a',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.M
+          });
+        } else {
+          qrContainer.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=172x172&data=${encodeURIComponent(targetUrl)}" style="width:172px;height:172px;border-radius:4px;" alt="QR" />`;
+        }
+      } catch (e) {
+        qrContainer.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=172x172&data=${encodeURIComponent(targetUrl)}" style="width:172px;height:172px;border-radius:4px;" alt="QR" />`;
+      }
+    }
+
+    function openMobileModal() {
+      if (mobileModal) mobileModal.classList.remove('hidden');
+      fetch('/api/server-info')
+        .then(r => r.json())
+        .then(sInfo => {
+          homeCachedServerInfo = sInfo;
+          if (!sInfo.tunnelUrl) homeActiveQrMode = 'local';
+          renderHomeQrCode();
+        })
+        .catch(() => {
+          renderHomeQrCode();
+        });
+    }
+
+    function closeMobileModal() {
+      if (mobileModal) mobileModal.classList.add('hidden');
+    }
+
+    window.openMobilePairingModal = openMobileModal;
+    if (btnOpenMobile) btnOpenMobile.addEventListener('click', openMobileModal);
+    if (btnCloseMobile) btnCloseMobile.addEventListener('click', closeMobileModal);
+    if (mobileBackdrop) mobileBackdrop.addEventListener('click', closeMobileModal);
+
+    if (homeTabCloud) {
+      homeTabCloud.addEventListener('click', () => {
+        homeActiveQrMode = 'cloud';
+        renderHomeQrCode();
+      });
+    }
+    if (homeTabLocal) {
+      homeTabLocal.addEventListener('click', () => {
+        homeActiveQrMode = 'local';
+        renderHomeQrCode();
+      });
+    }
+
+    if (btnCopyHome) {
+      btnCopyHome.addEventListener('click', () => {
+        const urlText = document.getElementById('home-qr-url-text')?.textContent;
+        if (urlText && navigator.clipboard) {
+          navigator.clipboard.writeText(urlText).then(() => {
+            const oldTxt = btnCopyHome.textContent;
+            btnCopyHome.textContent = '✓ Copied!';
+            btnCopyHome.style.background = '#15803d';
+            setTimeout(() => {
+              btnCopyHome.textContent = oldTxt;
+              btnCopyHome.style.background = '#2563eb';
+            }, 2000);
+          });
+        }
+      });
+    }
   </script>
+  <script src="qrcode.min.js"></script>
 
 </body>
 </html>

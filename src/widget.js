@@ -2206,6 +2206,9 @@ function initAlertSettingsModal() {
   const pillLabel = document.getElementById('header-alert-pill');
   const compLink = document.getElementById('mobile-companion-link');
 
+  let cachedServerInfo = null;
+  let activeQrMode = 'cloud'; // 'cloud' | 'local'
+
   // Load from LocalStorage if present
   try {
     const raw = localStorage.getItem('wfm_alert_prefs');
@@ -2213,6 +2216,93 @@ function initAlertSettingsModal() {
       agentAlertPrefs = { ...agentAlertPrefs, ...JSON.parse(raw) };
     }
   } catch (e) {}
+
+  function renderMobileQrCode() {
+    const qrContainer = document.getElementById('qr-code-container');
+    const compLink = document.getElementById('mobile-companion-link');
+    const urlText = document.getElementById('qr-url-text');
+    const statusPill = document.getElementById('qr-status-pill');
+    const netDesc = document.getElementById('qr-network-desc');
+    const tabCloud = document.getElementById('qr-tab-cloud');
+    const tabLocal = document.getElementById('qr-tab-local');
+
+    if (!qrContainer) return;
+
+    const currentAgentId = (agentState && agentState.id) ? agentState.id : 'AGT-8842';
+    let targetUrl = '';
+
+    if (activeQrMode === 'cloud' && cachedServerInfo && cachedServerInfo.tunnelUrl) {
+      targetUrl = `${cachedServerInfo.tunnelUrl}/mobile-alert.html?agentId=${encodeURIComponent(currentAgentId)}`;
+      if (statusPill) {
+        statusPill.textContent = '🌐 Cloud Active';
+        statusPill.style.background = '#dcfce7';
+        statusPill.style.color = '#15803d';
+      }
+      if (netDesc) netDesc.textContent = 'Works on any mobile network (4G/5G/Wi-Fi)';
+    } else {
+      const host = cachedServerInfo && cachedServerInfo.localIp 
+        ? `${cachedServerInfo.localIp}:${cachedServerInfo.port || 4000}` 
+        : (window.location.host || '127.0.0.1:4000');
+      targetUrl = `http://${host}/mobile-alert.html?agentId=${encodeURIComponent(currentAgentId)}`;
+      if (statusPill) {
+        statusPill.textContent = '📶 Local Wi-Fi';
+        statusPill.style.background = '#eff6ff';
+        statusPill.style.color = '#1d4ed8';
+      }
+      if (netDesc) netDesc.textContent = 'Requires phone on same Wi-Fi';
+    }
+
+    if (tabCloud) {
+      tabCloud.style.border = activeQrMode === 'cloud' ? '1.5px solid #3b82f6' : '1.5px solid #cbd5e1';
+      tabCloud.style.background = activeQrMode === 'cloud' ? '#eff6ff' : '#ffffff';
+      tabCloud.style.color = activeQrMode === 'cloud' ? '#1d4ed8' : '#64748b';
+    }
+    if (tabLocal) {
+      tabLocal.style.border = activeQrMode === 'local' ? '1.5px solid #3b82f6' : '1.5px solid #cbd5e1';
+      tabLocal.style.background = activeQrMode === 'local' ? '#eff6ff' : '#ffffff';
+      tabLocal.style.color = activeQrMode === 'local' ? '#1d4ed8' : '#64748b';
+    }
+
+    if (urlText) urlText.textContent = targetUrl;
+    if (compLink) {
+      compLink.href = targetUrl;
+      compLink.title = targetUrl;
+    }
+
+    // Render using QRCode library
+    qrContainer.innerHTML = '';
+    try {
+      if (typeof QRCode !== 'undefined') {
+        new QRCode(qrContainer, {
+          text: targetUrl,
+          width: 164,
+          height: 164,
+          colorDark: '#0f172a',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+      } else {
+        qrContainer.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=164x164&data=${encodeURIComponent(targetUrl)}" style="width:164px;height:164px;border-radius:4px;" alt="QR" />`;
+      }
+    } catch (e) {
+      qrContainer.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=164x164&data=${encodeURIComponent(targetUrl)}" style="width:164px;height:164px;border-radius:4px;" alt="QR" />`;
+    }
+  }
+
+  function fetchServerInfoAndRenderQr() {
+    fetch('/api/server-info')
+      .then(r => r.json())
+      .then(sInfo => {
+        cachedServerInfo = sInfo;
+        if (!sInfo.tunnelUrl) {
+          activeQrMode = 'local';
+        }
+        renderMobileQrCode();
+      })
+      .catch(() => {
+        renderMobileQrCode();
+      });
+  }
 
   function updateUiLabels() {
     window.updateAlertUiLabels = updateUiLabels;
@@ -2233,28 +2323,7 @@ function initAlertSettingsModal() {
       b.classList.toggle('selected', b.dataset.sound === agentAlertPrefs.soundStyle);
     });
 
-    const qrContainer = document.getElementById('qr-code-container');
-    fetch('/api/server-info')
-      .then(r => r.json())
-      .then(sInfo => {
-        const targetHost = sInfo.localIp ? `${sInfo.localIp}:${sInfo.port || 4000}` : (window.location.host || 'localhost:4000');
-        const mobileUrl = `http://${targetHost}/mobile-alert.html?agentId=${agentState.id || 'AGT-8842'}`;
-        if (compLink) {
-          compLink.href = mobileUrl;
-          compLink.textContent = `Open Mobile Companion (${mobileUrl}) ↗`;
-        }
-        if (qrContainer) {
-          qrContainer.innerHTML = `<img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(mobileUrl)}" alt="Scan QR" style="width:68px; height:68px; border-radius:4px; object-fit:contain;" />`;
-        }
-      })
-      .catch(() => {
-        const host = window.location.host || 'localhost:4000';
-        const url = `http://${host}/mobile-alert.html?agentId=${agentState.id || 'AGT-8842'}`;
-        if (compLink) {
-          compLink.href = url;
-          compLink.textContent = `Open Mobile Companion (${url}) ↗`;
-        }
-      });
+    fetchServerInfoAndRenderQr();
   }
 
   // Fetch from server
@@ -2281,6 +2350,35 @@ function initAlertSettingsModal() {
   btnCard?.addEventListener('click', openModal);
   btnPairMobile?.addEventListener('click', openModal);
   btnClose?.addEventListener('click', closeModal);
+
+  // Tab switches for QR network mode
+  document.getElementById('qr-tab-cloud')?.addEventListener('click', () => {
+    activeQrMode = 'cloud';
+    renderMobileQrCode();
+  });
+  document.getElementById('qr-tab-local')?.addEventListener('click', () => {
+    activeQrMode = 'local';
+    renderMobileQrCode();
+  });
+
+  // Copy QR URL button
+  document.getElementById('btn-copy-qr-url')?.addEventListener('click', () => {
+    const urlText = document.getElementById('qr-url-text')?.textContent;
+    const btn = document.getElementById('btn-copy-qr-url');
+    if (urlText && navigator.clipboard) {
+      navigator.clipboard.writeText(urlText).then(() => {
+        if (btn) {
+          const oldTxt = btn.textContent;
+          btn.textContent = '✓ Copied!';
+          btn.style.background = '#15803d';
+          setTimeout(() => {
+            btn.textContent = oldTxt;
+            btn.style.background = '#2563eb';
+          }, 2000);
+        }
+      });
+    }
+  });
 
   // Device selection clicks
   document.querySelectorAll('.dev-choice-card').forEach(card => {

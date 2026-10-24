@@ -454,14 +454,53 @@ const server = http.createServer((req, res) => {
   // Server Info & Mobile Pairing Link
   if (pathname === '/api/server-info' && req.method === 'GET') {
     const localIp = getLocalNetworkIp();
-    res.writeHead(200, { 'Content-Type': 'application/json' });
+    let tunnelUrl = null;
+    try {
+      const tunnelFile = path.join(__dirname, 'tunnel.json');
+      if (fs.existsSync(tunnelFile)) {
+        const tData = JSON.parse(fs.readFileSync(tunnelFile, 'utf8'));
+        if (tData && tData.tunnelUrl) {
+          tunnelUrl = tData.tunnelUrl.replace(/\/+$/, '');
+        }
+      }
+    } catch (e) {}
+
+    const localUrl = `http://${localIp}:${PORT}/mobile-alert.html`;
+    const primaryMobileUrl = tunnelUrl ? `${tunnelUrl}/mobile-alert.html` : localUrl;
+
+    res.writeHead(200, {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    });
     res.end(JSON.stringify({
       success: true,
       port: PORT,
       localIp: localIp,
-      mobileUrl: `http://${localIp}:${PORT}/mobile-alert.html`,
+      localUrl: localUrl,
+      tunnelUrl: tunnelUrl,
+      mobileUrl: primaryMobileUrl,
       serverTime: new Date().toISOString()
     }));
+    return;
+  }
+
+  // Tunnel Info Management Route
+  if (pathname === '/api/tunnel-info' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const data = JSON.parse(body || '{}');
+        if (data.tunnelUrl) {
+          fs.writeFileSync(path.join(__dirname, 'tunnel.json'), JSON.stringify(data, null, 2), 'utf8');
+        }
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify({ success: true, tunnelUrl: data.tunnelUrl }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
     return;
   }
 
