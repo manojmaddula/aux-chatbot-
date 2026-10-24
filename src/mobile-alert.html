@@ -1064,8 +1064,20 @@
     }
 
     // SHOW INCOMING CALL MODAL
-    function triggerIncomingCallScreen(alarmData) {
-      if (isSilenced) return; // Do not re-trigger if already silenced by user
+    function triggerIncomingCallScreen(alarmData = {}) {
+      const isSupervisor = alarmData && (
+        alarmData.triggeredBy === 'SUPERVISOR_WALLBOARD' ||
+        alarmData.triggeredBy === 'SUPERVISOR_RECALL' ||
+        alarmData.force === true
+      );
+
+      // A manual supervisor recall or ring always overrides prior agent silence
+      if (isSupervisor) {
+        isSilenced = false;
+      } else if (isSilenced) {
+        return; // Periodic countdown loop will not re-ring once silenced
+      }
+
       isAlarmActive = true;
       callOverlay.classList.remove('hidden');
 
@@ -1078,7 +1090,18 @@
       callStatThreshold.textContent = `+${threshMins}m`;
       callStatOverdue.textContent = `+${String(overMins).padStart(2, '0')}:${String(overSecs).padStart(2, '0')}`;
 
-      startAlarmSound(alertPrefs.soundStyle || 'phone_ring');
+      const callerSub = document.querySelector('.caller-sub');
+      if (callerSub) {
+        if (alarmData.triggeredBy === 'SUPERVISOR_RECALL') {
+          callerSub.textContent = '📞 SUPERVISOR VOICE RECALL';
+        } else if (alarmData.triggeredBy === 'SUPERVISOR_WALLBOARD') {
+          callerSub.textContent = '🚨 SUPERVISOR FLOOR RECALL';
+        } else {
+          callerSub.textContent = 'AUTOMATED ADHERENCE BOT';
+        }
+      }
+
+      startAlarmSound(alarmData.soundStyle || alertPrefs.soundStyle || 'phone_ring');
     }
 
     // DISMISS / ACKNOWLEDGE
@@ -1290,9 +1313,18 @@
           isAlarmActive = false;
           renderBreakUI();
         } else if (data.type === 'TRIGGER_ALARM') {
-          if (data.payload.agentId === currentAgentId) {
+          const isSup = data.payload && (data.payload.triggeredBy === 'SUPERVISOR_WALLBOARD' || data.payload.triggeredBy === 'SUPERVISOR_RECALL' || data.payload.force);
+          if (!data.payload || data.payload.agentId === currentAgentId || isSup) {
             triggerIncomingCallScreen(data.payload);
           }
+        } else if (data.type === 'SUPERVISOR_RECALL') {
+          triggerIncomingCallScreen({
+            agentId: currentAgentId,
+            triggeredBy: 'SUPERVISOR_RECALL',
+            force: true,
+            soundStyle: 'voice',
+            message: data.payload ? data.payload.message : 'Supervisor issued an immediate workstation recall.'
+          });
         }
       };
     } catch (e) {}
@@ -1312,8 +1344,21 @@
         es.addEventListener('ALARM_TRIGGERED', (e) => {
           try {
             const alarm = JSON.parse(e.data);
-            if (alarm.agentId === currentAgentId && !isSilenced && !alarm.silenced && (alertPrefs.device === 'mobile' || alertPrefs.device === 'both')) {
-              triggerIncomingCallScreen(alarm);
+            const isSupervisor = alarm && (
+              alarm.triggeredBy === 'SUPERVISOR_WALLBOARD' ||
+              alarm.triggeredBy === 'SUPERVISOR_RECALL' ||
+              alarm.force === true
+            );
+            const devMatches = (!alarm.device || alarm.device === 'mobile' || alarm.device === 'both' || alertPrefs.device === 'mobile' || alertPrefs.device === 'both');
+            const agentMatches = (alarm.agentId === currentAgentId || isSupervisor);
+
+            if (agentMatches && devMatches) {
+              if (isSupervisor) {
+                isSilenced = false;
+                triggerIncomingCallScreen(alarm);
+              } else if (!isSilenced && !alarm.silenced) {
+                triggerIncomingCallScreen(alarm);
+              }
             }
           } catch (err) {}
         });

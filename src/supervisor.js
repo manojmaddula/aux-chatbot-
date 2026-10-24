@@ -3,26 +3,26 @@
 // Active Shift Agents Roster
 let activeAgents = [
   // Sarah Jenkins (SUP-014) - Floor Lead & General Customer Service
-  { id: 'AGT-9102', name: 'Samantha Vance', queue: 'General Customer Service', state: 'WORKING (IN CALL)', breakLeft: '-', adherence: '71.2%', teaCount: 1, lunchVar: '+25m', supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins' },
-  { id: 'AGT-6512', name: 'Rachel Green', queue: 'General Customer Service', state: 'AVAILABLE', breakLeft: '-', adherence: '98.2%', teaCount: 1, lunchVar: '0m', supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins' },
-  { id: 'AGT-8819', name: 'Marcus Brody', queue: 'General Customer Service', state: 'WORKING (IN CALL)', breakLeft: '-', adherence: '91.0%', teaCount: 1, lunchVar: '+2m', supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins' },
-  { id: 'AGT-3310', name: 'Chloe Bennett', queue: 'General Customer Service', state: 'AVAILABLE', breakLeft: '-', adherence: '94.2%', teaCount: 1, lunchVar: '0m', supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins' },
+  { id: 'AGT-8842', name: 'Alex Morgan', queue: 'General Customer Service', state: 'AVAILABLE', breakLeft: '-', adherence: '96.4%', teaCount: 1, lunchVar: '0m', supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins', alertDevice: 'both', thresholdMins: 2 },
+  { id: 'AGT-9102', name: 'Samantha Vance', queue: 'General Customer Service', state: 'WORKING (IN CALL)', breakLeft: '-', adherence: '71.2%', teaCount: 1, lunchVar: '+25m', supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins', alertDevice: 'both', thresholdMins: 2 },
+  { id: 'AGT-6512', name: 'Rachel Green', queue: 'General Customer Service', state: 'AVAILABLE', breakLeft: '-', adherence: '98.2%', teaCount: 1, lunchVar: '0m', supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins', alertDevice: 'both', thresholdMins: 2 },
+  { id: 'AGT-8819', name: 'Marcus Brody', queue: 'General Customer Service', state: 'WORKING (IN CALL)', breakLeft: '-', adherence: '91.0%', teaCount: 1, lunchVar: '+2m', supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins', alertDevice: 'both', thresholdMins: 2 },
+  { id: 'AGT-3310', name: 'Chloe Bennett', queue: 'General Customer Service', state: 'AVAILABLE', breakLeft: '-', adherence: '94.2%', teaCount: 1, lunchVar: '0m', supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins', alertDevice: 'both', thresholdMins: 2 },
 
   // Michael Chang (SUP-021) - Customer Billing & Retention Manager
-  { id: 'AGT-4092', name: 'Jordan Miller', queue: 'Customer Billing & Retention', state: 'AVAILABLE', breakLeft: '-', adherence: '78.5%', teaCount: 4, lunchVar: '0m', supervisorId: 'SUP-021', supervisorName: 'Michael Chang' },
-  { id: 'AGT-5521', name: 'Lucas Wright', queue: 'Customer Billing & Retention', state: 'WORKING (IN CALL)', breakLeft: '-', adherence: '88.5%', teaCount: 2, lunchVar: '0m', supervisorId: 'SUP-021', supervisorName: 'Michael Chang' },
-  { id: 'AGT-7703', name: 'Maya Patel', queue: 'Customer Billing & Retention', state: 'AVAILABLE', breakLeft: '-', adherence: '97.0%', teaCount: 1, lunchVar: '0m', supervisorId: 'SUP-021', supervisorName: 'Michael Chang' },
+  { id: 'AGT-4092', name: 'Jordan Miller', queue: 'Customer Billing & Retention', state: 'AVAILABLE', breakLeft: '-', adherence: '78.5%', teaCount: 4, lunchVar: '0m', supervisorId: 'SUP-021', supervisorName: 'Michael Chang', alertDevice: 'both', thresholdMins: 2 },
+  { id: 'AGT-5521', name: 'Lucas Wright', queue: 'Customer Billing & Retention', state: 'WORKING (IN CALL)', breakLeft: '-', adherence: '88.5%', teaCount: 2, lunchVar: '0m', supervisorId: 'SUP-021', supervisorName: 'Michael Chang', alertDevice: 'both', thresholdMins: 2 },
+  { id: 'AGT-7703', name: 'Maya Patel', queue: 'Customer Billing & Retention', state: 'AVAILABLE', breakLeft: '-', adherence: '97.0%', teaCount: 1, lunchVar: '0m', supervisorId: 'SUP-021', supervisorName: 'Michael Chang', alertDevice: 'both', thresholdMins: 2 },
 
   // Elena Rostova (SUP-035) - QA & Tier-2 Tech Support Director
-  { id: 'AGT-8842', name: 'Alex Morgan', queue: 'Tier-2 Tech Support', state: 'AVAILABLE', breakLeft: '-', adherence: '96.4%', teaCount: 1, lunchVar: '0m', supervisorId: 'SUP-035', supervisorName: 'Elena Rostova' },
-  { id: 'AGT-4491', name: 'Carlos Mendez', queue: 'Tier-2 Tech Support', state: 'AVAILABLE', breakLeft: '-', adherence: '85.0%', teaCount: 2, lunchVar: '+6m', supervisorId: 'SUP-035', supervisorName: 'Elena Rostova' },
+  { id: 'AGT-4491', name: 'Carlos Mendez', queue: 'Tier-2 Tech Support', state: 'AVAILABLE', breakLeft: '-', adherence: '85.0%', teaCount: 2, lunchVar: '+6m', supervisorId: 'SUP-035', supervisorName: 'Elena Rostova', alertDevice: 'mobile', thresholdMins: 2 },
 
   // David Sterling (SUP-042) - Emergency Inbound Director
-  { id: 'AGT-7740', name: 'David Chen', queue: 'Emergency Inbound', state: 'AUX: AUX BREAK', breakLeft: '08:42', adherence: '82.0%', teaCount: 2, lunchVar: '0m', supervisorId: 'SUP-042', supervisorName: 'David Sterling' },
-  { id: 'AGT-6628', name: 'Olivia Taylor', queue: 'Emergency Inbound', state: 'AVAILABLE', breakLeft: '-', adherence: '99.5%', teaCount: 1, lunchVar: '0m', supervisorId: 'SUP-042', supervisorName: 'David Sterling' },
+  { id: 'AGT-7740', name: 'David Chen', queue: 'Emergency Inbound', state: 'AUX: AUX BREAK', breakLeft: '08:42', adherence: '82.0%', teaCount: 2, lunchVar: '0m', supervisorId: 'SUP-042', supervisorName: 'David Sterling', alertDevice: 'both', thresholdMins: 2 },
+  { id: 'AGT-6628', name: 'Olivia Taylor', queue: 'Emergency Inbound', state: 'AVAILABLE', breakLeft: '-', adherence: '99.5%', teaCount: 1, lunchVar: '0m', supervisorId: 'SUP-042', supervisorName: 'David Sterling', alertDevice: 'both', thresholdMins: 2 },
 
   // Priya Sharma (SUP-059) - WFM Scheduling & Trainee Development Lead
-  { id: 'AGT-2219', name: "Liam O'Connor", queue: 'General Customer Service', state: 'AUX: TRAINING', breakLeft: '22:15', adherence: '76.5%', teaCount: 3, lunchVar: '+14m', supervisorId: 'SUP-059', supervisorName: 'Priya Sharma' }
+  { id: 'AGT-2219', name: "Liam O'Connor", queue: 'General Customer Service', state: 'AUX: TRAINING', breakLeft: '22:15', adherence: '76.5%', teaCount: 3, lunchVar: '+14m', supervisorId: 'SUP-059', supervisorName: 'Priya Sharma', alertDevice: 'laptop', thresholdMins: 2 }
 ];
 
 // Supervisor Accounts
@@ -98,7 +98,28 @@ try {
   bc.onmessage = (event) => {
     const data = event.data;
     if (data.type === 'BREAK_APPROVED') {
-      updateAgentState(data.payload.agent?.id || 'AGT-8842', `AUX: ${data.payload.auxCode}`, `${data.payload.durationMinutes}:00`);
+      const aId = data.payload.agent?.id || 'AGT-8842';
+      const ag = activeAgents.find(a => a.id === aId);
+      if (ag) {
+        ag.state = `AUX: ${data.payload.auxCode}`;
+        ag.breakLeft = `${data.payload.durationMinutes}:00`;
+        if (data.payload.alertDevice || data.payload.device) {
+          ag.alertDevice = data.payload.alertDevice || data.payload.device;
+        }
+        if (data.payload.thresholdMins !== undefined) {
+          ag.thresholdMins = data.payload.thresholdMins;
+        }
+      }
+      renderWallboard();
+      fetchQueue();
+    } else if (data.type === 'ALARM_ACKNOWLEDGED' || data.type === 'BREAK_ENDED') {
+      const aId = data.payload?.agentId || 'AGT-8842';
+      const ag = activeAgents.find(a => a.id === aId);
+      if (ag) {
+        ag.state = 'AVAILABLE';
+        ag.breakLeft = '-';
+      }
+      renderWallboard();
       fetchQueue();
     } else if (data.type === 'BREAK_REJECTED') {
       fetchQueue();
@@ -344,7 +365,52 @@ function updateAgentState(agentId, newState, breakLeft = '-') {
 }
 
 
+function showSupervisorToast(msg, isSuccess = true) {
+  let toast = document.getElementById('supervisor-dynamic-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'supervisor-dynamic-toast';
+    toast.style.cssText = `
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      z-index: 999999;
+      background: #0f172a;
+      color: #ffffff;
+      padding: 16px 22px;
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+      border-left: 5px solid #ef4444;
+      font-size: 14px;
+      line-height: 1.5;
+      max-width: 440px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    `;
+    document.body.appendChild(toast);
+  }
+  toast.style.borderLeftColor = isSuccess ? '#10b981' : '#ef4444';
+  const icon = (msg.includes('Voice') || msg.includes('Recall') || msg.includes('Bot')) ? '📞' : '🚨';
+  toast.innerHTML = `<div style="font-size:26px;">${icon}</div><div><strong style="display:block; font-size:12px; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px;">Floor Adherence Action</strong><div style="font-weight:600;">${msg}</div></div>`;
+  toast.style.opacity = '1';
+  toast.style.transform = 'translateY(0)';
+  
+  if (window._toastTimer) clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateY(-10px)';
+  }, 4500);
+}
+
 window.ringAgentAlarm = async function(agentId, agentName) {
+  const ag = activeAgents.find(a => a.id === agentId) || {};
+  const targetDevice = ag.alertDevice || 'both';
+  const threshold = ag.thresholdMins !== undefined ? ag.thresholdMins : 2;
+  const customMessage = `Supervisor ${currentSupervisor.name} issued an urgent floor adherence alert. Your break threshold has been exceeded. Please return to your workstation immediately.`;
+
+  let alarmData = null;
   try {
     const res = await fetch('/api/alerts/trigger-alarm', {
       method: 'POST',
@@ -352,41 +418,95 @@ window.ringAgentAlarm = async function(agentId, agentName) {
       body: JSON.stringify({
         agentId: agentId,
         agentName: agentName,
+        device: targetDevice,
+        thresholdMins: threshold,
         triggeredBy: 'SUPERVISOR_WALLBOARD',
-        message: `Supervisor ${currentSupervisor.name} issued an urgent floor adherence alert. Your break threshold has been exceeded. Please return to your workstation immediately.`
+        soundStyle: 'phone_ring',
+        force: true,
+        message: customMessage
       })
     });
-    const data = await res.json();
-    if (data.success) {
-      alert(`🚨 Alarm & Calling Dispatched to ${agentName} (${agentId})!\nTarget Device: [${(data.alarm.device || 'BOTH').toUpperCase()}].\nRinging and vibrating their device now.`);
-    }
+    alarmData = await res.json();
   } catch (err) {
-    alert(`Dispatched alarm to ${agentName}.`);
+    console.warn('Backend trigger failed:', err);
   }
 
+  const effectiveDev = (alarmData && alarmData.alarm && alarmData.alarm.device) ? alarmData.alarm.device : targetDevice;
+
   if (bc) {
-    const targetDev = (data && data.alarm && data.alarm.device) ? data.alarm.device : 'both';
-    bc.postMessage({
-      type: 'TRIGGER_ALARM',
-      payload: {
-        agentId: agentId,
-        agentName: agentName,
-        device: targetDev,
-        message: `Supervisor ${currentSupervisor.name} issued an immediate workstation recall.`
-      }
-    });
+    try {
+      bc.postMessage({
+        type: 'TRIGGER_ALARM',
+        payload: {
+          agentId: agentId,
+          agentName: agentName,
+          device: effectiveDev,
+          triggeredBy: 'SUPERVISOR_WALLBOARD',
+          force: true,
+          message: customMessage
+        }
+      });
+    } catch (e) {}
   }
+
+  showSupervisorToast(`Calling & Alarm dispatched to ${agentName} (${agentId})! Target: [${effectiveDev.toUpperCase()}]. Workstation & phone ringing now.`);
 };
 
-window.recallAgent = function(agentId, agentName) {
-  const customMessage = `Attention Agent ${agentName}: Supervisor Sarah Jenkins has issued an immediate workstation recall. Please return to your desk and switch to Available status.`;
-  if (bc) {
-    bc.postMessage({
-      type: 'SUPERVISOR_RECALL',
-      payload: { agentId, message: customMessage }
+window.recallAgent = async function(agentId, agentName) {
+  const ag = activeAgents.find(a => a.id === agentId) || {};
+  const targetDevice = ag.alertDevice || 'both';
+  const customMessage = `Attention Agent ${agentName}: Supervisor ${currentSupervisor.name} has issued an urgent automated bot voice recall. Please return to your desk and switch to AVAILABLE status immediately.`;
+
+  let alarmData = null;
+  try {
+    const res = await fetch('/api/alerts/trigger-alarm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        agentId: agentId,
+        agentName: agentName,
+        device: targetDevice,
+        triggeredBy: 'SUPERVISOR_RECALL',
+        soundStyle: 'voice',
+        force: true,
+        message: customMessage
+      })
     });
+    alarmData = await res.json();
+  } catch (err) {
+    console.warn('Backend trigger failed:', err);
   }
-  alert(`Automated Bot Recall dispatched to ${agentName} (${agentId})! Their desktop widget will ring and speak the voice instructions.`);
+
+  const effectiveDev = (alarmData && alarmData.alarm && alarmData.alarm.device) ? alarmData.alarm.device : targetDevice;
+
+  if (bc) {
+    try {
+      bc.postMessage({
+        type: 'SUPERVISOR_RECALL',
+        payload: {
+          agentId: agentId,
+          agentName: agentName,
+          device: effectiveDev,
+          force: true,
+          message: customMessage
+        }
+      });
+      bc.postMessage({
+        type: 'TRIGGER_ALARM',
+        payload: {
+          agentId: agentId,
+          agentName: agentName,
+          device: effectiveDev,
+          soundStyle: 'voice',
+          triggeredBy: 'SUPERVISOR_RECALL',
+          force: true,
+          message: customMessage
+        }
+      });
+    } catch (e) {}
+  }
+
+  showSupervisorToast(`Automated Bot Recall dispatched to ${agentName} (${agentId})! Target: [${effectiveDev.toUpperCase()}]. Workstation & phone ringing now.`);
 };
 
 window.forceAvailable = function(agentId) {

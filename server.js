@@ -535,6 +535,8 @@ const server = http.createServer((req, res) => {
           soundStyle: payload.soundStyle || prefs.soundStyle || 'phone_ring',
           mobilePhone: prefs.mobilePhone || '+1 (555) 019-8842',
           triggeredBy: payload.triggeredBy || 'WFM_AUTOMATION_THRESHOLD',
+          force: payload.force || (payload.triggeredBy && payload.triggeredBy.includes('SUPERVISOR')) || false,
+          silenced: false,
           message: payload.message || `Attention Agent ${payload.agentName || 'Alex Morgan'}: Your AUX break duration and variance threshold of ${prefs.thresholdMins}m have been exceeded. Please return to your workstation immediately and resume AVAILABLE status.`,
           triggeredAt: new Date().toISOString(),
           status: 'ACTIVE'

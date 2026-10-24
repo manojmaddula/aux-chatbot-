@@ -389,11 +389,16 @@ try {
         silenceLaptopAlarm();
       }
     } else if (data.type === 'TRIGGER_ALARM') {
-      if (!data.payload || !data.payload.agentId || data.payload.agentId === agentState.id) {
+      const isSup = data.payload && (
+        data.payload.triggeredBy === 'SUPERVISOR_WALLBOARD' ||
+        data.payload.triggeredBy === 'SUPERVISOR_RECALL' ||
+        data.payload.force === true
+      );
+      if (!data.payload || !data.payload.agentId || data.payload.agentId === agentState.id || isSup) {
         // STRICT DEVICE ROUTING CHECK
         const targetDev = (data.payload && data.payload.device) || agentAlertPrefs.device || 'both';
         if (targetDev === 'laptop' || targetDev === 'both') {
-          triggerBotCallModal(data.payload.overdueMins || 1, data.payload.overdueSecs || 0, data.payload.message);
+          triggerBotCallModal(data.payload.overdueMins || 1, data.payload.overdueSecs || 0, data.payload.message, isSup);
         } else {
           // Mobile Only: record log and keep laptop calm
           addSupervisorLog('OVERDUE_ALARM', `Threshold exceeded! Calling alarm routed to Mobile Phone.`);
@@ -408,8 +413,11 @@ try {
         }
       }
     } else if (data.type === 'SUPERVISOR_RECALL') {
-      triggerBotCallModal(1, 0, data.payload.message);
-      addSupervisorLog('RECALL', `Supervisor Sarah Jenkins dispatched a bot voice recall to workstation.`);
+      const isSup = true;
+      if (!data.payload || !data.payload.agentId || data.payload.agentId === agentState.id || isSup) {
+        triggerBotCallModal(1, 0, data.payload ? data.payload.message : '', true);
+        addSupervisorLog('RECALL', `Supervisor issued an automated bot voice recall to workstation.`);
+      }
     } else if (data.type === 'BROADCAST_ALERT') {
       // Received broadcast from supervisor
       broadcastTicker.classList.remove('hidden');
@@ -879,10 +887,10 @@ function playWarningChime() {
   setTimeout(() => playTone(880, 'triangle', 0.4), 220);
 }
 
-function startPhoneRingtone(soundType = (agentAlertPrefs.soundStyle || 'phone_ring')) {
+function startPhoneRingtone(soundType = (agentAlertPrefs.soundStyle || 'phone_ring'), force = false) {
   stopPhoneRingtone();
-  // STRICT DEVICE GUARD: If target device is Mobile Only, never ring laptop speakers!
-  if (agentAlertPrefs.device === 'mobile') {
+  // STRICT DEVICE GUARD: If target device is Mobile Only, never ring laptop speakers unless forced
+  if (!force && agentAlertPrefs.device === 'mobile') {
     return;
   }
   try {
@@ -1316,7 +1324,7 @@ function triggerBotCallModal(overMins = 1, overSecs = 0, customMsg = '', force =
   if (speechTextEl) speechTextEl.textContent = `"${speechMessage}"`;
 
   if (overlay) overlay.classList.remove('hidden');
-  startPhoneRingtone(agentAlertPrefs.soundStyle || 'phone_ring');
+  startPhoneRingtone(agentAlertPrefs.soundStyle || 'phone_ring', force);
   addSupervisorLog('OVERDUE_CALL', `Automated bot voice call placed to agent for adherence violation.`);
 
   if ('speechSynthesis' in window && agentAlertPrefs.soundStyle !== 'siren') {
@@ -2294,10 +2302,15 @@ function initWidgetAlertSSE() {
     es.addEventListener('ALARM_TRIGGERED', (e) => {
       try {
         const a = JSON.parse(e.data);
-        if (!a.agentId || a.agentId === agentState.id) {
+        const isSupervisor = a && (
+          a.triggeredBy === 'SUPERVISOR_WALLBOARD' ||
+          a.triggeredBy === 'SUPERVISOR_RECALL' ||
+          a.force === true
+        );
+        if (!a.agentId || a.agentId === agentState.id || isSupervisor) {
           const dev = a.device || agentAlertPrefs.device || 'both';
           if (dev === 'laptop' || dev === 'both') {
-            triggerBotCallModal(a.overdueMins || 1, a.overdueSecs || 0, a.message);
+            triggerBotCallModal(a.overdueMins || 1, a.overdueSecs || 0, a.message, isSupervisor);
           }
         }
       } catch (err) {}
