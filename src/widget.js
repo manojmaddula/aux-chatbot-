@@ -390,7 +390,22 @@ try {
       }
     } else if (data.type === 'TRIGGER_ALARM') {
       if (!data.payload || !data.payload.agentId || data.payload.agentId === agentState.id) {
-        triggerBotCallModal(data.payload.overdueMins || 1, data.payload.overdueSecs || 0, data.payload.message);
+        // STRICT DEVICE ROUTING CHECK
+        const targetDev = (data.payload && data.payload.device) || agentAlertPrefs.device || 'both';
+        if (targetDev === 'laptop' || targetDev === 'both') {
+          triggerBotCallModal(data.payload.overdueMins || 1, data.payload.overdueSecs || 0, data.payload.message);
+        } else {
+          // Mobile Only: record log and keep laptop calm
+          addSupervisorLog('OVERDUE_ALARM', `Threshold exceeded! Calling alarm routed to Mobile Phone.`);
+        }
+      }
+    } else if (data.type === 'PREFERENCES_UPDATED') {
+      if (!data.payload || !data.payload.agentId || data.payload.agentId === agentState.id) {
+        agentAlertPrefs = { ...agentAlertPrefs, ...data.payload };
+        try { localStorage.setItem('wfm_alert_prefs', JSON.stringify(agentAlertPrefs)); } catch (e) {}
+        if (typeof window.updateAlertUiLabels === 'function') {
+          window.updateAlertUiLabels();
+        }
       }
     } else if (data.type === 'SUPERVISOR_RECALL') {
       triggerBotCallModal(1, 0, data.payload.message);
@@ -866,6 +881,10 @@ function playWarningChime() {
 
 function startPhoneRingtone(soundType = (agentAlertPrefs.soundStyle || 'phone_ring')) {
   stopPhoneRingtone();
+  // STRICT DEVICE GUARD: If target device is Mobile Only, never ring laptop speakers!
+  if (agentAlertPrefs.device === 'mobile') {
+    return;
+  }
   try {
     const AudioCtx = window.AudioContext || window.webkitAudioContext;
     ringAudioContext = new AudioCtx();
@@ -1094,6 +1113,21 @@ btnCompleteAcw.addEventListener('click', async () => {
 // ==========================================
 
 function startBreak(breakData) {
+  // Sync alert destination device and variance threshold from break submission
+  const targetDev = breakData.alertDevice || breakData.device;
+  if (targetDev) {
+    agentAlertPrefs.device = targetDev;
+  }
+  if (typeof breakData.thresholdMins === 'number') {
+    agentAlertPrefs.thresholdMins = breakData.thresholdMins;
+  }
+  try {
+    localStorage.setItem('wfm_alert_prefs', JSON.stringify(agentAlertPrefs));
+  } catch (e) {}
+  if (typeof window.updateAlertUiLabels === 'function') {
+    window.updateAlertUiLabels();
+  }
+
   const durMins = parseInt(breakData.durationMinutes, 10) || 15;
   const now = Date.now();
   const totalMs = durMins * 60 * 1000;
@@ -1204,7 +1238,12 @@ function updateBreakCountdown() {
       agentState.status = 'OVERDUE';
       agentStatusDot.className = 'status-indicator overdue';
       agentStateLabel.className = 'state-label overdue-mode';
-      agentStateLabel.textContent = `🚨 THRESHOLD EXCEEDED (+${formatted})`;
+      const targetDevice = agentAlertPrefs.device || 'both';
+      if (targetDevice === 'mobile') {
+        agentStateLabel.textContent = `🚨 OVERDUE (+${formatted}) • Alert Routed to Mobile`;
+      } else {
+        agentStateLabel.textContent = `🚨 THRESHOLD EXCEEDED (+${formatted})`;
+      }
 
       breakTimeLeft.textContent = `+${formatted}`;
       breakTimeLeft.className = 'countdown-digits overdue';
@@ -1265,7 +1304,12 @@ async function dispatchMobileThresholdAlarm(overMins = 1, overSecs = 0) {
   } catch (e) {}
 }
 
-function triggerBotCallModal(overMins = 1, overSecs = 0, customMsg = '') {
+function triggerBotCallModal(overMins = 1, overSecs = 0, customMsg = '', force = false) {
+  // STRICT DEVICE GUARD: If target device is Mobile Only, never show modal or ring on laptop unless forced
+  if (!force && agentAlertPrefs.device === 'mobile') {
+    console.log('[Widget] Alert routed to Mobile Only. Suppressing laptop modal.');
+    return;
+  }
   botCallTriggered = true;
   const overlay = document.getElementById('bot-call-overlay');
   const speechTextEl = document.getElementById('bot-call-speech-text');
@@ -2028,6 +2072,7 @@ function initAlertSettingsModal() {
   } catch (e) {}
 
   function updateUiLabels() {
+    window.updateAlertUiLabels = updateUiLabels;
     const devText = agentAlertPrefs.device === 'both' ? 'Both' : (agentAlertPrefs.device === 'mobile' ? 'Mobile' : 'Laptop');
     if (devLabel) devLabel.textContent = agentAlertPrefs.device === 'both' ? '💻+📱 Both' : (agentAlertPrefs.device === 'mobile' ? '📱 Mobile' : '💻 Laptop');
     if (threshLabel) threshLabel.textContent = `+${agentAlertPrefs.thresholdMins}m`;
@@ -2156,3 +2201,61 @@ function initAlertSettingsModal() {
 
 // Initialize on load
 initAlertSettingsModal();
+
+
+// Real-time SSE listener for Agent Widget
+function initWidgetAlertSSE() {
+  try {
+    const es = new EventSource('/api/alerts/stream');
+    es.addEventListener('PREFERENCES_UPDATED', (e) => {
+      try {
+        const p = JSON.parse(e.data);
+        if (!p.agentId || p.agentId === agentState.id) {
+          agentAlertPrefs = { ...agentAlertPrefs, ...p };
+          try { localStorage.setItem('wfm_alert_prefs', JSON.stringify(agentAlertPrefs)); } catch (err) {}
+          if (typeof window.updateAlertUiLabels === 'function') {
+            window.updateAlertUiLabels();
+          }
+        }
+      } catch (err) {}
+    });
+    es.addEventListener('ALARM_TRIGGERED', (e) => {
+      try {
+        const a = JSON.parse(e.data);
+        if (!a.agentId || a.agentId === agentState.id) {
+          const dev = a.device || agentAlertPrefs.device || 'both';
+          if (dev === 'laptop' || dev === 'both') {
+            triggerBotCallModal(a.overdueMins || 1, a.overdueSecs || 0, a.message);
+          }
+        }
+      } catch (err) {}
+    });
+    es.addEventListener('ALARM_ACKNOWLEDGED', (e) => {
+      try {
+        const ack = JSON.parse(e.data);
+        if (!ack.agentId || ack.agentId === agentState.id) {
+          stopPhoneRingtone();
+          if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+          const overlay = document.getElementById('bot-call-overlay');
+          if (overlay) overlay.classList.add('hidden');
+          endBreakEarly();
+        }
+      } catch (err) {}
+    });
+  } catch (e) {
+    console.warn('SSE not supported on desktop widget:', e);
+  }
+}
+initWidgetAlertSSE();
+
+// Storage listener for cross-tab preference sync
+window.addEventListener('storage', (e) => {
+  if (e.key === 'wfm_alert_prefs' && e.newValue) {
+    try {
+      agentAlertPrefs = { ...agentAlertPrefs, ...JSON.parse(e.newValue) };
+      if (typeof window.updateAlertUiLabels === 'function') {
+        window.updateAlertUiLabels();
+      }
+    } catch (err) {}
+  }
+});

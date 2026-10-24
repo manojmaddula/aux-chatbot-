@@ -892,6 +892,7 @@
 
     async function saveAlertPreferences() {
       try {
+        localStorage.setItem('wfm_alert_prefs', JSON.stringify(alertPrefs));
         await fetch('/api/alerts/preferences', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -905,6 +906,19 @@
       } catch (e) {
         console.warn('Preferences save error:', e);
       }
+
+      try {
+        const bc = new BroadcastChannel('wfm_aux_channel');
+        bc.postMessage({
+          type: 'PREFERENCES_UPDATED',
+          payload: {
+            agentId: currentAgentId,
+            device: alertPrefs.device,
+            thresholdMins: alertPrefs.thresholdMins,
+            soundStyle: alertPrefs.soundStyle
+          }
+        });
+      } catch (e) {}
     }
 
     // AUDIO & VIBRATION SYNTHESIZER
@@ -1168,6 +1182,20 @@
 
         if (data.type === 'BREAK_APPROVED') {
           activeBreak = data.payload;
+          if (data.payload.alertDevice || data.payload.device) {
+            alertPrefs.device = data.payload.alertDevice || data.payload.device;
+            document.querySelectorAll('.dev-btn').forEach(b => {
+              b.classList.toggle('active', b.dataset.device === alertPrefs.device);
+            });
+            metricDevice.textContent = alertPrefs.device === 'both' ? 'Both' : (alertPrefs.device === 'mobile' ? 'Mobile' : 'Laptop');
+          }
+          if (typeof data.payload.thresholdMins === 'number') {
+            alertPrefs.thresholdMins = data.payload.thresholdMins;
+            document.querySelectorAll('.thresh-btn').forEach(b => {
+              b.classList.toggle('active', parseInt(b.dataset.threshold, 10) === alertPrefs.thresholdMins);
+            });
+            metricThreshold.textContent = `+${alertPrefs.thresholdMins}m`;
+          }
           localStorage.setItem('wfm_active_break', JSON.stringify(data.payload));
           renderBreakUI();
         } else if (data.type === 'ALARM_ACKNOWLEDGED' || data.type === 'BREAK_ENDED') {

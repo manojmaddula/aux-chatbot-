@@ -365,11 +365,13 @@ window.ringAgentAlarm = async function(agentId, agentName) {
   }
 
   if (bc) {
+    const targetDev = (data && data.alarm && data.alarm.device) ? data.alarm.device : 'both';
     bc.postMessage({
       type: 'TRIGGER_ALARM',
       payload: {
         agentId: agentId,
         agentName: agentName,
+        device: targetDev,
         message: `Supervisor ${currentSupervisor.name} issued an immediate workstation recall.`
       }
     });

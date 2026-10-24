@@ -501,10 +501,20 @@ btnSubmitBreak.addEventListener('click', async () => {
           durationMinutes: payload.durationMinutes,
           thresholdMins: selectedThresh,
           alertDevice: selectedDevice,
+          device: selectedDevice,
           approvedAt: Date.now(),
           expiresAt: Date.now() + (payload.durationMinutes * 60 * 1000)
         }
       };
+
+      // Also broadcast PREFERENCES_UPDATED
+      try {
+        const bc = new BroadcastChannel('wfm_aux_channel');
+        bc.postMessage({
+          type: 'PREFERENCES_UPDATED',
+          payload: alertPrefs
+        });
+      } catch (e) {}
       localStorage.setItem('wfm_active_break', JSON.stringify(breakEvent.payload));
       
       // Dispatch via BroadcastChannel for real-time cross-tab/window sync
