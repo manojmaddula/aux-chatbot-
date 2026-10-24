@@ -136,25 +136,30 @@
 
     <!-- NAVIGATION TABS -->
     <nav class="widget-tabs">
-      <button class="tab-btn active" data-tab="tab-copilot">
-        <span>💬</span> Ask Shankar
-      </button>
-      <button class="tab-btn" data-tab="tab-acw">
-        <span>📋</span> ACW
-      </button>
-      <button class="tab-btn" data-tab="tab-aux">
-        <span>☕</span> AUX Breaks
-      </button>
-      <button class="tab-btn" data-tab="tab-troubleshoot">
-        <span>🔧</span> KB Articles
+      <button class="tab-btn active" data-tab="tab-aux">
+        <span class="tab-icon">☕</span>
+        <span class="tab-label">AUX Break</span>
       </button>
       <button class="tab-btn" data-tab="tab-alerts">
-        <span>📢</span> Advisories (<span id="unread-alert-count">0</span>)
+        <span class="tab-icon" style="position:relative; display:inline-flex;">📢<span id="unread-alert-count" class="tab-badge">0</span></span>
+        <span class="tab-label">Advisories</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-acw">
+        <span class="tab-icon">📋</span>
+        <span class="tab-label">ACW</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-troubleshoot">
+        <span class="tab-icon">🔧</span>
+        <span class="tab-label">KBA</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-copilot">
+        <span class="tab-icon">💬</span>
+        <span class="tab-label">Ask Shankar</span>
       </button>
     </nav>
 
     <!-- TAB 1: COPILOT ASSISTANT -->
-    <section id="tab-copilot" class="tab-pane active">
+    <section id="tab-copilot" class="tab-pane">
       <!-- Real-Time AI Suggested Replies (Dynamic AI Reply Engine) -->
       <div class="copilot-box">
         <div class="copilot-header" style="display:flex; justify-content:space-between; align-items:center;">
@@ -309,7 +314,7 @@
     </section>
 
     <!-- TAB 3: AUX BREAKS & ADHERENCE (READ-ONLY TELEMETRY) -->
-    <section id="tab-aux" class="tab-pane">
+    <section id="tab-aux" class="tab-pane active">
       <div class="aux-cta-banner">
         <h3>Need to Request a Break?</h3>
         <p>Break requests require authentication and Erlang-C staffing forecast verification via the secure Web Portal.</p>
