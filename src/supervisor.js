@@ -2726,6 +2726,8 @@ window.triggerEmergencyBroadcast = async function(targetType = 'unavailable') {
   }
 
   const targetIds = targetAgents.map(a => a.id);
+  const quotaInput = document.getElementById('input-emergency-quota');
+  const reqQuota = quotaInput ? (parseInt(quotaInput.value, 10) || 5) : 5;
   const defaultMsg = 'There is an emergency situation. High call volume surge detected and your availability is requested to balance the queue. If you are available please join, or decline.';
   const shiftWindow = '15:30 - 18:30 (Surge Shift • 3 hrs)';
 
@@ -2746,6 +2748,7 @@ window.triggerEmergencyBroadcast = async function(targetType = 'unavailable') {
         message: defaultMsg,
         shiftTimings: shiftWindow,
         queueTarget: 'Emergency Inbound & Tier-2 Support',
+        requiredCount: reqQuota,
         targetAgentIds: targetIds
       })
     });
@@ -2877,6 +2880,32 @@ function renderEmergencyCampaign(campaign) {
   if (statDec) statDec.textContent = declined;
   if (statPend) statPend.textContent = pending;
 
+  // Update Staffing Quota Progress
+  const reqQuota = campaign.requiredCount || parseInt(document.getElementById('input-emergency-quota')?.value, 10) || 5;
+  const qLabel = document.getElementById('em-quota-label');
+  const qPill = document.getElementById('em-quota-pill');
+  const qFill = document.getElementById('em-quota-fill');
+
+  const percent = Math.min(100, Math.round((accepted / reqQuota) * 100));
+  if (qLabel) qLabel.textContent = `${accepted} / ${reqQuota} Agents Confirmed (Wanting ${reqQuota} Extra Agents)`;
+  if (qFill) qFill.style.width = `${percent}%`;
+
+  if (accepted >= reqQuota) {
+    if (qPill) {
+      qPill.textContent = `✓ SUFFICIENT STAFFING SECURED (${accepted}/${reqQuota})`;
+      qPill.style.background = '#dcfce7';
+      qPill.style.color = '#15803d';
+    }
+    if (qFill) qFill.style.background = '#10b981';
+  } else {
+    if (qPill) {
+      qPill.textContent = `● AWAITING AVAILABILITY (${accepted}/${reqQuota})`;
+      qPill.style.background = '#fef3c7';
+      qPill.style.color = '#b45309';
+    }
+    if (qFill) qFill.style.background = 'linear-gradient(90deg, #3b82f6, #10b981)';
+  }
+
   if (!tbody) return;
 
   tbody.innerHTML = agentsList.map(ag => {
@@ -2970,6 +2999,13 @@ function initSupervisorEmergencySSE() {
       } catch (err) {}
     });
 
+    es.addEventListener('EMERGENCY_QUOTA_FULFILLED', (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        showQuotaFulfilledAlert(data);
+      } catch (err) {}
+    });
+
     es.addEventListener('EMERGENCY_RECALL_RESET', () => {
       currentEmergencyCampaign = null;
       renderEmptyEmergencyTable();
@@ -2984,3 +3020,68 @@ fetchEmergencyCampaign();
 initSupervisorEmergencySSE();
 setInterval(fetchEmergencyCampaign, 3000);
 updateUnavailablePill();
+
+
+window.closeQuotaModal = function() {
+  const m = document.getElementById('modal-quota-achieved');
+  if (m) m.classList.add('hidden');
+};
+
+window.showQuotaFulfilledAlert = function(data) {
+  const modal = document.getElementById('modal-quota-achieved');
+  const numEl = document.getElementById('modal-quota-number');
+  const shiftEl = document.getElementById('modal-quota-shift');
+  const listEl = document.getElementById('modal-quota-agents-list');
+
+  const count = data.acceptedCount || 5;
+  const target = data.requiredCount || 5;
+
+  if (numEl) numEl.textContent = `${count} / ${target}`;
+  if (shiftEl) shiftEl.textContent = data.shiftTimings || '15:30 - 18:30';
+
+  if (listEl && data.acceptedAgents) {
+    listEl.innerHTML = data.acceptedAgents.map(a => `
+      <div style="display:flex; justify-content:space-between; align-items:center; background:#ffffff; border:1px solid #cbd5e1; border-radius:6px; padding:6px 10px; font-size:12px;">
+        <span style="font-weight:700; color:#0f172a;">${a.agentName} (${a.agentId})</span>
+        <span style="color:#15803d; font-weight:800; font-size:11px;">✓ Confirmed (${a.queue || 'Support'})</span>
+      </div>
+    `).join('');
+  }
+
+  if (modal) modal.classList.remove('hidden');
+
+  // Trigger vocal announcement
+  if ('speechSynthesis' in window) {
+    const text = `System alert: We have obtained a sufficient number of agents for the outage. Staffing quota achieved.`;
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.rate = 1.0;
+    window.speechSynthesis.speak(utt);
+  }
+
+  showSupervisorToast(`🎉 SYSTEM ALERT: We have obtained a sufficient number of agents (${count}/${target}) for the outage! Staffing quota achieved.`, true);
+
+  // Update card UI
+  const qBadge = document.getElementById('em-quota-pill');
+  if (qBadge) {
+    qBadge.textContent = `✓ SUFFICIENT STAFFING SECURED (${count}/${target})`;
+    qBadge.style.background = '#dcfce7';
+    qBadge.style.color = '#15803d';
+  }
+  const qFill = document.getElementById('em-quota-fill');
+  if (qFill) {
+    qFill.style.width = '100%';
+    qFill.style.background = '#10b981';
+  }
+};
+
+window.simulateFiveAccepted = async function() {
+  try {
+    const res = await fetch('/api/emergency/simulate-quota', { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      fetchEmergencyCampaign();
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};

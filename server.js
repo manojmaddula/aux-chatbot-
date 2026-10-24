@@ -213,6 +213,9 @@ const SERVER_AGENTS_ROSTER = [
 let activeEmergencyRecall = {
   id: null,
   active: false,
+  requiredCount: 5,
+  quotaFulfilled: false,
+  quotaFulfilledAt: null,
   title: 'Storm / Emergency Call Volume Surge Alert',
   message: 'There is an emergency situation. High call volume surge detected and your availability is requested to balance the queue. If you are available please join, or decline.',
   shiftTimings: '15:30 - 18:30 (Surge Window • 3h)',
@@ -914,9 +917,16 @@ const server = http.createServer((req, res) => {
           };
         });
 
+        const reqCount = typeof payload.requiredCount === 'number' && payload.requiredCount > 0 
+          ? payload.requiredCount 
+          : (targetIds.length >= 5 ? 5 : targetIds.length);
+
         activeEmergencyRecall = {
           id: campaignId,
           active: true,
+          requiredCount: reqCount,
+          quotaFulfilled: false,
+          quotaFulfilledAt: null,
           title: payload.title || '🚨 Emergency Call Volume Surge Alert',
           message: msg,
           shiftTimings: shiftWindow,
@@ -990,6 +1000,17 @@ const server = http.createServer((req, res) => {
         agentEntry.status = userResp === 'YES' ? 'ACCEPTED' : 'DECLINED';
         agentEntry.responseTime = new Date().toISOString();
 
+        // Check quota fulfillment
+        const allAccepted = Object.values(activeEmergencyRecall.agents).filter(a => a.status === 'ACCEPTED');
+        const quotaTarget = activeEmergencyRecall.requiredCount || 5;
+        const isQuotaMet = allAccepted.length >= quotaTarget;
+        const justFulfilled = isQuotaMet && !activeEmergencyRecall.quotaFulfilled;
+
+        if (isQuotaMet) {
+          activeEmergencyRecall.quotaFulfilled = true;
+          activeEmergencyRecall.quotaFulfilledAt = activeEmergencyRecall.quotaFulfilledAt || new Date().toISOString();
+        }
+
         // Broadcast updated response to supervisor portal
         broadcastAlertEvent('EMERGENCY_RESPONSE_UPDATE', {
           campaignId: activeEmergencyRecall.id,
@@ -999,8 +1020,36 @@ const server = http.createServer((req, res) => {
           status: agentEntry.status,
           responseTime: agentEntry.responseTime,
           shiftTimings: agentEntry.shiftTimings,
-          agents: activeEmergencyRecall.agents
+          agents: activeEmergencyRecall.agents,
+          acceptedCount: allAccepted.length,
+          requiredCount: quotaTarget,
+          quotaFulfilled: activeEmergencyRecall.quotaFulfilled,
+          justFulfilled: justFulfilled
         });
+
+        if (justFulfilled) {
+          broadcastAlertEvent('EMERGENCY_QUOTA_FULFILLED', {
+            campaignId: activeEmergencyRecall.id,
+            acceptedCount: allAccepted.length,
+            requiredCount: quotaTarget,
+            shiftTimings: activeEmergencyRecall.shiftTimings,
+            message: `We have obtained sufficient number of agents (${allAccepted.length}/${quotaTarget}) for the outage! Staffing quota achieved.`,
+            acceptedAgents: allAccepted,
+            fulfilledAt: activeEmergencyRecall.quotaFulfilledAt
+          });
+
+          supervisorQueue.unshift({
+            id: 'QUOTA-' + Date.now(),
+            timestamp: new Date().toISOString(),
+            agentId: 'QUOTA_FULFILLED',
+            agentName: `Staffing Quota Met (${allAccepted.length}/${quotaTarget})`,
+            supervisorId: activeEmergencyRecall.supervisorId || 'SUP-014',
+            supervisorName: activeEmergencyRecall.supervisorName || 'Sarah Jenkins',
+            auxCode: 'OUTAGE_BALANCED',
+            status: 'SUFFICIENT_AVAILABILITY',
+            reason: `Sufficient number of agents (${allAccepted.length}/${quotaTarget}) confirmed availability for outage. Shift assigned: ${activeEmergencyRecall.shiftTimings}.`
+          });
+        }
 
         // Audit in supervisor queue
         supervisorQueue.unshift({
@@ -1035,6 +1084,54 @@ const server = http.createServer((req, res) => {
         res.end(JSON.stringify({ error: err.message }));
       }
     });
+    return;
+  }
+
+  // Simulate Quota Fulfilled (For Instant 5/5 Demo & System Alert Verification)
+  if (pathname === '/api/emergency/simulate-quota' && req.method === 'POST') {
+    if (!activeEmergencyRecall.active) {
+      activeEmergencyRecall.active = true;
+      activeEmergencyRecall.id = 'EMERG-' + Date.now();
+      activeEmergencyRecall.shiftTimings = '15:30 - 18:30 (Surge Shift • 3 hrs)';
+      activeEmergencyRecall.queueTarget = 'Emergency Inbound & Tier-2 Support';
+      activeEmergencyRecall.startedAt = new Date().toISOString();
+    }
+    activeEmergencyRecall.requiredCount = 5;
+
+    const demoFive = ['AGT-8842', 'AGT-7740', 'AGT-2219', 'AGT-4491', 'AGT-9102'];
+    demoFive.forEach(id => {
+      const info = SERVER_AGENTS_ROSTER.find(a => a.id === id) || { id, name: id, queue: 'General' };
+      activeEmergencyRecall.agents[id] = {
+        agentId: id,
+        agentName: info.name,
+        queue: info.queue || 'General Support',
+        currentState: info.state || 'AVAILABLE',
+        status: 'ACCEPTED',
+        response: 'YES',
+        responseTime: new Date().toISOString(),
+        shiftTimings: activeEmergencyRecall.shiftTimings,
+        queueTarget: 'Emergency Inbound & Tier-2 Support',
+        alertDelivered: true,
+        deliveredAt: new Date().toISOString()
+      };
+    });
+
+    activeEmergencyRecall.quotaFulfilled = true;
+    activeEmergencyRecall.quotaFulfilledAt = new Date().toISOString();
+    const acceptedList = Object.values(activeEmergencyRecall.agents).filter(a => a.status === 'ACCEPTED');
+
+    broadcastAlertEvent('EMERGENCY_QUOTA_FULFILLED', {
+      campaignId: activeEmergencyRecall.id,
+      acceptedCount: acceptedList.length,
+      requiredCount: 5,
+      shiftTimings: activeEmergencyRecall.shiftTimings,
+      message: `We have obtained sufficient number of agents (${acceptedList.length}/5) for the outage! Staffing quota achieved.`,
+      acceptedAgents: acceptedList,
+      fulfilledAt: activeEmergencyRecall.quotaFulfilledAt
+    });
+
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+    res.end(JSON.stringify({ success: true, acceptedCount: acceptedList.length, requiredCount: 5, recall: activeEmergencyRecall }));
     return;
   }
 

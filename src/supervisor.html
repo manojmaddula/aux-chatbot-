@@ -271,11 +271,19 @@
             </div>
           </div>
           <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <div style="display:flex; align-items:center; gap:6px; background:#ffffff; border:1px solid #cbd5e1; border-radius:6px; padding:5px 8px; font-size:12px;">
+              <span style="color:#64748b; font-weight:600;">Wanting:</span>
+              <input type="number" id="input-emergency-quota" min="1" max="12" value="5" style="width:44px; padding:2px 4px; font-weight:800; border:1px solid #94a3b8; border-radius:4px; font-size:12px; text-align:center; color:#0f172a;" title="Target number of extra agents wanted for outage" />
+              <span style="color:#64748b; font-weight:600;">Extra Agents</span>
+            </div>
             <button id="btn-notify-all-emergency" class="btn btn-emergency" style="background:#dc2626; color:#ffffff; font-weight:800; padding:8px 16px; border-radius:8px; border:none; box-shadow:0 4px 12px rgba(220,38,38,0.35); cursor:pointer; display:flex; align-items:center; gap:8px;" onclick="triggerEmergencyBroadcast('unavailable')">
               <span>📢</span> Notify All Unavailable (<span id="unavailable-count-pill">5</span> Agents)
             </button>
             <button id="btn-notify-all-fleet" class="btn btn-outline" style="border-color:#cbd5e1; background:#ffffff; color:#334155; font-size:12px; font-weight:700; padding:8px 14px; cursor:pointer;" onclick="triggerEmergencyBroadcast('all')">
               🌐 Notify All Fleet (12)
+            </button>
+            <button id="btn-demo-quota" class="btn btn-xs btn-outline" style="border-color:#10b981; color:#059669; font-weight:700; padding:7px 10px; cursor:pointer; background:#f0fdf4;" onclick="simulateFiveAccepted()" title="Simulate 5 agents accepting availability to trigger quota achieved system alert">
+              ⚡ Demo 5 Accepted
             </button>
             <button id="btn-reset-emergency-campaign" class="btn btn-outline" style="border-color:#ef4444; color:#ef4444; font-size:11px; padding:8px 10px; cursor:pointer;" onclick="resetEmergencyCampaign()" title="Reset active campaign">
               ⏹️ Reset Campaign
@@ -284,6 +292,23 @@
         </div>
 
         <div class="card-body">
+          <!-- Outage Staffing Availability Quota Progress Bar -->
+          <div id="em-quota-container" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:10px 14px; margin-bottom:14px; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:16px;">🎯</span>
+                <strong style="font-size:12px; color:#0f172a;">Outage Staffing Availability Target:</strong>
+                <span id="em-quota-label" style="font-size:12px; color:#2563eb; font-weight:700;">0 / 5 Agents Confirmed (Wanting 5 Extra Agents)</span>
+              </div>
+              <span id="em-quota-pill" style="font-size:11px; font-weight:800; padding:3px 10px; border-radius:12px; background:#fef3c7; color:#b45309;">
+                ● AWAITING AVAILABILITY
+              </span>
+            </div>
+            <div style="width:100%; height:10px; background:#f1f5f9; border-radius:5px; overflow:hidden;">
+              <div id="em-quota-fill" style="width:0%; height:100%; background:linear-gradient(90deg, #3b82f6, #10b981); border-radius:5px; transition:width 0.4s ease;"></div>
+            </div>
+          </div>
+
           <!-- Active Emergency Campaign Alert Bar -->
           <div id="em-campaign-active-bar" style="background:linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border:1.5px solid #f87171; border-radius:10px; padding:12px 16px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
             <div style="display:flex; align-items:center; gap:10px;">
@@ -1230,5 +1255,48 @@
 
   <script src="supervisor.js?v=2.1"></script>
   <script src="floating-widget.js?v=2.5"></script>
+  <!-- SYSTEM ALERT: SUFFICIENT STAFFING SECURED FOR OUTAGE MODAL -->
+  <div id="modal-quota-achieved" class="qa-modal hidden" style="z-index: 999999;">
+    <div class="qa-modal-backdrop" onclick="closeQuotaModal()"></div>
+    <div class="qa-modal-content" style="max-width: 500px; border-top: 5px solid #10b981; animation: modal-pop 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 25px 50px rgba(0,0,0,0.35);">
+      <div class="qa-modal-header" style="background:#ecfdf5; border-bottom:1px solid #a7f3d0; padding:16px 20px;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <span style="font-size:36px;">🎉</span>
+          <div>
+            <h3 style="margin:0; color:#065f46; font-size:17px; font-weight:800;">System Alert: Sufficient Staffing Secured!</h3>
+            <span style="color:#047857; font-size:12px; font-weight:600;">Outage Call Volume Deficit Resolved</span>
+          </div>
+        </div>
+        <button class="qa-modal-close" onclick="closeQuotaModal()" title="Close">✕</button>
+      </div>
+      <div class="qa-modal-body" style="padding:20px; display:flex; flex-direction:column; gap:14px;">
+        <div style="background:#f0fdf4; border:1.5px solid #86efac; border-radius:12px; padding:16px; text-align:center;">
+          <div style="font-size:22px; font-weight:800; color:#15803d; margin-bottom:6px;">
+            ✓ Staffing Quota Reached (<span id="modal-quota-number">5 / 5</span> Confirmed)
+          </div>
+          <p style="margin:0; font-size:13px; color:#166534; line-height:1.5;">
+            We have obtained a sufficient number of agents for the outage! All confirmed agents have been assigned their surge shift timings (<strong id="modal-quota-shift">15:30 - 18:30</strong>) and have been instructed to log in to workstation softphones to balance the queue.
+          </p>
+        </div>
+
+        <!-- Confirmed Agents List -->
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px;">
+          <div style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; margin-bottom:8px;">
+            Confirmed Outage Surge Staffing Roster:
+          </div>
+          <div id="modal-quota-agents-list" style="display:flex; flex-direction:column; gap:6px; max-height:160px; overflow-y:auto;">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:4px;">
+          <button class="btn btn-primary" onclick="closeQuotaModal()" style="flex:1; padding:11px; font-weight:700; background:#10b981; border:none; border-radius:8px; cursor:pointer;">
+            ✓ Acknowledge &amp; Monitor Floor
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
