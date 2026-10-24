@@ -192,6 +192,38 @@ const ivrDeflectionState = {
   ]
 };
 
+// ==========================================
+// EMERGENCY & STORM OUTAGE STAFFING RECALL STATE
+// ==========================================
+const SERVER_AGENTS_ROSTER = [
+  { id: 'AGT-8842', name: 'Alex Morgan', queue: 'General Customer Service', state: 'AVAILABLE', supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins', shift: '08:00 - 16:30' },
+  { id: 'AGT-9102', name: 'Samantha Vance', queue: 'General Customer Service', state: 'WORKING (IN CALL)', supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins', shift: '08:00 - 16:30' },
+  { id: 'AGT-6512', name: 'Rachel Green', queue: 'General Customer Service', state: 'AVAILABLE', supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins', shift: '08:30 - 17:00' },
+  { id: 'AGT-8819', name: 'Marcus Brody', queue: 'General Customer Service', state: 'WORKING (IN CALL)', supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins', shift: '08:30 - 17:00' },
+  { id: 'AGT-3310', name: 'Chloe Bennett', queue: 'General Customer Service', state: 'AVAILABLE', supervisorId: 'SUP-014', supervisorName: 'Sarah Jenkins', shift: '09:00 - 17:30' },
+  { id: 'AGT-4092', name: 'Jordan Miller', queue: 'Customer Billing & Retention', state: 'AVAILABLE', supervisorId: 'SUP-021', supervisorName: 'Michael Chang', shift: '08:00 - 16:30' },
+  { id: 'AGT-5521', name: 'Lucas Wright', queue: 'Customer Billing & Retention', state: 'WORKING (IN CALL)', supervisorId: 'SUP-021', supervisorName: 'Michael Chang', shift: '08:30 - 17:00' },
+  { id: 'AGT-7703', name: 'Maya Patel', queue: 'Customer Billing & Retention', state: 'AVAILABLE', supervisorId: 'SUP-021', supervisorName: 'Michael Chang', shift: '09:00 - 17:30' },
+  { id: 'AGT-4491', name: 'Carlos Mendez', queue: 'Tier-2 Tech Support', state: 'AVAILABLE', supervisorId: 'SUP-035', supervisorName: 'Elena Rostova', shift: '10:00 - 18:30' },
+  { id: 'AGT-7740', name: 'David Chen', queue: 'Emergency Inbound', state: 'AUX: AUX BREAK', supervisorId: 'SUP-042', supervisorName: 'David Sterling', shift: '07:30 - 16:00' },
+  { id: 'AGT-6628', name: 'Olivia Taylor', queue: 'Emergency Inbound', state: 'AVAILABLE', supervisorId: 'SUP-042', supervisorName: 'David Sterling', shift: '08:00 - 16:30' },
+  { id: 'AGT-2219', name: "Liam O'Connor", queue: 'General Customer Service', state: 'AUX: TRAINING', supervisorId: 'SUP-059', supervisorName: 'Priya Sharma', shift: '09:30 - 18:00' }
+];
+
+let activeEmergencyRecall = {
+  id: null,
+  active: false,
+  title: 'Storm / Emergency Call Volume Surge Alert',
+  message: 'There is an emergency situation. High call volume surge detected and your availability is requested to balance the queue. If you are available please join, or decline.',
+  shiftTimings: '15:30 - 18:30 (Surge Window • 3h)',
+  queueTarget: 'Emergency Inbound & Tier-2 Support',
+  overtimeRate: '+1.5x Premium Overtime Differential',
+  supervisorId: 'SUP-014',
+  supervisorName: 'Sarah Jenkins',
+  startedAt: null,
+  agents: {}
+};
+
 // Dynamic WFM Intraday Queue & Skill Rebalance State
 const wfmQueueBalanceState = {
   isSurgeActive: false,
@@ -828,6 +860,202 @@ const server = http.createServer((req, res) => {
         res.end(JSON.stringify({ error: e.message }));
       }
     });
+    return;
+  }
+
+  // ==========================================
+  // API ROUTES: EMERGENCY SURGE MOBILE RECALL & RESPONSE TRACKING
+  // ==========================================
+
+  // Get Emergency Status & Current Agent Response
+  if (pathname === '/api/emergency/status' && req.method === 'GET') {
+    const aId = parsedUrl.query.agentId;
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+    res.end(JSON.stringify({
+      success: true,
+      active: activeEmergencyRecall.active,
+      recall: activeEmergencyRecall,
+      agentSpecific: aId && activeEmergencyRecall.agents[aId] ? activeEmergencyRecall.agents[aId] : null
+    }));
+    return;
+  }
+
+  // Supervisor Dispatches Emergency Alert to Unavailable Agents (Mobile Only)
+  if (pathname === '/api/emergency/notify-all' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const campaignId = 'EMERG-' + Date.now();
+        const targetIds = Array.isArray(payload.targetAgentIds) && payload.targetAgentIds.length > 0
+          ? payload.targetAgentIds
+          : SERVER_AGENTS_ROSTER.filter(a => a.state !== 'AVAILABLE').map(a => a.id);
+
+        const shiftWindow = payload.shiftTimings || '15:30 - 18:30 (Surge Shift • 3 hrs)';
+        const targetQueue = payload.queueTarget || 'Emergency Inbound & Tier-2 Support';
+        const msg = payload.message || 'There is an emergency situation. High call volume surge detected and your availability is requested to balance the queue. If you are available please join, or decline.';
+
+        const agentsMap = {};
+        targetIds.forEach(id => {
+          const info = SERVER_AGENTS_ROSTER.find(a => a.id === id) || { id, name: id, queue: 'General', state: 'AUX Break' };
+          agentsMap[id] = {
+            agentId: id,
+            agentName: info.name,
+            queue: info.queue,
+            currentState: info.state,
+            status: 'PENDING',
+            response: null,
+            responseTime: null,
+            shiftTimings: shiftWindow,
+            queueTarget: targetQueue,
+            alertDelivered: true,
+            deliveredAt: new Date().toISOString()
+          };
+        });
+
+        activeEmergencyRecall = {
+          id: campaignId,
+          active: true,
+          title: payload.title || '🚨 Emergency Call Volume Surge Alert',
+          message: msg,
+          shiftTimings: shiftWindow,
+          queueTarget: targetQueue,
+          overtimeRate: payload.overtimeRate || '+1.5x Premium Overtime Differential',
+          supervisorId: payload.supervisorId || 'SUP-014',
+          supervisorName: payload.supervisorName || 'Sarah Jenkins',
+          startedAt: new Date().toISOString(),
+          agents: agentsMap
+        };
+
+        // Broadcast to mobile companions via SSE
+        broadcastAlertEvent('EMERGENCY_RECALL_DISPATCH', activeEmergencyRecall);
+
+        // Audit in supervisor queue
+        supervisorQueue.unshift({
+          id: campaignId,
+          timestamp: activeEmergencyRecall.startedAt,
+          agentId: 'ALL_UNAVAILABLE',
+          agentName: `Fleet Alert (${targetIds.length} Agents)`,
+          supervisorId: activeEmergencyRecall.supervisorId,
+          supervisorName: activeEmergencyRecall.supervisorName,
+          auxCode: 'EMERGENCY_RECALL',
+          durationMinutes: 180,
+          status: 'EMERGENCY_DISPATCHED',
+          reason: `Storm / Surge Emergency: Alert dispatched to ${targetIds.length} unavailable agents on Mobile only. Target Shift: ${shiftWindow}.`
+        });
+
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify({ success: true, recall: activeEmergencyRecall }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // Agent Responds from Mobile Companion (YES or NO)
+  if (pathname === '/api/emergency/respond' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const aId = payload.agentId || 'AGT-8842';
+        const userResp = (payload.response || '').toUpperCase(); // 'YES' or 'NO'
+
+        if (!activeEmergencyRecall.active) {
+          activeEmergencyRecall.active = true;
+          activeEmergencyRecall.id = 'EMERG-' + Date.now();
+          activeEmergencyRecall.shiftTimings = '15:30 - 18:30 (Surge Shift • 3 hrs)';
+          activeEmergencyRecall.queueTarget = 'Emergency Inbound & Tier-2 Support';
+          activeEmergencyRecall.startedAt = new Date().toISOString();
+        }
+
+        if (!activeEmergencyRecall.agents[aId]) {
+          const info = SERVER_AGENTS_ROSTER.find(a => a.id === aId) || { id: aId, name: 'Alex Morgan', queue: 'General', state: 'AUX Break' };
+          activeEmergencyRecall.agents[aId] = {
+            agentId: aId,
+            agentName: info.name,
+            queue: info.queue,
+            currentState: info.state,
+            shiftTimings: activeEmergencyRecall.shiftTimings,
+            queueTarget: activeEmergencyRecall.queueTarget
+          };
+        }
+
+        const agentEntry = activeEmergencyRecall.agents[aId];
+        agentEntry.response = userResp;
+        agentEntry.status = userResp === 'YES' ? 'ACCEPTED' : 'DECLINED';
+        agentEntry.responseTime = new Date().toISOString();
+
+        // Broadcast updated response to supervisor portal
+        broadcastAlertEvent('EMERGENCY_RESPONSE_UPDATE', {
+          campaignId: activeEmergencyRecall.id,
+          agentId: aId,
+          agentName: agentEntry.agentName,
+          response: userResp,
+          status: agentEntry.status,
+          responseTime: agentEntry.responseTime,
+          shiftTimings: agentEntry.shiftTimings,
+          agents: activeEmergencyRecall.agents
+        });
+
+        // Audit in supervisor queue
+        supervisorQueue.unshift({
+          id: 'RESP-' + Date.now(),
+          timestamp: agentEntry.responseTime,
+          agentId: aId,
+          agentName: agentEntry.agentName,
+          supervisorId: activeEmergencyRecall.supervisorId || 'SUP-014',
+          supervisorName: activeEmergencyRecall.supervisorName || 'Sarah Jenkins',
+          auxCode: userResp === 'YES' ? 'SURGE_ACCEPTED' : 'SURGE_DECLINED',
+          status: userResp === 'YES' ? 'ACCEPTED' : 'DECLINED',
+          reason: userResp === 'YES' 
+            ? `Agent ACCEPTED Emergency Mobile Surge Shift (${agentEntry.shiftTimings}). Ready to log in.`
+            : `Agent DECLINED Emergency Surge Shift (Currently unavailable).`
+        });
+
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify({
+          success: true,
+          agentId: aId,
+          response: userResp,
+          status: agentEntry.status,
+          shiftTimings: agentEntry.shiftTimings,
+          queueTarget: agentEntry.queueTarget || 'Emergency Inbound & Tier-2 Support',
+          overtimeRate: activeEmergencyRecall.overtimeRate,
+          message: userResp === 'YES' 
+            ? `Availability confirmed! Your shift timings are ${agentEntry.shiftTimings}. Please log in to your workstation softphone now.`
+            : `Response recorded: Unavailable. Thank you for notifying supervisor.`
+        }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
+  // Reset / Clear Emergency Recall Campaign
+  if (pathname === '/api/emergency/reset' && req.method === 'POST') {
+    activeEmergencyRecall = {
+      id: null,
+      active: false,
+      title: 'Storm / Emergency Call Volume Surge Alert',
+      message: 'There is an emergency situation. High call volume surge detected and your availability is requested to balance the queue. If you are available please join, or decline.',
+      shiftTimings: '15:30 - 18:30 (Surge Window • 3h)',
+      queueTarget: 'Emergency Inbound & Tier-2 Support',
+      overtimeRate: '+1.5x Premium Overtime Differential',
+      supervisorId: 'SUP-014',
+      supervisorName: 'Sarah Jenkins',
+      startedAt: null,
+      agents: {}
+    };
+    broadcastAlertEvent('EMERGENCY_RECALL_RESET', { reset: true });
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+    res.end(JSON.stringify({ success: true, message: 'Emergency recall campaign reset.' }));
     return;
   }
 

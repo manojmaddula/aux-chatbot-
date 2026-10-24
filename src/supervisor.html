@@ -35,6 +35,9 @@
         <a href="/index.html" class="btn btn-sm btn-outline" style="text-decoration:none; display:flex; align-items:center; gap:6px; color:#2563eb; border-color:#cbd5e1; background:#ffffff;">
           <img src="/favicon.svg?v=panda2" style="width:14px; height:14px;" /> Home
         </a>
+        <button id="btn-header-emergency-notify" class="btn btn-sm" style="background:#dc2626; color:#ffffff; font-weight:800; border:none; display:flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(220,38,38,0.3); cursor:pointer;" onclick="triggerEmergencyBroadcast('unavailable')">
+          <span style="animation: pulse 1.5s infinite;">🚨</span> Notify Unavailable (<span id="header-unavailable-pill">5</span>)
+        </button>
         <button id="btn-open-sup-bot-header" class="btn btn-sm btn-accent" onclick="window.openSupBot && window.openSupBot()" style="display:flex; align-items:center; gap:6px;">
           <span>🤖</span> Ask Supervisor Bot
         </button>
@@ -253,6 +256,104 @@
       </div>
 
       
+      <!-- TAB 3 SUBSECTION: EMERGENCY SURGE STAFFING & MOBILE RECALL ENGINE -->
+      <div class="card" id="card-emergency-recall-hub" style="margin-bottom: 20px; border-top: 4px solid #ef4444; box-shadow: 0 4px 16px rgba(239,68,68,0.12);">
+        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div>
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:26px;">🚨</span>
+              <div>
+                <h3 style="margin:0; color:#0f172a;">Emergency Staffing & Mobile Recall Engine (Storm Surge Alert)</h3>
+                <p style="margin-top:2px; color:#64748b; font-size:12px;">
+                  During storm/disaster traffic surges, alert all unavailable agents (in AUX, break, training, or off-shift) directly on their mobile phones to join and balance volume. Live responses & shift timings are tracked in real-time below.
+                </p>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <button id="btn-notify-all-emergency" class="btn btn-emergency" style="background:#dc2626; color:#ffffff; font-weight:800; padding:8px 16px; border-radius:8px; border:none; box-shadow:0 4px 12px rgba(220,38,38,0.35); cursor:pointer; display:flex; align-items:center; gap:8px;" onclick="triggerEmergencyBroadcast('unavailable')">
+              <span>📢</span> Notify All Unavailable (<span id="unavailable-count-pill">5</span> Agents)
+            </button>
+            <button id="btn-notify-all-fleet" class="btn btn-outline" style="border-color:#cbd5e1; background:#ffffff; color:#334155; font-size:12px; font-weight:700; padding:8px 14px; cursor:pointer;" onclick="triggerEmergencyBroadcast('all')">
+              🌐 Notify All Fleet (12)
+            </button>
+            <button id="btn-reset-emergency-campaign" class="btn btn-outline" style="border-color:#ef4444; color:#ef4444; font-size:11px; padding:8px 10px; cursor:pointer;" onclick="resetEmergencyCampaign()" title="Reset active campaign">
+              ⏹️ Reset Campaign
+            </button>
+          </div>
+        </div>
+
+        <div class="card-body">
+          <!-- Active Emergency Campaign Alert Bar -->
+          <div id="em-campaign-active-bar" style="background:linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border:1.5px solid #f87171; border-radius:10px; padding:12px 16px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span style="font-size:22px;">⚡</span>
+              <div>
+                <strong style="color:#b91c1c; font-size:13px; display:block;">Active Mobile Alert Dispatch:</strong>
+                <span id="em-campaign-msg-text" style="color:#475569; font-size:12px;">
+                  "There is an emergency situation. High call volume surge detected and your availability is requested to balance the queue. If you are available please join, or decline."
+                </span>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="background:#ffffff; border:1px solid #fca5a5; border-radius:6px; padding:4px 10px; font-size:11px;">
+                <span style="color:#64748b;">Assigned Shift Window:</span>
+                <strong id="em-campaign-shift-label" style="color:#0284c7; margin-left:4px;">15:30 - 18:30 (Surge Shift • 3 hrs)</strong>
+              </div>
+              <span id="em-campaign-status-badge" style="background:#dc2626; color:#ffffff; font-size:11px; font-weight:800; padding:4px 10px; border-radius:12px;">
+                ● ACTIVE RECALL
+              </span>
+            </div>
+          </div>
+
+          <!-- 4 Metrics Telemetry Row -->
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-bottom:16px;">
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px 14px;">
+              <span style="font-size:11px; color:#64748b; font-weight:700; text-transform:uppercase;">📱 Mobile Alerts Sent</span>
+              <div id="em-stat-total" style="font-size:24px; font-weight:800; color:#0f172a; margin-top:2px;">0</div>
+              <span style="font-size:10px; color:#64748b;">Delivered to agent phones</span>
+            </div>
+            <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:12px 14px;">
+              <span style="font-size:11px; color:#15803d; font-weight:700; text-transform:uppercase;">✅ Accepted &amp; Joining (YES)</span>
+              <div id="em-stat-accepted" style="font-size:24px; font-weight:800; color:#15803d; margin-top:2px;">0</div>
+              <span style="font-size:10px; color:#15803d;">Shift schedule displayed on mobile</span>
+            </div>
+            <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:10px; padding:12px 14px;">
+              <span style="font-size:11px; color:#b91c1c; font-weight:700; text-transform:uppercase;">❌ Declined (NO)</span>
+              <div id="em-stat-declined" style="font-size:24px; font-weight:800; color:#b91c1c; margin-top:2px;">0</div>
+              <span style="font-size:10px; color:#b91c1c;">Currently unavailable for shift</span>
+            </div>
+            <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:12px 14px;">
+              <span style="font-size:11px; color:#b45309; font-weight:700; text-transform:uppercase;">⏳ Awaiting Response</span>
+              <div id="em-stat-pending" style="font-size:24px; font-weight:800; color:#b45309; margin-top:2px;">0</div>
+              <span style="font-size:10px; color:#b45309;">Mobile notification pending action</span>
+            </div>
+          </div>
+
+          <!-- Real-Time Agent Response Table -->
+          <div class="table-responsive" style="border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Agent ID</th>
+                  <th>Agent Name</th>
+                  <th>Assigned Queue</th>
+                  <th>Floor Work State</th>
+                  <th>Mobile Alert Status</th>
+                  <th>Agent Response</th>
+                  <th>Response Time</th>
+                  <th>Assigned Shift Timings</th>
+                  <th>Supervisor Actions</th>
+                </tr>
+              </thead>
+              <tbody id="emergency-response-table-body">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
       <!-- TAB 3 SUBSECTION: BIRTHDAY CALENDAR & CELEBRATIONS HUB -->
       <div class="card birthday-calendar-card" style="margin-bottom: 20px; border-top: 4px solid #ec4899;">
         <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">

@@ -254,6 +254,12 @@ function renderWallboard() {
   const myTeamCountEl = document.getElementById('my-team-count');
   if (myTeamCountEl) myTeamCountEl.textContent = myTeamAgents.length;
 
+  const unavailCount = activeAgents.filter(ag => ag.state !== 'AVAILABLE').length;
+  const p1 = document.getElementById('unavailable-count-pill');
+  if (p1) p1.textContent = unavailCount;
+  const p2 = document.getElementById('header-unavailable-pill');
+  if (p2) p2.textContent = unavailCount;
+
   // 2. Select base list according to active view mode (Default: My Assigned Team)
   const baseList = teamViewMode === 'my_team' ? myTeamAgents : activeAgents;
 
@@ -2691,3 +2697,290 @@ document.getElementById('btn-save-deflection-threshold')?.addEventListener('clic
 });
 
 updateSupervisorHomePolicies();
+
+
+// ========================================================
+// EMERGENCY SURGE STAFFING & MOBILE RECALL ENGINE
+// ========================================================
+
+let currentEmergencyCampaign = null;
+
+function updateUnavailablePill() {
+  const unavail = activeAgents.filter(ag => ag.state !== 'AVAILABLE').length;
+  const p1 = document.getElementById('unavailable-count-pill');
+  if (p1) p1.textContent = unavail;
+  const p2 = document.getElementById('header-unavailable-pill');
+  if (p2) p2.textContent = unavail;
+}
+
+window.triggerEmergencyBroadcast = async function(targetType = 'unavailable') {
+  updateUnavailablePill();
+  let targetAgents = [];
+  if (targetType === 'all') {
+    targetAgents = activeAgents;
+  } else {
+    targetAgents = activeAgents.filter(ag => ag.state !== 'AVAILABLE');
+    if (targetAgents.length === 0) {
+      targetAgents = activeAgents; // Fallback to all if none in AUX
+    }
+  }
+
+  const targetIds = targetAgents.map(a => a.id);
+  const defaultMsg = 'There is an emergency situation. High call volume surge detected and your availability is requested to balance the queue. If you are available please join, or decline.';
+  const shiftWindow = '15:30 - 18:30 (Surge Shift • 3 hrs)';
+
+  const btn = document.getElementById('btn-notify-all-emergency');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span>⏳</span> Dispatching Mobile Alerts...';
+  }
+
+  try {
+    const res = await fetch('/api/emergency/notify-all', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        supervisorId: currentSupervisor.id,
+        supervisorName: currentSupervisor.name,
+        emergencyType: 'STORM_SURGE',
+        message: defaultMsg,
+        shiftTimings: shiftWindow,
+        queueTarget: 'Emergency Inbound & Tier-2 Support',
+        targetAgentIds: targetIds
+      })
+    });
+
+    const data = await res.json();
+    if (data.success && data.recall) {
+      currentEmergencyCampaign = data.recall;
+      renderEmergencyCampaign(currentEmergencyCampaign);
+
+      // Play vocal announcement confirmation
+      if ('speechSynthesis' in window) {
+        const text = `Emergency mobile alert sent to ${targetIds.length} unavailable agents. Standing by for mobile responses.`;
+        const utt = new SpeechSynthesisUtterance(text);
+        utt.rate = 1.0;
+        window.speechSynthesis.speak(utt);
+      }
+
+      // Switch to Alerts tab so supervisor sees the live responses
+      const tabBtn = document.querySelector('.sup-tab-btn[data-tab="stab-alerts"]');
+      if (tabBtn) tabBtn.click();
+
+      // Scroll to emergency recall card
+      setTimeout(() => {
+        const hub = document.getElementById('card-emergency-recall-hub');
+        if (hub) {
+          hub.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          hub.style.transition = 'box-shadow 0.5s ease';
+          hub.style.boxShadow = '0 0 35px rgba(239, 68, 68, 0.45)';
+          setTimeout(() => {
+            hub.style.boxShadow = '0 4px 16px rgba(239, 68, 68, 0.12)';
+          }, 3000);
+        }
+      }, 250);
+    }
+  } catch (err) {
+    console.error('Emergency dispatch error:', err);
+    alert('Failed to dispatch emergency alerts: ' + err.message);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      const count = activeAgents.filter(ag => ag.state !== 'AVAILABLE').length;
+      btn.innerHTML = `<span>📢</span> Notify All Unavailable (<span id="unavailable-count-pill">${count}</span> Agents)`;
+    }
+  }
+};
+
+window.resetEmergencyCampaign = async function() {
+  if (!confirm('Are you sure you want to reset and clear the active emergency recall campaign?')) return;
+  try {
+    const res = await fetch('/api/emergency/reset', { method: 'POST' });
+    const data = await res.json();
+    if (data.success) {
+      currentEmergencyCampaign = null;
+      renderEmptyEmergencyTable();
+    }
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+window.rePingAgentMobile = async function(agentId, agentName) {
+  try {
+    await fetch('/api/alerts/trigger-alarm', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        agentId: agentId,
+        agentName: agentName,
+        device: 'mobile',
+        triggeredBy: 'SUPERVISOR_WALLBOARD',
+        force: true,
+        message: 'URGENT: Emergency Floor Call Volume Surge. Please check your mobile alert companion and confirm shift availability.'
+      })
+    });
+    alert(`Mobile ping re-sent to ${agentName} (${agentId})!`);
+  } catch (err) {
+    alert('Failed to ping agent: ' + err.message);
+  }
+};
+
+function renderEmptyEmergencyTable() {
+  const statTotal = document.getElementById('em-stat-total');
+  const statAcc = document.getElementById('em-stat-accepted');
+  const statDec = document.getElementById('em-stat-declined');
+  const statPend = document.getElementById('em-stat-pending');
+  const tbody = document.getElementById('emergency-response-table-body');
+  const bar = document.getElementById('em-campaign-active-bar');
+
+  if (statTotal) statTotal.textContent = '0';
+  if (statAcc) statAcc.textContent = '0';
+  if (statDec) statDec.textContent = '0';
+  if (statPend) statPend.textContent = '0';
+  if (bar) bar.style.display = 'none';
+
+  if (tbody) {
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:#64748b;">
+      No active emergency mobile recall campaign running. Click <strong>"Notify All Unavailable"</strong> to alert agents on mobile.
+    </td></tr>`;
+  }
+}
+
+function renderEmergencyCampaign(campaign) {
+  if (!campaign || !campaign.active || !campaign.agents) {
+    renderEmptyEmergencyTable();
+    return;
+  }
+
+  const statTotal = document.getElementById('em-stat-total');
+  const statAcc = document.getElementById('em-stat-accepted');
+  const statDec = document.getElementById('em-stat-declined');
+  const statPend = document.getElementById('em-stat-pending');
+  const tbody = document.getElementById('emergency-response-table-body');
+  const bar = document.getElementById('em-campaign-active-bar');
+  const msgEl = document.getElementById('em-campaign-msg-text');
+  const shiftEl = document.getElementById('em-campaign-shift-label');
+
+  if (bar) bar.style.display = 'flex';
+  if (msgEl) msgEl.textContent = `"${campaign.message}"`;
+  if (shiftEl) shiftEl.textContent = campaign.shiftTimings || '15:30 - 18:30 (Surge Shift • 3 hrs)';
+
+  const agentsList = Object.values(campaign.agents);
+  const total = agentsList.length;
+  const accepted = agentsList.filter(a => a.status === 'ACCEPTED').length;
+  const declined = agentsList.filter(a => a.status === 'DECLINED').length;
+  const pending = agentsList.filter(a => a.status === 'PENDING').length;
+
+  if (statTotal) statTotal.textContent = total;
+  if (statAcc) statAcc.textContent = accepted;
+  if (statDec) statDec.textContent = declined;
+  if (statPend) statPend.textContent = pending;
+
+  if (!tbody) return;
+
+  tbody.innerHTML = agentsList.map(ag => {
+    let responseBadge = '';
+    let shiftDisplay = '';
+    let rowBg = '';
+
+    if (ag.status === 'ACCEPTED') {
+      responseBadge = '<span class="status-tag approved" style="background:#dcfce7; color:#15803d; font-weight:800; font-size:11px; padding:4px 10px; border-radius:6px;">✅ YES (Will Join)</span>';
+      shiftDisplay = `<strong style="color:#0284c7; font-size:12px; font-family:monospace;">${ag.shiftTimings}</strong>`;
+      rowBg = 'background: rgba(16, 185, 129, 0.04);';
+    } else if (ag.status === 'DECLINED') {
+      responseBadge = '<span class="status-tag overdue" style="background:#fee2e2; color:#dc2626; font-weight:800; font-size:11px; padding:4px 10px; border-radius:6px;">❌ NO (Declined)</span>';
+      shiftDisplay = '<span style="color:#94a3b8; font-size:11px;">-</span>';
+      rowBg = 'background: rgba(239, 68, 68, 0.03);';
+    } else {
+      responseBadge = '<span class="status-tag" style="background:#fef3c7; color:#b45309; font-weight:700; font-size:11px; padding:4px 10px; border-radius:6px; animation: pulse 1.5s infinite;">⏳ Awaiting Mobile Tap...</span>';
+      shiftDisplay = `<span style="color:#64748b; font-size:11px;">${ag.shiftTimings} (Pending)</span>`;
+    }
+
+    const timeFormatted = ag.responseTime ? new Date(ag.responseTime).toLocaleTimeString() : '<span style="color:#94a3b8;">-</span>';
+
+    return `
+      <tr style="${rowBg}">
+        <td style="font-family:monospace; color:#64748b; font-weight:700;">${ag.agentId}</td>
+        <td><strong style="color:#0f172a;">${ag.agentName}</strong></td>
+        <td style="color:#334155; font-size:12px;">${ag.queue || 'General Support'}</td>
+        <td><span class="status-tag aux" style="font-size:10px;">${ag.currentState || 'AUX Break'}</span></td>
+        <td>
+          <span style="display:inline-flex; align-items:center; gap:5px; font-size:11px; color:#0284c7; font-weight:700; background:#f0f9ff; padding:3px 8px; border-radius:6px; border:1px solid #bae6fd;">
+            📱 Mobile Alert Delivered
+          </span>
+        </td>
+        <td>${responseBadge}</td>
+        <td style="font-family:monospace; font-size:11px; color:#475569;">${timeFormatted}</td>
+        <td>${shiftDisplay}</td>
+        <td>
+          ${ag.status === 'PENDING' ? `
+            <button class="btn btn-xs btn-outline" style="border-color:#38bdf8; color:#0284c7; font-weight:700; padding:4px 8px;" onclick="rePingAgentMobile('${ag.agentId}', '${ag.agentName}')">
+              📱 Re-Ping
+            </button>
+          ` : (ag.status === 'ACCEPTED' ? `
+            <span style="font-size:11px; color:#15803d; font-weight:700;">✓ Confirmed</span>
+          ` : `
+            <span style="font-size:11px; color:#94a3b8;">Unavailable</span>
+          `)}
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+async function fetchEmergencyCampaign() {
+  try {
+    const res = await fetch('/api/emergency/status');
+    if (res.ok) {
+      const data = await res.json();
+      if (data.active && data.recall) {
+        currentEmergencyCampaign = data.recall;
+        renderEmergencyCampaign(currentEmergencyCampaign);
+      } else {
+        renderEmptyEmergencyTable();
+      }
+    }
+  } catch (e) {
+    console.warn('Emergency status fetch error:', e);
+  }
+}
+
+// Supervisor Real-Time SSE Listener
+function initSupervisorEmergencySSE() {
+  try {
+    const es = new EventSource('/api/alerts/stream');
+    es.addEventListener('EMERGENCY_RECALL_DISPATCH', (e) => {
+      try {
+        const campaign = JSON.parse(e.data);
+        currentEmergencyCampaign = campaign;
+        renderEmergencyCampaign(campaign);
+      } catch (err) {}
+    });
+
+    es.addEventListener('EMERGENCY_RESPONSE_UPDATE', (e) => {
+      try {
+        const update = JSON.parse(e.data);
+        fetchEmergencyCampaign();
+        if (update.response === 'YES' && 'speechSynthesis' in window) {
+          const utt = new SpeechSynthesisUtterance(`Agent ${update.agentName} has accepted the surge shift.`);
+          utt.rate = 1.0;
+          window.speechSynthesis.speak(utt);
+        }
+      } catch (err) {}
+    });
+
+    es.addEventListener('EMERGENCY_RECALL_RESET', () => {
+      currentEmergencyCampaign = null;
+      renderEmptyEmergencyTable();
+    });
+  } catch (e) {
+    console.warn('Supervisor SSE not supported, relying on polling.');
+  }
+}
+
+// Initial fetch & polling
+fetchEmergencyCampaign();
+initSupervisorEmergencySSE();
+setInterval(fetchEmergencyCampaign, 3000);
+updateUnavailablePill();

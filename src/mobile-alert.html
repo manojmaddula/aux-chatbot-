@@ -636,6 +636,209 @@
       color: #64748b;
       margin-top: 16px;
     }
+    /* EMERGENCY SURGE RECALL MODAL STYLES */
+    .emergency-mobile-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(10, 15, 29, 0.95);
+      backdrop-filter: blur(16px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      animation: fadeIn 0.25s ease;
+    }
+    .emergency-mobile-overlay.hidden {
+      display: none !important;
+    }
+    .emergency-modal-content {
+      background: #111827;
+      border: 1.5px solid rgba(239, 68, 68, 0.5);
+      box-shadow: 0 0 35px rgba(239, 68, 68, 0.35);
+      border-radius: 20px;
+      padding: 22px 18px;
+      width: 100%;
+      max-width: 390px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes scaleUp {
+      from { transform: scale(0.92); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .emergency-pulse-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      align-self: flex-start;
+    }
+    .emergency-badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 8px #ef4444;
+      animation: emergencyPulse 1.2s infinite;
+    }
+    @keyframes emergencyPulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.5; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .emergency-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #ffffff;
+      margin: 0;
+      line-height: 1.25;
+    }
+    .emergency-desc {
+      font-size: 13px;
+      color: #cbd5e1;
+      line-height: 1.45;
+      margin: 0;
+    }
+    .emergency-meta-box {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+    }
+    .meta-label {
+      color: #94a3b8;
+    }
+    .meta-val {
+      color: #f8fafc;
+    }
+    .emergency-btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .btn-emergency-accept {
+      flex: 1.2;
+      padding: 14px 10px;
+      border-radius: 12px;
+      border: none;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-emergency-accept:active {
+      transform: scale(0.97);
+    }
+    .btn-emergency-decline {
+      flex: 1;
+      padding: 14px 10px;
+      border-radius: 12px;
+      border: 1.5px solid rgba(239, 68, 68, 0.4);
+      background: rgba(239, 68, 68, 0.12);
+      color: #fca5a5;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn-emergency-decline:active {
+      transform: scale(0.97);
+    }
+    .shift-details-card {
+      background: #0a0f1d;
+      border-radius: 10px;
+      padding: 12px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      margin-bottom: 12px;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .shift-detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+    .workstation-action-box {
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-align: left;
+      margin-bottom: 14px;
+    }
+    .workstation-action-box span {
+      font-size: 24px;
+    }
+    .workstation-action-box strong {
+      display: block;
+      font-size: 12px;
+      color: #93c5fd;
+      margin-bottom: 2px;
+    }
+    .workstation-action-box p {
+      font-size: 11px;
+      color: #cbd5e1;
+      line-height: 1.35;
+      margin: 0;
+    }
+    .btn-emergency-ack {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      background: #10b981;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .btn-emergency-dim {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      background: #334155;
+      color: #f8fafc;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
   </style>
 </head>
 <body>
@@ -666,9 +869,18 @@
           <p id="agent-id-display">AGT-8842 • Tier-2 Tech Support</p>
         </div>
         <select id="agent-select" class="agent-picker">
-          <option value="AGT-8842">Alex Morgan (AGT-8842)</option>
-          <option value="AGT-9102">Samantha Vance (AGT-9102)</option>
-          <option value="AGT-4491">Carlos Mendez (AGT-4491)</option>
+          <option value="AGT-8842">Alex Morgan (AGT-8842) • Tech Support</option>
+          <option value="AGT-9102">Samantha Vance (AGT-9102) • Customer Service</option>
+          <option value="AGT-6512">Rachel Green (AGT-6512) • Customer Service</option>
+          <option value="AGT-8819">Marcus Brody (AGT-8819) • Customer Service</option>
+          <option value="AGT-3310">Chloe Bennett (AGT-3310) • Customer Service</option>
+          <option value="AGT-4092">Jordan Miller (AGT-4092) • Customer Billing</option>
+          <option value="AGT-5521">Lucas Wright (AGT-5521) • Customer Billing</option>
+          <option value="AGT-7703">Maya Patel (AGT-7703) • Customer Billing</option>
+          <option value="AGT-4491">Carlos Mendez (AGT-4491) • Tech Support</option>
+          <option value="AGT-7740">David Chen (AGT-7740) • Emergency Inbound</option>
+          <option value="AGT-6628">Olivia Taylor (AGT-6628) • Emergency Inbound</option>
+          <option value="AGT-2219">Liam O'Connor (AGT-2219) • Trainee Support</option>
         </select>
       </div>
 
@@ -804,6 +1016,95 @@
           <strong style="color:#ffffff; display:block; font-size:12px; margin-bottom:2px;">Workstation Resumption Policy</strong>
           <span>To switch back to READY / AVAILABLE status, you must report to your laptop desk.</span>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMERGENCY SURGE AVAILABILITY REQUEST MODAL (STORM / DISASTER RECALL) -->
+  <div id="emergency-mobile-overlay" class="emergency-mobile-overlay hidden">
+    <div class="emergency-modal-content">
+      <div class="emergency-pulse-badge">
+        <span class="emergency-badge-dot"></span>
+        🚨 CRITICAL FLOOR EMERGENCY
+      </div>
+      <h2 class="emergency-title">Call Volume Surge Detected</h2>
+      <p class="emergency-desc" id="emergency-modal-msg">
+        There is an emergency situation. High call volume surge detected and your availability is requested to balance the queue. If you are available please join, or select NO.
+      </p>
+
+      <div class="emergency-meta-box">
+        <div class="meta-row">
+          <span class="meta-label">Dispatched By:</span>
+          <strong id="emergency-sup-name" class="meta-val">Supervisor Sarah Jenkins</strong>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Target Queue:</span>
+          <strong id="emergency-target-queue" class="meta-val">Emergency Inbound & Tier-2 Support</strong>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Surge Shift Timings:</span>
+          <strong id="emergency-proposed-shift" class="meta-val" style="color:#38bdf8;">15:30 - 18:30 (Surge Shift • 3 hrs)</strong>
+        </div>
+        <div class="meta-row">
+          <span class="meta-label">Overtime Premium:</span>
+          <strong class="meta-val" style="color:#34d399;">+1.5x Premium Overtime</strong>
+        </div>
+      </div>
+
+      <!-- Action Choice Buttons -->
+      <div id="emergency-action-buttons" class="emergency-btn-row">
+        <button type="button" id="btn-emergency-yes" class="btn-emergency-accept">
+          <span>✅</span> YES, I Can Join
+        </button>
+        <button type="button" id="btn-emergency-no" class="btn-emergency-decline">
+          <span>❌</span> NO, Unavailable
+        </button>
+      </div>
+
+      <!-- Post-response Confirmed Screen (If YES) -->
+      <div id="emergency-confirmed-yes" class="emergency-confirmed-box hidden">
+        <div style="font-size:36px; margin-bottom:6px;">🎉</div>
+        <h3 style="color:#34d399; font-size:17px; font-weight:800; margin-bottom:4px;">Availability Confirmed!</h3>
+        <p style="font-size:12px; color:#cbd5e1; margin-bottom:12px;">Your acceptance has been transmitted to the floor supervisor. Your assigned shift timings:</p>
+        
+        <div class="shift-details-card">
+          <div class="shift-detail-row">
+            <span>🕒 Assigned Shift Timings:</span>
+            <strong id="confirmed-shift-timings" style="color:#38bdf8; font-size:14px;">15:30 - 18:30 (Surge Window)</strong>
+          </div>
+          <div class="shift-detail-row">
+            <span>🎯 Primary ACD Queue:</span>
+            <strong id="confirmed-shift-queue" style="color:#f8fafc;">Emergency Inbound & Tier-2</strong>
+          </div>
+          <div class="shift-detail-row">
+            <span>💰 Overtime Incentive:</span>
+            <strong style="color:#34d399;">+1.5x Hourly Premium</strong>
+          </div>
+        </div>
+
+        <div class="workstation-action-box">
+          <span>💻</span>
+          <div>
+            <strong>Report to Workstation</strong>
+            <p>Please log in to your workstation softphone immediately to start handling live customer calls.</p>
+          </div>
+        </div>
+
+        <button type="button" id="btn-close-emergency-yes" class="btn-emergency-ack">
+          ✓ Acknowledged & Opening Workstation
+        </button>
+      </div>
+
+      <!-- Post-response Declined Screen (If NO) -->
+      <div id="emergency-confirmed-no" class="emergency-confirmed-box hidden">
+        <div style="font-size:32px; margin-bottom:6px;">ℹ️</div>
+        <h3 style="color:#f87171; font-size:16px; font-weight:800; margin-bottom:4px;">Response Logged: Unavailable</h3>
+        <p style="font-size:12px; color:#cbd5e1; margin-bottom:14px;">
+          Thank you for letting us know. Your supervisor has been informed that you cannot take calls for this surge shift. Enjoy your break.
+        </p>
+        <button type="button" id="btn-close-emergency-no" class="btn-emergency-dim">
+          Close Notice
+        </button>
       </div>
     </div>
   </div>
@@ -1345,6 +1646,29 @@
           connText.textContent = 'Live Sync';
         };
 
+        es.addEventListener('EMERGENCY_RECALL_DISPATCH', (e) => {
+          try {
+            const campaign = JSON.parse(e.data);
+            checkAndShowEmergencyRecall(campaign);
+          } catch (err) {}
+        });
+
+        es.addEventListener('EMERGENCY_RESPONSE_UPDATE', (e) => {
+          try {
+            const update = JSON.parse(e.data);
+            if (update.campaignId && activeEmergencyCampaign) {
+              if (update.agents && update.agents[currentAgentId]) {
+                activeEmergencyCampaign.agents[currentAgentId] = update.agents[currentAgentId];
+              }
+            }
+          } catch (err) {}
+        });
+
+        es.addEventListener('EMERGENCY_RECALL_RESET', () => {
+          if (emOverlay) emOverlay.classList.add('hidden');
+          activeEmergencyCampaign = null;
+        });
+
         es.addEventListener('ALARM_TRIGGERED', (e) => {
           try {
             const alarm = JSON.parse(e.data);
@@ -1406,8 +1730,136 @@
       } catch (e) {}
     }, 2000);
 
+    // ==========================================
+    // EMERGENCY RECALL & AVAILABILITY RESPONSE LOGIC
+    // ==========================================
+    const emOverlay = document.getElementById('emergency-mobile-overlay');
+    const emMsg = document.getElementById('emergency-modal-msg');
+    const emSup = document.getElementById('emergency-sup-name');
+    const emQueue = document.getElementById('emergency-target-queue');
+    const emShift = document.getElementById('emergency-proposed-shift');
+    const emActions = document.getElementById('emergency-action-buttons');
+    const emConfYes = document.getElementById('emergency-confirmed-yes');
+    const emConfNo = document.getElementById('emergency-confirmed-no');
+    const confShiftTimings = document.getElementById('confirmed-shift-timings');
+    const confShiftQueue = document.getElementById('confirmed-shift-queue');
+    const btnEmYes = document.getElementById('btn-emergency-yes');
+    const btnEmNo = document.getElementById('btn-emergency-no');
+    const btnCloseEmYes = document.getElementById('btn-close-emergency-yes');
+    const btnCloseEmNo = document.getElementById('btn-close-emergency-no');
+
+    let activeEmergencyCampaign = null;
+
+    function checkAndShowEmergencyRecall(campaign) {
+      if (!campaign || !campaign.active) {
+        if (emOverlay) emOverlay.classList.add('hidden');
+        return;
+      }
+      activeEmergencyCampaign = campaign;
+      const targetAgent = campaign.agents ? campaign.agents[currentAgentId] : null;
+
+      // Only show if targeted or campaign includes this agent
+      if (campaign.agents && Object.keys(campaign.agents).length > 0 && !targetAgent) {
+        return;
+      }
+
+      if (emMsg) emMsg.textContent = campaign.message || 'There is an emergency situation. High call volume surge detected and your availability is requested to balance the queue. If you are available please join, or select NO.';
+      if (emSup) emSup.textContent = campaign.supervisorName || 'Floor Supervisor';
+      if (emQueue) emQueue.textContent = campaign.queueTarget || 'Emergency Inbound & Tier-2 Support';
+      if (emShift) emShift.textContent = campaign.shiftTimings || '15:30 - 18:30 (Surge Shift • 3 hrs)';
+
+      // Check current agent response state
+      if (targetAgent && targetAgent.response === 'YES') {
+        if (emActions) emActions.classList.add('hidden');
+        if (emConfNo) emConfNo.classList.add('hidden');
+        if (emConfYes) emConfYes.classList.remove('hidden');
+        if (confShiftTimings) confShiftTimings.textContent = targetAgent.shiftTimings || campaign.shiftTimings;
+        if (confShiftQueue) confShiftQueue.textContent = targetAgent.queueTarget || campaign.queueTarget;
+      } else if (targetAgent && targetAgent.response === 'NO') {
+        if (emActions) emActions.classList.add('hidden');
+        if (emConfYes) emConfYes.classList.add('hidden');
+        if (emConfNo) emConfNo.classList.remove('hidden');
+      } else {
+        if (emActions) emActions.classList.remove('hidden');
+        if (emConfYes) emConfYes.classList.add('hidden');
+        if (emConfNo) emConfNo.classList.add('hidden');
+      }
+
+      if (emOverlay) emOverlay.classList.remove('hidden');
+
+      // Vibrate phone for attention
+      try {
+        if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 500]);
+      } catch (e) {}
+
+      // Play chime if audio initialized
+      try {
+        playTestTone(880, 0.3);
+      } catch (e) {}
+    }
+
+    async function sendEmergencyResponse(choice) {
+      try {
+        if (navigator.vibrate) navigator.vibrate([100, 50, 150]);
+        const res = await fetch('/api/emergency/respond', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            agentId: currentAgentId,
+            response: choice
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          if (choice === 'YES') {
+            if (emActions) emActions.classList.add('hidden');
+            if (emConfNo) emConfNo.classList.add('hidden');
+            if (emConfYes) emConfYes.classList.remove('hidden');
+            if (confShiftTimings) confShiftTimings.textContent = data.shiftTimings || '15:30 - 18:30 (Surge Shift • 3 hrs)';
+            if (confShiftQueue) confShiftQueue.textContent = data.queueTarget || 'Emergency Inbound & Tier-2';
+          } else {
+            if (emActions) emActions.classList.add('hidden');
+            if (emConfYes) emConfYes.classList.add('hidden');
+            if (emConfNo) emConfNo.classList.remove('hidden');
+          }
+        }
+      } catch (e) {
+        console.warn('Emergency response error:', e);
+      }
+    }
+
+    if (btnEmYes) btnEmYes.addEventListener('click', () => sendEmergencyResponse('YES'));
+    if (btnEmNo) btnEmNo.addEventListener('click', () => sendEmergencyResponse('NO'));
+    if (btnCloseEmYes) btnCloseEmYes.addEventListener('click', () => emOverlay?.classList.add('hidden'));
+    if (btnCloseEmNo) btnCloseEmNo.addEventListener('click', () => emOverlay?.classList.add('hidden'));
+
+    // Check emergency status on initial load & agent change
+    async function fetchEmergencyStatus() {
+      try {
+        const res = await fetch(`/api/emergency/status?agentId=${currentAgentId}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.active && data.recall) {
+            checkAndShowEmergencyRecall(data.recall);
+          }
+        }
+      } catch (e) {}
+    }
+
+    if (agentSelect) {
+      agentSelect.addEventListener('change', () => {
+        currentAgentId = agentSelect.value;
+        const opt = agentSelect.options[agentSelect.selectedIndex];
+        if (agentNameDisplay) agentNameDisplay.textContent = opt.text.split('(')[0].trim();
+        if (agentIdDisplay) agentIdDisplay.textContent = currentAgentId;
+        fetchEmergencyStatus();
+      });
+    }
+
+
     // INITIALIZE
     fetchAlertPreferences();
+    fetchEmergencyStatus();
     checkLocalStorageBreak();
     initSSE();
   </script>
