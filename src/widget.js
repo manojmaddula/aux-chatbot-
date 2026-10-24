@@ -1822,14 +1822,20 @@ function openArticleDetail(item) {
   if (stepsEl) stepsEl.textContent = steps;
 
   detailView.classList.remove('hidden');
+  detailView.style.display = 'block';
   detailView.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 const btnCloseArticle = document.getElementById('btn-close-article');
 if (btnCloseArticle) {
-  btnCloseArticle.addEventListener('click', () => {
+  btnCloseArticle.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
     const detailView = document.getElementById('article-detail-view');
-    if (detailView) detailView.classList.add('hidden');
+    if (detailView) {
+      detailView.classList.add('hidden');
+      detailView.style.display = 'none';
+    }
   });
 }
 
@@ -2176,7 +2182,8 @@ function initAlertSettingsModal() {
     const devText = agentAlertPrefs.device === 'both' ? 'Both' : (agentAlertPrefs.device === 'mobile' ? 'Mobile' : 'Laptop');
     if (devLabel) devLabel.textContent = agentAlertPrefs.device === 'both' ? '💻+📱 Both' : (agentAlertPrefs.device === 'mobile' ? '📱 Mobile' : '💻 Laptop');
     if (threshLabel) threshLabel.textContent = `+${agentAlertPrefs.thresholdMins}m`;
-    if (pillLabel) pillLabel.textContent = `${devText} (+${agentAlertPrefs.thresholdMins}m)`;
+    if (pillLabel) pillLabel.textContent = `+${agentAlertPrefs.thresholdMins}m`;
+    if (btnHeader) btnHeader.title = `Break Alert Threshold Settings (+${agentAlertPrefs.thresholdMins}m, ${devText})`;
 
     // Update active classes in modal
     document.querySelectorAll('.dev-choice-card').forEach(c => {

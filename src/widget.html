@@ -42,13 +42,13 @@
         </div>
       </div>
       <div class="header-tools">
-        <button id="btn-header-alert-settings" class="btn-xs btn-outline" style="font-weight:700; display:inline-flex; align-items:center; gap:4px; padding:5px 8px;" title="Break Threshold Alarm &amp; Device Settings">
-          🔔 <span id="header-alert-pill">Both (+2m)</span>
+        <button id="btn-header-alert-settings" class="btn-xs btn-outline" style="font-weight:700; display:inline-flex; align-items:center; gap:4px; padding:4px 7px;" title="Break Alert Threshold Settings">
+          ⚙️ <span id="header-alert-pill">+2m</span>
         </button>
-        <a href="/agent-home.html" id="btn-agent-home" class="btn-xs btn-outline" style="text-decoration:none; display:inline-flex; align-items:center; gap:5px; padding:5px 8px; font-weight:700;" title="Agent Bot Home">
+        <a href="/agent-home.html" id="btn-agent-home" class="btn-xs btn-outline" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px; padding:4px 7px; font-weight:700;" title="Agent Bot Home">
           <img src="/favicon.svg?v=panda2" style="width:14px; height:14px;" /> Home
         </a>
-        </div>
+      </div>
     </header>
 
     <!-- CRITICAL BROADCAST TICKER (SUPERVISOR DISPATCHED ONLY) -->
@@ -136,23 +136,23 @@
 
     <!-- NAVIGATION TABS -->
     <nav class="widget-tabs">
-      <button class="tab-btn active" data-tab="tab-aux">
+      <button class="tab-btn active" data-tab="tab-aux" title="AUX Breaks">
         <span class="tab-icon">☕</span>
-        <span class="tab-label">AUX Break</span>
+        <span class="tab-label">AUX</span>
       </button>
-      <button class="tab-btn" data-tab="tab-alerts">
+      <button class="tab-btn" data-tab="tab-alerts" title="Advisories">
         <span class="tab-icon" style="position:relative; display:inline-flex;">📢<span id="unread-alert-count" class="tab-badge">0</span></span>
         <span class="tab-label">Advisories</span>
       </button>
-      <button class="tab-btn" data-tab="tab-acw">
-        <span class="tab-icon">📋</span>
-        <span class="tab-label">ACW</span>
-      </button>
-      <button class="tab-btn" data-tab="tab-troubleshoot">
+      <button class="tab-btn" data-tab="tab-troubleshoot" title="KBA Articles">
         <span class="tab-icon">🔧</span>
         <span class="tab-label">KBA</span>
       </button>
-      <button class="tab-btn" data-tab="tab-copilot">
+      <button class="tab-btn" data-tab="tab-acw" title="After Call Work">
+        <span class="tab-icon">📋</span>
+        <span class="tab-label">ACW</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-copilot" title="Ask Shankar AI">
         <span class="tab-icon">💬</span>
         <span class="tab-label">Ask Shankar</span>
       </button>
@@ -366,10 +366,10 @@
       </div>
 
       <!-- INLINE FULL ARTICLE READER (STAYS ON TAB 3, NO REDIRECT) -->
-      <div id="article-detail-view" class="article-detail-view hidden" style="background:var(--card-bg); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:14px; margin-bottom:12px; animation: slide-down 0.2s ease;">
+      <div id="article-detail-view" class="article-detail-view hidden" style="display:none; background:var(--card-bg); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:14px; margin-bottom:12px; animation: slide-down 0.2s ease;">
         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
           <span id="article-detail-cat" class="card-badge badge-agent" style="font-size:10px; font-weight:700;">NICE CXone</span>
-          <button id="btn-close-article" class="btn-xs btn-outline" style="font-size:10px; padding:2px 8px;">✕ Close Guide</button>
+          <button id="btn-close-article" class="btn-xs btn-outline" style="font-size:10px; padding:2px 8px;" onclick="const dv=document.getElementById('article-detail-view'); if(dv){ dv.classList.add('hidden'); dv.style.display='none'; }">✕ Close Guide</button>
         </div>
         <h3 id="article-detail-title" style="font-size:13px; font-weight:700; margin-bottom:6px; color:var(--text-main);">Article Title</h3>
         <p id="article-detail-desc" style="font-size:11px; color:var(--text-muted); line-height:1.4; margin-bottom:10px;">Article description and root cause.</p>
@@ -406,7 +406,6 @@
       <div class="card-section">
         <div class="card-title-row">
           <h4>📢 Supervisor Broadcasts & Operations Advisories</h4>
-          <span class="badge-readonly">READ-ONLY</span>
         </div>
         <p class="subtitle">Advisories are dispatched directly by floor leadership and WFM supervisors.</p>
         
