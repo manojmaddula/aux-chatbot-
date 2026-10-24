@@ -847,6 +847,7 @@
 
     let activeBreak = null;
     let isAlarmActive = false;
+    let isSilenced = false; // Persistent flag to prevent alarm restart after silence
     let audioCtx = null;
     let alarmOsc1 = null;
     let alarmOsc2 = null;
@@ -998,7 +999,7 @@
         } else {
           // Realistic dual-tone telephone ring (440Hz + 480Hz) with 1.5s ring / 1.5s pause cadence
           const playRingCadence = () => {
-            if (!isAlarmActive && !alarmOsc1) return;
+            if (!isAlarmActive || isSilenced || !audioCtx) return;
             try {
               const now = audioCtx.currentTime;
               const oscA = audioCtx.createOscillator();
@@ -1064,6 +1065,7 @@
 
     // SHOW INCOMING CALL MODAL
     function triggerIncomingCallScreen(alarmData) {
+      if (isSilenced) return; // Do not re-trigger if already silenced by user
       isAlarmActive = true;
       callOverlay.classList.remove('hidden');
 
@@ -1119,9 +1121,11 @@
 
     // Ready only from laptop
     async function silenceAlarm() {
+      isSilenced = true; // Permanently silenced for this break session
       isAlarmActive = false;
       stopAlarmSound();
       callOverlay.classList.add('hidden');
+      renderBreakUI();
 
       // Send silence to backend server so laptop also silences
       try {
@@ -1151,6 +1155,7 @@
 
     // TEST BUTTON
     btnTestAlarm.addEventListener('click', () => {
+      isSilenced = false;
       triggerIncomingCallScreen({
         agentId: currentAgentId,
         durationMinutes: 15,
@@ -1221,13 +1226,18 @@
         } else {
           // THRESHOLD IS EXCEEDED!
           statusTag.className = 'status-tag overdue';
-          statusTag.textContent = '🚨 THRESHOLD EXCEEDED';
-          timerLabel.textContent = 'VIOLATION LIMIT EXCEEDED • ALARM ACTIVE';
+          if (isSilenced) {
+            statusTag.textContent = '🚨 OVERDUE (SILENCED)';
+            timerLabel.textContent = 'ALARM SILENCED • RETURN TO LAPTOP TO RESUME READY';
+          } else {
+            statusTag.textContent = '🚨 THRESHOLD EXCEEDED';
+            timerLabel.textContent = 'VIOLATION LIMIT EXCEEDED • ALARM ACTIVE';
+          }
           timerDigits.className = 'timer-clock overdue';
           timerDigits.textContent = `+${timeStr}`;
 
-          // If alert preference includes mobile, trigger screen
-          if ((alertPrefs.device === 'mobile' || alertPrefs.device === 'both') && !isAlarmActive) {
+          // If alert preference includes mobile, trigger screen (ONLY if not silenced!)
+          if ((alertPrefs.device === 'mobile' || alertPrefs.device === 'both') && !isAlarmActive && !isSilenced) {
             triggerIncomingCallScreen({
               agentId: currentAgentId,
               durationMinutes: activeBreak.durationMinutes,
@@ -1253,6 +1263,7 @@
         if (!data) return;
 
         if (data.type === 'BREAK_APPROVED') {
+          isSilenced = false;
           activeBreak = data.payload;
           if (data.payload.alertDevice || data.payload.device) {
             alertPrefs.device = data.payload.alertDevice || data.payload.device;
@@ -1271,6 +1282,7 @@
           localStorage.setItem('wfm_active_break', JSON.stringify(data.payload));
           renderBreakUI();
         } else if (data.type === 'ALARM_ACKNOWLEDGED' || data.type === 'BREAK_ENDED') {
+          isSilenced = false;
           activeBreak = null;
           localStorage.removeItem('wfm_active_break');
           stopAlarmSound();
@@ -1300,7 +1312,7 @@
         es.addEventListener('ALARM_TRIGGERED', (e) => {
           try {
             const alarm = JSON.parse(e.data);
-            if (alarm.agentId === currentAgentId && (alertPrefs.device === 'mobile' || alertPrefs.device === 'both')) {
+            if (alarm.agentId === currentAgentId && !isSilenced && !alarm.silenced && (alertPrefs.device === 'mobile' || alertPrefs.device === 'both')) {
               triggerIncomingCallScreen(alarm);
             }
           } catch (err) {}
@@ -1331,7 +1343,7 @@
         const data = await res.json();
         if (data.success && data.alarms) {
           const myAlarm = data.alarms.find(a => a.agentId === currentAgentId);
-          if (myAlarm && !isAlarmActive && (alertPrefs.device === 'mobile' || alertPrefs.device === 'both')) {
+          if (myAlarm && !isAlarmActive && !isSilenced && !myAlarm.silenced && (alertPrefs.device === 'mobile' || alertPrefs.device === 'both')) {
             triggerIncomingCallScreen(myAlarm);
           } else if (!myAlarm && isAlarmActive) {
             // Alarm was cleared on supervisor or laptop desk
