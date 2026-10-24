@@ -1002,13 +1002,13 @@
 
       let targetUrl = '';
       if (homeActiveQrMode === 'cloud' && homeCachedServerInfo && homeCachedServerInfo.tunnelUrl) {
-        targetUrl = `${homeCachedServerInfo.tunnelUrl}/mobile-alert.html?agentId=${encodeURIComponent(currentAgentId)}`;
+        targetUrl = `${homeCachedServerInfo.tunnelUrl}/mobile-alert.html?agentId=${encodeURIComponent(currentAgentId)}&_t=${Date.now()}`;
         if (netDesc) netDesc.textContent = 'Works on any carrier (4G/5G/Wi-Fi) via HTTPS';
       } else {
         const host = homeCachedServerInfo && homeCachedServerInfo.localIp 
           ? `${homeCachedServerInfo.localIp}:${homeCachedServerInfo.port || 4000}` 
           : (window.location.host || '127.0.0.1:4000');
-        targetUrl = `http://${host}/mobile-alert.html?agentId=${encodeURIComponent(currentAgentId)}`;
+        targetUrl = `http://${host}/mobile-alert.html?agentId=${encodeURIComponent(currentAgentId)}&_t=${Date.now()}`;
         if (netDesc) netDesc.textContent = 'Requires phone on same Wi-Fi (192.168.0.142)';
       }
 

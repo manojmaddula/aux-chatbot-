@@ -8,6 +8,9 @@
   <meta name="theme-color" content="#090d16" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
   <style>
     :root {
       --bg-dark: #0a0f1d;
@@ -1714,6 +1717,8 @@
     // ==========================================
     // EMERGENCY RECALL & AVAILABILITY RESPONSE LOGIC
     // ==========================================
+    // legacy-meta-purge
+    document.querySelectorAll('.emergency-meta-box, .meta-row').forEach(el => el.remove());
     const emOverlay = document.getElementById('emergency-mobile-overlay');
     const emMsg = document.getElementById('emergency-modal-msg');
     const emSup = document.getElementById('emergency-sup-name');

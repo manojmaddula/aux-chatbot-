@@ -2232,7 +2232,7 @@ function initAlertSettingsModal() {
     let targetUrl = '';
 
     if (activeQrMode === 'cloud' && cachedServerInfo && cachedServerInfo.tunnelUrl) {
-      targetUrl = `${cachedServerInfo.tunnelUrl}/mobile-alert.html?agentId=${encodeURIComponent(currentAgentId)}`;
+      targetUrl = `${cachedServerInfo.tunnelUrl}/mobile-alert.html?agentId=${encodeURIComponent(currentAgentId)}&_t=${Date.now()}`;
       if (statusPill) {
         statusPill.textContent = '🌐 Cloud Active';
         statusPill.style.background = '#dcfce7';
@@ -2243,7 +2243,7 @@ function initAlertSettingsModal() {
       const host = cachedServerInfo && cachedServerInfo.localIp 
         ? `${cachedServerInfo.localIp}:${cachedServerInfo.port || 4000}` 
         : (window.location.host || '127.0.0.1:4000');
-      targetUrl = `http://${host}/mobile-alert.html?agentId=${encodeURIComponent(currentAgentId)}`;
+      targetUrl = `http://${host}/mobile-alert.html?agentId=${encodeURIComponent(currentAgentId)}&_t=${Date.now()}`;
       if (statusPill) {
         statusPill.textContent = '📶 Local Wi-Fi';
         statusPill.style.background = '#eff6ff';
