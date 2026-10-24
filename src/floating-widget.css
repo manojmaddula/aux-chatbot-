@@ -327,6 +327,7 @@
 }
 
 
+
 /* FULLSCREEN IN-APP MODE */
 .floating-panda-panel.fullscreen {
   top: 0 !important;
@@ -343,7 +344,10 @@
   transform: none !important;
   margin: 0 !important;
   z-index: 9999999 !important;
-  transition: opacity 0.2s ease, width 0.2s ease, height 0.2s ease !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  display: flex !important;
+  transition: none !important;
 }
 
 .floating-panda-panel.fullscreen .floating-panda-panel-header {
@@ -354,4 +358,6 @@
 .floating-panda-panel.fullscreen .floating-panda-panel-body {
   height: calc(100vh - 54px) !important;
   max-height: calc(100vh - 54px) !important;
+  flex: 1 !important;
 }
+

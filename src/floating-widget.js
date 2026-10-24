@@ -20,7 +20,21 @@
     document.head.appendChild(link);
   }
 
-  function initFloatingWidget() {
+  // Early global function declarations
+window.openFloatingWidget = function (full = false) {
+  if (typeof window._internalOpenPanel === 'function') {
+    window._internalOpenPanel(full);
+  } else {
+    initFloatingWidget();
+    if (typeof window._internalOpenPanel === 'function') window._internalOpenPanel(full);
+  }
+};
+
+  window.openFullApp = function () {
+  window.openFloatingWidget(true);
+};
+
+function initFloatingWidget() {
     if (document.getElementById('floating-panda-launcher')) {
       return; // Already initialized
     }
@@ -111,17 +125,40 @@
       isExpanded = full;
       if (isExpanded) {
         panel.classList.add('fullscreen');
+        panel.classList.add('open');
         panel.classList.remove('expanded');
-        btnExpand.textContent = '🗗';
-        btnExpand.title = 'Restore compact view';
+        panel.style.top = '0px';
+        panel.style.left = '0px';
+        panel.style.right = '0px';
+        panel.style.bottom = '0px';
+        panel.style.width = '100vw';
+        panel.style.height = '100vh';
+        panel.style.transform = 'none';
+        panel.style.opacity = '1';
+        panel.style.pointerEvents = 'auto';
+        panel.style.borderRadius = '0';
+        if (btnExpand) {
+          btnExpand.textContent = '🗗';
+          btnExpand.title = 'Restore compact view';
+        }
         if (iframe && iframe.contentWindow) {
           iframe.contentWindow.postMessage({ type: 'SET_ALL_SCREEN', enable: true }, '*');
         }
       } else {
         panel.classList.remove('fullscreen');
         panel.classList.remove('expanded');
-        btnExpand.textContent = '🗖';
-        btnExpand.title = 'Toggle full screen view';
+        panel.style.top = '';
+        panel.style.left = '';
+        panel.style.right = '24px';
+        panel.style.bottom = '24px';
+        panel.style.width = '440px';
+        panel.style.height = '680px';
+        panel.style.transform = '';
+        panel.style.borderRadius = '';
+        if (btnExpand) {
+          btnExpand.textContent = '🗖';
+          btnExpand.title = 'Toggle full screen view';
+        }
         if (iframe && iframe.contentWindow) {
           iframe.contentWindow.postMessage({ type: 'SET_ALL_SCREEN', enable: false }, '*');
         }
@@ -259,9 +296,9 @@
       }
     });
 
-    btnClose.addEventListener('click', closePanel);
-    btnExpand.addEventListener('click', toggleExpand);
-    btnPopout.addEventListener('click', popoutWindow);
+    if (btnClose) btnClose.addEventListener('click', closePanel);
+    if (btnExpand) btnExpand.addEventListener('click', toggleExpand);
+    if (btnPopout) btnPopout.addEventListener('click', popoutWindow);
 
     // Escape key closes panel
     window.addEventListener('keydown', (e) => {
