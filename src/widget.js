@@ -377,16 +377,16 @@ try {
     } else if (data.type === 'BREAK_REJECTED') {
       addSupervisorLog('REJECTED', `${data.payload.auxCode} rejected: ${data.payload.reason}`);
       showNotification('AUX Break Rejected', data.payload.reason);
-    } else if (data.type === 'ALARM_ACKNOWLEDGED') {
-      // Alarm acknowledged on mobile companion or supervisor desk
+    } else if (data.type === 'ALARM_ACKNOWLEDGED' || data.type === 'BREAK_ENDED') {
+      // Alarm acknowledged / break ended on mobile companion or supervisor desk
       if (!data.payload || !data.payload.agentId || data.payload.agentId === agentState.id) {
-        stopPhoneRingtone();
-        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-        const overlay = document.getElementById('bot-call-overlay');
-        if (overlay) overlay.classList.add('hidden');
         endBreakEarly();
-        addSupervisorLog('ALARM_ACKNOWLEDGED', `Break alarm acknowledged via ${data.payload.from || 'Mobile Companion'}. Resumed AVAILABLE state.`);
-        showNotification('Break Resumed', 'Alarm acknowledged and silenced on Mobile. Resumed AVAILABLE state in NICE CXone.');
+        addSupervisorLog('ALARM_ACKNOWLEDGED', `Break ended & acknowledged via ${data.payload.from || 'Mobile'}. Resumed AVAILABLE state.`);
+        showNotification('Break Resumed', 'Resumed AVAILABLE state in NICE CXone.');
+      }
+    } else if (data.type === 'ALARM_SILENCED') {
+      if (!data.payload || !data.payload.agentId || data.payload.agentId === agentState.id) {
+        silenceLaptopAlarm();
       }
     } else if (data.type === 'TRIGGER_ALARM') {
       if (!data.payload || !data.payload.agentId || data.payload.agentId === agentState.id) {
@@ -973,13 +973,11 @@ function stopPhoneRingtone() {
 
 // System Notification Helper
 function showNotification(title, body) {
-  if ('Notification' in window && Notification.permission === 'granted') {
-    new Notification(title, { body });
-  } else if ('Notification' in window && Notification.permission !== 'denied') {
-    Notification.requestPermission().then(perm => {
-      if (perm === 'granted') new Notification(title, { body });
-    });
-  }
+  try {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification(title, { body });
+    }
+  } catch (err) {}
 }
 
 // ==========================================
@@ -1367,29 +1365,78 @@ btnEndBreak.addEventListener('click', () => {
 });
 
 function endBreakEarly() {
-  const agentKey = agentState.id || 'AGT-8842';
-  const history = generate30DayBreakHistory(agentKey);
-  if (history && history[0] && history[0].status === 'In Progress') {
-    const endTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const startTimeStr = history[0].time.split(' - ')[0];
-    history[0].time = startTimeStr + ' - ' + endTime;
-    history[0].status = 'Completed';
-    history[0].statusClass = 'completed';
-    renderBreakHistory(agentKey);
+  try {
+    stopPhoneRingtone();
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+
+    // Hide any modal overlays completely so screen is NEVER stuck
+    const botOverlay = document.getElementById('bot-call-overlay');
+    if (botOverlay) botOverlay.classList.add('hidden');
+
+    const alertModal = document.getElementById('alert-settings-modal');
+    if (alertModal) alertModal.classList.add('hidden');
+
+    // Reset countdown and violation flags
+    if (countdownInterval) clearInterval(countdownInterval);
+    countdownInterval = null;
+    botCallTriggered = false;
+    twoMinuteWarningTriggered = false;
+
+    agentState.status = 'READY';
+    agentState.activeBreak = null;
+    try { localStorage.removeItem('wfm_active_break'); } catch (e) {}
+
+    // Reset UI indicators
+    if (agentStatusDot) agentStatusDot.className = 'status-indicator ready';
+    if (agentStateLabel) {
+      agentStateLabel.className = 'state-label';
+      agentStateLabel.textContent = 'NICE CXone: AVAILABLE';
+    }
+
+    if (breakActiveCard) breakActiveCard.classList.add('hidden');
+    if (twoMinAlert) twoMinAlert.classList.add('hidden');
+
+    if (breakProgressBar) {
+      breakProgressBar.style.width = '0%';
+      breakProgressBar.style.background = '#6366f1';
+    }
+    if (breakTimeLeft) {
+      breakTimeLeft.className = 'countdown-digits';
+      breakTimeLeft.textContent = '--:--';
+    }
+
+    // Complete 30-day break history record
+    const agentKey = agentState.id || 'AGT-8842';
+    try {
+      const history = generate30DayBreakHistory(agentKey);
+      if (history && history[0] && history[0].status === 'In Progress') {
+        const endTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const startTimeStr = history[0].time.split(' - ')[0];
+        history[0].time = startTimeStr + ' - ' + endTime;
+        history[0].status = 'Completed';
+        history[0].statusClass = 'completed';
+        renderBreakHistory(agentKey);
+      }
+    } catch (err) {}
+
+    try { playTone(440, 'sine', 0.15); } catch (e) {}
+  } catch (err) {
+    console.error('[Widget] Error in endBreakEarly:', err);
   }
-  if (countdownInterval) clearInterval(countdownInterval);
-  countdownInterval = null;
-  agentState.status = 'READY';
-  agentState.activeBreak = null;
-  localStorage.removeItem('wfm_active_break');
+}
 
-  agentStatusDot.className = 'status-indicator ready';
-  agentStateLabel.className = 'state-label';
-  agentStateLabel.textContent = 'NICE CXone: AVAILABLE';
-
-  breakActiveCard.classList.add('hidden');
-  twoMinAlert.classList.add('hidden');
-  playTone(440, 'sine', 0.2);
+function silenceLaptopAlarm() {
+  try {
+    stopPhoneRingtone();
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    const botOverlay = document.getElementById('bot-call-overlay');
+    if (botOverlay) botOverlay.classList.add('hidden');
+    botCallTriggered = true; // prevent immediate re-trigger
+    if (agentStateLabel) {
+      agentStateLabel.textContent = '🚨 OVERDUE • Ringtone Silenced';
+    }
+    addSupervisorLog('SILENCED', 'Ringtone & alarm silenced via Mobile Companion.');
+  } catch (err) {}
 }
 
 // Supervisor Audit Log Updater
@@ -2234,11 +2281,15 @@ function initWidgetAlertSSE() {
       try {
         const ack = JSON.parse(e.data);
         if (!ack.agentId || ack.agentId === agentState.id) {
-          stopPhoneRingtone();
-          if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-          const overlay = document.getElementById('bot-call-overlay');
-          if (overlay) overlay.classList.add('hidden');
           endBreakEarly();
+        }
+      } catch (err) {}
+    });
+    es.addEventListener('ALARM_SILENCED', (e) => {
+      try {
+        const sil = JSON.parse(e.data);
+        if (!sil.agentId || sil.agentId === agentState.id) {
+          silenceLaptopAlarm();
         }
       } catch (err) {}
     });

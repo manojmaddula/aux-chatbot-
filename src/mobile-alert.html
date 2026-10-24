@@ -1066,14 +1066,42 @@
           type: 'ALARM_ACKNOWLEDGED',
           payload: { agentId: currentAgentId, from: 'mobile' }
         });
+        bc.postMessage({
+          type: 'BREAK_ENDED',
+          payload: { agentId: currentAgentId }
+        });
       } catch (e) {}
     }
 
     btnCallAccept.addEventListener('click', acknowledgeAlarm);
-    btnCallSilence.addEventListener('click', () => {
+    async function silenceAlarm() {
+      isAlarmActive = false;
       stopAlarmSound();
       callOverlay.classList.add('hidden');
-    });
+
+      // Send silence to backend server so laptop also silences
+      try {
+        await fetch('/api/alerts/silence', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            agentId: currentAgentId,
+            silencedBy: 'AGENT_MOBILE'
+          })
+        });
+      } catch (e) {}
+
+      // Broadcast silence to laptop widget via BroadcastChannel
+      try {
+        const bc = new BroadcastChannel('wfm_aux_channel');
+        bc.postMessage({
+          type: 'ALARM_SILENCED',
+          payload: { agentId: currentAgentId, from: 'mobile' }
+        });
+      } catch (e) {}
+    }
+
+    btnCallSilence.addEventListener('click', silenceAlarm);
 
     btnManualEnd.addEventListener('click', acknowledgeAlarm);
 

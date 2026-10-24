@@ -623,6 +623,34 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // Silence Alarm (Silences audio and closes modal across laptop & mobile)
+  if (pathname === '/api/alerts/silence' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const aId = payload.agentId || 'AGT-8842';
+        if (activeBreakAlarms[aId]) {
+          activeBreakAlarms[aId].silenced = true;
+        }
+
+        broadcastAlertEvent('ALARM_SILENCED', {
+          agentId: aId,
+          silencedBy: payload.silencedBy || 'AGENT_MOBILE',
+          timestamp: new Date().toISOString()
+        });
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ success: true, message: 'Alarm silenced on all devices.' }));
+      } catch (err) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
   // Server-Sent Events (SSE) Stream for Mobile & Desktop Real-Time Calling/Alerts
   if (pathname === '/api/alerts/stream' && req.method === 'GET') {
     res.writeHead(200, {
