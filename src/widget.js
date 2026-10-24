@@ -2412,3 +2412,52 @@ window.addEventListener('storage', (e) => {
     } catch (err) {}
   }
 });
+
+
+// ========================================================
+// ALL-SCREEN / FULL TAB WORKSPACE CONTROLLER
+// ========================================================
+(function initAllScreenMode() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const isFullParam = urlParams.get('mode') === 'full' || urlParams.get('fulltab') === '1';
+  const savedMode = sessionStorage.getItem('widgetScreenMode');
+  
+  // Standalone top window defaults to all-screen if requested or saved
+  const shouldBeAllScreen = isFullParam || savedMode === 'all-screen';
+
+  const container = document.querySelector('.widget-container');
+  const btnToggle = document.getElementById('btn-toggle-all-screen');
+  const toggleLbl = document.getElementById('toggle-screen-lbl');
+
+  function applyScreenMode(isAll) {
+    if (isAll) {
+      document.body.classList.add('all-screen');
+      if (container) container.classList.add('all-screen');
+      if (toggleLbl) toggleLbl.textContent = 'Compact';
+      sessionStorage.setItem('widgetScreenMode', 'all-screen');
+    } else {
+      document.body.classList.remove('all-screen');
+      if (container) container.classList.remove('all-screen');
+      if (toggleLbl) toggleLbl.textContent = 'All Screen';
+      sessionStorage.setItem('widgetScreenMode', 'compact');
+    }
+  }
+
+  // Inside iframe, only apply if explicitly loaded with mode=full
+  if (window.self !== window.top) {
+    if (isFullParam) applyScreenMode(true);
+    if (btnToggle) btnToggle.style.display = 'none'; // inside iframe, managed by parent
+  } else {
+    // In standalone browser tab
+    if (shouldBeAllScreen) {
+      applyScreenMode(true);
+    }
+  }
+
+  if (btnToggle) {
+    btnToggle.addEventListener('click', () => {
+      const isCurrentlyAll = document.body.classList.contains('all-screen');
+      applyScreenMode(!isCurrentlyAll);
+    });
+  }
+})();

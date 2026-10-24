@@ -2064,3 +2064,140 @@ body {
   white-space: nowrap;
   flex-shrink: 0;
 }
+
+
+/* ========================================================
+   ALL-SCREEN / FULL TAB WORKSPACE ENHANCEMENTS
+   Allows widget to expand across entire screen width
+   ======================================================== */
+
+body.all-screen {
+  display: block !important;
+  background: #f8fafc !important;
+  justify-content: unset !important;
+  overflow-x: auto;
+}
+
+body.all-screen .widget-container,
+.widget-container.all-screen {
+  max-width: 100% !important;
+  width: 100% !important;
+  border-left: none !important;
+  border-right: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  min-height: 100vh;
+}
+
+/* Header in all-screen mode */
+body.all-screen .widget-header {
+  padding: 12px 32px;
+  max-width: 100%;
+  border-bottom: 1px solid #cbd5e1;
+  background: #ffffff;
+}
+
+body.all-screen .widget-agent-select {
+  max-width: 280px;
+  font-size: 12px;
+  padding: 5px 8px;
+}
+
+body.all-screen .agent-info .state-label {
+  font-size: 12px;
+}
+
+/* Tabs in all-screen mode */
+body.all-screen .widget-tabs {
+  padding: 0 24px;
+  background: #ffffff;
+  border-bottom: 2px solid #e2e8f0;
+  gap: 8px;
+}
+
+body.all-screen .tab-btn {
+  padding: 12px 24px 10px 24px;
+  font-size: 13px;
+  flex: 0 1 auto;
+  gap: 6px;
+  border-bottom-width: 3px;
+  border-radius: 6px 6px 0 0;
+}
+
+body.all-screen .tab-btn .tab-icon {
+  font-size: 18px;
+}
+
+body.all-screen .tab-btn .tab-label {
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+/* Content panes in all-screen mode: spacious, centered workspace */
+body.all-screen .tab-pane {
+  max-width: 1440px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 24px 32px;
+}
+
+/* Articles list in all-screen mode: 3-column card grid */
+body.all-screen .articles-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 16px;
+}
+
+body.all-screen .article-card {
+  margin-bottom: 0;
+  transition: all 0.2s ease;
+}
+
+body.all-screen .article-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.06);
+}
+
+/* Break history in all-screen mode */
+body.all-screen .break-summary-bar {
+  padding: 14px 20px;
+  font-size: 13px;
+}
+
+body.all-screen .break-history-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 12px;
+  max-height: 580px;
+}
+
+/* Advisories list in all-screen mode */
+body.all-screen .advisories-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 16px;
+}
+
+/* Copilot suggestions in all-screen mode */
+body.all-screen .ai-suggestions-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 12px;
+}
+
+/* ACW in all-screen mode */
+body.all-screen .acw-card {
+  padding: 20px 24px;
+}
+
+body.all-screen #summary-result {
+  margin-top: 16px;
+  padding: 18px;
+}
+
+/* Diagnostic terminal in all-screen mode */
+body.all-screen .diagnostic-box {
+  margin-top: 20px;
+}

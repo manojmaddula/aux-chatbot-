@@ -405,6 +405,60 @@
       border-bottom-left-radius: 14px;
       border-bottom-right-radius: 14px;
     }
+  
+    /* Home View Mode Switcher */
+    .home-view-nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+    }
+    .view-nav-btn {
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 700;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      color: var(--text-muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .view-nav-btn:hover {
+      background: #f1f5f9;
+      color: var(--text-main);
+    }
+    .view-nav-btn.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(37,99,235,0.25);
+    }
+    .home-fullscreen-container {
+      width: 100%;
+      height: calc(100vh - 180px);
+      min-height: 680px;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      margin-bottom: 24px;
+    }
+    .home-fullscreen-container.hidden {
+      display: none !important;
+    }
+    .home-fullscreen-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
   </style>
 </head>
 <body>
@@ -498,9 +552,14 @@
             • <strong>Disposition Sync</strong>: Directly logs call results to telephony & CRM
           </div>
         </div>
-        <button type="button" onclick="if(window.openFloatingWidget) window.openFloatingWidget(); else window.open('/widget.html', 'ZELWidget', 'width=460,height=780');" class="btn-launch btn-launch-primary" style="border:none; cursor:pointer; width:100%; display:inline-flex; align-items:center; justify-content:center; gap:8px;">
-          <img src="/favicon.svg?v=panda2" style="width:16px; height:16px;" /> Launch Floating Widget
-        </button>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <a href="/widget.html?mode=full" target="_blank" class="btn-launch btn-launch-primary" style="text-decoration:none; border:none; cursor:pointer; width:100%; display:inline-flex; align-items:center; justify-content:center; gap:8px; box-sizing:border-box;">
+            <span>🖥️</span> Open in Full Tab (All Screen)
+          </a>
+          <button type="button" onclick="if(window.openFloatingWidget) window.openFloatingWidget(); else window.open('/widget.html', 'ZELWidget', 'width=460,height=780');" class="btn-launch btn-launch-secondary" style="border:1px solid #cbd5e1; cursor:pointer; width:100%; display:inline-flex; align-items:center; justify-content:center; gap:6px; background:#ffffff;">
+            <img src="/favicon.svg?v=panda2" style="width:16px; height:16px;" /> Launch Floating Widget
+          </button>
+        </div>
       </div>
 
       <!-- CARD 2: QA INTERACTION SCORECARD -->
@@ -577,6 +636,37 @@
     };
 
     const agentSelect = document.getElementById('agent-select');
+    
+    // Switch between 3-Card Overview and Embedded Full Tab Assistant
+    const btnViewOverview = document.getElementById('btn-view-overview');
+    const btnViewFulltab = document.getElementById('btn-view-fulltab');
+    const cardsGrid = document.getElementById('home-cards-grid');
+    const fulltabView = document.getElementById('home-fulltab-view');
+    const fulltabIframe = document.getElementById('home-fulltab-iframe');
+
+    function showOverviewView() {
+      if (btnViewOverview) btnViewOverview.classList.add('active');
+      if (btnViewFulltab) btnViewFulltab.classList.remove('active');
+      if (cardsGrid) cardsGrid.style.display = 'grid';
+      if (fulltabView) fulltabView.classList.add('hidden');
+    }
+
+    function showFulltabView() {
+      if (btnViewOverview) btnViewOverview.classList.remove('active');
+      if (btnViewFulltab) btnViewFulltab.classList.add('active');
+      if (cardsGrid) cardsGrid.style.display = 'none';
+      if (fulltabView) fulltabView.classList.remove('hidden');
+
+      // Sync active agent to full tab iframe
+      if (fulltabIframe && fulltabIframe.contentWindow) {
+        const currentAgent = (agentSelect && agentSelect.value) || localStorage.getItem('activeAgentId') || 'AGT-8842';
+        fulltabIframe.contentWindow.postMessage({ type: 'SYNC_AGENT', agentId: currentAgent }, '*');
+      }
+    }
+
+    if (btnViewOverview) btnViewOverview.addEventListener('click', showOverviewView);
+    if (btnViewFulltab) btnViewFulltab.addEventListener('click', showFulltabView);
+
     function updateAgentView(id) {
       const p = AGENT_PROFILES[id] || AGENT_PROFILES['AGT-8842'];
       document.getElementById('agent-welcome-name').textContent = 'Welcome back, ' + p.name;
