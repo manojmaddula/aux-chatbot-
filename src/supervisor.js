@@ -2714,6 +2714,7 @@ function updateUnavailablePill() {
 }
 
 window.triggerEmergencyBroadcast = async function(targetType = 'unavailable') {
+  quotaAlertDismissed = false;
   updateUnavailablePill();
   let targetAgents = [];
   if (targetType === 'all') {
@@ -3022,12 +3023,21 @@ setInterval(fetchEmergencyCampaign, 3000);
 updateUnavailablePill();
 
 
+let quotaAlertDismissed = false;
+
 window.closeQuotaModal = function() {
+  quotaAlertDismissed = true;
   const m = document.getElementById('modal-quota-achieved');
-  if (m) m.classList.add('hidden');
+  if (m) {
+    m.classList.add('hidden');
+    m.style.setProperty('display', 'none', 'important');
+  }
 };
 
 window.showQuotaFulfilledAlert = function(data) {
+  if (quotaAlertDismissed) {
+    return;
+  }
   const modal = document.getElementById('modal-quota-achieved');
   const numEl = document.getElementById('modal-quota-number');
   const shiftEl = document.getElementById('modal-quota-shift');
@@ -3048,14 +3058,19 @@ window.showQuotaFulfilledAlert = function(data) {
     `).join('');
   }
 
-  if (modal) modal.classList.remove('hidden');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.style.setProperty('display', 'flex', 'important');
+  }
 
   // Trigger vocal announcement
   if ('speechSynthesis' in window) {
-    const text = `System alert: We have obtained a sufficient number of agents for the outage. Staffing quota achieved.`;
-    const utt = new SpeechSynthesisUtterance(text);
-    utt.rate = 1.0;
-    window.speechSynthesis.speak(utt);
+    try {
+      const text = `System alert: We have obtained a sufficient number of agents for the outage. Staffing quota achieved.`;
+      const utt = new SpeechSynthesisUtterance(text);
+      utt.rate = 1.0;
+      window.speechSynthesis.speak(utt);
+    } catch (e) {}
   }
 
   showSupervisorToast(`🎉 SYSTEM ALERT: We have obtained a sufficient number of agents (${count}/${target}) for the outage! Staffing quota achieved.`, true);
@@ -3074,7 +3089,46 @@ window.showQuotaFulfilledAlert = function(data) {
   }
 };
 
+// Wire up direct event listeners for modal buttons
+function attachQuotaModalListeners() {
+  const btnClose = document.getElementById('btn-close-quota-modal');
+  const btnAck = document.getElementById('btn-ack-quota-modal');
+  const backdrop = document.getElementById('quota-modal-backdrop');
+
+  if (btnClose) {
+    btnClose.addEventListener('click', (e) => {
+      e.stopPropagation();
+      window.closeQuotaModal();
+    });
+  }
+  if (btnAck) {
+    btnAck.addEventListener('click', (e) => {
+      e.stopPropagation();
+      window.closeQuotaModal();
+    });
+  }
+  if (backdrop) {
+    backdrop.addEventListener('click', (e) => {
+      e.stopPropagation();
+      window.closeQuotaModal();
+    });
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', attachQuotaModalListeners);
+} else {
+  attachQuotaModalListeners();
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    window.closeQuotaModal();
+  }
+});
+
 window.simulateFiveAccepted = async function() {
+  quotaAlertDismissed = false;
   try {
     const res = await fetch('/api/emergency/simulate-quota', { method: 'POST' });
     const data = await res.json();

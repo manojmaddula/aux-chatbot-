@@ -1144,3 +1144,45 @@ textarea:focus, select:focus {
   border-bottom: 2px solid #f472b6 !important;
   color: #ffffff !important;
 }
+
+/* Global Utility & System Alert Modal Styles */
+.hidden {
+  display: none !important;
+}
+
+.quota-alert-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.quota-alert-modal.hidden {
+  display: none !important;
+}
+
+#quota-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 10000000;
+  cursor: pointer;
+}
+
+#btn-close-quota-modal:hover {
+  background: #fee2e2 !important;
+  border-color: #f87171 !important;
+  color: #dc2626 !important;
+}
+
+#btn-ack-quota-modal:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+#btn-ack-quota-modal:active {
+  transform: translateY(0);
+}
