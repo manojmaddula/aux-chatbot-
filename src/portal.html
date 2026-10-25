@@ -41,8 +41,8 @@
         <p class="subtitle">Enter your enterprise agent credentials to access AUX authorization.</p>
         <div class="form-grid">
           <div class="form-group" style="grid-column: span 2; background: rgba(37, 99, 235, 0.1); padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(37, 99, 235, 0.3);">
-            <label style="color: #1e40af; font-weight: 700; font-size: 12px;">👤 Switch Agent User Persona (Pre-Configured Scenarios):</label>
-            <select id="preset-agent-select" style="margin-top: 6px; background: #ffffff; font-weight: 600; color: #0f172a; border: 1px solid #3b82f6;">
+            <label style="color: #93c5fd; font-weight: 700; font-size: 12px;">👤 Switch Agent User Persona (Pre-Configured Scenarios):</label>
+            <select id="preset-agent-select" style="margin-top: 6px; background: rgba(15, 23, 42, 0.9); font-weight: 600; color: #f8fafc; border: 1px solid rgba(59, 130, 246, 0.5);">
               <option value="AGT-8842">Alex Morgan (AGT-8842) • Tier-2 Tech • Clean Adherence 96% (Auto-Approve)</option>
               <option value="AGT-4092">Jordan Miller (AGT-4092) • Billing • 4 AUX Breaks Taken (Triggers AUX Pattern Reject)</option>
               <option value="AGT-9102">Samantha Vance (AGT-9102) • Customer Care • +25m Lunch Overage (Triggers Lunch Reject)</option>
@@ -163,18 +163,18 @@
         </div>
 
         <!-- IT SYSTEM ISSUE DOCUMENTATION (SHOWN ONLY WHEN AUX-5 IS SELECTED) -->
-        <div id="it-system-issue-box" class="it-issue-box hidden" style="background:rgba(37,99,235,0.06); border:1px solid #93c5fd; border-radius:8px; padding:12px; margin-top:12px;">
+        <div id="it-system-issue-box" class="it-issue-box hidden" style="background:rgba(30, 58, 138, 0.2); border:1px solid rgba(59, 130, 246, 0.35); border-radius:8px; padding:12px; margin-top:12px;">
           <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
             <span style="font-size:20px;">💻</span>
             <div>
-              <strong style="color:#1e40af; font-size:12px;">System Issue Alert: Document & Distribute to IT Helpdesk</strong>
-              <p style="font-size:11px; color:#475569; margin-top:2px;">Direct IT portal distribution ensures faster technical resolution while you are in AUX-5.</p>
+              <strong style="color:#93c5fd; font-size:12px;">System Issue Alert: Document & Distribute to IT Helpdesk</strong>
+              <p style="font-size:11px; color:#94a3b8; margin-top:2px;">Direct IT portal distribution ensures faster technical resolution while you are in AUX-5.</p>
             </div>
           </div>
           <div class="form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:8px;">
             <div class="form-group">
               <label style="font-size:11px; color:#475569;">Technical Failure Category:</label>
-              <select id="it-issue-category" style="background:#ffffff; color:#0f172a; border:1px solid #93c5fd; padding:6px; border-radius:4px; width:100%;">
+              <select id="it-issue-category" style="background:rgba(15,23,42,0.85); color:#ffffff; border:1px solid rgba(59,130,246,0.4); padding:6px; border-radius:4px; width:100%;">
                 <option value="Cisco AnyConnect / VPN Error 412">Cisco AnyConnect / VPN Error 412 (MTU/Tunnel)</option>
                 <option value="Citrix Workspace VDI Freeze">Citrix Workspace VDI Black Screen / Freeze</option>
                 <option value="NICE CXone MAX Audio / WebRTC Drop">NICE CXone MAX Audio Drop / Code 99 CTI Lockout</option>
@@ -184,12 +184,12 @@
             </div>
             <div class="form-group">
               <label style="font-size:11px; color:#475569;">Error Code / Specific Symptoms:</label>
-              <input type="text" id="it-issue-details" placeholder="e.g. Lost audio stream on incoming call #90421" style="background:#ffffff; color:#0f172a; border:1px solid #93c5fd; padding:6px; border-radius:4px; width:100%;" />
+              <input type="text" id="it-issue-details" placeholder="e.g. Lost audio stream on incoming call #90421" style="background:rgba(15,23,42,0.85); color:#ffffff; border:1px solid rgba(59,130,246,0.4); padding:6px; border-radius:4px; width:100%;" />
             </div>
           </div>
           <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
             <input type="checkbox" id="it-notify-chk" checked style="cursor:pointer;" />
-            <label for="it-notify-chk" style="color:#334155; font-size:11px; cursor:pointer;">
+            <label for="it-notify-chk" style="color:#cbd5e1; font-size:11px; cursor:pointer;">
               <strong>Auto-dispatch ticket to IT Support queue</strong> for rapid response
             </label>
           </div>
@@ -234,23 +234,23 @@
         </div>
 
                 <!-- THRESHOLD CALLING & DEVICE SELECTION -->
-        <div class="alert-config-box" style="background:#f8fafc; border:1.5px solid #e2e8f0; border-radius:12px; padding:14px; margin-top:14px; margin-bottom:14px;">
+        <div class="alert-config-box" style="background:rgba(15, 23, 42, 0.6); border:1px solid rgba(255, 255, 255, 0.08); border-radius:14px; padding:16px; margin-top:16px; margin-bottom:16px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <h4 style="font-size:13px; font-weight:800; color:#0f172a; margin:0; display:flex; align-items:center; gap:6px;">
+            <h4 style="font-size:13px; font-weight:800; color:#ffffff; margin:0; display:flex; align-items:center; gap:6px;">
               <span>🚨</span> Break Threshold Calling &amp; Alert Device Selection
             </h4>
-            <span style="font-size:10px; font-weight:700; color:#2563eb; background:#eff6ff; padding:2px 8px; border-radius:99px; border:1px solid #bfdbfe;">
+            <span style="font-size:10px; font-weight:700; color:#60a5fa; background:rgba(59, 130, 246, 0.15); padding:2px 8px; border-radius:99px; border:1px solid rgba(59, 130, 246, 0.3);">
               Adherence Guard
             </span>
           </div>
-          <p style="font-size:11px; color:#64748b; margin-bottom:12px;">
+          <p style="font-size:11px; color:#94a3b8; margin-bottom:12px;">
             Configure where you wish to receive an automated call/alarm if your break exceeds the applied time plus threshold limit.
           </p>
 
           <div class="form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
             <div class="form-group">
-              <label style="font-size:11px; font-weight:700; color:#334155;">Alert Destination Device:</label>
-              <select id="portal-alert-device" style="width:100%; border-radius:6px; padding:7px; border:1px solid #cbd5e1; font-size:12px; font-weight:600;">
+              <label style="font-size:11px; font-weight:700; color:#cbd5e1;">Alert Destination Device:</label>
+              <select id="portal-alert-device" style="width:100%; border-radius:6px; padding:7px; border:1px solid rgba(255, 255, 255, 0.12); background:rgba(15, 23, 42, 0.85); color:#ffffff; font-size:12px; font-weight:600;">
                 <option value="both" selected>💻 + 📱 Both Laptop &amp; Mobile Phone</option>
                 <option value="laptop">💻 Laptop / Workstation Only</option>
                 <option value="mobile">📱 Mobile Phone Only</option>
@@ -258,8 +258,8 @@
             </div>
 
             <div class="form-group">
-              <label style="font-size:11px; font-weight:700; color:#334155;">Variance Threshold Buffer:</label>
-              <select id="portal-alert-threshold" style="width:100%; border-radius:6px; padding:7px; border:1px solid #cbd5e1; font-size:12px; font-weight:600;">
+              <label style="font-size:11px; font-weight:700; color:#cbd5e1;">Variance Threshold Buffer:</label>
+              <select id="portal-alert-threshold" style="width:100%; border-radius:6px; padding:7px; border:1px solid rgba(255, 255, 255, 0.12); background:rgba(15, 23, 42, 0.85); color:#ffffff; font-size:12px; font-weight:600;">
                 <option value="0">0m (Immediate Alarm once break ends)</option>
                 <option value="1">+1 min Grace Buffer</option>
                 <option value="2" selected>+2 mins (Recommended Standard)</option>
@@ -268,9 +268,9 @@
             </div>
           </div>
 
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:8px; border-top:1px dashed #cbd5e1; font-size:11px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:8px; border-top:1px dashed rgba(255, 255, 255, 0.08); font-size:11px;">
             <span style="color:#64748b;">Companion Mobile Companion:</span>
-            <a href="/mobile-alert.html" target="_blank" style="color:#2563eb; font-weight:700; text-decoration:underline;">
+            <a href="/mobile-alert.html" target="_blank" style="color:#60a5fa; font-weight:700; text-decoration:underline;">
               📱 Open Mobile Companion Companion (/mobile-alert.html) ↗
             </a>
           </div>
@@ -299,7 +299,7 @@
             <span style="font-size:24px;">⏳</span>
             <div>
               <strong style="color:#b45309; font-size:13px; display:block;">Check Back Later for AUX Availability</strong>
-              <p style="color:#475569; font-size:11px; margin-top:2px;">
+              <p style="color:#94a3b8; font-size:11px; margin-top:2px;">
                 ACD queue depth or staffing constraints are currently active. Discretionary AUX requests are temporarily held.
               </p>
               <div style="margin-top:6px; display:flex; gap:14px; font-size:11px; font-weight:700;">
@@ -321,7 +321,7 @@
     </div>
   
     <!-- BUSINESS CONTINUITY PLAN (BCP) CONTINGENCY FOOTER -->
-    <footer class="portal-bcp-footer" style="margin-top:20px; padding:12px; background:#ffffff; border:1px solid #e2e8f0; border-radius:8px; box-shadow:0 1px 3px rgba(0,0,0,0.03);">
+    <footer class="portal-bcp-footer" style="margin-top:24px; padding:14px 18px; background:rgba(15, 23, 42, 0.6); border:1px solid rgba(255, 255, 255, 0.08); border-radius:12px; backdrop-filter:blur(12px);">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
         <div style="display:flex; align-items:center; gap:8px;">
           <span style="font-size:18px;">🛡️</span>

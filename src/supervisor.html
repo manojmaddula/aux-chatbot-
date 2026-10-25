@@ -17,7 +17,7 @@
     <!-- TOP HEADER -->
     <header class="sup-header">
       <div class="header-left">
-        <h2 style="font-size: 20px; font-weight: 800; color: #0f172a; margin: 0;">Supervisor Dashboard</h2>
+        <h2 style="font-size: 20px; font-weight: 800; color: #ffffff; margin: 0; letter-spacing: -0.4px;">Supervisor Dashboard</h2>
       </div>
       <div class="header-right">
         <div class="sup-profile">
@@ -32,7 +32,7 @@
             </select>
           </div>
         </div>
-        <a href="/index.html" class="btn btn-sm btn-outline" style="text-decoration:none; display:flex; align-items:center; gap:6px; color:#2563eb; border-color:#cbd5e1; background:#ffffff;">
+        <a href="/index.html" class="btn btn-sm btn-outline" style="text-decoration:none; display:flex; align-items:center; gap:6px; color:#60a5fa; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.04);">
           <img src="/favicon.svg?v=panda2" style="width:14px; height:14px;" /> Home
         </a>
         <button id="btn-header-emergency-notify" class="btn btn-sm" style="background:#dc2626; color:#ffffff; font-weight:800; border:none; display:flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(220,38,38,0.3); cursor:pointer;" onclick="triggerEmergencyBroadcast('unavailable')">
@@ -107,12 +107,12 @@
             <p>Live status synchronized with NICE CXone MAX CTI state engine. Supervisors can remotely recall or reassign agents.</p>
           </div>
           <div class="header-actions" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-            <div style="display:flex; align-items:center; border:1px solid #cbd5e1; border-radius:6px; overflow:hidden;">
+            <div style="display:flex; align-items:center; border:1px solid rgba(255,255,255,0.1); border-radius:8px; overflow:hidden;">
               <button id="btn-team-filter-my" class="btn btn-xs btn-primary" style="padding:6px 12px; font-weight:700; cursor:pointer;" onclick="setTeamFilter('my_team')">★ My Assigned Team (<span id="my-team-count">4</span>)</button>
-              <button id="btn-team-filter-all" class="btn btn-xs btn-outline" style="padding:6px 12px; border:none; background:#ffffff; color:#64748b; cursor:pointer;" onclick="setTeamFilter('all_floor')">🌐 All Floor (12)</button>
+              <button id="btn-team-filter-all" class="btn btn-xs btn-outline" style="padding:6px 12px; border:none; background:rgba(255,255,255,0.03); color:#94a3b8; cursor:pointer;" onclick="setTeamFilter('all_floor')">🌐 All Floor (12)</button>
             </div>
             <div style="display:flex; align-items:center; gap:6px;">
-              <input type="text" id="agent-search-input" placeholder="Search agent name, ID or skill..." style="padding:6px 10px; border-radius:6px; border:1px solid #cbd5e1; font-size:12px; width:190px;" />
+              <input type="text" id="agent-search-input" placeholder="Search agent name, ID or skill..." style="padding:6px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.12); background:rgba(15,23,42,0.85); color:#ffffff; font-size:12px; width:190px;" />
               <button id="btn-search-agents" class="btn btn-sm btn-primary">🔍 Search</button>
               <button id="btn-clear-agent-search" class="btn btn-sm btn-outline">Clear</button>
             </div>
@@ -263,7 +263,7 @@
             <div style="display:flex; align-items:center; gap:10px;">
               <span style="font-size:26px;">🚨</span>
               <div>
-                <h3 style="margin:0; color:#0f172a;">Emergency Staffing & Mobile Recall Engine (Storm Surge Alert)</h3>
+                <h3 style="margin:0; color:#ffffff;">Emergency Staffing & Mobile Recall Engine (Storm Surge Alert)</h3>
                 <p style="margin-top:2px; color:#64748b; font-size:12px;">
                   During storm/disaster traffic surges, alert all unavailable agents (in AUX, break, training, or off-shift) directly on their mobile phones to join and balance volume. Live responses & shift timings are tracked in real-time below.
                 </p>
@@ -271,15 +271,15 @@
             </div>
           </div>
           <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-            <div style="display:flex; align-items:center; gap:6px; background:#ffffff; border:1px solid #cbd5e1; border-radius:6px; padding:5px 8px; font-size:12px;">
+            <div style="display:flex; align-items:center; gap:6px; background:rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.12); border-radius:8px; padding:5px 10px; font-size:12px;">
               <span style="color:#64748b; font-weight:600;">Wanting:</span>
-              <input type="number" id="input-emergency-quota" min="1" max="12" value="5" style="width:44px; padding:2px 4px; font-weight:800; border:1px solid #94a3b8; border-radius:4px; font-size:12px; text-align:center; color:#0f172a;" title="Target number of extra agents wanted for outage" />
+              <input type="number" id="input-emergency-quota" min="1" max="12" value="5" style="width:44px; padding:2px 4px; font-weight:800; border:1px solid rgba(59,130,246,0.4); background:rgba(15,23,42,0.9); border-radius:6px; font-size:12px; text-align:center; color:#ffffff;" title="Target number of extra agents wanted for outage" />
               <span style="color:#64748b; font-weight:600;">Extra Agents</span>
             </div>
             <button id="btn-notify-all-emergency" class="btn btn-emergency" style="background:#dc2626; color:#ffffff; font-weight:800; padding:8px 16px; border-radius:8px; border:none; box-shadow:0 4px 12px rgba(220,38,38,0.35); cursor:pointer; display:flex; align-items:center; gap:8px;" onclick="triggerEmergencyBroadcast('unavailable')">
               <span>📢</span> Notify All Unavailable (<span id="unavailable-count-pill">5</span> Agents)
             </button>
-            <button id="btn-notify-all-fleet" class="btn btn-outline" style="border-color:#cbd5e1; background:#ffffff; color:#334155; font-size:12px; font-weight:700; padding:8px 14px; cursor:pointer;" onclick="triggerEmergencyBroadcast('all')">
+            <button id="btn-notify-all-fleet" class="btn btn-outline" style="border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.04); color:#cbd5e1; font-size:12px; font-weight:700; padding:8px 14px; cursor:pointer;" onclick="triggerEmergencyBroadcast('all')">
               🌐 Notify All Fleet (12)
             </button>
             <button id="btn-demo-quota" class="btn btn-xs btn-outline" style="border-color:#10b981; color:#059669; font-weight:700; padding:7px 10px; cursor:pointer; background:#f0fdf4;" onclick="simulateFiveAccepted()" title="Simulate 5 agents accepting availability to trigger quota achieved system alert">
@@ -293,11 +293,11 @@
 
         <div class="card-body">
           <!-- Outage Staffing Availability Quota Progress Bar -->
-          <div id="em-quota-container" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:10px 14px; margin-bottom:14px; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+          <div id="em-quota-container" style="background:rgba(15,23,42,0.65); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:12px 16px; margin-bottom:14px; backdrop-filter:blur(12px);">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
               <div style="display:flex; align-items:center; gap:8px;">
                 <span style="font-size:16px;">🎯</span>
-                <strong style="font-size:12px; color:#0f172a;">Outage Staffing Availability Target:</strong>
+                <strong style="font-size:12px; color:#ffffff;">Outage Staffing Availability Target:</strong>
                 <span id="em-quota-label" style="font-size:12px; color:#2563eb; font-weight:700;">0 / 5 Agents Confirmed (Wanting 5 Extra Agents)</span>
               </div>
               <span id="em-quota-pill" style="font-size:11px; font-weight:800; padding:3px 10px; border-radius:12px; background:#fef3c7; color:#b45309;">
@@ -321,7 +321,7 @@
               </div>
             </div>
             <div style="display:flex; align-items:center; gap:12px;">
-              <div style="background:#ffffff; border:1px solid #fca5a5; border-radius:6px; padding:4px 10px; font-size:11px;">
+              <div style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; border-radius:6px; padding:4px 10px; font-size:11px;">
                 <span style="color:#64748b;">Assigned Shift Window:</span>
                 <strong id="em-campaign-shift-label" style="color:#0284c7; margin-left:4px;">15:30 - 18:30 (Surge Shift • 3 hrs)</strong>
               </div>
@@ -333,9 +333,9 @@
 
           <!-- 4 Metrics Telemetry Row -->
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-bottom:16px;">
-            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px 14px;">
+            <div style="background:rgba(15,23,42,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px 14px;">
               <span style="font-size:11px; color:#64748b; font-weight:700; text-transform:uppercase;">📱 Mobile Alerts Sent</span>
-              <div id="em-stat-total" style="font-size:24px; font-weight:800; color:#0f172a; margin-top:2px;">0</div>
+              <div id="em-stat-total" style="font-size:24px; font-weight:800; color:#ffffff; margin-top:2px;">0</div>
               <span style="font-size:10px; color:#64748b;">Delivered to agent phones</span>
             </div>
             <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:12px 14px;">
@@ -386,7 +386,7 @@
             <div style="display:flex; align-items:center; gap:10px;">
               <span style="font-size:24px;">🎂</span>
               <div>
-                <h3 style="margin:0; color:#0f172a;">Contact Center Birthday Calendar & Celebrations Hub</h3>
+                <h3 style="margin:0; color:#ffffff;">Contact Center Birthday Calendar & Celebrations Hub</h3>
                 <p style="margin-top:2px; color:#64748b; font-size:12px;">
                   All 12 agents and 5 supervisors. Track upcoming milestones and publish official floor-wide birthday broadcast greetings with 1-click.
                 </p>
@@ -413,7 +413,7 @@
               <button class="btn btn-xs bday-tab-btn" data-filter="all" onclick="setBirthdayFilter('all')">📅 All 12 Months</button>
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
-              <input type="text" id="birthday-search-input" placeholder="Search person, ID, or skill..." onkeyup="handleBirthdaySearch(this.value)" style="padding:6px 12px; font-size:12px; border:1px solid #cbd5e1; border-radius:6px; width:210px; outline:none;" />
+              <input type="text" id="birthday-search-input" placeholder="Search person, ID, or skill..." onkeyup="handleBirthdaySearch(this.value)" style="padding:6px 12px; font-size:12px; border:1px solid rgba(255,255,255,0.12); background:rgba(15,23,42,0.85); color:#ffffff; border-radius:8px; width:210px; outline:none;" />
             </div>
           </div>
 
@@ -517,7 +517,7 @@
             <div style="display:flex; align-items:center; gap:10px;">
               <span style="font-size:24px;">📈</span>
               <div>
-                <h3 style="margin:0; color:#0f172a;">Call Volume, AHT & Service Level Trend Analysis</h3>
+                <h3 style="margin:0; color:#ffffff;">Call Volume, AHT & Service Level Trend Analysis</h3>
                 <p style="margin-top:2px; color:#64748b; font-size:12px;">
                   Multi-day telemetry based on previous days' calls (Offered, Handled, IVR Deflected, Abandonment, ASA, and AHT).
                 </p>

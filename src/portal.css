@@ -1,15 +1,18 @@
 :root {
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
-  --success: #059669;
-  --danger: #dc2626;
-  --warning: #d97706;
-  --bg-dark: #f8fafc;
-  --card-bg: #ffffff;
-  --border: #e2e8f0;
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --radius: 12px;
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --bg-dark: #070a13;
+  --card-bg: rgba(15, 23, 42, 0.75);
+  --card-hover: rgba(22, 33, 62, 0.85);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-focus: #3b82f6;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-dim: #64748b;
+  --radius: 16px;
 }
 
 * {
@@ -21,10 +24,16 @@
 
 body {
   background: var(--bg-dark);
+  background-image: 
+    radial-gradient(circle at 50% 0%, rgba(37, 99, 235, 0.18) 0%, transparent 60%),
+    radial-gradient(circle at 90% 40%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 10% 80%, rgba(16, 185, 129, 0.06) 0%, transparent 50%);
+  background-attachment: fixed;
   color: var(--text-main);
-  padding: 24px 16px;
+  padding: 32px 16px;
   display: flex;
   justify-content: center;
+  -webkit-font-smoothing: antialiased;
 }
 
 .portal-container {
@@ -95,9 +104,11 @@ body {
   background: var(--card-bg);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   overflow: hidden;
-  transition: all 0.2s ease;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .card.disabled {
@@ -107,8 +118,8 @@ body {
 }
 
 .card-header {
-  padding: 14px 18px;
-  background: rgba(255, 255, 255, 0.03);
+  padding: 16px 22px;
+  background: rgba(15, 23, 42, 0.6);
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
@@ -129,7 +140,7 @@ body {
 }
 
 .card-body {
-  padding: 20px;
+  padding: 24px;
 }
 
 .subtitle {
@@ -154,40 +165,42 @@ body {
 .form-group label {
   font-size: 12px;
   font-weight: 600;
-  color: #334155;
+  color: #cbd5e1;
 }
 
 .section-label {
   display: block;
   font-size: 13px;
-  font-weight: 600;
-  margin-bottom: 10px;
-  color: #334155;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #ffffff;
 }
 
 input, select, textarea {
-  background: #ffffff;
+  background: rgba(15, 23, 42, 0.85);
   border: 1px solid var(--border);
-  color: #0f172a;
+  color: #f8fafc;
   padding: 10px 14px;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 13px;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 input:focus, select:focus, textarea:focus {
   border-color: var(--primary);
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.25);
 }
 
 .wfm-gauge-banner {
   display: flex;
   justify-content: space-around;
-  background: rgba(37, 99, 235, 0.06);
-  border: 1px dashed rgba(37, 99, 235, 0.3);
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 20px;
+  background: rgba(30, 58, 138, 0.18);
+  border: 1px dashed rgba(59, 130, 246, 0.35);
+  padding: 14px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  backdrop-filter: blur(8px);
 }
 
 .gauge-item {
@@ -204,9 +217,10 @@ input:focus, select:focus, textarea:focus {
 }
 
 .gauge-val {
-  font-size: 14px;
-  font-weight: 700;
-  color: #0f172a;
+  font-size: 15px;
+  font-weight: 800;
+  color: #ffffff;
+  font-family: monospace;
 }
 
 .gauge-val.highlight {
@@ -230,17 +244,17 @@ input:focus, select:focus, textarea:focus {
 }
 
 .aux-card {
-  background: #ffffff;
+  background: rgba(15, 23, 42, 0.6);
   border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 14px 10px;
+  border-radius: 12px;
+  padding: 16px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   gap: 6px;
-  transition: all 0.2s;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
 }
 
 .aux-card .aux-icon {
@@ -249,7 +263,7 @@ input:focus, select:focus, textarea:focus {
 
 .aux-card strong {
   font-size: 13px;
-  color: #0f172a;
+  color: #f8fafc;
 }
 
 .aux-card small {
@@ -259,8 +273,8 @@ input:focus, select:focus, textarea:focus {
 
 .aux-option input[type="radio"]:checked + .aux-card {
   border-color: var(--primary);
-  background: rgba(37, 99, 235, 0.08);
-  box-shadow: 0 0 0 1px var(--primary);
+  background: rgba(59, 130, 246, 0.18);
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.25);
 }
 
 .duration-pills {
@@ -271,27 +285,29 @@ input:focus, select:focus, textarea:focus {
 }
 
 .pill {
-  background: #f1f5f9;
-  border: 1px solid var(--border);
-  color: #334155;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
   padding: 8px 16px;
   border-radius: 20px;
   cursor: pointer;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   transition: all 0.2s;
 }
 
 .pill:hover {
-  background: #e2e8f0;
-  border-color: #94a3b8;
+  background: rgba(59, 130, 246, 0.15);
+  border-color: rgba(59, 130, 246, 0.35);
+  color: #ffffff;
 }
 
 .pill.active {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: #fff;
-  font-weight: 600;
+  background: #3b82f6;
+  border-color: #3b82f6;
+  color: #ffffff;
+  font-weight: 700;
+  box-shadow: 0 2px 12px rgba(59, 130, 246, 0.35);
 }
 
 #it-system-issue-box.hidden,
@@ -407,14 +423,15 @@ input:focus, select:focus, textarea:focus {
 }
 
 .decision-box {
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 32px;
-  max-width: 500px;
+  background: #0d1322;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 36px;
+  max-width: 520px;
   width: 90%;
   text-align: center;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7), 0 0 24px rgba(59, 130, 246, 0.15);
+  backdrop-filter: blur(20px);
 }
 
 .status-big-icon {
@@ -435,23 +452,24 @@ input:focus, select:focus, textarea:focus {
 }
 
 .decision-metrics {
-  background: #f8fafc;
+  background: rgba(15, 23, 42, 0.7);
   border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 16px;
+  border-radius: 12px;
+  padding: 18px;
   text-align: left;
   font-size: 13px;
   margin-bottom: 24px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .metric-row {
   display: flex;
   justify-content: space-between;
-  border-bottom: 1px solid #e2e8f0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   padding-bottom: 6px;
+  color: #cbd5e1;
 }
 
 .metric-row:last-child {
