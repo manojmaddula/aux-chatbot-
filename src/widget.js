@@ -3014,15 +3014,12 @@ window.addEventListener('storage', (e) => {
 
 
 // ========================================================
-// ALL-SCREEN / FULL TAB WORKSPACE CONTROLLER
+// COMPACT (DEFAULT) & ALL-SCREEN WORKSPACE CONTROLLER
 // ========================================================
-(function initAllScreenMode() {
+(function initScreenMode() {
   const urlParams = new URLSearchParams(window.location.search);
+  // Default for agent is COMPACT ONLY! Never default to full.
   const isFullParam = urlParams.get('mode') === 'full' || urlParams.get('fulltab') === '1';
-  const savedMode = sessionStorage.getItem('widgetScreenMode');
-  
-  // Standalone top window defaults to all-screen if requested or saved
-  const shouldBeAllScreen = isFullParam || savedMode === 'all-screen';
 
   const container = document.querySelector('.widget-container');
   const btnToggle = document.getElementById('btn-toggle-all-screen');
@@ -3033,48 +3030,38 @@ window.addEventListener('storage', (e) => {
       document.body.classList.add('all-screen');
       if (container) container.classList.add('all-screen');
       if (toggleLbl) toggleLbl.textContent = 'Compact';
-      sessionStorage.setItem('widgetScreenMode', 'all-screen');
+      try { sessionStorage.setItem('widgetScreenMode', 'all-screen'); } catch (e) {}
     } else {
       document.body.classList.remove('all-screen');
       if (container) container.classList.remove('all-screen');
       if (toggleLbl) toggleLbl.textContent = 'All Screen';
-      sessionStorage.setItem('widgetScreenMode', 'compact');
+      try { sessionStorage.setItem('widgetScreenMode', 'compact'); } catch (e) {}
     }
   }
 
-  // Inside iframe, only apply if explicitly loaded with mode=full
-  if (window.self !== window.top) {
-    if (isFullParam) applyScreenMode(true);
-    if (btnToggle) btnToggle.style.display = 'none'; // inside iframe, managed by parent
-  } else {
-    // In standalone browser tab
-    if (shouldBeAllScreen) {
-      applyScreenMode(true);
-    }
+  // Inside iframe, hide internal toggle button (managed by parent)
+  if (window.self !== window.top && btnToggle) {
+    btnToggle.style.display = 'none';
   }
 
+  // Always default to compact unless explicitly requested via ?mode=full URL parameter
+  applyScreenMode(isFullParam);
+
+  // Allow manual toggle via the header tool button
   if (btnToggle) {
     btnToggle.addEventListener('click', () => {
       const isCurrentlyAll = document.body.classList.contains('all-screen');
       applyScreenMode(!isCurrentlyAll);
     });
   }
-})();
 
-// Auto activate all-screen when iframe or window is wide (>= 600px)
-function checkAutoAllScreen() {
-  if (window.innerWidth >= 600) {
-    document.body.classList.add('all-screen');
-    const c = document.querySelector('.widget-container');
-    if (c) c.classList.add('all-screen');
-  } else {
-    document.body.classList.remove('all-screen');
-    const c = document.querySelector('.widget-container');
-    if (c) c.classList.remove('all-screen');
-  }
-}
-window.addEventListener('resize', checkAutoAllScreen);
-setTimeout(checkAutoAllScreen, 100);
+  // Listen to postMessage from parent iframe if embedded
+  window.addEventListener('message', (e) => {
+    if (e.data && e.data.type === 'SET_ALL_SCREEN') {
+      applyScreenMode(!!e.data.enable);
+    }
+  });
+})();
 
 
 // Wire Ask Shankar Expanded Chat Controls
