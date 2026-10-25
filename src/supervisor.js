@@ -578,7 +578,7 @@ function renderQueue(queue) {
   if (badgeEl) badgeEl.textContent = displayQueue.length;
 
   if (!displayQueue || displayQueue.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:#9ca3af; padding:20px;">
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:#64748b; padding:20px;">
       No break requests in ${queueViewMode === 'my_team' ? currentSupervisor.name + "'s queue" : 'all floor queues'}.
     </td></tr>`;
     return;
@@ -591,7 +591,7 @@ function renderQueue(queue) {
     
     return `
       <tr>
-        <td style="color:#9ca3af; font-family:monospace;">${timeStr}</td>
+        <td style="color:#64748b; font-family:monospace;">${timeStr}</td>
         <td><strong>${item.id || 'REQ-AUTO'}</strong></td>
         <td>
           <div style="font-weight:600; color:#0f172a;">${item.agentName || 'Agent'}</div>
@@ -2121,7 +2121,7 @@ function renderQueueBalanceUI() {
 
   if (rosterBody) {
     if (!wfmRebalanceData.reallocatedAgents || wfmRebalanceData.reallocatedAgents.length === 0) {
-      rosterBody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#9ca3af; padding:20px;">No agents currently flexed. All personnel operating on base WFM shift schedules.</td></tr>';
+      rosterBody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#64748b; padding:20px;">No agents currently flexed. All personnel operating on base WFM shift schedules.</td></tr>';
     } else {
       rosterBody.innerHTML = wfmRebalanceData.reallocatedAgents.map(ag => {
         return '<tr>' +
@@ -2535,12 +2535,12 @@ function executeSupBotCommand(cmd) {
       '• <strong>General Customer Service:</strong> ' + cs.callsWaiting + ' Waiting | ' + cs.assignedAgents + ' Agents Logged-in (' + cs.occupancyPct + '% Occ)<br/><br/>';
     
     if (wfmRebalanceData.isSurgeActive && !wfmRebalanceData.isRebalanced) {
-      html += '<span style="color:#f87171; font-weight:700;">⚠️ Surge Detected! WFM recommends cross-skilling 3 CS agents to Billing.</span><br/>' +
+      html += '<span style="color:#b91c1c; font-weight:700;">⚠️ Surge Detected! WFM recommends cross-skilling 3 CS agents to Billing.</span><br/>' +
         '<button class="btn btn-xs btn-primary" onclick="postQueueBalance(\'TRIGGER_REBALANCE\'); addSupBotMessage(\'bot\', \'Executed WFM Rebalance: 3 CS agents flexed to Billing!\');" style="margin-top:6px;">🔄 Execute Rebalance Now</button>';
     } else if (wfmRebalanceData.isRebalanced) {
       html += '<span style="color:#38bdf8; font-weight:700;">✓ Dynamic Flex Active: 3 CS Agents flexed to Billing.</span>';
     } else {
-      html += '<span style="color:#34d399; font-weight:700;">✓ Queues Balanced: Normal operating levels.</span>';
+      html += '<span style="color:#047857; font-weight:700;">✓ Queues Balanced: Normal operating levels.</span>';
     }
     setTimeout(() => addSupBotMessage('bot', '', html), 400);
   }
@@ -2662,7 +2662,7 @@ function renderItIncidents(tickets) {
   if (!tbody) return;
 
   if (!tickets || tickets.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#9ca3af; padding:16px;">No active IT system incidents reported. All systems operational.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#64748b; padding:16px;">No active IT system incidents reported. All systems operational.</td></tr>';
     return;
   }
 
@@ -2674,10 +2674,10 @@ function renderItIncidents(tickets) {
 
     return '<tr>' +
       '<td style="font-family:monospace; color:#38bdf8; font-weight:700;">' + t.id + '</td>' +
-      '<td style="font-family:monospace; color:#9ca3af;">' + timeStr + '</td>' +
-      '<td><strong style="color:#0f172a;">' + t.agentName + '</strong><div style="font-family:monospace; font-size:11px; color:#9ca3af;">' + t.agentId + ' (' + t.queue + ')</div></td>' +
+      '<td style="font-family:monospace; color:#64748b;">' + timeStr + '</td>' +
+      '<td><strong style="color:#0f172a;">' + t.agentName + '</strong><div style="font-family:monospace; font-size:11px; color:#64748b;">' + t.agentId + ' (' + t.queue + ')</div></td>' +
       '<td><span class="status-tag ' + tagClass + '">' + t.category + '</span></td>' +
-      '<td style="color:#cbd5e1; max-width:320px; line-height:1.4;">' + t.description + '</td>' +
+      '<td style="color:#475569; max-width:320px; line-height:1.4;">' + t.description + '</td>' +
       '<td><small style="color:#a78bfa; font-weight:700;">' + t.assignedTo + '</small></td>' +
       '<td><span class="status-tag ' + tagClass + '">' + t.status + '</span></td>' +
     '</tr>';
@@ -2923,15 +2923,15 @@ function renderEmergencyCampaign(campaign) {
     let rowBg = '';
 
     if (ag.status === 'ACCEPTED') {
-      responseBadge = '<span class="status-tag approved" style="background:rgba(16,185,129,0.18); color:#34d399; border:1px solid rgba(16,185,129,0.35); font-weight:800; font-size:11px; padding:4px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> YES (Will Join)</span>';
+      responseBadge = '<span class="status-tag approved" style="background:rgba(16,185,129,0.18); color:#047857; border:1px solid rgba(16,185,129,0.35); font-weight:800; font-size:11px; padding:4px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> YES (Will Join)</span>';
       shiftDisplay = `<strong style="color:#0284c7; font-size:12px; font-family:monospace;">${ag.shiftTimings}</strong>`;
       rowBg = 'background: rgba(16, 185, 129, 0.04);';
     } else if (ag.status === 'DECLINED') {
-      responseBadge = '<span class="status-tag overdue" style="background:rgba(239,68,68,0.18); color:#f87171; border:1px solid rgba(239,68,68,0.35); font-weight:800; font-size:11px; padding:4px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> NO (Declined)</span>';
+      responseBadge = '<span class="status-tag overdue" style="background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; font-weight:800; font-size:11px; padding:4px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> NO (Declined)</span>';
       shiftDisplay = '<span style="color:#94a3b8; font-size:11px;">-</span>';
       rowBg = 'background: rgba(239, 68, 68, 0.03);';
     } else {
-      responseBadge = '<span class="status-tag" style="background:rgba(245,158,11,0.18); color:#fbbf24; border:1px solid rgba(245,158,11,0.35); font-weight:700; font-size:11px; padding:4px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Awaiting Mobile Tap...</span>';
+      responseBadge = '<span class="status-tag" style="background:#fffbeb; color:#b45309; border:1px solid #fde68a; font-weight:700; font-size:11px; padding:4px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Awaiting Mobile Tap...</span>';
       shiftDisplay = `<span style="color:#64748b; font-size:11px;">${ag.shiftTimings} (Pending)</span>`;
     }
 
@@ -3066,13 +3066,13 @@ window.showQuotaFulfilledAlert = function(data) {
     listEl.innerHTML = data.acceptedAgents.map(a => `
       <div style="display:flex; justify-content:space-between; align-items:center; background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:9px 12px; font-size:12px;">
         <div style="display:flex; align-items:center; gap:9px;">
-          <span style="width:26px; height:26px; border-radius:50%; background:rgba(16,185,129,0.2); border:1px solid rgba(16,185,129,0.4); color:#34d399; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; flex-shrink:0;">✓</span>
+          <span style="width:26px; height:26px; border-radius:50%; background:#ecfdf5; border:1px solid #a7f3d0; color:#047857; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; flex-shrink:0;">✓</span>
           <div>
             <strong style="color:#0f172a; font-size:12px; display:block;">${a.agentName}</strong>
             <span style="color:#64748b; font-size:11px; font-family:ui-monospace,monospace;">${a.agentId} · ${a.queue || 'Support'}</span>
           </div>
         </div>
-        <span style="background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.3); font-weight:800; font-size:10px; padding:3px 8px; border-radius:6px; text-transform:uppercase; flex-shrink:0;">Confirmed</span>
+        <span style="background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; font-weight:800; font-size:10px; padding:3px 8px; border-radius:6px; text-transform:uppercase; flex-shrink:0;">Confirmed</span>
       </div>
     `).join('');
   }

@@ -224,8 +224,8 @@
       width: 28px;
       height: 28px;
       border-radius: 8px;
-      background: rgba(59, 130, 246, 0.25);
-      color: #60a5fa;
+      background: #eff6ff;
+      color: #2563eb;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -283,9 +283,9 @@
     }
 
     .status-tag.approved {
-      background: rgba(16, 185, 129, 0.15);
-      color: #34d399;
-      border: 1px solid rgba(16, 185, 129, 0.35);
+      background: #ecfdf5;
+      color: #047857;
+      border: 1px solid #a7f3d0;
     }
 
     .agent-id-badge {
@@ -794,9 +794,9 @@
     }
 
     .card-icon-pod.aux-pod {
-      background: rgba(245, 158, 11, 0.15);
-      border-color: rgba(245, 158, 11, 0.35);
-      color: #fbbf24;
+      background: #fffbeb;
+      border-color: #fde68a;
+      color: #b45309;
     }
 
     .agent-sub-grid {
@@ -868,7 +868,7 @@
         <strong style="color:#1e40af; margin-right:6px;">Active Operational Advisory:</strong>
         <span id="active-advisory-text">All systems nominal. Agent softphone connected. Emergency IVR deflection standing by.</span>
       </div>
-      <div style="display:flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:#34d399; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); padding:3px 10px; border-radius:999px;">
+      <div style="display:flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:#047857; background:#ecfdf5; border:1px solid #a7f3d0; color:#047857; padding:3px 10px; border-radius:999px;">
         <span style="width:6px; height:6px; border-radius:50%; background:#10b981;"></span>
         <span>CTI MAX SYNCED</span>
       </div>
@@ -911,7 +911,7 @@
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
                 Adherence
               </span>
-              <span class="s-stat-num" id="agent-adh-stat" style="color:#34d399;">96.4%</span>
+              <span class="s-stat-num" id="agent-adh-stat" style="color:#047857;">96.4%</span>
             </div>
 
             <div class="s-stat-pod">
@@ -927,7 +927,7 @@
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                 Lunch Var
               </span>
-              <span class="s-stat-num" id="agent-lunch-stat" style="color:#34d399;">0m</span>
+              <span class="s-stat-num" id="agent-lunch-stat" style="color:#047857;">0m</span>
             </div>
 
             <div class="s-stat-pod">
@@ -935,7 +935,7 @@
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
                 Next Window
               </span>
-              <span class="s-stat-num" style="color:#60a5fa;">15:00</span>
+              <span class="s-stat-num" style="color:#2563eb;">15:00</span>
             </div>
           </div>
         </div>
@@ -947,20 +947,20 @@
           </div>
           <div class="card-details-box">
             <div class="policy-row">
-              <span style="color:#94a3b8;">Max Discretionary Breaks:</span>
+              <span style="color:#64748b;">Max Discretionary Breaks:</span>
               <strong id="agent-policy-tea">2 breaks / shift</strong>
             </div>
             <div class="policy-row">
-              <span style="color:#94a3b8;">Lunch Variance Allowed:</span>
+              <span style="color:#64748b;">Lunch Variance Allowed:</span>
               <strong id="agent-policy-lunch">Max +10 mins</strong>
             </div>
             <div class="policy-row">
-              <span style="color:#94a3b8;">Request Frequency Throttle:</span>
+              <span style="color:#64748b;">Request Frequency Throttle:</span>
               <strong id="agent-policy-freq">Max 5 requests / 1-Wk</strong>
             </div>
             <div class="policy-row">
-              <span style="color:#94a3b8;">Target Schedule Adherence:</span>
-              <strong id="agent-policy-adh" style="color:#34d399;">≥ 90.0%</strong>
+              <span style="color:#64748b;">Target Schedule Adherence:</span>
+              <strong id="agent-policy-adh" style="color:#047857;">≥ 90.0%</strong>
             </div>
           </div>
         </div>
@@ -1045,16 +1045,16 @@
               </div>
               <div class="card-details-box" style="margin-top:12px;">
                 <div class="policy-row">
-                  <span style="color:#94a3b8;">Tone Sentiment:</span>
-                  <strong id="agent-qa-tone" style="color:#34d399;">Good / Empathetic</strong>
+                  <span style="color:#64748b;">Tone Sentiment:</span>
+                  <strong id="agent-qa-tone" style="color:#047857;">Good / Empathetic</strong>
                 </div>
                 <div class="policy-row">
-                  <span style="color:#94a3b8;">CSAT Rating:</span>
-                  <strong id="agent-qa-csat" style="color:#fbbf24;">★ 5.0 / 5.0</strong>
+                  <span style="color:#64748b;">CSAT Rating:</span>
+                  <strong id="agent-qa-csat" style="color:#b45309;">★ 5.0 / 5.0</strong>
                 </div>
                 <div class="policy-row">
-                  <span style="color:#94a3b8;">QA Score:</span>
-                  <strong id="agent-qa-score" style="color:#60a5fa;">96% (Top Tier)</strong>
+                  <span style="color:#64748b;">QA Score:</span>
+                  <strong id="agent-qa-score" style="color:#2563eb;">96% (Top Tier)</strong>
                 </div>
               </div>
             </div>
@@ -1086,7 +1086,7 @@
           </div>
           <div>
             <h3 style="margin:0; font-size:15px; color:#ffffff; font-weight:700;">Interaction Quality &amp; Performance Scorecard</h3>
-            <span id="qa-modal-agent-name" style="font-size:12px; color:#94a3b8;">Alex Morgan (AGT-8842)</span>
+            <span id="qa-modal-agent-name" style="font-size:12px; color:#64748b;">Alex Morgan (AGT-8842)</span>
           </div>
         </div>
         <button id="btn-close-qa-modal" class="qa-modal-close" title="Close">
@@ -1097,12 +1097,12 @@
       <div class="qa-modal-body">
         <div class="qa-score-banner">
           <div>
-            <span style="font-size:10.5px; color:#94a3b8; text-transform:uppercase; font-weight:700; letter-spacing:0.6px;">Overall Weighted QA Score</span>
-            <div id="qa-modal-overall-score" style="font-size:28px; font-weight:800; color:#60a5fa; margin-top:2px; font-family:monospace;">96%</div>
+            <span style="font-size:10.5px; color:#64748b; text-transform:uppercase; font-weight:700; letter-spacing:0.6px;">Overall Weighted QA Score</span>
+            <div id="qa-modal-overall-score" style="font-size:28px; font-weight:800; color:#2563eb; margin-top:2px; font-family:monospace;">96%</div>
           </div>
           <div style="text-align:right;">
             <span id="qa-modal-tier-badge" class="qa-tier-badge top-tier">TOP TIER</span>
-            <div id="qa-modal-sample-size" style="font-size:11px; color:#94a3b8; margin-top:6px;">12 Evaluated Calls (Current Month)</div>
+            <div id="qa-modal-sample-size" style="font-size:11px; color:#64748b; margin-top:6px;">12 Evaluated Calls (Current Month)</div>
           </div>
         </div>
 
@@ -1140,9 +1140,9 @@
         <div class="qa-call-sample">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
             <strong style="font-size:12px; color:#f8fafc;">Recent Evaluated Interaction: Contact #90421</strong>
-            <span id="qa-call-stars" style="color:#fbbf24; font-weight:700; font-size:12px;">★★★★★ 5.0 CSAT</span>
+            <span id="qa-call-stars" style="color:#b45309; font-weight:700; font-size:12px;">★★★★★ 5.0 CSAT</span>
           </div>
-          <p id="qa-call-summary" style="font-size:12px; color:#94a3b8; margin-bottom:8px; line-height:1.5;">
+          <p id="qa-call-summary" style="font-size:12px; color:#64748b; margin-bottom:8px; line-height:1.5;">
             Customer inquired regarding promotional discount expiration on fiber plan. Agent verified CTI ledger, issued $25 credit adjustment, and de-escalated call calmly.
           </p>
           <div class="qa-coach-note" id="qa-supervisor-feedback">
@@ -1163,12 +1163,12 @@
     <div class="qa-modal-content" style="max-width: 460px;">
       <div class="qa-modal-header">
         <div style="display:flex; align-items:center; gap:12px;">
-          <div style="width:36px; height:36px; border-radius:10px; background:rgba(59,130,246,0.2); color:#60a5fa; display:flex; align-items:center; justify-content:center;">
+          <div style="width:36px; height:36px; border-radius:10px; background:rgba(59,130,246,0.2); color:#2563eb; display:flex; align-items:center; justify-content:center;">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></svg>
           </div>
           <div>
             <h3 style="font-size:15px; font-weight:800; color:#ffffff; margin:0;">Pair Mobile Alert Companion</h3>
-            <span id="mobile-modal-agent-name" style="font-size:11px; color:#94a3b8;">Alex Morgan (AGT-8842)</span>
+            <span id="mobile-modal-agent-name" style="font-size:11px; color:#64748b;">Alex Morgan (AGT-8842)</span>
           </div>
         </div>
         <button id="btn-close-mobile-modal" class="qa-modal-close" title="Close">
@@ -1177,16 +1177,16 @@
       </div>
 
       <div class="qa-modal-body" style="gap:14px;">
-        <p style="font-size:12.5px; color:#cbd5e1; line-height:1.5; margin:0;">
+        <p style="font-size:12.5px; color:#475569; line-height:1.5; margin:0;">
           Scan with your phone camera to pair your mobile screen for real-time break countdowns, alarm sirens, and emergency storm recall alerts.
         </p>
 
         <!-- Network Selector Tabs -->
         <div style="display:flex; gap:8px;">
-          <button type="button" id="home-qr-tab-cloud" style="flex:1; padding:8px 12px; font-size:11.5px; font-weight:700; border-radius:8px; border:1.5px solid #3b82f6; background:rgba(59, 130, 246, 0.15); color:#60a5fa; cursor:pointer;">
+          <button type="button" id="home-qr-tab-cloud" style="flex:1; padding:8px 12px; font-size:11.5px; font-weight:700; border-radius:8px; border:1.5px solid #3b82f6; background:rgba(59, 130, 246, 0.15); color:#2563eb; cursor:pointer;">
             Cloud (4G/5G/Wi-Fi)
           </button>
-          <button type="button" id="home-qr-tab-local" style="flex:1; padding:8px 12px; font-size:11.5px; font-weight:700; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#94a3b8; cursor:pointer;">
+          <button type="button" id="home-qr-tab-local" style="flex:1; padding:8px 12px; font-size:11.5px; font-weight:700; border-radius:8px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#64748b; cursor:pointer;">
             Local Wi-Fi Network
           </button>
         </div>
@@ -1196,7 +1196,7 @@
           <div id="home-qr-code-container" style="width:180px; height:180px; background:#ffffff; border-radius:10px; padding:8px; box-shadow:0 8px 24px rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center;">
             <span style="color:#64748b; font-size:11px;">Generating QR...</span>
           </div>
-          <div id="home-qr-guide" style="margin-top:12px; font-size:11.5px; color:#34d399; font-weight:700; display:flex; align-items:center; gap:6px;">
+          <div id="home-qr-guide" style="margin-top:12px; font-size:11.5px; color:#047857; font-weight:700; display:flex; align-items:center; gap:6px;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
             <span>Point phone camera at code to open companion</span>
           </div>
@@ -1205,11 +1205,11 @@
         <!-- URL and Copy -->
         <div style="display:flex; flex-direction:column; gap:8px;">
           <div style="background:rgba(15, 23, 42, 0.7); border:1px solid rgba(255, 255, 255, 0.1); border-radius:8px; padding:8px 12px; display:flex; align-items:center; justify-content:space-between; gap:8px;">
-            <span id="home-qr-url-text" style="font-family:monospace; font-size:10.5px; color:#94a3b8; word-break:break-all; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:260px;">loading...</span>
+            <span id="home-qr-url-text" style="font-family:monospace; font-size:10.5px; color:#64748b; word-break:break-all; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:260px;">loading...</span>
             <button type="button" id="btn-copy-home-qr" style="padding:6px 12px; font-size:11px; font-weight:700; background:#3b82f6; color:#ffffff; border:none; border-radius:6px; cursor:pointer; flex-shrink:0;">Copy URL</button>
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center; font-size:11.5px;">
-            <a id="home-mobile-link" href="/mobile-alert.html" target="_blank" style="font-weight:700; color:#60a5fa; text-decoration:none;">
+            <a id="home-mobile-link" href="/mobile-alert.html" target="_blank" style="font-weight:700; color:#2563eb; text-decoration:none;">
               Open Companion on this PC ↗
             </a>
             <span id="home-qr-network-desc" style="color:#64748b; font-size:10.5px;">Works on any carrier &amp; Wi-Fi</span>

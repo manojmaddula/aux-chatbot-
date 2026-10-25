@@ -79,7 +79,7 @@
       <!-- Sidebar Bottom: Supervisor Profile Switcher & Gateway -->
       <div class="sidebar-footer">
         <div class="sidebar-profile-card">
-          <span class="sup-avatar" id="sup-avatar-icon" style="display:flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:50%; background:rgba(59,130,246,0.2); color:#60a5fa;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+          <span class="sup-avatar" id="sup-avatar-icon" style="display:flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:50%; background:#eff6ff; color:#2563eb; border:1px solid #bfdbfe;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
           <div class="profile-details">
             <span class="profile-caption">SUPERVISOR STATION</span>
             <select id="supervisor-select" class="supervisor-dropdown" title="Switch active supervisor account">
@@ -298,7 +298,7 @@
           <!-- Announcement Script Box & Caller Audio Test -->
           <div class="announcement-preview-box">
             <div class="ann-header">
-              <span style="font-weight:700; color:#93c5fd; font-size:11px;">📢 Automated Caller Voice Announcement (Call 1001+):</span>
+              <span style="font-weight:700; color:#1d4ed8; font-size:11px;">📢 Automated Caller Voice Announcement (Call 1001+):</span>
               <button id="btn-test-announcement-audio" class="btn btn-sm btn-accent">
                 🔊 Listen to Voice Announcement (Audio Test)
               </button>
@@ -348,7 +348,7 @@
         <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
           <div>
             <div style="display:flex; align-items:center; gap:10px;">
-              <div style="width:40px; height:40px; border-radius:12px; background:rgba(239,68,68,0.15); border:1.5px solid rgba(239,68,68,0.4); display:flex; align-items:center; justify-content:center; color:#f87171;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18h12M12 2v4M20 7l-3 3M4 7l3 3M12 6a6 6 0 0 0-6 6v6h12v-6a6 6 0 0 0-6-6z"/></svg></div>
+              <div style="width:40px; height:40px; border-radius:12px; background:#fef2f2; border:1px solid #fecaca; display:flex; align-items:center; justify-content:center; color:#b91c1c;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18h12M12 2v4M20 7l-3 3M4 7l3 3M12 6a6 6 0 0 0-6 6v6h12v-6a6 6 0 0 0-6-6z"/></svg></div>
               <div>
                 <h3 style="margin:0; color:#0f172a;">Emergency Staffing & Mobile Recall Engine (Storm Surge Alert)</h3>
                 <p style="margin-top:2px; color:#64748b; font-size:12px;">
@@ -366,10 +366,10 @@
             <button id="btn-notify-all-emergency" class="btn btn-emergency" style="background:#dc2626; color:#ffffff; font-weight:800; padding:8px 16px; border-radius:8px; border:none; box-shadow:0 4px 12px rgba(220,38,38,0.35); cursor:pointer; display:flex; align-items:center; gap:8px;" onclick="triggerEmergencyBroadcast('unavailable')">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg> Notify All Unavailable (<span id="unavailable-count-pill">5</span> Agents)
             </button>
-            <button id="btn-notify-all-fleet" class="btn btn-outline" style="border:1px solid #cbd5e1; background:#f8fafc; color:#cbd5e1; font-size:12px; font-weight:700; padding:8px 14px; cursor:pointer;" onclick="triggerEmergencyBroadcast('all')">
+            <button id="btn-notify-all-fleet" class="btn btn-outline" style="border:1px solid #cbd5e1; background:#f8fafc; color:#475569; font-size:12px; font-weight:700; padding:8px 14px; cursor:pointer;" onclick="triggerEmergencyBroadcast('all')">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg> Notify All Fleet (12)
             </button>
-            <button id="btn-demo-quota" class="btn btn-xs btn-outline" style="border:1px solid rgba(16,185,129,0.4); color:#34d399; font-weight:700; padding:7px 12px; cursor:pointer; background:rgba(16,185,129,0.12); border-radius:8px;" onclick="simulateFiveAccepted()" title="Simulate 5 agents accepting availability to trigger quota achieved system alert">
+            <button id="btn-demo-quota" class="btn btn-xs btn-outline" style="border:1px solid rgba(16,185,129,0.4); color:#047857; font-weight:700; padding:7px 12px; cursor:pointer; background:#ecfdf5; border-radius:8px;" onclick="simulateFiveAccepted()" title="Simulate 5 agents accepting availability to trigger quota achieved system alert">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Demo 5 Accepted
             </button>
             <button id="btn-reset-emergency-campaign" class="btn btn-outline" style="border-color:#ef4444; color:#ef4444; font-size:11px; padding:8px 10px; cursor:pointer;" onclick="resetEmergencyCampaign()" title="Reset active campaign">
@@ -383,7 +383,7 @@
           <div id="em-quota-container" style="background:#ffffff; border:1px solid #cbd5e1; border-radius:12px; padding:12px 16px; margin-bottom:14px; backdrop-filter:blur(12px);">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
               <div style="display:flex; align-items:center; gap:8px;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
                 <strong style="font-size:12px; color:#0f172a;">Outage Staffing Availability Target:</strong>
                 <span id="em-quota-label" style="font-size:12px; color:#2563eb; font-weight:700;">0 / 5 Agents Confirmed (Wanting 5 Extra Agents)</span>
               </div>
@@ -399,16 +399,16 @@
           <!-- Active Emergency Campaign Alert Bar -->
           <div id="em-campaign-active-bar" style="background:rgba(239,68,68,0.1); border:1.5px solid rgba(239,68,68,0.35); border-radius:12px; padding:14px 18px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; backdrop-filter:blur(12px);">
             <div style="display:flex; align-items:center; gap:10px;">
-              <div style="width:36px; height:36px; border-radius:10px; background:rgba(239,68,68,0.2); color:#f87171; display:flex; align-items:center; justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+              <div style="width:36px; height:36px; border-radius:10px; background:#fef2f2; color:#b91c1c; display:flex; align-items:center; justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
               <div>
-                <strong style="color:#f87171; font-size:13px; font-weight:800; display:block;">Active Mobile Alert Dispatch:</strong>
-                <span id="em-campaign-msg-text" style="color:#cbd5e1; font-size:12px;">
+                <strong style="color:#b91c1c; font-size:13px; font-weight:800; display:block;">Active Mobile Alert Dispatch:</strong>
+                <span id="em-campaign-msg-text" style="color:#475569; font-size:12px;">
                   "There is an emergency situation. High call volume surge detected and your availability is requested to balance the queue. If you are available please join, or decline."
                 </span>
               </div>
             </div>
             <div style="display:flex; align-items:center; gap:12px;">
-              <div style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; border-radius:6px; padding:4px 10px; font-size:11px;">
+              <div style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:#b91c1c; border-radius:6px; padding:4px 10px; font-size:11px;">
                 <span style="color:#64748b;">Assigned Shift Window:</span>
                 <strong id="em-campaign-shift-label" style="color:#0284c7; margin-left:4px;">15:30 - 18:30 (Surge Shift • 3 hrs)</strong>
               </div>
@@ -426,19 +426,19 @@
               <span style="font-size:10px; color:#64748b;">Delivered to agent phones</span>
             </div>
             <div style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); border-radius:12px; padding:14px 16px;">
-              <span style="font-size:11px; color:#34d399; font-weight:700; text-transform:uppercase; display:flex; align-items:center; gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Accepted &amp; Joining (YES)</span>
-              <div id="em-stat-accepted" style="font-size:24px; font-weight:800; color:#34d399; margin-top:2px;">0</div>
+              <span style="font-size:11px; color:#047857; font-weight:700; text-transform:uppercase; display:flex; align-items:center; gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Accepted &amp; Joining (YES)</span>
+              <div id="em-stat-accepted" style="font-size:24px; font-weight:800; color:#047857; margin-top:2px;">0</div>
               <span style="font-size:10px; color:#a7f3d0;">Shift schedule displayed on mobile</span>
             </div>
             <div style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:12px; padding:14px 16px;">
-              <span style="font-size:11px; color:#f87171; font-weight:700; text-transform:uppercase; display:flex; align-items:center; gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Declined (NO)</span>
-              <div id="em-stat-declined" style="font-size:24px; font-weight:800; color:#f87171; margin-top:2px;">0</div>
-              <span style="font-size:10px; color:#fca5a5;">Currently unavailable for shift</span>
+              <span style="font-size:11px; color:#b91c1c; font-weight:700; text-transform:uppercase; display:flex; align-items:center; gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Declined (NO)</span>
+              <div id="em-stat-declined" style="font-size:24px; font-weight:800; color:#b91c1c; margin-top:2px;">0</div>
+              <span style="font-size:10px; color:#b91c1c;">Currently unavailable for shift</span>
             </div>
             <div style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); border-radius:12px; padding:14px 16px;">
-              <span style="font-size:11px; color:#fbbf24; font-weight:700; text-transform:uppercase; display:flex; align-items:center; gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Awaiting Response</span>
-              <div id="em-stat-pending" style="font-size:24px; font-weight:800; color:#fbbf24; margin-top:2px;">0</div>
-              <span style="font-size:10px; color:#fde68a;">Mobile notification pending action</span>
+              <span style="font-size:11px; color:#b45309; font-weight:700; text-transform:uppercase; display:flex; align-items:center; gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Awaiting Response</span>
+              <div id="em-stat-pending" style="font-size:24px; font-weight:800; color:#b45309; margin-top:2px;">0</div>
+              <span style="font-size:10px; color:#b45309;">Mobile notification pending action</span>
             </div>
           </div>
 
@@ -793,8 +793,8 @@
       <div class="card" style="margin-bottom: 20px; border-left: 4px solid #3b82f6;">
         <div class="card-header" style="background: rgba(37,99,235,0.06);">
           <div>
-            <h4 style="color:#93c5fd; font-size:13px;">📐 Automated Evaluation Formulas & Compliance Matrix</h4>
-            <p style="font-size:11px; color:#cbd5e1; margin-top:2px;">
+            <h4 style="color:#1d4ed8; font-size:13px;">📐 Automated Evaluation Formulas & Compliance Matrix</h4>
+            <p style="font-size:11px; color:#475569; margin-top:2px;">
               Overall QA Score = <strong>(25% &times; Security Verification)</strong> + <strong>(20% &times; Customer Account Discovery)</strong> + <strong>(25% &times; Empathy & Tone Index)</strong> + <strong>(30% &times; Query Resolution Outcome)</strong>
             </p>
           </div>
@@ -856,7 +856,7 @@
       <div id="training-modal-overlay" class="decision-overlay hidden">
         <div class="decision-box" style="text-align:left; max-width:550px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <h3 style="color:#93c5fd; font-size:16px;">🎓 Assign Extra Training & Coaching Module</h3>
+            <h3 style="color:#1d4ed8; font-size:16px;">🎓 Assign Extra Training & Coaching Module</h3>
             <button id="btn-close-training-modal" class="btn-xs btn-outline" style="font-size:14px;">✕</button>
           </div>
           <p style="font-size:11px; color:#94a3b8; margin-bottom:14px;">
@@ -1309,8 +1309,8 @@
       <div style="display:flex; align-items:center; gap:8px;">
         <span style="font-size:22px;">🤖</span>
         <div>
-          <strong style="color:#93c5fd; font-size:14px; display:block;">REMI for Supervisors</strong>
-          <small style="color:#cbd5e1; font-size:10px;">Autonomous Floor Operations & WFM Intelligence Assistant (Ask Shankar)</small>
+          <strong style="color:#1d4ed8; font-size:14px; display:block;">REMI for Supervisors</strong>
+          <small style="color:#475569; font-size:10px;">Autonomous Floor Operations & WFM Intelligence Assistant (Ask Shankar)</small>
         </div>
       </div>
       <div style="display:flex; align-items:center; gap:8px;">
@@ -1357,12 +1357,12 @@
       <!-- Header -->
       <div style="padding:20px 22px 16px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0;">
         <div style="display:flex; align-items:center; gap:14px;">
-          <div style="width:48px; height:48px; border-radius:14px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); display:flex; align-items:center; justify-content:center; box-shadow:0 0 20px rgba(16,185,129,0.2);">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <div style="width:48px; height:48px; border-radius:14px; background:#ecfdf5; border:1px solid #a7f3d0; display:flex; align-items:center; justify-content:center; box-shadow:0 0 20px rgba(16,185,129,0.2);">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#047857" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
           </div>
           <div>
             <h3 style="margin:0 0 3px; color:#0f172a; font-size:17px; font-weight:800; letter-spacing:-0.3px;">System Alert: Sufficient Staffing Secured!</h3>
-            <span style="display:flex; align-items:center; gap:5px; color:#34d399; font-size:12px; font-weight:600;">
+            <span style="display:flex; align-items:center; gap:5px; color:#047857; font-size:12px; font-weight:600;">
               <span style="width:6px;height:6px;border-radius:50%;background:#10b981;display:inline-block;box-shadow:0 0 8px #10b981;"></span>
               Outage Call Volume Deficit Resolved
             </span>
@@ -1377,13 +1377,13 @@
       <div style="padding:20px 22px; display:flex; flex-direction:column; gap:16px;">
 
         <!-- Quota Summary Card -->
-        <div style="background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.25); border-radius:16px; padding:18px; text-align:center; position:relative; overflow:hidden;">
+        <div style="background:#ecfdf5; border:1px solid rgba(16,185,129,0.25); border-radius:16px; padding:18px; text-align:center; position:relative; overflow:hidden;">
           <div style="position:absolute; top:-30px; left:50%; transform:translateX(-50%); width:120px; height:80px; background:radial-gradient(ellipse,rgba(16,185,129,0.25) 0%,transparent 70%); pointer-events:none;"></div>
-          <div style="font-size:32px; font-weight:900; color:#34d399; margin-bottom:4px; letter-spacing:-1px; font-family:ui-monospace,monospace;"><span id="modal-quota-number">5 / 5</span></div>
-          <div style="font-size:12px; font-weight:700; color:#6ee7b7; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px;">Confirmed Agents</div>
+          <div style="font-size:32px; font-weight:900; color:#047857; margin-bottom:4px; letter-spacing:-1px; font-family:ui-monospace,monospace;"><span id="modal-quota-number">5 / 5</span></div>
+          <div style="font-size:12px; font-weight:700; color:#047857; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px;">Confirmed Agents</div>
           <p style="margin:0; font-size:13px; color:#94a3b8; line-height:1.6;">
             We have obtained a sufficient number of agents for the outage. All confirmed agents have been assigned surge shift timings
-            <strong id="modal-quota-shift" style="color:#34d399; font-family:ui-monospace,monospace; background:rgba(16,185,129,0.12); padding:2px 8px; border-radius:5px; margin:0 2px;">15:30 – 18:30</strong>
+            <strong id="modal-quota-shift" style="color:#047857; font-family:ui-monospace,monospace; background:#ecfdf5; padding:2px 8px; border-radius:5px; margin:0 2px;">15:30 – 18:30</strong>
             and instructed to log in to workstation softphones to balance the queue.
           </p>
         </div>
@@ -1392,7 +1392,7 @@
         <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:14px; padding:14px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
             <span style="font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:0.8px;">Outage Surge Roster</span>
-            <span style="font-size:10px; font-weight:700; color:#34d399; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); padding:3px 10px; border-radius:999px;">Ready for Dispatch</span>
+            <span style="font-size:10px; font-weight:700; color:#047857; background:#ecfdf5; border:1px solid #a7f3d0; padding:3px 10px; border-radius:999px;">Ready for Dispatch</span>
           </div>
           <div id="modal-quota-agents-list" style="display:flex; flex-direction:column; gap:7px; max-height:160px; overflow-y:auto; padding-right:2px;">
             <!-- Populated dynamically -->

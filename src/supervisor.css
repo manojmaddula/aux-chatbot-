@@ -226,21 +226,21 @@ body {
 }
 
 .nav-badge.text-ok {
-  background: rgba(16, 185, 129, 0.15);
-  color: #34d399;
-  border-color: rgba(16, 185, 129, 0.3);
+  background: #ecfdf5;
+  color: #047857;
+  border-color: #a7f3d0;
 }
 
 .nav-badge.text-danger {
-  background: rgba(239, 68, 68, 0.15);
-  color: #f87171;
-  border-color: rgba(239, 68, 68, 0.3);
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fecaca;
 }
 
 .nav-badge.alert-chip {
-  background: rgba(245, 158, 11, 0.15);
-  color: #fbbf24;
-  border-color: rgba(245, 158, 11, 0.3);
+  background: #fffbeb;
+  color: #b45309;
+  border-color: #fde68a;
 }
 
 /* SIDEBAR FOOTER */
@@ -391,9 +391,9 @@ body {
 }
 
 .topbar-btn-copilot {
-  background: rgba(139, 92, 246, 0.15);
-  color: #c084fc;
-  border: 1px solid rgba(139, 92, 246, 0.35);
+  background: #f5f3ff;
+  color: #6d28d9;
+  border: 1px solid #ddd6fe;
   border-radius: 8px;
   padding: 7px 14px;
   font-size: 11.5px;
@@ -406,8 +406,8 @@ body {
 }
 
 .topbar-btn-copilot:hover {
-  background: rgba(139, 92, 246, 0.25);
-  color: #ffffff;
+  background: #ede9fe;
+  color: #5b21b6;
 }
 
 /* WORKSTATION CONTENT SCROLLER */
@@ -464,11 +464,11 @@ body {
   height: 2px;
 }
 
-.kpi-staff-card::before { background: #3b82f6; box-shadow: 0 0 10px #3b82f6; }
-.kpi-queue-card::before { background: #8b5cf6; box-shadow: 0 0 10px #8b5cf6; }
-.kpi-sla-card::before { background: #10b981; box-shadow: 0 0 10px #10b981; }
-.kpi-aux-card::before { background: #f59e0b; box-shadow: 0 0 10px #f59e0b; }
-.kpi-overdue-card::before { background: #ef4444; box-shadow: 0 0 10px #ef4444; }
+.kpi-staff-card::before { background: #3b82f6;  }
+.kpi-queue-card::before { background: #8b5cf6;  }
+.kpi-sla-card::before { background: #10b981;  }
+.kpi-aux-card::before { background: #f59e0b;  }
+.kpi-overdue-card::before { background: #ef4444;  }
 
 .kpi-card-header {
   display: flex;
@@ -493,11 +493,11 @@ body {
   letter-spacing: 0.5px;
 }
 
-.kpi-pill-blue { background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3); }
-.kpi-pill-purple { background: rgba(139, 92, 246, 0.15); color: #d8b4fe; border: 1px solid rgba(139, 92, 246, 0.3); }
-.kpi-pill-emerald { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
-.kpi-pill-amber { background: rgba(245, 158, 11, 0.15); color: #fde68a; border: 1px solid rgba(245, 158, 11, 0.3); }
-.kpi-pill-danger { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+.kpi-pill-blue { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.kpi-pill-purple { background: #f5f3ff; color: #6d28d9; border: 1px solid #ddd6fe; }
+.kpi-pill-emerald { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+.kpi-pill-amber { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+.kpi-pill-danger { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
 
 .kpi-val {
   font-size: 26px;
@@ -507,7 +507,7 @@ body {
   letter-spacing: -0.5px;
 }
 
-.kpi-val.highlight { color: #38bdf8; text-shadow: 0 0 16px rgba(56, 189, 248, 0.3); }
+.kpi-val.highlight { color: #2563eb; }
 .kpi-sub { font-size: 11px; font-weight: 600; }
 
 .tab-panes-wrapper {
@@ -609,14 +609,14 @@ body {
   font-weight: 700;
 }
 
-.status-tag.approved { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-.status-tag.rejected { background: rgba(239, 68, 68, 0.2); color: #f87171; }
-.status-tag.aux { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-.status-tag.ready { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+.status-tag.approved { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
+.status-tag.rejected { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+.status-tag.aux { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+.status-tag.ready { background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; }
 .status-tag.overdue {
-  background: rgba(239, 68, 68, 0.25);
-  color: #ef4444;
-  border: 1px solid #ef4444;
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #f87171;
   animation: pulse-border 1s infinite alternate;
 }
 
