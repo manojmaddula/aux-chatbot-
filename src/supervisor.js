@@ -3051,9 +3051,15 @@ window.showQuotaFulfilledAlert = function(data) {
 
   if (listEl && data.acceptedAgents) {
     listEl.innerHTML = data.acceptedAgents.map(a => `
-      <div style="display:flex; justify-content:space-between; align-items:center; background:#ffffff; border:1px solid #cbd5e1; border-radius:6px; padding:6px 10px; font-size:12px;">
-        <span style="font-weight:700; color:#0f172a;">${a.agentName} (${a.agentId})</span>
-        <span style="color:#15803d; font-weight:800; font-size:11px;">✓ Confirmed (${a.queue || 'Support'})</span>
+      <div style="display:flex; justify-content:space-between; align-items:center; background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:8px 12px; font-size:12px; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="width:24px; height:24px; border-radius:50%; background:#dcfce7; color:#15803d; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:11px;">✓</span>
+          <div>
+            <strong style="color:#0f172a; font-size:12px; display:block;">${a.agentName}</strong>
+            <span style="color:#64748b; font-size:11px; font-family:monospace;">${a.agentId} • ${a.queue || 'Support'}</span>
+          </div>
+        </div>
+        <span style="background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; font-weight:800; font-size:10px; padding:3px 8px; border-radius:6px; text-transform:uppercase;">Confirmed</span>
       </div>
     `).join('');
   }

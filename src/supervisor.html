@@ -1259,39 +1259,42 @@
     <div id="quota-modal-backdrop" onclick="closeQuotaModal()" style="position:fixed; inset:0; background:rgba(15, 23, 42, 0.75); backdrop-filter:blur(4px); z-index:10000000; cursor:pointer;"></div>
     
     <!-- Modal Content Window -->
-    <div class="qa-modal-content" style="position:relative; z-index:10000001; width:100%; max-width:520px; background:#ffffff; border-radius:16px; border-top:6px solid #10b981; box-shadow:0 25px 60px rgba(0,0,0,0.45); overflow:hidden; animation:modal-pop 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
-      <div class="qa-modal-header" style="background:#ecfdf5; border-bottom:1px solid #a7f3d0; padding:16px 20px; display:flex; justify-content:space-between; align-items:center;">
+    <div class="qa-modal-content" style="position:relative; z-index:10000001; width:100%; max-width:520px; background:#ffffff; border-radius:20px; border-top:6px solid #10b981; box-shadow:0 25px 60px rgba(0,0,0,0.35); overflow:hidden; animation:modal-pop 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
+      <div class="qa-modal-header" style="background:linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%); border-bottom:1px solid #a7f3d0; padding:18px 22px; display:flex; justify-content:space-between; align-items:center;">
         <div style="display:flex; align-items:center; gap:12px;">
-          <span style="font-size:32px; line-height:1;">🎉</span>
+          <div style="width:44px; height:44px; border-radius:12px; background:#dcfce7; border:1px solid #86efac; display:flex; align-items:center; justify-content:center; font-size:22px; box-shadow:0 2px 8px rgba(16,185,129,0.2);">
+            🎉
+          </div>
           <div>
-            <h3 style="margin:0; color:#065f46; font-size:17px; font-weight:800;">System Alert: Sufficient Staffing Secured!</h3>
-            <span style="color:#047857; font-size:12px; font-weight:600;">Outage Call Volume Deficit Resolved</span>
+            <h3 style="margin:0; color:#065f46; font-size:18px; font-weight:800; letter-spacing:-0.3px;">System Alert: Sufficient Staffing Secured!</h3>
+            <span style="color:#059669; font-size:12px; font-weight:600;">Outage Call Volume Deficit Resolved</span>
           </div>
         </div>
         <button id="btn-close-quota-modal" type="button" onclick="closeQuotaModal()" title="Close Alert" style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:8px; color:#64748b; cursor:pointer; font-size:18px; width:34px; height:34px; display:flex; align-items:center; justify-content:center; transition:all 0.15s; font-weight:700;">✕</button>
       </div>
-      <div class="qa-modal-body" style="padding:20px; display:flex; flex-direction:column; gap:14px;">
-        <div style="background:#f0fdf4; border:1.5px solid #86efac; border-radius:12px; padding:16px; text-align:center;">
-          <div style="font-size:20px; font-weight:800; color:#15803d; margin-bottom:6px;">
+      <div class="qa-modal-body" style="padding:22px; display:flex; flex-direction:column; gap:16px;">
+        <div style="background:linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%); border:1.5px solid #86efac; border-radius:14px; padding:18px; text-align:center; box-shadow:inset 0 1px 0 #ffffff;">
+          <div style="font-size:20px; font-weight:800; color:#15803d; margin-bottom:6px; letter-spacing:-0.2px;">
             ✓ Staffing Quota Reached (<span id="modal-quota-number">5 / 5</span> Confirmed)
           </div>
-          <p style="margin:0; font-size:13px; color:#166534; line-height:1.5;">
-            We have obtained a sufficient number of agents for the outage! All confirmed agents have been assigned their surge shift timings (<strong id="modal-quota-shift">15:30 - 18:30</strong>) and have been instructed to log in to workstation softphones to balance the queue.
+          <p style="margin:0; font-size:13px; color:#166534; line-height:1.55;">
+            We have obtained a sufficient number of agents for the outage! All confirmed agents have been assigned their surge shift timings (<strong id="modal-quota-shift" style="background:#dcfce7; padding:2px 6px; border-radius:4px; font-family:monospace; color:#047857;">15:30 - 18:30</strong>) and have been instructed to log in to workstation softphones to balance the queue.
           </p>
         </div>
 
         <!-- Confirmed Agents List -->
-        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px;">
-          <div style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; margin-bottom:8px;">
-            Confirmed Outage Surge Staffing Roster:
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <span style="font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:0.5px;">Confirmed Outage Surge Roster</span>
+            <span style="font-size:11px; font-weight:700; color:#10b981; background:#dcfce7; padding:2px 8px; border-radius:999px;">Ready for Dispatch</span>
           </div>
-          <div id="modal-quota-agents-list" style="display:flex; flex-direction:column; gap:6px; max-height:160px; overflow-y:auto;">
+          <div id="modal-quota-agents-list" style="display:flex; flex-direction:column; gap:8px; max-height:170px; overflow-y:auto; padding-right:2px;">
             <!-- Populated dynamically -->
           </div>
         </div>
 
         <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:4px;">
-          <button id="btn-ack-quota-modal" type="button" onclick="closeQuotaModal()" style="flex:1; padding:12px; font-size:14px; font-weight:800; color:#ffffff; background:linear-gradient(135deg, #10b981 0%, #059669 100%); border:none; border-radius:10px; cursor:pointer; box-shadow:0 4px 14px rgba(16,185,129,0.35); transition:all 0.15s;">
+          <button id="btn-ack-quota-modal" type="button" onclick="closeQuotaModal()" style="flex:1; padding:13px; font-size:14px; font-weight:800; color:#ffffff; background:linear-gradient(135deg, #10b981 0%, #059669 100%); border:none; border-radius:12px; cursor:pointer; box-shadow:0 4px 16px rgba(16,185,129,0.4); transition:all 0.15s; letter-spacing:0.2px;">
             ✓ Acknowledge &amp; Monitor Floor
           </button>
         </div>
