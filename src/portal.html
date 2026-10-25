@@ -109,7 +109,7 @@
         </div>
 
         <!-- BCP CONTINGENCY CARD -->
-        <div class="card" style="padding:14px 16px; background:rgba(15, 23, 42, 0.6);">
+        <div class="card" style="padding:14px 16px; background:#ffffff;">
           <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             <span style="font-size:11px; font-weight:800; color:#cbd5e1; text-transform:uppercase;">BCP Protocol Active</span>
@@ -197,7 +197,7 @@
           <div class="form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:8px;">
             <div class="form-group">
               <label style="font-size:11px; color:#475569;">Technical Failure Category:</label>
-              <select id="it-issue-category" style="background:rgba(15,23,42,0.85); color:#ffffff; border:1px solid rgba(59,130,246,0.4); padding:6px; border-radius:4px; width:100%;">
+              <select id="it-issue-category" style="background:rgba(15,23,42,0.85); color:#0f172a; border:1px solid rgba(59,130,246,0.4); padding:6px; border-radius:4px; width:100%;">
                 <option value="Cisco AnyConnect / VPN Error 412">Cisco AnyConnect / VPN Error 412 (MTU/Tunnel)</option>
                 <option value="Citrix Workspace VDI Freeze">Citrix Workspace VDI Black Screen / Freeze</option>
                 <option value="NICE CXone MAX Audio / WebRTC Drop">NICE CXone MAX Audio Drop / Code 99 CTI Lockout</option>
@@ -207,7 +207,7 @@
             </div>
             <div class="form-group">
               <label style="font-size:11px; color:#475569;">Error Code / Specific Symptoms:</label>
-              <input type="text" id="it-issue-details" placeholder="e.g. Lost audio stream on incoming call #90421" style="background:rgba(15,23,42,0.85); color:#ffffff; border:1px solid rgba(59,130,246,0.4); padding:6px; border-radius:4px; width:100%;" />
+              <input type="text" id="it-issue-details" placeholder="e.g. Lost audio stream on incoming call #90421" style="background:rgba(15,23,42,0.85); color:#0f172a; border:1px solid rgba(59,130,246,0.4); padding:6px; border-radius:4px; width:100%;" />
             </div>
           </div>
           <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
@@ -257,9 +257,9 @@
         </div>
 
                 <!-- THRESHOLD CALLING & DEVICE SELECTION -->
-        <div class="alert-config-box" style="background:rgba(15, 23, 42, 0.6); border:1px solid rgba(255, 255, 255, 0.08); border-radius:14px; padding:16px; margin-top:16px; margin-bottom:16px;">
+        <div class="alert-config-box" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:14px; padding:16px; margin-top:16px; margin-bottom:16px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <h4 style="font-size:13px; font-weight:800; color:#ffffff; margin:0; display:flex; align-items:center; gap:6px;">
+            <h4 style="font-size:13px; font-weight:800; color:#0f172a; margin:0; display:flex; align-items:center; gap:6px;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2"><path d="M6 18h12M12 2v4M20 7l-3 3M4 7l3 3M12 6a6 6 0 0 0-6 6v6h12v-6a6 6 0 0 0-6-6z"/></svg> Break Threshold Calling &amp; Device Routing
             </h4>
             <span style="font-size:10px; font-weight:700; color:#60a5fa; background:rgba(59, 130, 246, 0.15); padding:2px 8px; border-radius:99px; border:1px solid rgba(59, 130, 246, 0.3);">
@@ -273,7 +273,7 @@
           <div class="form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
             <div class="form-group">
               <label style="font-size:11px; font-weight:700; color:#cbd5e1;">Alert Destination Device:</label>
-              <select id="portal-alert-device" style="width:100%; border-radius:6px; padding:7px; border:1px solid rgba(255, 255, 255, 0.12); background:rgba(15, 23, 42, 0.85); color:#ffffff; font-size:12px; font-weight:600;">
+              <select id="portal-alert-device" style="width:100%; border-radius:6px; padding:7px; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a; font-size:12px; font-weight:600;">
                 <option value="both" selected>💻 + 📱 Both Laptop &amp; Mobile Phone</option>
                 <option value="laptop">💻 Laptop / Workstation Only</option>
                 <option value="mobile">📱 Mobile Phone Only</option>
@@ -282,7 +282,7 @@
 
             <div class="form-group">
               <label style="font-size:11px; font-weight:700; color:#cbd5e1;">Variance Threshold Buffer:</label>
-              <select id="portal-alert-threshold" style="width:100%; border-radius:6px; padding:7px; border:1px solid rgba(255, 255, 255, 0.12); background:rgba(15, 23, 42, 0.85); color:#ffffff; font-size:12px; font-weight:600;">
+              <select id="portal-alert-threshold" style="width:100%; border-radius:6px; padding:7px; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a; font-size:12px; font-weight:600;">
                 <option value="0">0m (Immediate Alarm once break ends)</option>
                 <option value="1">+1 min Grace Buffer</option>
                 <option value="2" selected>+2 mins (Recommended Standard)</option>
@@ -346,7 +346,7 @@
     </div>
   
     <!-- BUSINESS CONTINUITY PLAN (BCP) CONTINGENCY FOOTER -->
-    <footer class="portal-bcp-footer" style="margin-top:24px; padding:14px 18px; background:rgba(15, 23, 42, 0.6); border:1px solid rgba(255, 255, 255, 0.08); border-radius:12px; backdrop-filter:blur(12px);">
+    <footer class="portal-bcp-footer" style="margin-top:24px; padding:14px 18px; background:#ffffff; border:1px solid #e2e8f0; border-radius:12px; backdrop-filter:blur(12px);">
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
         <div style="display:flex; align-items:center; gap:8px;">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>

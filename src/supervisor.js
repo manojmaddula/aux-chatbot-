@@ -326,8 +326,8 @@ function renderWallboard() {
     return `
       <tr style="${isMine ? 'background: rgba(37, 99, 235, 0.02);' : ''}">
         <td style="font-family:monospace; color:#64748b;">${ag.id}</td>
-        <td><strong style="color:#ffffff;">${ag.name}</strong></td>
-        <td style="color:#cbd5e1;">${ag.queue}</td>
+        <td><strong style="color:#0f172a;">${ag.name}</strong></td>
+        <td style="color:#475569;">${ag.queue}</td>
         <td>
           <span class="status-tag" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:10px; font-weight:700;">
             ${ag.supervisorName}
@@ -594,8 +594,8 @@ function renderQueue(queue) {
         <td style="color:#9ca3af; font-family:monospace;">${timeStr}</td>
         <td><strong>${item.id || 'REQ-AUTO'}</strong></td>
         <td>
-          <div style="font-weight:600; color:#fff;">${item.agentName || 'Agent'}</div>
-          <small style="color:#9ca3af;">${item.agentId || 'AGT'}</small>
+          <div style="font-weight:600; color:#0f172a;">${item.agentName || 'Agent'}</div>
+          <small style="color:#64748b;">${item.agentId || 'AGT'}</small>
           <div style="margin-top:2px;">
             <span class="status-tag" style="background:#1e293b; color:#93c5fd; border:1px solid #334155; font-size:9px;">
               ${item.supervisorName}
@@ -682,8 +682,8 @@ function renderActiveBroadcasts() {
           <span class="status-tag ${tagColor}">${b.severity}</span>
           <span class="adv-time">${timeStr}</span>
         </div>
-        <strong style="color:#fff; font-size:12px; margin:4px 0; display:block;">${b.title}</strong>
-        <p style="font-size:11px; color:#cbd5e1; line-height:1.4;">${b.message}</p>
+        <strong style="color:#0f172a; font-size:12px; margin:4px 0; display:block;">${b.title}</strong>
+        <p style="font-size:11px; color:#475569; line-height:1.4;">${b.message}</p>
         <div style="display:flex; justify-content:flex-end; margin-top:6px;">
           <button class="btn btn-sm btn-outline" onclick="retractBroadcast('${b.id}')">Retract Broadcast</button>
         </div>
@@ -2675,7 +2675,7 @@ function renderItIncidents(tickets) {
     return '<tr>' +
       '<td style="font-family:monospace; color:#38bdf8; font-weight:700;">' + t.id + '</td>' +
       '<td style="font-family:monospace; color:#9ca3af;">' + timeStr + '</td>' +
-      '<td><strong style="color:#fff;">' + t.agentName + '</strong><div style="font-family:monospace; font-size:11px; color:#9ca3af;">' + t.agentId + ' (' + t.queue + ')</div></td>' +
+      '<td><strong style="color:#0f172a;">' + t.agentName + '</strong><div style="font-family:monospace; font-size:11px; color:#9ca3af;">' + t.agentId + ' (' + t.queue + ')</div></td>' +
       '<td><span class="status-tag ' + tagClass + '">' + t.category + '</span></td>' +
       '<td style="color:#cbd5e1; max-width:320px; line-height:1.4;">' + t.description + '</td>' +
       '<td><small style="color:#a78bfa; font-weight:700;">' + t.assignedTo + '</small></td>' +
@@ -2940,8 +2940,8 @@ function renderEmergencyCampaign(campaign) {
     return `
       <tr style="${rowBg}">
         <td style="font-family:monospace; color:#64748b; font-weight:700;">${ag.agentId}</td>
-        <td><strong style="color:#ffffff;">${ag.agentName}</strong></td>
-        <td style="color:#cbd5e1; font-size:12px;">${ag.queue || 'General Support'}</td>
+        <td><strong style="color:#0f172a;">${ag.agentName}</strong></td>
+        <td style="color:#475569; font-size:12px;">${ag.queue || 'General Support'}</td>
         <td><span class="status-tag aux" style="font-size:10px;">${ag.currentState || 'AUX Break'}</span></td>
         <td>
           <span style="display:inline-flex; align-items:center; gap:5px; font-size:11px; color:#0284c7; font-weight:700; background:#f0f9ff; padding:3px 8px; border-radius:6px; border:1px solid #bae6fd;">
@@ -3064,11 +3064,11 @@ window.showQuotaFulfilledAlert = function(data) {
 
   if (listEl && data.acceptedAgents) {
     listEl.innerHTML = data.acceptedAgents.map(a => `
-      <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:9px 12px; font-size:12px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:9px 12px; font-size:12px;">
         <div style="display:flex; align-items:center; gap:9px;">
           <span style="width:26px; height:26px; border-radius:50%; background:rgba(16,185,129,0.2); border:1px solid rgba(16,185,129,0.4); color:#34d399; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; flex-shrink:0;">✓</span>
           <div>
-            <strong style="color:#f1f5f9; font-size:12px; display:block;">${a.agentName}</strong>
+            <strong style="color:#0f172a; font-size:12px; display:block;">${a.agentName}</strong>
             <span style="color:#64748b; font-size:11px; font-family:ui-monospace,monospace;">${a.agentId} · ${a.queue || 'Support'}</span>
           </div>
         </div>

@@ -12,11 +12,11 @@
   <link rel="stylesheet" href="floating-widget.css?v=2.5" />
   <style>
     :root {
-      --bg: #070913;
-      --surface-1: rgba(15, 23, 42, 0.7);
-      --surface-2: rgba(22, 33, 62, 0.8);
+      --bg: #ffffff;
+      --surface-1: #ffffff;
+      --surface-2: #f8fafc;
       --surface-hover: rgba(30, 48, 88, 0.9);
-      --border: rgba(255, 255, 255, 0.08);
+      --border: #e2e8f0;
       --border-highlight: rgba(59, 130, 246, 0.4);
       --primary: #3b82f6;
       --primary-glow: rgba(59, 130, 246, 0.25);
@@ -26,9 +26,9 @@
       --success: #10b981;
       --warning: #f59e0b;
       --danger: #ef4444;
-      --text: #f8fafc;
-      --text-muted: #94a3b8;
-      --text-dim: #64748b;
+      --text: #0f172a;
+      --text-muted: #64748b;
+      --text-dim: #94a3b8;
       --radius-sm: 8px;
       --radius-md: 14px;
       --radius-lg: 20px;
@@ -42,15 +42,9 @@
     }
 
     body {
-      background: var(--bg);
-      background-image: 
-        radial-gradient(ellipse at 50% -10%, rgba(59, 130, 246, 0.22) 0%, transparent 55%),
-        radial-gradient(circle at 90% 25%, rgba(139, 92, 246, 0.12) 0%, transparent 45%),
-        radial-gradient(circle at 10% 75%, rgba(16, 185, 129, 0.08) 0%, transparent 45%),
-        linear-gradient(180deg, #070913 0%, #05070e 100%);
-      background-attachment: fixed;
-      color: var(--text);
-      min-height: 100vh;
+  background: #ffffff;
+  color: var(--text);
+  min-height: 100vh;
       display: flex;
       flex-direction: column;
       -webkit-font-smoothing: antialiased;
@@ -58,7 +52,7 @@
 
     /* TOP APPLICATION NAVIGATION BAR */
     .top-nav {
-      background: rgba(10, 15, 29, 0.85);
+      background: #ffffff;
       backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border);
       padding: 14px 32px;
@@ -106,7 +100,7 @@
       font-size: 16px;
       font-weight: 800;
       letter-spacing: -0.3px;
-      color: #ffffff;
+      color: #0f172a;
       display: flex;
       align-items: center;
       gap: 8px;
@@ -133,7 +127,7 @@
       display: flex;
       align-items: center;
       gap: 16px;
-      background: rgba(15, 23, 42, 0.6);
+      background: #f8fafc;
       border: 1px solid var(--border);
       padding: 6px 14px;
       border-radius: 999px;
@@ -179,8 +173,8 @@
       text-decoration: none;
       transition: all 0.2s ease;
       border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.03);
-      color: #cbd5e1;
+      background: #f8fafc;
+      color: #334155;
     }
 
     .nav-btn-link:hover {
@@ -236,7 +230,7 @@
       flex-direction: column;
       justify-content: space-between;
       backdrop-filter: blur(20px);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 10px 25px -5px rgba(0, 0, 0, 0.04);
       position: relative;
       overflow: hidden;
     }
@@ -274,9 +268,7 @@
       font-weight: 800;
       line-height: 1.15;
       letter-spacing: -0.8px;
-      background: linear-gradient(135deg, #ffffff 40%, #93c5fd 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: #0f172a;
       margin-bottom: 14px;
     }
 
@@ -321,9 +313,9 @@
     }
 
     .btn-action-hero.secondary {
-      background: rgba(255, 255, 255, 0.05);
-      color: #e2e8f0;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #f1f5f9;
+      color: #1e293b;
+      border: 1px solid #cbd5e1;
       backdrop-filter: blur(10px);
     }
 
@@ -344,7 +336,7 @@
       flex-direction: column;
       gap: 16px;
       backdrop-filter: blur(20px);
-      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 10px 25px -5px rgba(0, 0, 0, 0.04);
       justify-content: space-between;
     }
 
@@ -374,7 +366,7 @@
     }
 
     .matrix-item {
-      background: rgba(10, 15, 29, 0.6);
+      background: #f8fafc;
       border: 1px solid rgba(255, 255, 255, 0.05);
       border-radius: var(--radius-md);
       padding: 14px 16px;
@@ -407,14 +399,14 @@
     .matrix-val {
       font-size: 18px;
       font-weight: 800;
-      color: #ffffff;
+      color: #0f172a;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", monospace;
     }
 
-    .matrix-val.accent { color: #60a5fa; }
-    .matrix-val.success { color: #34d399; }
-    .matrix-val.warning { color: #fbbf24; }
-    .matrix-val.danger { color: #f87171; }
+    .matrix-val.accent { color: #2563eb; }
+    .matrix-val.success { color: #059669; }
+    .matrix-val.warning { color: #d97706; }
+    .matrix-val.danger { color: #dc2626; }
 
     /* GATEWAY CARDS BENTO GRID */
     .bento-grid {
@@ -441,7 +433,7 @@
       color: var(--text);
       transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
       backdrop-filter: blur(20px);
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 10px 25px -5px rgba(0, 0, 0, 0.04);
       position: relative;
       overflow: hidden;
     }
@@ -496,8 +488,8 @@
       align-items: center;
       justify-content: center;
       transition: transform 0.25s ease;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
       box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
     }
 
@@ -527,7 +519,7 @@
     .bento-title {
       font-size: 20px;
       font-weight: 800;
-      color: #ffffff;
+      color: #0f172a;
       margin-bottom: 8px;
       letter-spacing: -0.4px;
     }
@@ -546,8 +538,8 @@
       justify-content: space-between;
       width: 100%;
       padding: 12px 18px;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
       border-radius: 12px;
       color: #e2e8f0;
       font-size: 13px;
@@ -574,7 +566,7 @@
     .hub-footer {
       border-top: 1px solid var(--border);
       padding: 24px 32px;
-      background: rgba(10, 15, 29, 0.6);
+      background: #f8fafc;
       display: flex;
       justify-content: space-between;
       align-items: center;
