@@ -1500,6 +1500,21 @@
     let alarmOsc2 = null;
     let alarmInterval = null;
     let vibrationInterval = null;
+    let lastProcessedAlarmId = null;
+    function unlockMobileAudio() {
+      if (!audioCtx) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) audioCtx = new AudioCtx();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().then(() => {
+          if (unmuteTip) unmuteTip.style.display = 'none';
+        });
+      }
+    }
+    window.addEventListener('touchstart', unlockMobileAudio, { passive: true });
+    window.addEventListener('click', unlockMobileAudio, { passive: true });
+
 
     // Load active break from localStorage or API
     function checkLocalStorageBreak() {

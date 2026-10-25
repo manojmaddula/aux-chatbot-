@@ -4,6 +4,28 @@ const fs = require('fs');
 const path = require('path');
 const url = require('url');
 const os = require('os');
+const httpsClient = require('https');
+function relayToCloud(path, payload) {
+  if (process.env.RENDER) return; // Do not relay if already on cloud
+  try {
+    const data = JSON.stringify(payload);
+    const req = httpsClient.request({
+      hostname: 'aux-chatbot.onrender.com',
+      port: 443,
+      path: path,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(data),
+        'X-Relayed-From': 'localhost'
+      }
+    });
+    req.on('error', () => {});
+    req.write(data);
+    req.end();
+  } catch (e) {}
+}
+
 
 function getLocalNetworkIp() {
   try {
@@ -732,6 +754,7 @@ const server = http.createServer((req, res) => {
         };
 
         activeBreakAlarms[aId] = alarmData;
+        if (!req.headers['x-relayed-from']) relayToCloud('/api/alerts/trigger-alarm', alarmData);
 
         // Push to supervisor audit queue
         supervisorQueue.unshift({
@@ -781,6 +804,7 @@ const server = http.createServer((req, res) => {
         const aId = payload.agentId || 'AGT-8842';
         const existing = activeBreakAlarms[aId];
         delete activeBreakAlarms[aId];
+        if (!req.headers['x-relayed-from']) relayToCloud('/api/alerts/acknowledge', payload);
 
         broadcastAlertEvent('ALARM_ACKNOWLEDGED', {
           agentId: aId,
@@ -824,6 +848,7 @@ const server = http.createServer((req, res) => {
         const aId = payload.agentId || 'AGT-8842';
         if (activeBreakAlarms[aId]) {
           activeBreakAlarms[aId].silenced = true;
+        if (!req.headers['x-relayed-from']) relayToCloud('/api/alerts/silence', payload);
         }
 
         broadcastAlertEvent('ALARM_SILENCED', {
