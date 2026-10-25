@@ -456,11 +456,8 @@ function runClientSideDecisionEngine(payload) {
   }
 
   // 3. ACD & WFM Forecasting Engine
-  const liveStaffing = 23; // available agents
-  const projectedCallSurge = (payload.urgency === 'Urgent-Medical') ? false : (Boolean(payload.agent && payload.agent.forceHighVolumeSurge) || Math.random() < 0.25); // 25% chance of simulated peak queue
-  const isMondayRush = new Date().getDay() === 1 && new Date().getHours() < 12;
-
-  if (projectedCallSurge || isMondayRush) {
+  const isSurgeTriggered = Boolean(payload.agent && payload.agent.forceHighVolumeSurge);
+  if (isSurgeTriggered && payload.urgency !== 'Urgent-Medical') {
     return {
       status: 'REJECTED',
       code: 'WFM_ACD_STAFFING_LIMITED',

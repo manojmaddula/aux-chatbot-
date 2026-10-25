@@ -1766,13 +1766,9 @@ function evaluateBreak(payload) {
   }
 
   // 3. ACD Call Forecast & WFM Staffing Buffer
-  // Check if peak Monday morning volume is active
-  const isMondayPeak = new Date().getDay() === 1 && new Date().getHours() < 12;
-  const simulatedQueueDepth = 28;
-  const currentAvailableStaff = 22;
-  const requiredStaffForSla = 26;
-
-  if ((agent.forceHighVolumeSurge || isMondayPeak) && payload.urgency !== 'Urgent-Medical') {
+  // Triggered deterministically for Carlos Mendez (High Volume Surge scenario)
+  const isSurgeForced = Boolean(agent.forceHighVolumeSurge);
+  if (isSurgeForced && payload.urgency !== 'Urgent-Medical') {
     return {
       status: 'REJECTED',
       code: 'WFM_ACD_STAFFING_LIMITED',
