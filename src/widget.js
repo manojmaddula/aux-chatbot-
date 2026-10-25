@@ -456,19 +456,7 @@ try {
     } else if (data.type === 'WFM_REBALANCE_UPDATE') {
       handleWfmRebalanceUpdate(data.payload);
     } else if (data.type === 'MANDATORY_TRAINING_ASSIGNED') {
-      const banner = document.getElementById('training-assigned-banner');
-      const titleEl = document.getElementById('training-banner-title');
-      const descEl = document.getElementById('training-banner-desc');
-      if (banner) {
-        if (!data.payload.targetAgentId || data.payload.targetAgentId === agentState.id || data.payload.targetAgentId === 'ALL') {
-          banner.classList.remove('hidden');
-          if (titleEl) titleEl.textContent = `🎓 Mandatory Coaching Assigned: ${data.payload.moduleName || 'Training'}`;
-          if (descEl) descEl.textContent = `Reason: ${data.payload.reason}. Schedule: ${data.payload.scheduleMode}. Notes: ${data.payload.notes || 'Please complete ASAP.'}`;
-          playWarningChime();
-          addSupervisorLog('TRAINING_ASSIGNED', `Supervisor assigned ${data.payload.moduleName} due to: ${data.payload.reason}`);
-          showNotification('Mandatory Coaching Assigned', `${data.payload.moduleName} scheduled by supervisor.`);
-        }
-      }
+      handleTrainingAssignment(data.payload);
     }
   };
 } catch (e) {
@@ -2354,6 +2342,76 @@ document.getElementById('btn-reset-audio').addEventListener('click', () => {
 // 4. READ-ONLY ADVISORIES TAB
 // ==========================================
 
+
+// Training advisory handler for Banner and Alerts tab
+function handleTrainingAssignment(payload) {
+  if (!payload) return;
+  const targetId = payload.targetAgentId || payload.agentId;
+  if (targetId && targetId !== 'ALL' && targetId !== (agentState && agentState.id)) {
+    return;
+  }
+
+  // 1. Show the banner above chat
+  const banner = document.getElementById('training-assigned-banner');
+  const titleEl = document.getElementById('training-banner-title');
+  const descEl = document.getElementById('training-banner-desc');
+  if (banner) {
+    banner.classList.remove('hidden');
+    if (titleEl) titleEl.textContent = `🎓 Mandatory Coaching Assigned: ${payload.moduleName || 'Training'}`;
+    if (descEl) descEl.textContent = `Reason: ${payload.reason || 'QA/Compliance Coaching'}. Schedule: ${payload.scheduleMode || 'IMMEDIATE'}. ${payload.notes ? 'Notes: ' + payload.notes : ''}`;
+  }
+
+  // 2. Add or update in activeAdvisories for the Alerts tab (#tab-alerts)
+  const advId = `ADV-TRAIN-${payload.moduleId || '101'}`;
+  const existingIdx = activeAdvisories.findIndex(a => a.id === advId || a.trainingId === payload.moduleId);
+  const advItem = {
+    id: advId,
+    trainingId: payload.moduleId,
+    timestamp: payload.timestamp || new Date().toISOString(),
+    severity: 'CRITICAL',
+    title: `🎓 Mandatory Coaching: ${payload.moduleName || 'Training Module'}`,
+    message: `Supervisor dispatched mandatory coaching interval. Reason: ${payload.reason || 'Quality Refresher'}. Schedule Mode: ${payload.scheduleMode || 'IMMEDIATE'}.${payload.notes ? ' Supervisor Notes: ' + payload.notes : ''}`,
+    sender: 'Supervisor Coaching Desk',
+    isTraining: true,
+    trainingPayload: payload
+  };
+
+  if (existingIdx >= 0) {
+    activeAdvisories[existingIdx] = advItem;
+  } else {
+    activeAdvisories.unshift(advItem);
+  }
+
+  renderAdvisories();
+  if (typeof playWarningChime === 'function') playWarningChime();
+  if (typeof addSupervisorLog === 'function') {
+    addSupervisorLog('TRAINING_ASSIGNED', `Supervisor assigned ${payload.moduleName} due to: ${payload.reason}`);
+  }
+  if (typeof showNotification === 'function') {
+    showNotification('Mandatory Coaching Assigned', `${payload.moduleName} scheduled by supervisor.`);
+  }
+}
+
+window.startTrainingFromAdvisory = function(id) {
+  const auxTabBtn = document.querySelector('.tab-btn[data-tab="tab-aux"]');
+  if (auxTabBtn) auxTabBtn.click();
+  const aId = (agentState && agentState.id) || 'AGT-8842';
+  const portalUrl = `/portal.html?agentId=${encodeURIComponent(aId)}&selectAux=${encodeURIComponent('AUX-4: Training / Coaching')}`;
+  window.open(portalUrl, '_blank');
+};
+
+function syncActiveTrainingStatus() {
+  const aId = (agentState && agentState.id) || 'AGT-8842';
+  fetch(`/api/training/status?agentId=${encodeURIComponent(aId)}`)
+    .then(r => r.json())
+    .then(res => {
+      if (res && res.success && res.training) {
+        handleTrainingAssignment(res.training);
+      }
+    })
+    .catch(() => {});
+}
+
 function renderAdvisories() {
   const container = document.getElementById('advisories-list');
   const unreadEl = document.getElementById('unread-alert-count');
@@ -2372,17 +2430,25 @@ function renderAdvisories() {
     if (adv.severity.includes('CRITICAL') || adv.severity.includes('STORM') || adv.severity.includes('OUTAGE')) tagColor = 'danger';
     if (adv.severity.includes('WARNING') || adv.severity.includes('MONDAY')) tagColor = 'warning';
 
+    const trainingAction = adv.isTraining ? `
+      <button class="btn-xs" onclick="startTrainingFromAdvisory('${adv.id}')" style="background:#2563eb; color:#ffffff; border:1px solid #1d4ed8; padding:3px 8px; border-radius:4px; font-weight:700; cursor:pointer;">
+        ⚡ Start AUX-4 (45m)
+      </button>` : '';
+
     return `
-      <div class="advisory-card">
+      <div class="advisory-card" style="${adv.isTraining ? 'border-left: 4px solid #dc2626; background: #fff1f2;' : ''}">
         <div class="adv-header">
           <span class="adv-tag ${tagColor}">${adv.severity}</span>
           <span class="adv-time">${timeStr}</span>
         </div>
-        <strong class="adv-title">${adv.title}</strong>
-        <p class="adv-msg">${adv.message}</p>
+        <strong class="adv-title" style="${adv.isTraining ? 'color:#991b1b;' : ''}">${adv.title}</strong>
+        <p class="adv-msg" style="${adv.isTraining ? 'color:#881337;' : ''}">${adv.message}</p>
         <div class="adv-footer">
           <small class="adv-sender">By: ${adv.sender || 'Supervisor'}</small>
-          <button class="btn-xs btn-outline" onclick="dismissAdvisory('${adv.id}')">Acknowledge</button>
+          <div style="display:flex; gap:6px;">
+            ${trainingAction}
+            <button class="btn-xs btn-outline" onclick="dismissAdvisory('${adv.id}')">Acknowledge</button>
+          </div>
         </div>
       </div>
     `;
@@ -2879,6 +2945,23 @@ function initWidgetAlertSSE() {
         }
       } catch (err) {}
     });
+    es.addEventListener('MANDATORY_TRAINING_ASSIGNED', (e) => {
+      try {
+        const payload = JSON.parse(e.data);
+        handleTrainingAssignment(payload);
+      } catch (err) {}
+    });
+    es.addEventListener('TRAINING_COMPLETED', (e) => {
+      try {
+        const p = JSON.parse(e.data);
+        if (!p.agentId || p.agentId === agentState.id) {
+          activeAdvisories = activeAdvisories.filter(a => !a.isTraining);
+          renderAdvisories();
+          const banner = document.getElementById('training-assigned-banner');
+          if (banner) banner.classList.add('hidden');
+        }
+      } catch (err) {}
+    });
     es.addEventListener('ALARM_TRIGGERED', (e) => {
       try {
         const a = JSON.parse(e.data);
@@ -3052,3 +3135,10 @@ setTimeout(checkAutoAllScreen, 100);
     });
   }
 })();
+
+
+// Sync active training status on boot and periodically
+if (typeof syncActiveTrainingStatus === 'function') {
+  syncActiveTrainingStatus();
+  setInterval(syncActiveTrainingStatus, 6000);
+}

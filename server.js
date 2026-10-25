@@ -100,6 +100,7 @@ const agentAlertPreferences = {
 
 const activeBreakAlarms = {};
 const activeAgentBreaks = {};
+const activeTrainingAssignments = {};
 const sseAlertClients = [];
 
 function broadcastAlertEvent(eventType, payload) {
@@ -777,6 +778,61 @@ const server = http.createServer((req, res) => {
   }
 
   // Trigger Automated Calling / Alarm (From Widget Countdown or Supervisor Wallboard)
+  
+  // API ROUTE: Assign Mandatory Training / Coaching (from Supervisor)
+  if (pathname === '/api/training/assign' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const targetId = payload.targetAgentId || payload.agentId || 'ALL';
+        activeTrainingAssignments[targetId] = payload;
+        broadcastAlertEvent('MANDATORY_TRAINING_ASSIGNED', payload);
+        if (!req.headers['x-relayed-from']) relayToCloud('/api/training/assign', payload);
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify({ success: true, assignment: payload }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: e.message }));
+      }
+    });
+    return;
+  }
+
+  // API ROUTE: Get Active Mandatory Training Assignment for Agent
+  if (pathname === '/api/training/status' && req.method === 'GET') {
+    const aId = (parsedUrl.query && parsedUrl.query.agentId) || 'AGT-8842';
+    const training = activeTrainingAssignments[aId] || activeTrainingAssignments['ALL'] || null;
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+    res.end(JSON.stringify({ success: true, training: training, allTrainings: activeTrainingAssignments }));
+    return;
+  }
+
+  // API ROUTE: Complete / Acknowledge Mandatory Training
+  if (pathname === '/api/training/complete' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const aId = payload.targetAgentId || payload.agentId || 'AGT-8842';
+        delete activeTrainingAssignments[aId];
+        if (payload.clearAll) {
+          delete activeTrainingAssignments['ALL'];
+        }
+        broadcastAlertEvent('TRAINING_COMPLETED', { agentId: aId, payload });
+        if (!req.headers['x-relayed-from']) relayToCloud('/api/training/complete', payload);
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify({ success: true, message: 'Training marked completed / cleared.' }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: e.message }));
+      }
+    });
+    return;
+  }
+
   if (pathname === '/api/alerts/trigger-alarm' && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => { body += chunk; });

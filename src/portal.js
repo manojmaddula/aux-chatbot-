@@ -736,3 +736,118 @@ document.querySelectorAll('.aux-option').forEach(opt => {
     console.warn('Agent auto-sync error:', e);
   }
 })();
+
+
+// ==========================================
+// MANDATORY TRAINING ALERT HANDLER & SYNC
+// ==========================================
+
+function showPortalTrainingAlert(training) {
+  if (!training) return;
+  const currentAgentId = document.getElementById('agent-id')?.value.trim() || 'AGT-8842';
+  const targetId = training.targetAgentId || training.agentId;
+  if (targetId && targetId !== 'ALL' && targetId !== currentAgentId) {
+    return;
+  }
+
+  const banner = document.getElementById('portal-training-banner');
+  const moduleEl = document.getElementById('portal-train-module');
+  const modeEl = document.getElementById('portal-train-mode');
+  const descEl = document.getElementById('portal-train-desc');
+  const notesBox = document.getElementById('portal-train-notes-box');
+
+  if (banner) {
+    banner.classList.remove('hidden');
+    if (moduleEl) moduleEl.textContent = training.moduleName || 'Module 101: Professional De-Escalation';
+    if (modeEl) modeEl.textContent = `SCHEDULE: ${training.scheduleMode || 'IMMEDIATE'}`;
+    if (descEl) descEl.textContent = `Supervisor dispatched mandatory coaching interval. Reason: ${training.reason || 'QA / Operational Refresher'}.`;
+    if (notesBox) {
+      notesBox.textContent = training.notes ? `Supervisor Note: "${training.notes}"` : '';
+      notesBox.style.display = training.notes ? 'block' : 'none';
+    }
+  }
+}
+
+function fetchPortalTrainingStatus() {
+  const currentAgentId = document.getElementById('agent-id')?.value.trim() || 'AGT-8842';
+  fetch(`/api/training/status?agentId=${encodeURIComponent(currentAgentId)}`)
+    .then(r => r.json())
+    .then(res => {
+      if (res && res.success && res.training) {
+        showPortalTrainingAlert(res.training);
+      } else {
+        const banner = document.getElementById('portal-training-banner');
+        if (banner) banner.classList.add('hidden');
+      }
+    })
+    .catch(() => {});
+}
+
+// Button actions for portal training banner
+document.addEventListener('DOMContentLoaded', () => {
+  const btnPortalApply = document.getElementById('btn-portal-apply-training');
+  if (btnPortalApply) {
+    btnPortalApply.addEventListener('click', () => {
+      const aux4Radio = document.querySelector('input[name="aux-code"][value="AUX-4: Training / Coaching"]');
+      if (aux4Radio) {
+        aux4Radio.checked = true;
+        aux4Radio.dispatchEvent(new Event('change'));
+      }
+      const pill45 = document.querySelector('.duration-pill[data-minutes="45"]');
+      if (pill45) {
+        pill45.click();
+      } else if (typeof customMinutesInput !== 'undefined' && customMinutesInput) {
+        customMinutesInput.value = 45;
+        customMinutesInput.dispatchEvent(new Event('input'));
+      }
+      const breakSec = document.getElementById('break-section');
+      if (breakSec) breakSec.scrollIntoView({ behavior: 'smooth' });
+    });
+  }
+
+  const btnPortalDismiss = document.getElementById('btn-portal-dismiss-training');
+  if (btnPortalDismiss) {
+    btnPortalDismiss.addEventListener('click', () => {
+      const banner = document.getElementById('portal-training-banner');
+      if (banner) banner.classList.add('hidden');
+      const currentAgentId = document.getElementById('agent-id')?.value.trim() || 'AGT-8842';
+      fetch('/api/training/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ agentId: currentAgentId })
+      }).catch(() => {});
+    });
+  }
+});
+
+// SSE and BroadcastChannel listener for training
+try {
+  const bcTrain = new BroadcastChannel('wfm_aux_channel');
+  bcTrain.onmessage = (e) => {
+    if (e.data && e.data.type === 'MANDATORY_TRAINING_ASSIGNED') {
+      showPortalTrainingAlert(e.data.payload);
+    } else if (e.data && e.data.type === 'TRAINING_COMPLETED') {
+      const banner = document.getElementById('portal-training-banner');
+      if (banner) banner.classList.add('hidden');
+    }
+  };
+} catch (err) {}
+
+try {
+  const esTrain = new EventSource('/api/alerts/stream');
+  esTrain.addEventListener('MANDATORY_TRAINING_ASSIGNED', (e) => {
+    try {
+      const payload = JSON.parse(e.data);
+      showPortalTrainingAlert(payload);
+    } catch (err) {}
+  });
+  esTrain.addEventListener('TRAINING_COMPLETED', (e) => {
+    try {
+      const banner = document.getElementById('portal-training-banner');
+      if (banner) banner.classList.add('hidden');
+    } catch (err) {}
+  });
+} catch (err) {}
+
+fetchPortalTrainingStatus();
+setInterval(fetchPortalTrainingStatus, 6000);

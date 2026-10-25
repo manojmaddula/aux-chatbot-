@@ -1527,6 +1527,12 @@ if (btnConfirmTraining) {
         payload: payload
       });
     }
+    // Also dispatch to backend server for persistent storage, SSE, and Cloud relay
+    fetch('/api/training/assign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).catch(err => console.warn('Training API assign error:', err));
 
     // Update wallboard status for this agent
     updateAgentState(currentTrainingAgent.agentId, 'AUX: TRAINING', '45:00');
