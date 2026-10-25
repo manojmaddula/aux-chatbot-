@@ -373,7 +373,8 @@ try {
     const data = event.data;
     if (data.type === 'BREAK_APPROVED') {
       startBreak(data.payload);
-      addSupervisorLog('APPROVED', `${data.payload.auxCode} (${data.payload.durationMinutes}m) approved. Synced from Web Portal.`);
+      const durStr = data.payload.durationFormatted || (data.payload.durationMinutes + 'm');
+      addSupervisorLog('APPROVED', `${data.payload.auxCode} (${durStr}) approved. Synced from Web Portal.`);
     } else if (data.type === 'BREAK_REJECTED') {
       addSupervisorLog('REJECTED', `${data.payload.auxCode} rejected: ${data.payload.reason}`);
       showNotification('AUX Break Rejected', data.payload.reason);
@@ -719,9 +720,12 @@ function renderBreakHistory(agentId, filter) {
   }
 
   container.innerHTML = filtered.map(item => {
+    const isLunch = item.category === 'lunch';
+    const isTea = item.category === 'tea';
+    const iconClass = isLunch ? 'icon-lunch' : (isTea ? 'icon-tea' : 'icon-other');
     return '<div class="break-history-item">' +
       '<div class="break-history-left">' +
-        '<div class="break-history-icon">' + (item.icon || '☕') + '</div>' +
+        '<div class="break-history-icon ' + iconClass + '">' + (item.icon || '☕') + '</div>' +
         '<div class="break-history-meta">' +
           '<strong>' + item.auxCode + '</strong>' +
           '<span><span class="break-date-label">' + item.date + '</span>• ' + item.time + '</span>' +
@@ -729,7 +733,7 @@ function renderBreakHistory(agentId, filter) {
       '</div>' +
       '<div class="break-history-right">' +
         '<span class="break-duration-tag">' + item.duration + '</span>' +
-        '<span class="break-status-badge ' + item.statusClass + '">' + item.status + '</span>' +
+        '<span class="break-status-badge ' + item.statusClass + '">✓ ' + item.status + '</span>' +
       '</div>' +
     '</div>';
   }).join('');
@@ -1171,16 +1175,21 @@ function startBreak(breakData) {
     window.updateAlertUiLabels();
   }
 
-  const durMins = parseInt(breakData.durationMinutes, 10) || 15;
+  const durMins = parseInt(breakData.durationMinutes, 10) || 0;
+  const durSecs = parseInt(breakData.durationSeconds, 10) || 0;
+  const totalSeconds = breakData.durationTotalSeconds || ((durMins * 60) + durSecs) || 900;
   const now = Date.now();
-  const totalMs = durMins * 60 * 1000;
+  const totalMs = totalSeconds * 1000;
   const expiresAt = breakData.expiresAt || (now + totalMs);
   const startedAt = breakData.approvedAt || (expiresAt - totalMs);
+  const durFormatted = breakData.durationFormatted || (durMins > 0 ? (durSecs > 0 ? `${durMins}m ${durSecs}s` : `${durMins} mins`) : `${durSecs} secs`);
 
   agentState.status = 'AUX';
   agentState.activeBreak = {
     auxCode: breakData.auxCode || 'AUX-2: Short Break / AUX',
     durationMinutes: durMins,
+    durationSeconds: durSecs,
+    durationFormatted: durFormatted,
     totalMs: totalMs,
     startedAt: startedAt,
     expiresAt: expiresAt
@@ -1203,7 +1212,7 @@ function startBreak(breakData) {
       auxCode: agentState.activeBreak.auxCode,
       icon: getAuxIcon(agentState.activeBreak.auxCode),
       time: startTime + ' - (in progress)',
-      duration: durMins + ' mins',
+      duration: durFormatted,
       status: 'In Progress',
       statusClass: 'in-progress',
       category: getAuxCategory(agentState.activeBreak.auxCode)
@@ -1552,48 +1561,126 @@ function addSupervisorLog(tag, message) {
 }
 
 // ==========================================
-// DYNAMIC AI SUGGESTED REPLIES ENGINE
+// ==========================================
+// DYNAMIC AI SUGGESTED REPLIES & PLAYBOOKS ENGINE
 // ==========================================
 
 const AI_REPLY_TOPICS = {
   billing: [
     {
-      tag: 'Empathy + Credit Approval',
-      text: 'I apologize for the confusion regarding the $25 monthly surcharge. I have reviewed your billing record and applied a one-time adjustment credit to your balance today.'
+      tag: 'Fee Waiver & Courtesy Credit',
+      title: 'Billing Surcharge / Late Fee Dispute',
+      policy: 'Frontline agent authority: Up to $50.00 adjustment. Disposition: RESOLVED_BILLING_CREDIT.',
+      text: 'I apologize for the confusion regarding the $25 monthly surcharge on your statement. I have reviewed your billing history and applied a one-time adjustment credit of $25 to your balance today.',
+      copilotQuery: 'What is the frontline credit limit and fee waiver policy?'
     },
     {
-      tag: 'Auto-Pay Enrollment Link',
-      text: 'I have verified your account security PIN. Let me guide you to our self-service billing management portal to update your auto-pay method and receive the $5 paperless discount.'
+      tag: 'Promotional Continuity',
+      title: 'Fiber Rate Lock Restoration',
+      policy: 'Authorized to restore promo tier RET-2026 for 12 months for 1+ year accounts.',
+      text: 'I understand you were expecting your promotional rate to continue. I have successfully re-applied promotional tier RET-2026 to your Fiber account, maintaining your $65 monthly rate for the next 12 months.',
+      copilotQuery: 'What are the active retention promotional codes for Fiber?'
+    },
+    {
+      tag: 'Paperless Auto-Pay',
+      title: 'Auto-Pay $5/mo Savings Pitch',
+      policy: 'Direct customer to self-service portal or send secure SMS setup link.',
+      text: 'To help you save on future statements, enrolling in paperless auto-pay provides an ongoing $5 monthly recurring discount. I can dispatch a secure setup link directly to your mobile phone right now.',
+      copilotQuery: 'How does the auto-pay discount enrollment workflow work?'
     }
   ],
   security: [
     {
-      tag: 'PIN Verification Required',
-      text: 'To protect your account security, I have dispatched a one-time 6-digit verification code to the phone number on file. Please read that back to me when received.'
+      tag: 'Standard SMS OTP',
+      title: 'Identity Verification Challenge',
+      policy: 'Required for all balance modifications, plan changes, or address updates.',
+      text: 'To protect your account security, I have dispatched a one-time 6-digit verification code to the mobile number on file ending in 4821. Please read that back to me whenever you are ready.',
+      copilotQuery: 'What is the security verification protocol?'
     },
     {
-      tag: 'Identity Confirmed',
-      text: 'Thank you for confirming your security credentials. Your account is verified and I can now assist with any service modifications.'
+      tag: 'PIN Bypass Secondary Auth',
+      title: 'Forgotten Security PIN Protocol',
+      policy: 'Validate 3 of 4: Billing Zip, Last 4 digits of card, Install address, Last bill amount.',
+      text: 'No problem if you have forgotten your PIN. We can authenticate using your billing zip code, the last four digits of the payment card on file, and your service installation address.',
+      copilotQuery: 'What is the protocol for forgotten PIN or verification bypass?'
+    },
+    {
+      tag: 'High-Risk Fraud Warning',
+      title: 'Suspicious Account Change Request',
+      policy: 'Never bypass PIN for SIM swap or email change. Warm transfer to Fraud Ops Ext. 4409.',
+      text: 'For your security, changes to primary contact email or device SIM require two-factor biometric or verified government ID review. Let me transfer you directly to our Secure Identity Operations team.',
+      copilotQuery: 'What is the high-risk fraud and SIM swap escalation protocol?'
     }
   ],
   outage: [
     {
-      tag: 'Storm / Outage Guidance',
-      text: 'Our dispatch center confirms that regional utility field technicians are actively working to restore service in your sector. Real-time restoration status is available via SMS updates.'
+      tag: 'Storm Outage Broadcast',
+      title: 'Regional Grid / Fiber Outage Broadcast',
+      policy: 'Storm mode active when inbound >1000/min. Reassure without committing specific hour.',
+      text: 'Our regional utility operations center confirms severe weather has affected local distribution lines. Specialized field technicians are already dispatched and on-site actively restoring connectivity.',
+      copilotQuery: 'What is the current storm outage IVR deflection rate and status?'
     },
     {
-      tag: 'Emergency Gas Safety',
-      text: 'If you smell natural gas or suspect a line leak: please evacuate the premises immediately, avoid using electrical switches, and call emergency services from outside.'
+      tag: 'Real-Time Incident Tracker',
+      title: 'Automated SMS Outage Subscription',
+      policy: 'Enroll caller ANI in automated push notifications.',
+      text: 'I have enrolled your mobile number +1 (555) 019-4821 into our real-time dispatch SMS tracker. You will receive automatic updates every 30 minutes until full service is restored.',
+      copilotQuery: 'How do I subscribe a caller to automated outage SMS notifications?'
+    },
+    {
+      tag: 'Emergency Safety Protocol',
+      title: 'Gas Leak or Downed Wire Hazard',
+      policy: 'Immediate call termination and 911 instruction protocol.',
+      text: 'SAFETY ALERT: If you smell natural gas or observe a downed power line, please evacuate the building immediately, avoid operating any electrical switches, and dial 911 from outside the premises.',
+      copilotQuery: 'What is the emergency safety protocol for downed utility lines?'
     }
   ],
   empathy: [
     {
       tag: 'De-escalation & Ownership',
-      text: 'I completely understand your frustration with this service delay, and I appreciate your patience. I am taking direct personal ownership of this inquiry until resolved.'
+      title: 'Frustrated Caller Turnaround',
+      policy: 'Use H.E.A.R. framework (Hear, Empathize, Acknowledge, Resolve).',
+      text: 'I completely understand how frustrating this delay has been for you, and I sincerely apologize for the inconvenience. You have reached the right specialist, and I am taking direct personal ownership of this inquiry until it is 100% resolved.',
+      copilotQuery: 'How do I de-escalate an upset customer using the HEAR framework?'
     },
     {
-      tag: 'Closing & Confirmation',
-      text: 'Thank you for your time today. All changes have been logged in your account history, and a detailed confirmation email has been dispatched.'
+      tag: 'Retention Loyalty Credit',
+      title: 'Customer Threatening to Disconnect',
+      policy: 'Offer Tier-2 Fiber loyalty credit ($15/month for 12 months) before order cancellation.',
+      text: 'We deeply value your 3-year loyalty with us, and I want to make this right. I have authorized a loyalty credit of $15 per month for the next 12 months on your fiber service so you can enjoy uninterrupted gigabit connectivity.',
+      copilotQuery: 'What retention offers can I provide to a customer threatening to cancel?'
+    }
+  ],
+  escalation: [
+    {
+      tag: 'Supervisor Transfer Protocol',
+      title: 'Customer Demanding Floor Supervisor',
+      policy: 'Warm transfer required. Brief SUP-014 Sarah Jenkins on Contact ID and dispute.',
+      text: 'I will be glad to connect you with my supervisor, Sarah Jenkins. Before I transfer your line, may I take 60 seconds to review the case details so I can brief her directly on the exact resolution you are requesting?',
+      copilotQuery: 'What is the supervisor escalation and warm transfer procedure?'
+    },
+    {
+      tag: 'Tier-3 Engineering Hand-off',
+      title: 'Unresolved WebRTC / Telephony Packet Loss',
+      policy: 'Escalate via JIRA ticket with MTU packet trace.',
+      text: 'I have captured the network diagnostics and opened Priority Ticket INC-88210 directly with our Core Systems Engineering team. An engineer will follow up via email within 2 business hours.',
+      copilotQuery: 'How do I escalate an unresolved technical incident to Tier-3?'
+    }
+  ],
+  closing: [
+    {
+      tag: 'Comprehensive Wrap & Next Steps',
+      title: 'First-Call Resolution Closing Script',
+      policy: 'Summarize actions, confirm satisfaction, prevent repeat callbacks.',
+      text: 'To recap: I have adjusted the $25 fee, restored your promotional rate for 12 months, and dispatched an email confirmation with reference #90421. Is there anything else I can assist you with today?',
+      copilotQuery: 'What is the standard closing script to achieve 100% First Call Resolution?'
+    },
+    {
+      tag: 'Post-Call Survey Invitation',
+      title: 'Positive CSAT Survey Prompt',
+      policy: 'Prompt callers when sentiment score is positive (>+0.7).',
+      text: 'Thank you for choosing ZEL! At the end of this call, you may hear a brief 1-question automated survey about my service today. I would greatly appreciate your feedback. Have a wonderful rest of your day!',
+      copilotQuery: 'What is the policy for introducing the post-call IVR survey?'
     }
   ]
 };
@@ -1606,11 +1693,20 @@ function renderSuggestedReplies(topic) {
   let html = '';
   items.forEach(item => {
     html += `
-      <div class="suggestion-item" data-text="${item.text}">
-        <span class="suggestion-tag">${item.tag}</span>
-        <p>"${item.text}"</p>
-        <div style="display:flex; gap:6px; margin-top:6px;">
-          <button class="btn-copy">Copy</button>
+      <div class="suggestion-item">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+          <span class="suggestion-tag">${item.tag}</span>
+          <span style="font-size:10px; font-weight:700; color:#1e3a8a;">${item.title}</span>
+        </div>
+        <div class="script-quote-box">
+          <p class="script-quote-text">"${item.text}"</p>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; flex-wrap:wrap; gap:4px;">
+          <small style="font-size:10px; color:#1e3a8a; font-weight:600;">💡 ${item.policy}</small>
+          <div style="display:flex; gap:6px;">
+            <button class="btn-xs btn-outline btn-ask-copilot" data-query="${item.copilotQuery}" style="font-size:10px; padding:3px 7px;" title="Ask Shankar about this policy">💬 Ask Copilot</button>
+            <button class="btn-xs btn-copy" data-text="${item.text.replace(/"/g, '&quot;')}" style="font-size:10px; padding:3px 8px; font-weight:700;" title="Copy verbatim script to clipboard">📋 Copy Script</button>
+          </div>
         </div>
       </div>
     `;
@@ -1621,14 +1717,27 @@ function renderSuggestedReplies(topic) {
 
 function bindSuggestionButtons() {
   document.querySelectorAll('.btn-copy').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const parent = e.target.closest('.suggestion-item');
-      const text = parent.getAttribute('data-text');
+    btn.onclick = (e) => {
+      const text = btn.getAttribute('data-text');
+      if (!text) return;
       navigator.clipboard.writeText(text).then(() => {
         btn.textContent = '✓ Copied!';
-        setTimeout(() => btn.textContent = 'Copy', 1500);
+        playTone(587.33, 'sine', 0.1);
+        setTimeout(() => { btn.textContent = '📋 Copy Script'; }, 1500);
       });
-    });
+    };
+  });
+
+  document.querySelectorAll('.btn-ask-copilot').forEach(btn => {
+    btn.onclick = (e) => {
+      const q = btn.getAttribute('data-query');
+      if (!q) return;
+      const chatInput = document.getElementById('chat-input');
+      if (chatInput) {
+        chatInput.value = q;
+        handleUserChat();
+      }
+    };
   });
 }
 
@@ -1680,6 +1789,199 @@ document.querySelectorAll('.chat-chip').forEach(chip => {
   });
 });
 
+const SERVICENOW_TICKETS = [
+  {
+    id: 'INC-88102',
+    type: 'Incident',
+    agentId: 'AGT-4491',
+    agentName: 'Carlos Mendez',
+    queue: 'Tier-2 Tech Support',
+    category: 'Cisco AnyConnect VPN Error 412',
+    severity: 'P2 - High',
+    status: 'IN_PROGRESS',
+    statusLabel: 'In Progress',
+    statusBadgeColor: '#f59e0b',
+    assignedTo: 'Network Engineering Tier-3',
+    assignedEngineer: 'Marcus Vance',
+    openedAt: 'Today 09:14 AM',
+    slaTarget: '2 Hours (Remaining: 34m)',
+    description: 'MTU mismatch on Wi-Fi adapter causing WebRTC voice packet drops during customer calls.',
+    workNotes: 'Engineers deployed MTU 1350 patch to adapter registry. Verifying WebRTC packet trace.'
+  },
+  {
+    id: 'INC-88103',
+    type: 'Incident',
+    agentId: 'AGT-9102',
+    agentName: 'Samantha Vance',
+    queue: 'General Customer Service',
+    category: 'Citrix Workspace Display Driver Freeze',
+    severity: 'P3 - Moderate',
+    status: 'RESOLVED',
+    statusLabel: 'Resolved',
+    statusBadgeColor: '#10b981',
+    assignedTo: 'VDI Desktop Support',
+    assignedEngineer: 'Kevin Zhao',
+    openedAt: 'Today 10:20 AM',
+    slaTarget: '4 Hours (Met in 42m)',
+    description: 'Virtual display driver frozen on reconnect after scheduled lunch interval.',
+    workNotes: 'VDI broker session hard-reset completed. Agent successfully re-authenticated.'
+  },
+  {
+    id: 'INC-90421',
+    type: 'Incident',
+    agentId: 'AGT-8842',
+    agentName: 'Alex Morgan',
+    queue: 'Tier-2 Tech Support',
+    category: 'CXone MAX Softphone WebRTC UDP Packet Loss',
+    severity: 'P1 - Critical',
+    status: 'INVESTIGATING',
+    statusLabel: 'Under Investigation',
+    statusBadgeColor: '#ef4444',
+    assignedTo: 'Core Telephony Systems Ops',
+    assignedEngineer: 'DevOps Primary On-Call',
+    openedAt: 'Today 11:05 AM',
+    slaTarget: '1 Hour (Remaining: 18m)',
+    description: 'One-way audio reported on incoming contact #90421 due to UDP 10000-20000 firewall jitter.',
+    workNotes: 'Network router QoS prioritization rule applied. Telephony gateway responding normally.'
+  },
+  {
+    id: 'INC-77401',
+    type: 'Incident',
+    agentId: 'AGT-7740',
+    agentName: 'David Chen',
+    queue: 'General Customer Service',
+    category: 'Okta SSO / Duo MFA Desynchronization',
+    severity: 'P2 - High',
+    status: 'IN_PROGRESS',
+    statusLabel: 'In Progress',
+    statusBadgeColor: '#f59e0b',
+    assignedTo: 'Identity & Access Management (IAM)',
+    assignedEngineer: 'Sarah Lin',
+    openedAt: 'Today 08:30 AM',
+    slaTarget: '2 Hours (Remaining: 45m)',
+    description: 'Duo MFA push notifications timing out on mobile token generator.',
+    workNotes: 'Reset MFA token seed. Awaiting agent biometric confirmation.'
+  },
+  {
+    id: 'RITM-40291',
+    type: 'Service Request',
+    agentId: 'AGT-4092',
+    agentName: 'Jordan Miller',
+    queue: 'Customer Billing & Retention',
+    category: 'Hardware Logistics: Plantronics Headset Replacement',
+    severity: 'P4 - Low',
+    status: 'DISPATCHED',
+    statusLabel: 'Dispatched / In Transit',
+    statusBadgeColor: '#2563eb',
+    assignedTo: 'Hardware Logistics Depot',
+    assignedEngineer: 'Depot Fulfillment',
+    openedAt: 'Yesterday 04:15 PM',
+    slaTarget: '24 Hours (On Schedule)',
+    description: 'Replacement noise-canceling USB-C headset ordered under warranty exchange.',
+    workNotes: 'FedEx Tracking #748920192841 dispatched. Expected delivery by 02:00 PM.'
+  }
+];
+
+function extractServiceNowTicketId(query) {
+  if (!query) return null;
+  const q = query.trim();
+
+  // Pattern 1: Explicit prefixes INC, RITM, REQ, TASK, CHG
+  const prefixMatch = q.match(/\b(INC|RITM|REQ|TASK|CHG)[-_\s]?(\d{3,8})\b/i);
+  if (prefixMatch) {
+    return `${prefixMatch[1].toUpperCase()}-${prefixMatch[2]}`;
+  }
+
+  // Pattern 2: Contextual keywords like "ticket 12345" or "incident #88102"
+  const wordMatch = q.match(/\b(?:ticket|incident|case|issue|req|request)\s*#?\s*(\d{3,8})\b/i);
+  if (wordMatch) {
+    return `INC-${wordMatch[1]}`;
+  }
+
+  // Pattern 3: Hashtag like "#90421"
+  const hashMatch = q.match(/#(\d{4,8})\b/);
+  if (hashMatch) {
+    return `INC-${hashMatch[1]}`;
+  }
+
+  // Pattern 4: Bare number like "88102" or "55421"
+  const bareMatch = q.match(/^\s*(\d{4,8})\s*$/);
+  if (bareMatch) {
+    return `INC-${bareMatch[1]}`;
+  }
+
+  return null;
+}
+
+function getOrGenerateServiceNowTicket(ticketId, agentId = 'AGT-8842') {
+  if (!ticketId) return null;
+  const cleanId = ticketId.toUpperCase();
+
+  // 1. Check seeded tickets first
+  const existing = SERVICENOW_TICKETS.find(t => t.id === cleanId || t.id.replace('-', '') === cleanId.replace('-', ''));
+  if (existing) return existing;
+
+  // 2. Generate deterministic ticket data based on number
+  const numStr = cleanId.replace(/\D/g, '') || '88421';
+  const num = parseInt(numStr, 10);
+
+  const categories = [
+    { cat: 'CXone WebRTC Softphone: UDP Jitter & Voice Stream Latency', grp: 'Core Telephony Systems Ops', eng: 'David Kim (On-Call)', sev: 'P1 - Critical', prioBadge: '#ef4444' },
+    { cat: 'Cisco AnyConnect VPN: IPsec MTU Tunnel Fragmentation (Error 412)', grp: 'Network Infrastructure Tier-3', eng: 'Marcus Vance', sev: 'P2 - High', prioBadge: '#f59e0b' },
+    { cat: 'Okta SSO / Duo MFA: Security Token Clock Skew Desync', grp: 'Identity & Access Management (IAM)', eng: 'Sarah Lin', sev: 'P2 - High', prioBadge: '#f59e0b' },
+    { cat: 'Citrix Workspace VDI: Virtual GPU Display Driver Crash', grp: 'VDI & Desktop Virtualization Support', eng: 'Kevin Zhao', sev: 'P3 - Moderate', prioBadge: '#2563eb' },
+    { cat: 'Salesforce CRM CTI Connector: Screen-Pop Socket Disconnect', grp: 'Enterprise CRM Integrations', eng: 'Priya Sharma', sev: 'P2 - High', prioBadge: '#f59e0b' },
+    { cat: 'Hardware Logistics: Noise-Canceling USB-C Headset Replacement', grp: 'Hardware Depot & Field Dispatch', eng: 'Logistics Depot', sev: 'P4 - Low', prioBadge: '#10b981' },
+    { cat: 'Fiber Gateway Modem: Residential Bandwidth Provisioning Error', grp: 'Broadband NOC Engineering', eng: 'Tyler Brooks', sev: 'P3 - Moderate', prioBadge: '#2563eb' },
+    { cat: 'NICE WFM Adherence: Real-Time Telemetry Feed Synchronization', grp: 'Workforce Technology Services', eng: 'Elena Rostova', sev: 'P2 - High', prioBadge: '#f59e0b' }
+  ];
+
+  const statuses = [
+    { status: 'IN_PROGRESS', label: 'In Progress', color: '#f59e0b' },
+    { status: 'INVESTIGATING', label: 'Under Investigation', color: '#ef4444' },
+    { status: 'ASSIGNED', label: 'Assigned / Under Review', color: '#2563eb' },
+    { status: 'RESOLVED', label: 'Resolved / Fix Applied', color: '#10b981' },
+    { status: 'PENDING_VENDOR', label: 'Pending Hardware Dispatch', color: '#f59e0b' }
+  ];
+
+  const catObj = categories[num % categories.length];
+  const statObj = statuses[(num >> 2) % statuses.length];
+  const type = cleanId.startsWith('RITM') || cleanId.startsWith('REQ') ? 'Service Request' : 'Incident';
+
+  const minsRemaining = 15 + (num % 85);
+  const slaTarget = statObj.status === 'RESOLVED' ? 'Resolved within SLA (Met in 38m)' : `${minsRemaining}m remaining against 2h SLA`;
+
+  const workNotesList = [
+    `Diagnostics captured. Telephony QoS gateway prioritized. Network trace indicates 0% packet loss on regional node.`,
+    `Agent configuration updated. Registry MTU patch verified. System diagnostics operating normally.`,
+    `Session state purged and recreated on primary cluster. Awaiting agent confirmation.`,
+    `Telemetry logs reviewed. Carrier dispatch verified local fiber node online. Monitoring contact stability.`
+  ];
+  const workNotes = workNotesList[num % workNotesList.length];
+
+  const profile = (typeof AGENT_PROFILES !== 'undefined' && AGENT_PROFILES[agentId]) || 
+                  { name: 'Alex Morgan', queue: 'Tier-2 Tech Support' };
+
+  return {
+    id: cleanId,
+    type,
+    agentId,
+    agentName: profile.name,
+    queue: profile.queue,
+    category: catObj.cat,
+    severity: catObj.sev,
+    status: statObj.status,
+    statusLabel: statObj.label,
+    statusBadgeColor: statObj.color,
+    assignedTo: catObj.grp,
+    assignedEngineer: catObj.eng,
+    openedAt: 'Today 09:30 AM',
+    slaTarget,
+    description: `Reported issue: ${catObj.cat}. Automatically ingested from agent workstation telemetry.`,
+    workNotes
+  };
+}
+
 async function handleUserChat() {
   const query = chatInput.value.trim();
   if (!query) return;
@@ -1691,7 +1993,7 @@ async function handleUserChat() {
   const thinkingMsg = document.createElement('div');
   thinkingMsg.className = 'chat-msg ai';
   thinkingMsg.id = thinkingId;
-  thinkingMsg.innerHTML = '<div class="msg-bubble" style="opacity:0.7;">⚡ Querying live ACD telemetry, WFM forecast & IT logs...</div>';
+  thinkingMsg.innerHTML = '<div class="msg-bubble" style="opacity:0.75; font-size:11px; color:#1e3a8a;">⚡ Querying live ACD telemetry, WFM forecast &amp; Ask Shankar playbooks...</div>';
   chatHistory.appendChild(thinkingMsg);
   chatHistory.scrollTop = chatHistory.scrollHeight;
 
@@ -1713,13 +2015,14 @@ async function handleUserChat() {
       const thinkingEl = document.getElementById(thinkingId);
       if (thinkingEl) thinkingEl.remove();
       addChatMessage('ai', data.answer);
+      playTone(659.25, 'sine', 0.1);
       return;
     }
   } catch (err) {
-    console.warn('Backend copilot query offline, using local real-time telemetry engine:', err);
+    console.warn('Backend copilot query offline, using local intelligent engine:', err);
   }
 
-  // Client-Side Real-Time Fallback Engine
+  // Client-Side Intelligent Local LLM Engine (Fallback)
   const thinkingEl = document.getElementById(thinkingId);
   if (thinkingEl) thinkingEl.remove();
 
@@ -1727,36 +2030,147 @@ async function handleUserChat() {
   const qLower = query.toLowerCase();
   let response = '';
 
-  if (qLower.includes('volume') || qLower.includes('queue') || qLower.includes('calls waiting') || qLower.includes('traffic')) {
+  const detectedTicketId = extractServiceNowTicketId(query);
+
+  if (detectedTicketId) {
+    const ticket = getOrGenerateServiceNowTicket(detectedTicketId, currentAgentId);
+    response = `🎫 <strong>ServiceNow Incident Record: ${ticket.id}</strong><br/>` +
+      `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:8px; padding:12px; margin:6px 0; box-shadow:0 1px 4px rgba(37,99,235,0.05);">` +
+      `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:4px;">` +
+      `<span style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; padding:2px 8px; border-radius:4px; font-weight:800; font-size:10px;">SERVICENOW CMDB &bull; ${ticket.severity}</span>` +
+      `<span style="background:#eff6ff; color:${ticket.statusBadgeColor}; border:1px solid #bfdbfe; padding:2px 8px; border-radius:12px; font-weight:800; font-size:10px;">● ${ticket.statusLabel.toUpperCase()}</span>` +
+      `</div>` +
+      `• <strong>Category / Issue</strong>: ${ticket.category}<br/>` +
+      `• <strong>Caller / Agent</strong>: <strong>${ticket.agentName} (${ticket.agentId})</strong> &bull; ${ticket.queue}<br/>` +
+      `• <strong>Assignment Group</strong>: <strong>${ticket.assignedTo}</strong> (${ticket.assignedEngineer})<br/>` +
+      `• <strong>SLA Performance</strong>: ${ticket.slaTarget}<br/>` +
+      `• <strong>Latest Work Note</strong>: <em style="color:#0f172a;">"${ticket.workNotes}"</em>` +
+      `</div>` +
+      `<small style="color:#1e3a8a; font-weight:600;">To append notes or request priority escalation, submit details via the Break Portal under AUX-5.</small>`;
+  } else if (qLower.includes('servicenow') || qLower.includes('service now') || qLower.includes('ticket') || qLower.includes('snow') || qLower.includes('incident status') || qLower.includes('helpdesk')) {
+    let relevantTickets = SERVICENOW_TICKETS;
+    if (qLower.includes('my ticket') || qLower.includes('my incident')) {
+      const myTickets = SERVICENOW_TICKETS.filter(t => t.agentId === currentAgentId);
+      if (myTickets.length > 0) relevantTickets = myTickets;
+    }
+
+    let ticketRows = relevantTickets.map(t => {
+      return `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:8px 10px; margin-bottom:6px; box-shadow:0 1px 3px rgba(37,99,235,0.04);">` +
+        `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">` +
+        `<strong><span style="color:#2563eb;">${t.id}</span> (${t.type})</strong>` +
+        `<span style="background:#eff6ff; color:${t.statusBadgeColor}; border:1px solid #bfdbfe; padding:1px 6px; border-radius:10px; font-size:9.5px; font-weight:800;">● ${t.statusLabel}</span>` +
+        `</div>` +
+        `<div style="font-size:11px; color:#0f172a; margin-bottom:2px;">• <strong>${t.category}</strong> [${t.severity}]</div>` +
+        `<div style="font-size:10.5px; color:#1e3a8a;">Caller: ${t.agentName} &bull; Assigned: ${t.assignedEngineer} &bull; SLA: ${t.slaTarget}</div>` +
+        `</div>`;
+    }).join('');
+
+    response = `🎫 <strong>ServiceNow Enterprise IT Service Desk (Live Telemetry):</strong><br/>` +
+      `<p style="font-size:11px; color:#1e3a8a; margin:4px 0 6px 0;">Connected to ServiceNow Instance <strong>nice-cxone-wfm.service-now.com</strong> &bull; ${relevantTickets.length} active records:</p>` +
+      `<div style="margin:6px 0;">${ticketRows}</div>` +
+      `<small style="color:#1e3a8a; font-weight:600;">Type any ticket number (e.g. <em>"INC-88102"</em>, <em>"INC-55421"</em>, or <em>"ticket 99412"</em>) for instant live details.</small>`;
+  } else if (qLower.includes('volume') || qLower.includes('queue') || qLower.includes('calls waiting') || qLower.includes('traffic') || qLower.includes('surge') || qLower.includes('sla')) {
     response = `📊 <strong>Real-Time ACD Queue Telemetry:</strong><br/>` +
-      `• <strong>Billing & Payments</strong>: 42 calls waiting | Avg Wait: 35s | SLA: 86.4%<br/>` +
+      `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin:6px 0; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
+      `• <strong>Billing &amp; Payments</strong>: 42 calls waiting | Avg Wait: 35s | SLA: 86.4%<br/>` +
       `• <strong>General Customer Service</strong>: 8 calls waiting | Avg Wait: 14s | SLA: 97.2%<br/>` +
       `• <strong>Tier-2 Tech Support</strong>: 15 calls waiting | Avg Wait: 32s | SLA: 88.0%<br/>` +
-      `<small style="color:#1e3a8a; display:block; margin-top:4px;">Inbound Rate: 420 calls/min. All skill queues operating normally.</small>`;
-  } else if (qLower.includes('adherence') || qLower.includes('aux break') || qLower.includes('my break') || qLower.includes('lunch') || qLower.includes('quota')) {
+      `• <strong>Emergency Inbound</strong>: 0 calls waiting | Avg Wait: 0s` +
+      `</div>` +
+      `<small style="color:#1e3a8a; display:block; margin-top:4px;">Inbound Rate: 420 calls/min. All skill queues operating within SLA thresholds.</small>`;
+  } else if (qLower.includes('adherence') || qLower.includes('aux break') || qLower.includes('my break') || qLower.includes('lunch') || qLower.includes('quota') || qLower.includes('policy')) {
     response = `⏱️ <strong>Live Schedule Adherence for ${profile.name}:</strong><br/>` +
-      `• <strong>CXone Adherence</strong>: <strong>${profile.adherence}</strong> (Target: &ge; 90%)<br/>` +
-      `• <strong>AUX Breaks Taken Today</strong>: <strong>${profile.teaBreaks}</strong> (Policy: Max 2)<br/>` +
+      `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin:6px 0; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
+      `• <strong>CXone Adherence</strong>: <strong style="color:#10b981;">${profile.adherence}</strong> (Target: &ge; 90%)<br/>` +
+      `• <strong>AUX Breaks Taken Today</strong>: <strong>${profile.teaBreaks}</strong> (Policy Limit: Max 2)<br/>` +
       `• <strong>Lunch Variance</strong>: <strong>${profile.lunchOverage}</strong> (Tolerance: &lt;15m)<br/>` +
-      `• <strong>Frequency (30m)</strong>: <strong>${profile.freqCount}</strong> requests`;
+      `• <strong>Request Frequency (30m)</strong>: <strong>${profile.freqCount}</strong> requests` +
+      `</div>` +
+      `<small style="color:#1e3a8a; display:block; margin-top:2px;">Break policy governance is synchronized in real-time with Floor Supervisor.</small>`;
+  } else if (qLower.includes('billing') || qLower.includes('credit') || qLower.includes('refund') || qLower.includes('waiver') || qLower.includes('fee') || qLower.includes('surcharge') || qLower.includes('dispute')) {
+    response = `💳 <strong>Billing Governance &amp; Credit Adjustment Authority:</strong><br/>` +
+      `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin:6px 0; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
+      `• <strong>Frontline Discretionary Authority</strong>: Up to <strong>$50.00</strong> courtesy credit without supervisor override.<br/>` +
+      `• <strong>Tier-2 Lead Sign-off</strong>: $50.01 &ndash; $150.00.<br/>` +
+      `• <strong>Supervisor (SUP-014) Required</strong>: &gt; $150.00.<br/>` +
+      `• <strong>Promotional Renewal Code</strong>: Use <code>RET-PROMO-2026</code> to extend 12-month promotional discount.` +
+      `</div>` +
+      `<strong>Recommended Customer Script:</strong><br/>` +
+      `<div style="background:#eff6ff; border-left:3px solid #2563eb; padding:8px 10px; border-radius:4px; font-size:11px; color:#0f172a; font-style:italic; margin-top:4px;">` +
+      `"I apologize for the confusion regarding the surcharge on your statement. I have reviewed your billing history and applied a one-time courtesy adjustment credit of $25 to your balance today."` +
+      `</div>`;
+    } else if (qLower.includes('athun') || qLower.includes('auth') || qLower.includes('authen') || qLower.includes('autent') || qLower.includes('pin') || qLower.includes('verify') || qLower.includes('security') || qLower.includes('otp') || qLower.includes('bypass') || qLower.includes('login') || qLower.includes('sso')) {
+    const isTrouble = qLower.includes('not working') || qLower.includes('fail') || qLower.includes('cant') || qLower.includes("can't") || qLower.includes('unable') || qLower.includes('error') || qLower.includes('issue') || qLower.includes('stuck') || qLower.includes('forgot') || qLower.includes('bypass');
+    if (isTrouble) {
+      response = `🛡️ <strong>Authentication Troubleshooting &amp; Bypass Protocols:</strong><br/>` +
+        `<p style="font-size:11px; color:#1e3a8a; margin:4px 0 6px 0;">Troubleshooting steps for customer caller authentication failures and agent portal SSO sessions:</p>` +
+        `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin:6px 0; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
+        `• <strong>1. SMS OTP Not Received</strong>: Check registered ANI; click <em>"Re-send OTP"</em> after 30s. If it fails twice, use Secondary PIN Bypass.<br/>` +
+        `• <strong>2. Forgotten PIN Bypass (3 of 4)</strong>: (1) Billing Zip, (2) Last 4 of card, (3) Service address, (4) Last bill amount.<br/>` +
+        `• <strong>3. Agent Portal SSO Auth</strong>: Sessions auto-authenticate on load. Use <em>"Authenticate &amp; Continue"</em> in Step 1 to refresh token.<br/>` +
+        `• <strong>4. High-Risk Rule</strong>: Never bypass PIN for SIM swaps or password resets. Escalate to Fraud Ops (Ext. #4409).<br/>` +
+        `</div>` +
+        `<strong>Customer Script:</strong><br/>` +
+        `<div style="background:#eff6ff; border-left:3px solid #2563eb; padding:8px 10px; border-radius:4px; font-size:11px; color:#0f172a; font-style:italic; margin-top:4px;">` +
+        `"No worries if you haven't received the verification code or have forgotten your security PIN. To protect your account, I can quickly verify your identity using a few alternate security details, such as your billing zip code and recent invoice amount."` +
+        `</div>`;
+    } else {
+      response = `🛡️ <strong>Security Verification &amp; Authentication Protocols:</strong><br/>` +
+        `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin:6px 0; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
+        `• <strong>Standard Auth</strong>: Validate 4-digit PIN or dispatch 6-digit SMS OTP.<br/>` +
+        `• <strong>Forgotten PIN Bypass</strong>: Validate 3 of 4: (1) Billing Zip, (2) Last 4 of card, (3) Install Address, (4) Last bill amount.<br/>` +
+        `• <strong>Agent Portal SSO Auth</strong>: Enterprise SSO auto-authenticates agent sessions in Break Portal.<br/>` +
+        `• <strong>High-Risk Rule</strong>: Never bypass PIN for SIM swaps or password resets. Escalate to Fraud Ops (Ext. 4409).<br/>` +
+        `</div>` +
+        `<strong>Customer Script:</strong><br/>` +
+        `<div style="background:#eff6ff; border-left:3px solid #2563eb; padding:8px 10px; border-radius:4px; font-size:11px; color:#0f172a; font-style:italic; margin-top:4px;">` +
+        `"To protect your privacy and account security, I have dispatched a one-time 6-digit verification code to the phone number on file. Please read that back to me whenever you are ready."` +
+        `</div>`;
+    }
   } else if (qLower.includes('storm') || qLower.includes('weather') || qLower.includes('deflection') || qLower.includes('outage')) {
     response = `🌪️ <strong>Storm Outage IVR Telemetry:</strong><br/>` +
-      `• Current Call Rate: <strong>1,240 calls/min</strong> (Threshold: 1,000/min)<br/>` +
-      `• Deflection: <strong style="color:#38bdf8;">ACTIVE</strong> (Callers 1,001+ hearing outage broadcast).<br/>` +
-      `• Auto-clears when volume drops below 1,000/min.`;
+      `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin:6px 0; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
+      `• Current Call Rate: <strong>1,240 calls/min</strong> (Ceiling: 1,000/min)<br/>` +
+      `• Deflection: <strong style="color:#ef4444;">ACTIVE</strong> (Callers 1,001+ hearing automated outage broadcast).<br/>` +
+      `• Auto-clears when volume drops below 1,000/min.` +
+      `</div>`;
+  } else if (qLower.includes('empathy') || qLower.includes('angry') || qLower.includes('de-escalat') || qLower.includes('frustrat') || qLower.includes('yell')) {
+    response = `🤝 <strong>Customer De-escalation &amp; Retention Playbook:</strong><br/>` +
+      `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin:6px 0; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
+      `• <strong>Apply H.E.A.R. Framework</strong>: Hear, Empathize, Acknowledge, Resolve.<br/>` +
+      `• <strong>Retention Credit</strong>: Authorized for $15/month discount for 12 months before processing disconnect.` +
+      `</div>` +
+      `<strong>Recommended Turnaround Script:</strong><br/>` +
+      `<div style="background:#eff6ff; border-left:3px solid #2563eb; padding:8px 10px; border-radius:4px; font-size:11px; color:#0f172a; font-style:italic; margin-top:4px;">` +
+      `"I completely understand your frustration with this service delay, and I sincerely appreciate your patience. You have reached the right specialist, and I am taking direct personal ownership of this inquiry until it is 100% resolved."` +
+      `</div>`;
+  } else if (qLower.includes('supervisor') || qLower.includes('manager') || qLower.includes('escalat') || qLower.includes('sarah')) {
+    response = `🛡️ <strong>Floor Leadership &amp; Supervisor Escalation Workflow:</strong><br/>` +
+      `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin:6px 0; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
+      `• <strong>Active Floor Supervisor</strong>: Sarah Jenkins (SUP-014) &bull; Desk: Lead Pod B &bull; Status: Available<br/>` +
+      `• <strong>Warm Transfer Protocol</strong>: Brief supervisor with Contact ID #90421 and customer resolution request before bridging call.` +
+      `</div>`;
   } else if (qLower.includes('rebalance') || qLower.includes('flex')) {
     response = `🔄 <strong>WFM Intraday Skill Rebalance:</strong><br/>` +
-      `Customer Service agents flexed to Billing queue to absorb surge. Billing quick-replies boosted.`;
-  } else if (qLower.includes('it') || qLower.includes('ticket') || qLower.includes('vpn') || qLower.includes('incident')) {
-    response = `💻 <strong>Active IT Incidents:</strong><br/>` +
+      `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin:6px 0; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
+      `Customer Service agents flexed to Billing queue to absorb surge. Billing quick-replies boosted.` +
+      `</div>`;
+  } else if (qLower.includes('it') || qLower.includes('ticket') || qLower.includes('vpn') || qLower.includes('incident') || qLower.includes('webrtc') || qLower.includes('audio')) {
+    response = `🎧 <strong>Active IT Incidents &amp; Softphone Diagnostics:</strong><br/>` +
+      `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin:6px 0; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
       `• INC-88102: Carlos Mendez - Cisco AnyConnect VPN MTU 1350 (In Progress)<br/>` +
-      `• INC-88103: Samantha Vance - Citrix Workspace Reconnect (Assigned)`;
+      `• INC-88103: Samantha Vance - Citrix Workspace Reconnect (Assigned)<br/>` +
+      `• WebRTC One-Way Audio Fix: Toggle audio endpoint in CXone MAX toolbar & unblock UDP 10000-20000.` +
+      `</div>`;
   } else {
-    response = `🤖 <strong>Live NICE CXone (Ask Shankar) Telemetry Briefing:</strong><br/>` +
-      `All circuits operational. Your adherence: <strong>${profile.adherence}</strong>. Inbound rate: <strong>420 calls/min</strong>. ` +
-      `Ask about <em>queue volume</em>, <em>my adherence</em>, <em>storm deflection</em>, or <em>WFM skill flex</em>!`;
+    response = `🤖 <strong>Ask Shankar AI &bull; Live Telemetry &amp; Intelligence Briefing:</strong><br/>` +
+      `<p style="font-size:11px; color:#1e3a8a; margin:4px 0 6px 0;">Telephony switch operational &bull; Inbound: <strong>420 calls/min</strong> &bull; Your adherence: <strong>${profile.adherence}</strong>.</p>` +
+      `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin:6px 0; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
+      `• Ask about <strong>credit limits</strong>, <strong>PIN bypass</strong>, <strong>storm deflection</strong>, <strong>de-escalation scripts</strong>, <strong>ServiceNow tickets</strong>, or <strong>supervisor escalation</strong>.` +
+      `</div>`;
   }
   addChatMessage('ai', response);
+  playTone(659.25, 'sine', 0.1);
 }
 
 // ==========================================
@@ -2231,8 +2645,12 @@ function initAlertSettingsModal() {
     const currentAgentId = (agentState && agentState.id) ? agentState.id : 'AGT-8842';
     let targetUrl = '';
 
-    if (activeQrMode === 'cloud' && cachedServerInfo && cachedServerInfo.tunnelUrl) {
-      targetUrl = `${cachedServerInfo.tunnelUrl}/mobile-alert.html?agentId=${encodeURIComponent(currentAgentId)}&_t=${Date.now()}`;
+    const cloudOrigin = (typeof window !== 'undefined' && window.location && window.location.origin && window.location.origin.includes('.trycloudflare.com'))
+      ? window.location.origin
+      : (cachedServerInfo && cachedServerInfo.tunnelUrl ? cachedServerInfo.tunnelUrl : null);
+
+    if (activeQrMode === 'cloud' && cloudOrigin) {
+      targetUrl = `${cloudOrigin}/mobile-alert.html?agentId=${encodeURIComponent(currentAgentId)}&_t=${Date.now()}`;
       if (statusPill) {
         statusPill.textContent = '🌐 Cloud Active';
         statusPill.style.background = '#dcfce7';
@@ -2574,3 +2992,63 @@ function checkAutoAllScreen() {
 }
 window.addEventListener('resize', checkAutoAllScreen);
 setTimeout(checkAutoAllScreen, 100);
+
+
+// Wire Ask Shankar Expanded Chat Controls
+(function initExpandedChatControls() {
+  const btnToggleChatExpand = document.getElementById('btn-toggle-chat-expand');
+  const chatExpandIcon = document.getElementById('chat-expand-icon');
+  const chatExpandText = document.getElementById('chat-expand-text');
+  const copilotChatContainer = document.getElementById('copilot-chat-container');
+  const copilotBox = document.getElementById('copilot-box');
+  const btnTogglePlaybooks = document.getElementById('btn-toggle-playbooks');
+  const playbooksArea = document.getElementById('playbooks-collapsible-area');
+  const btnClearChat = document.getElementById('btn-clear-chat');
+
+  if (btnToggleChatExpand && copilotChatContainer) {
+    btnToggleChatExpand.addEventListener('click', () => {
+      const isExpanded = copilotChatContainer.classList.toggle('expanded');
+      if (isExpanded) {
+        if (chatExpandIcon) chatExpandIcon.textContent = '⤡';
+        if (chatExpandText) chatExpandText.textContent = 'Standard';
+        if (copilotBox) copilotBox.classList.add('chat-expanded-hidden');
+        btnToggleChatExpand.classList.add('active');
+      } else {
+        if (chatExpandIcon) chatExpandIcon.textContent = '⤢';
+        if (chatExpandText) chatExpandText.textContent = 'Full Chat';
+        if (copilotBox) copilotBox.classList.remove('chat-expanded-hidden');
+        btnToggleChatExpand.classList.remove('active');
+      }
+      if (typeof chatHistory !== 'undefined' && chatHistory) {
+        setTimeout(() => {
+          chatHistory.scrollTop = chatHistory.scrollHeight;
+        }, 120);
+      }
+    });
+  }
+
+  if (btnTogglePlaybooks && playbooksArea) {
+    btnTogglePlaybooks.addEventListener('click', () => {
+      const isHidden = playbooksArea.classList.toggle('hidden');
+      if (isHidden) {
+        btnTogglePlaybooks.textContent = '📖 Playbooks';
+        if (copilotChatContainer) copilotChatContainer.classList.add('extra-tall');
+      } else {
+        btnTogglePlaybooks.textContent = '📖 Minimize';
+        if (copilotChatContainer) copilotChatContainer.classList.remove('extra-tall');
+      }
+    });
+  }
+
+  if (btnClearChat && typeof chatHistory !== 'undefined' && chatHistory) {
+    btnClearChat.addEventListener('click', () => {
+      chatHistory.innerHTML = `
+        <div class="chat-msg ai">
+          <div class="msg-bubble">
+            👋 Chat stream refreshed. I am <strong>Ask Shankar</strong>, your assistant for live telephony, queue status, and ServiceNow incident records.
+          </div>
+        </div>
+      `;
+    });
+  }
+})();

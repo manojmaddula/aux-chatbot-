@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ask Shankar & AUX Assistant</title>
+  <title>ZEL Call Center Assist</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=panda2" />
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=panda2" />
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=panda2" />
@@ -22,37 +22,69 @@
           <span id="agent-status-dot" class="status-indicator ready"></span>
         </div>
         <div class="agent-info">
-          <select id="widget-agent-select" class="widget-agent-select" title="Switch logged-in agent persona">
-            <option value="AGT-8842">Alex Morgan (AGT-8842) • Normal</option>
-            <option value="AGT-4092">Jordan Miller (AGT-4092) • 4 Teas</option>
-            <option value="AGT-9102">Samantha Vance (AGT-9102) • +25m Lunch</option>
-            <option value="AGT-7740">David Chen (AGT-7740) • Spammer</option>
-            <option value="AGT-6512">Rachel Green (AGT-6512) • Medical</option>
-            <option value="AGT-8819">Marcus Brody (AGT-8819) • Trainee</option>
-            <option value="AGT-3310">Chloe Bennett (AGT-3310) • CS Senior Lead</option>
-            <option value="AGT-5521">Lucas Wright (AGT-5521) • Billing Specialist</option>
-            <option value="AGT-7703">Maya Patel (AGT-7703) • VIP Care 5.0★</option>
-            <option value="AGT-4491">Carlos Mendez (AGT-4491) • Tech/Hardware</option>
-            <option value="AGT-6628">Olivia Taylor (AGT-6628) • Disaster Lead 99%</option>
-            <option value="AGT-2219">Liam O'Connor (AGT-2219) • Care Trainee</option>
-          </select>
+          <div class="agent-select-wrapper">
+            <select id="widget-agent-select" class="widget-agent-select" title="Switch logged-in agent persona">
+              <option value="AGT-8842">Alex Morgan (AGT-8842) • Tech</option>
+              <option value="AGT-4092">Jordan Miller (AGT-4092) • Billing</option>
+              <option value="AGT-9102">Samantha Vance (AGT-9102) • Care</option>
+              <option value="AGT-7740">David Chen (AGT-7740) • Inbound</option>
+              <option value="AGT-6512">Rachel Green (AGT-6512) • Retention</option>
+              <option value="AGT-8819">Marcus Brody (AGT-8819) • Trainee</option>
+              <option value="AGT-3310">Chloe Bennett (AGT-3310) • Senior Lead</option>
+              <option value="AGT-5521">Lucas Wright (AGT-5521) • Billing</option>
+              <option value="AGT-7703">Maya Patel (AGT-7703) • VIP 5.0★</option>
+              <option value="AGT-4491">Carlos Mendez (AGT-4491) • Tech Lead</option>
+              <option value="AGT-6628">Olivia Taylor (AGT-6628) • Disaster 99%</option>
+              <option value="AGT-2219">Liam O'Connor (AGT-2219) • Trainee</option>
+            </select>
+          </div>
           <div class="status-text-row">
-            <span id="agent-state-label" class="state-label">STATUS: AVAILABLE</span>
+            <span id="agent-state-label" class="state-label">AVAILABLE</span>
           </div>
         </div>
       </div>
       <div class="header-tools">
-        <button id="btn-toggle-all-screen" class="btn-xs btn-outline" style="font-weight:700; display:inline-flex; align-items:center; gap:4px; padding:4px 8px; cursor:pointer;" title="Toggle Full Tab (All Screen) / Compact View">
-          🖥️ <span id="toggle-screen-lbl">All Screen</span>
+        <button id="btn-toggle-all-screen" class="btn-tool-pill" title="Toggle Full Tab (All Screen) / Compact View">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          <span id="toggle-screen-lbl">Expand</span>
         </button>
-        <button id="btn-header-alert-settings" class="btn-xs btn-outline" style="font-weight:700; display:inline-flex; align-items:center; justify-content:center; padding:4px 8px; font-size:13px;" title="Break Alert &amp; Mobile Settings">
-          ⚙️<span id="header-alert-pill" style="display:none;"></span>
+        <button id="btn-header-alert-settings" class="btn-tool-pill icon-only" title="Break Alert &amp; Mobile Settings">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span id="header-alert-pill" style="display:none;"></span>
         </button>
-        <a href="/agent-home.html" id="btn-agent-home" class="btn-xs btn-outline" style="text-decoration:none; display:inline-flex; align-items:center; gap:4px; padding:4px 7px; font-weight:700;" title="Agent Bot Home">
-          <img src="/favicon.svg?v=panda2" style="width:14px; height:14px;" /> Home
+        <a href="/agent-home.html" id="btn-agent-home" class="btn-tool-pill" title="Agent Bot Home" style="text-decoration:none;">
+          <img src="/favicon.svg?v=panda2" style="width:13px; height:13px;" alt="Home" />
+          <span>Home</span>
         </a>
       </div>
     </header>
+
+    <!-- NAVIGATION TABS -->
+    <nav class="widget-tabs">
+      <button class="tab-btn active" data-tab="tab-aux" title="AUX Breaks">
+        <svg class="tab-svg-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M10 2v2M14 2v2M6 2v2M18 8a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-1v2a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8h15z"/></svg>
+        <span class="tab-label">AUX</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-alerts" title="Advisories">
+        <span style="position:relative; display:inline-flex; align-items:center;">
+          <svg class="tab-svg-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m3 11 18-5v12L3 14v-3zM11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+          <span id="unread-alert-count" class="tab-badge">0</span>
+        </span>
+        <span class="tab-label">Alerts</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-copilot" title="Ask Shankar">
+        <svg class="tab-svg-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
+        <span class="tab-label">Ask Shankar</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-troubleshoot" title="Knowledge Base">
+        <svg class="tab-svg-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+        <span class="tab-label">Knowledge Base</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-acw" title="After Call Work">
+        <svg class="tab-svg-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>
+        <span class="tab-label">ACW</span>
+      </button>
+    </nav>
 
     <!-- CRITICAL BROADCAST TICKER (SUPERVISOR DISPATCHED ONLY) -->
     <div id="broadcast-ticker" class="broadcast-ticker hidden">
@@ -79,7 +111,7 @@
         <span style="font-size:18px;">🔄</span>
         <div>
           <strong id="wfm-rebalance-title">WFM Schedule Flex: Customer Billing Support</strong>
-          <p id="wfm-rebalance-desc">Temporarily flexed from Customer Service to absorb Billing queue surge. Billing Ask Shankar quick-replies boosted.</p>
+          <p id="wfm-rebalance-desc">Temporarily flexed from Customer Service to absorb Billing queue surge. Billing Ask Shankar playbooks boosted.</p>
         </div>
       </div>
       <button id="btn-ack-rebalance" class="btn-xs btn-outline" style="white-space:nowrap; margin-left:6px;">Got It</button>
@@ -91,7 +123,7 @@
         <span class="traffic-icon">⚡</span>
         <div>
           <strong>High Call Volume Mode Active</strong>
-          <p>ACD queue surge detected. Discretionary AUX restricted. Quick-replies boosted.</p>
+          <p>ACD queue surge detected. Discretionary AUX restricted. Ask Shankar playbooks boosted.</p>
         </div>
       </div>
       <span class="traffic-tag">PEAK LOAD</span>
@@ -137,89 +169,51 @@
       </div>
     </div>
 
-    <!-- NAVIGATION TABS -->
-    <nav class="widget-tabs">
-      <button class="tab-btn active" data-tab="tab-aux" title="AUX Breaks">
-        <span class="tab-icon">☕</span>
-        <span class="tab-label">AUX</span>
-      </button>
-      <button class="tab-btn" data-tab="tab-alerts" title="Advisories">
-        <span class="tab-icon" style="position:relative; display:inline-flex;">📢<span id="unread-alert-count" class="tab-badge">0</span></span>
-        <span class="tab-label">Advisories</span>
-      </button>
-      <button class="tab-btn" data-tab="tab-troubleshoot" title="KBA Articles">
-        <span class="tab-icon">🔧</span>
-        <span class="tab-label">KBA</span>
-      </button>
-      <button class="tab-btn" data-tab="tab-acw" title="After Call Work">
-        <span class="tab-icon">📋</span>
-        <span class="tab-label">ACW</span>
-      </button>
-      <button class="tab-btn" data-tab="tab-copilot" title="Ask Shankar AI">
-        <span class="tab-icon">💬</span>
-        <span class="tab-label">Ask Shankar</span>
-      </button>
-    </nav>
-
-    <!-- TAB 1: COPILOT ASSISTANT -->
+        <!-- TAB 1: COPILOT ASSISTANT (PURE COPILOT STREAM ONLY) -->
     <section id="tab-copilot" class="tab-pane">
-      <!-- Real-Time AI Suggested Replies (Dynamic AI Reply Engine) -->
-      <div class="copilot-box">
-        <div class="copilot-header" style="display:flex; justify-content:space-between; align-items:center;">
-          <div style="display:flex; align-items:center; gap:6px;">
-            <span class="sparkle">✨</span>
-            <span>AI Suggested Replies for Agent</span>
+      <!-- Live Agent Copilot Chat Stream (Full Tab Height) -->
+      <div class="chat-container" id="copilot-chat-container">
+        <!-- Expanded Chat Header Bar with Full Name and Expand Control -->
+        <div class="chat-header-bar">
+          <div class="chat-header-left">
+            <span class="chat-header-badge">✨ Ask Shankar</span>
+            <span class="chat-header-status">● Live Telephony &amp; ServiceNow Active</span>
           </div>
-          <button id="btn-refresh-replies" class="btn-xs btn-outline" style="font-size:10px; padding:2px 6px;" title="Refresh reply suggestions">🔄 Refresh</button>
-        </div>
-
-        <!-- Suggestion Filter Chips -->
-        <div class="suggestion-chips" style="display:flex; gap:4px; overflow-x:auto; padding:6px 0; margin-bottom:6px;">
-          <button class="reply-filter-chip active" data-topic="billing">💳 Billing</button>
-          <button class="reply-filter-chip" data-topic="security">🛡️ PIN / Security</button>
-          <button class="reply-filter-chip" data-topic="outage">⚡ Outage Deflection</button>
-          <button class="reply-filter-chip" data-topic="empathy">🤝 Empathy</button>
-        </div>
-
-        <div class="ai-suggestions-list" id="ai-suggestions">
-          <div class="suggestion-item" data-text="I apologize for the confusion regarding the $25 monthly surcharge. I have applied a one-time adjustment credit to your balance today.">
-            <span class="suggestion-tag">Empathy + Credit Approval</span>
-            <p>"I apologize for the confusion regarding the $25 monthly surcharge. I have applied a one-time adjustment credit to your balance today."</p>
-            <div style="display:flex; gap:6px; margin-top:6px;">
-              <button class="btn-copy">Copy</button>
-            </div>
-          </div>
-          <div class="suggestion-item" data-text="I have verified your account security PIN. Let me guide you to our self-service billing management portal to update your auto-pay method.">
-            <span class="suggestion-tag">Self-Service Link</span>
-            <p>"I have verified your account security PIN. Let me guide you to our self-service billing management portal to update your auto-pay method."</p>
-            <div style="display:flex; gap:6px; margin-top:6px;">
-              <button class="btn-copy">Copy</button>
-            </div>
+          <div class="chat-header-actions">
+            <button id="btn-toggle-chat-expand" class="btn-chat-tool" title="Toggle Full Screen View">
+              <span id="chat-expand-icon">⤢</span>
+              <span id="chat-expand-text">Full Screen</span>
+            </button>
+            <button id="btn-clear-chat" class="btn-chat-tool" title="Clear chat stream">
+              <span>🗑️ Clear</span>
+            </button>
           </div>
         </div>
-      </div>
 
-      <!-- Live Agent Copilot Chat Stream -->
-      <div class="chat-container">
+        <!-- REAL-TIME COPILOT PROMPT CHIPS TOOLBAR -->
+        <div class="copilot-chips-bar">
+          <span class="chips-toolbar-label">⚡ Suggestions:</span>
+          <button class="chat-chip" data-query="Check live status of ServiceNow IT tickets">🎫 ServiceNow Tickets</button>
+          <button class="chat-chip" data-query="What is the frontline credit limit and fee waiver policy?">💳 Credit Limits</button>
+          <button class="chat-chip" data-query="What is the customer authentication and PIN bypass protocol?">🔐 Authentication</button>
+          <button class="chat-chip" data-query="How do I de-escalate an upset customer using the HEAR framework?">🤝 De-escalate</button>
+          <button class="chat-chip" data-query="What is the current queue volume and traffic?">📊 Queue Volume</button>
+          <button class="chat-chip" data-query="What is my schedule adherence and break limit?">⏱️ My Adherence</button>
+          <button class="chat-chip" data-query="What is the storm outage IVR deflection rate?">🌪️ Storm Deflection</button>
+          <button class="chat-chip" data-query="How do I resolve WebRTC one-way audio in MAX softphone?">🎧 Softphone Fix</button>
+          <button class="chat-chip" data-query="What is the supervisor escalation and warm transfer procedure?">📞 Supervisor Transfer</button>
+        </div>
+
         <div class="chat-history" id="chat-history">
           <div class="chat-msg ai">
             <div class="msg-bubble">
-              👋 Hi Alex! I am Ask Shankar, your AI assistant trained on real-time telephony, queue traffic, and adherence telemetry. Ask me anything or select a live topic below:
+              👋 Hi Alex! I am <strong>Ask Shankar</strong>, trained on real-time telephony, queue traffic, adherence telemetry, and ServiceNow ITSM incident records. Click a suggestion above or type your inquiry below:
             </div>
           </div>
         </div>
-        
-        <!-- REAL-TIME COPILOT PROMPT CHIPS -->
-        <div class="copilot-chips-bar">
-          <button class="chat-chip" data-query="What is the current queue volume and traffic?">📊 Queue Volume</button>
-          <button class="chat-chip" data-query="What is my schedule adherence and break limit?">⏱️ My Adherence</button>
-          <button class="chat-chip" data-query="Is dynamic WFM skill rebalance active?">🔄 WFM Skill Flex</button>
-          <button class="chat-chip" data-query="What is the storm outage IVR deflection rate?">🌪️ Storm Deflection</button>
-          <button class="chat-chip" data-query="Show active IT system issue tickets">💻 Open IT Tickets</button>
-        </div>
 
         <div class="chat-input-row">
-          <input type="text" id="chat-input" placeholder="Ask Shankar (e.g. queue volume, my adherence, storm rate)..." />
+          <input type="text" id="chat-input" placeholder="Ask Shankar (e.g. ServiceNow tickets, credit limit, adherence, queue status)..." />
           <button id="btn-send-chat" class="btn-send">➤</button>
         </div>
       </div>
@@ -317,18 +311,25 @@
     <!-- TAB 3: AUX BREAKS & ADHERENCE (READ-ONLY TELEMETRY) -->
     <section id="tab-aux" class="tab-pane active">
       <div class="aux-cta-banner">
-        <h3>Need to Request a Break?</h3>
-        <p>Break requests require authentication and Erlang-C staffing forecast verification via the secure Web Portal.</p>
+        <div class="cta-banner-header">
+          <span class="cta-micro-tag">INTRADAY WFM TELEMETRY</span>
+        </div>
+        <h3>Request Auxiliary Break</h3>
+        <p>Instant Erlang-C staffing evaluation &amp; adherence sync via Web Portal.</p>
         <button id="btn-open-portal" class="btn-portal-launch">
-          <span>🚀</span> Open Web Portal to Apply Break
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <span>Open Web Portal to Apply Break</span>
         </button>
       </div>
 
       <!-- 30-Day Break History Card -->
       <div class="card-section">
         <div class="card-title-row">
-          <h4>🗓️ 30-Day Break History</h4>
-          <span class="badge-readonly" id="break-count-badge">30-Day Audit</span>
+          <h4>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x1="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+            <span>30-Day Break History</span>
+          </h4>
+          <span class="badge-readonly" id="break-count-badge">54 in 30 Days</span>
         </div>
 
         <!-- Filter Chips for 30-Day History -->
@@ -341,9 +342,18 @@
 
         <!-- 30-Day Summary Bar -->
         <div id="break-30d-summary" class="break-summary-bar">
-          <span>30D Breaks: <strong id="sum-total-breaks">--</strong></span>
-          <span>Avg Duration: <strong id="sum-avg-duration">18m</strong></span>
-          <span>Adherence: <strong id="sum-compliance">96.4%</strong></span>
+          <div class="summary-metric-pod">
+            <span class="sum-label">30D Breaks</span>
+            <strong id="sum-total-breaks" class="sum-val">--</strong>
+          </div>
+          <div class="summary-metric-pod">
+            <span class="sum-label">Avg Duration</span>
+            <strong id="sum-avg-duration" class="sum-val">19m</strong>
+          </div>
+          <div class="summary-metric-pod">
+            <span class="sum-label">Adherence</span>
+            <strong id="sum-compliance" class="sum-val sum-val-green">96.4%</strong>
+          </div>
         </div>
 
         <div id="break-history-list" class="break-history-list">

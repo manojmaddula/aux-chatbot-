@@ -1,6 +1,6 @@
 /**
  * floating-widget.js - Global Floating Panda Widget Component
- * Ask Shankar & AUX Assistant Launcher
+ * ZEL Call Center Assist Launcher
  */
 
 (function () {
@@ -44,13 +44,14 @@ function initFloatingWidget() {
     launcher.id = 'floating-panda-launcher';
     launcher.className = 'floating-panda-launcher';
     launcher.setAttribute('role', 'button');
-    launcher.setAttribute('aria-label', 'Toggle Ask Shankar & AUX Assistant');
+    launcher.setAttribute('aria-label', 'Toggle ZEL Call Center Assist');
+    launcher.setAttribute('title', 'ZEL');
     launcher.setAttribute('tabindex', '0');
     launcher.innerHTML = `
-      <img src="/favicon.svg?v=panda2" alt="Ask Shankar" class="floating-panda-img" />
+      <img src="/favicon.svg?v=panda2" alt="ZEL" class="floating-panda-img" />
       <span class="floating-panda-status-dot" title="NICE CXone Telephony Live"></span>
       <div class="floating-panda-tooltip">
-        <span>🐼</span> <strong>Ask Shankar & AUX Assistant</strong>
+        <span>🐼</span> <strong>ZEL Call Center Assist</strong>
       </div>
     `;
 
@@ -65,7 +66,7 @@ function initFloatingWidget() {
             <img src="/favicon.svg?v=panda2" alt="Panda Logo" />
           </div>
           <div class="fp-header-title-box">
-            <span class="fp-header-title">ZEL Ask Shankar & AUX Assistant</span>
+            <span class="fp-header-title">ZEL Call Center Assist</span>
             <span class="fp-header-subtitle">
               <span class="dot"></span> Connected to Telephony CTI
             </span>
@@ -77,16 +78,31 @@ function initFloatingWidget() {
         </div>
       </div>
       <div class="floating-panda-panel-body">
-        <iframe id="floating-panda-iframe" class="floating-panda-iframe" src="/widget.html" title="Agent Ask Shankar & AUX Assistant"></iframe>
+        <iframe id="floating-panda-iframe" class="floating-panda-iframe" src="/widget.html" title="Agent ZEL Call Center Assist"></iframe>
       </div>
     `;
 
-    // Hide launcher button on agent-home (since page has dedicated Launch button)
-    if (window.location.pathname.includes('agent-home.html')) {
-      launcher.style.display = 'none';
-    }
+// Launcher enabled on all pages
     document.body.appendChild(launcher);
     document.body.appendChild(panel);
+
+    // Restore saved drag position from localStorage
+    try {
+      const savedPos = localStorage.getItem('floating_launcher_pos');
+      if (savedPos) {
+        const p = JSON.parse(savedPos);
+        if (typeof p.left === 'number' && typeof p.top === 'number') {
+          const btnSize = 62;
+          const pad = 8;
+          const sLeft = Math.min(Math.max(pad, p.left), window.innerWidth - btnSize - pad);
+          const sTop = Math.min(Math.max(pad, p.top), window.innerHeight - btnSize - pad);
+          launcher.style.left = sLeft + 'px';
+          launcher.style.top = sTop + 'px';
+          launcher.style.right = 'auto';
+          launcher.style.bottom = 'auto';
+        }
+      }
+    } catch (err) {}
 
     const iframe = document.getElementById('floating-panda-iframe');
     const btnPopout = document.getElementById('fp-btn-popout');
@@ -193,7 +209,7 @@ function initFloatingWidget() {
       } catch (err) {}
     }
 
-    // Drag-and-drop capability for launcher button
+    // Robust drag-and-drop capability for launcher button
     let isDragging = false;
     let startX = 0;
     let startY = 0;
@@ -202,45 +218,53 @@ function initFloatingWidget() {
     let hasMoved = false;
 
     function onPointerDown(e) {
-      if (e.button && e.button !== 0) return; // Only primary mouse button
+      if (e.button && e.button !== 0 && e.pointerType === 'mouse') return; // Only primary mouse button
       isDragging = true;
       hasMoved = false;
       launcher.classList.add('is-dragging');
 
+      // Temporarily disable panel pointer-events so iframe never steals pointer events during drag!
+      if (panel) panel.style.pointerEvents = 'none';
+      document.body.style.userSelect = 'none';
+
+      // Capture pointer so moving outside the launcher or over iframes is never lost
+      try {
+        launcher.setPointerCapture(e.pointerId);
+      } catch (err) {}
+
       const rect = launcher.getBoundingClientRect();
       initialLeft = rect.left;
       initialTop = rect.top;
-      startX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
-      startY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
+      startX = e.clientX;
+      startY = e.clientY;
 
-      window.addEventListener('pointermove', onPointerMove);
+      window.addEventListener('pointermove', onPointerMove, { passive: false });
       window.addEventListener('pointerup', onPointerUp);
-      window.addEventListener('touchmove', onPointerMove, { passive: false });
-      window.addEventListener('touchend', onPointerUp);
+      window.addEventListener('pointercancel', onPointerUp);
     }
 
     function onPointerMove(e) {
       if (!isDragging) return;
-      const clientX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
-      const clientY = e.clientY || (e.touches && e.touches[0].clientY) || 0;
-      const deltaX = clientX - startX;
-      const deltaY = clientY - startY;
+      const deltaX = e.clientX - startX;
+      const deltaY = e.clientY - startY;
 
-      if (Math.abs(deltaX) > 6 || Math.abs(deltaY) > 6) {
+      if (Math.abs(deltaX) > 4 || Math.abs(deltaY) > 4) {
         hasMoved = true;
         if (e.cancelable) e.preventDefault();
       }
 
       if (hasMoved) {
-        const newLeft = Math.min(Math.max(10, initialLeft + deltaX), window.innerWidth - 72);
-        const newTop = Math.min(Math.max(10, initialTop + deltaY), window.innerHeight - 72);
+        const btnSize = launcher.offsetWidth || 62;
+        const pad = 10;
+        const maxLeft = window.innerWidth - btnSize - pad;
+        const maxTop = window.innerHeight - btnSize - pad;
+        const newLeft = Math.min(Math.max(pad, initialLeft + deltaX), maxLeft);
+        const newTop = Math.min(Math.max(pad, initialTop + deltaY), maxTop);
+
         launcher.style.left = newLeft + 'px';
         launcher.style.top = newTop + 'px';
         launcher.style.right = 'auto';
         launcher.style.bottom = 'auto';
-
-        // Also adjust panel position if dragged
-        adjustPanelPosition(newLeft, newTop);
       }
     }
 
@@ -249,44 +273,53 @@ function initFloatingWidget() {
       isDragging = false;
       launcher.classList.remove('is-dragging');
 
+      try {
+        launcher.releasePointerCapture(e.pointerId);
+      } catch (err) {}
+
       window.removeEventListener('pointermove', onPointerMove);
       window.removeEventListener('pointerup', onPointerUp);
-      window.removeEventListener('touchmove', onPointerMove);
-      window.removeEventListener('touchend', onPointerUp);
+      window.removeEventListener('pointercancel', onPointerUp);
 
-      if (!hasMoved) {
+      document.body.style.userSelect = '';
+      if (panel) panel.style.pointerEvents = isOpen ? 'auto' : 'none';
+
+      if (hasMoved) {
+        const rect = launcher.getBoundingClientRect();
+        adjustPanelPosition(rect.left, rect.top);
+        try {
+          localStorage.setItem('floating_launcher_pos', JSON.stringify({ left: rect.left, top: rect.top }));
+        } catch (err) {}
+      } else {
         togglePanel();
       }
     }
 
     function adjustPanelPosition(launcherLeft, launcherTop) {
+      if (!panel) return;
       const panelWidth = isExpanded ? 620 : 440;
       const panelHeight = isExpanded ? 740 : 680;
 
       // Position panel intelligently based on launcher quadrant
       if (launcherLeft < window.innerWidth / 2) {
-        // Place panel on the right side of launcher
         panel.style.left = Math.min(window.innerWidth - panelWidth - 16, Math.max(16, launcherLeft)) + 'px';
         panel.style.right = 'auto';
       } else {
-        // Place panel on the right edge
         panel.style.right = Math.min(window.innerWidth - 20, Math.max(20, window.innerWidth - launcherLeft - 72)) + 'px';
         panel.style.left = 'auto';
       }
 
       if (launcherTop < window.innerHeight / 2) {
-        // Place below launcher
         panel.style.top = Math.min(window.innerHeight - panelHeight - 16, launcherTop + 72) + 'px';
         panel.style.bottom = 'auto';
       } else {
-        // Place above launcher
         panel.style.bottom = Math.min(window.innerHeight - 20, Math.max(20, window.innerHeight - launcherTop + 10)) + 'px';
         panel.style.top = 'auto';
       }
     }
 
     launcher.addEventListener('pointerdown', onPointerDown);
-    launcher.addEventListener('touchstart', onPointerDown, { passive: true });
+    launcher.addEventListener('dragstart', (e) => e.preventDefault());
 
     // Keyboard accessibility
     launcher.addEventListener('keydown', (e) => {

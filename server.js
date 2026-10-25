@@ -19,7 +19,7 @@ function getLocalNetworkIp() {
   return 'localhost';
 }
 
-const PORT = 4000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 4000;
 const PUBLIC_DIR = path.join(__dirname, 'src');
 
 // Agent to Supervisor Mapping (Team Tagging)
@@ -319,6 +319,99 @@ const wfmQueueBalanceState = {
 const agentRequestLog = new Map();
 
 // Centralized IT System Issue Incidents Store
+const SERVICENOW_TICKETS = [
+  {
+    id: 'INC-88102',
+    type: 'Incident',
+    agentId: 'AGT-4491',
+    agentName: 'Carlos Mendez',
+    queue: 'Tier-2 Tech Support',
+    category: 'Cisco AnyConnect VPN Error 412',
+    severity: 'P2 - High',
+    status: 'IN_PROGRESS',
+    statusLabel: 'In Progress',
+    statusBadgeColor: '#f59e0b',
+    assignedTo: 'Network Engineering Tier-3',
+    assignedEngineer: 'Marcus Vance',
+    openedAt: 'Today 09:14 AM',
+    slaTarget: '2 Hours (Remaining: 34m)',
+    description: 'MTU mismatch on Wi-Fi adapter causing WebRTC voice packet drops during customer calls.',
+    workNotes: 'Engineers deployed MTU 1350 patch to adapter registry. Verifying WebRTC packet trace.'
+  },
+  {
+    id: 'INC-88103',
+    type: 'Incident',
+    agentId: 'AGT-9102',
+    agentName: 'Samantha Vance',
+    queue: 'General Customer Service',
+    category: 'Citrix Workspace Display Driver Freeze',
+    severity: 'P3 - Moderate',
+    status: 'RESOLVED',
+    statusLabel: 'Resolved',
+    statusBadgeColor: '#10b981',
+    assignedTo: 'VDI Desktop Support',
+    assignedEngineer: 'Kevin Zhao',
+    openedAt: 'Today 10:20 AM',
+    slaTarget: '4 Hours (Met in 42m)',
+    description: 'Virtual display driver frozen on reconnect after scheduled lunch interval.',
+    workNotes: 'VDI broker session hard-reset completed. Agent successfully re-authenticated.'
+  },
+  {
+    id: 'INC-90421',
+    type: 'Incident',
+    agentId: 'AGT-8842',
+    agentName: 'Alex Morgan',
+    queue: 'Tier-2 Tech Support',
+    category: 'CXone MAX Softphone WebRTC UDP Packet Loss',
+    severity: 'P1 - Critical',
+    status: 'INVESTIGATING',
+    statusLabel: 'Under Investigation',
+    statusBadgeColor: '#ef4444',
+    assignedTo: 'Core Telephony Systems Ops',
+    assignedEngineer: 'DevOps Primary On-Call',
+    openedAt: 'Today 11:05 AM',
+    slaTarget: '1 Hour (Remaining: 18m)',
+    description: 'One-way audio reported on incoming contact #90421 due to UDP 10000-20000 firewall jitter.',
+    workNotes: 'Network router QoS prioritization rule applied. Telephony gateway responding normally.'
+  },
+  {
+    id: 'INC-77401',
+    type: 'Incident',
+    agentId: 'AGT-7740',
+    agentName: 'David Chen',
+    queue: 'General Customer Service',
+    category: 'Okta SSO / Duo MFA Desynchronization',
+    severity: 'P2 - High',
+    status: 'IN_PROGRESS',
+    statusLabel: 'In Progress',
+    statusBadgeColor: '#f59e0b',
+    assignedTo: 'Identity & Access Management (IAM)',
+    assignedEngineer: 'Sarah Lin',
+    openedAt: 'Today 08:30 AM',
+    slaTarget: '2 Hours (Remaining: 45m)',
+    description: 'Duo MFA push notifications timing out on mobile token generator.',
+    workNotes: 'Reset MFA token seed. Awaiting agent biometric confirmation.'
+  },
+  {
+    id: 'RITM-40291',
+    type: 'Service Request',
+    agentId: 'AGT-4092',
+    agentName: 'Jordan Miller',
+    queue: 'Customer Billing & Retention',
+    category: 'Hardware Logistics: Plantronics Headset Replacement',
+    severity: 'P4 - Low',
+    status: 'DISPATCHED',
+    statusLabel: 'Dispatched / In Transit',
+    statusBadgeColor: '#2563eb',
+    assignedTo: 'Hardware Logistics Depot',
+    assignedEngineer: 'Depot Fulfillment',
+    openedAt: 'Yesterday 04:15 PM',
+    slaTarget: '24 Hours (On Schedule)',
+    description: 'Replacement noise-canceling USB-C headset ordered under warranty exchange.',
+    workNotes: 'FedEx Tracking #748920192841 dispatched. Expected delivery by 02:00 PM.'
+  }
+];
+
 const itIncidents = [
   {
     id: 'INC-88102',
@@ -407,6 +500,9 @@ const server = http.createServer((req, res) => {
           supervisorName: supInfo.supervisorName,
           auxCode: payload.auxCode,
           durationMinutes: payload.durationMinutes,
+          durationSeconds: payload.durationSeconds || 0,
+          durationTotalSeconds: payload.durationTotalSeconds || (payload.durationMinutes * 60),
+          durationFormatted: payload.durationFormatted || (payload.durationMinutes + 'm'),
           status: decision.status,
           reason: decision.description,
           metrics: decision.metrics
@@ -490,15 +586,33 @@ const server = http.createServer((req, res) => {
   if (pathname === '/api/server-info' && req.method === 'GET') {
     const localIp = getLocalNetworkIp();
     let tunnelUrl = null;
-    try {
-      const tunnelFile = path.join(__dirname, 'tunnel.json');
-      if (fs.existsSync(tunnelFile)) {
-        const tData = JSON.parse(fs.readFileSync(tunnelFile, 'utf8'));
-        if (tData && tData.tunnelUrl) {
-          tunnelUrl = tData.tunnelUrl.replace(/\/+$/, '');
+
+    // 1. Auto-detect live tunnel from request headers (if accessed via cloudflare tunnel)
+    const reqHost = req.headers['x-forwarded-host'] || req.headers.host || '';
+    if (reqHost.includes('.trycloudflare.com')) {
+      const proto = req.headers['x-forwarded-proto'] || 'https';
+      tunnelUrl = `${proto}://${reqHost}`;
+      try {
+        fs.writeFileSync(path.join(__dirname, 'tunnel.json'), JSON.stringify({
+          tunnelUrl: tunnelUrl,
+          mobileUrl: `${tunnelUrl}/mobile-alert.html`,
+          updatedAt: new Date().toISOString()
+        }, null, 2), 'utf8');
+      } catch (e) {}
+    }
+
+    // 2. Read from tunnel.json if not accessed directly via tunnel header
+    if (!tunnelUrl) {
+      try {
+        const tunnelFile = path.join(__dirname, 'tunnel.json');
+        if (fs.existsSync(tunnelFile)) {
+          const tData = JSON.parse(fs.readFileSync(tunnelFile, 'utf8'));
+          if (tData && tData.tunnelUrl) {
+            tunnelUrl = tData.tunnelUrl.replace(/\/+$/, '');
+          }
         }
-      }
-    } catch (e) {}
+      } catch (e) {}
+    }
 
     const localUrl = `http://${localIp}:${PORT}/mobile-alert.html`;
     const primaryMobileUrl = tunnelUrl ? `${tunnelUrl}/mobile-alert.html` : localUrl;
@@ -975,6 +1089,33 @@ const server = http.createServer((req, res) => {
         const aId = payload.agentId || 'AGT-8842';
         const userResp = (payload.response || '').toUpperCase(); // 'YES' or 'NO'
 
+        // If quota is already fulfilled, close survey for all non-accepted agents!
+        if (activeEmergencyRecall.active && activeEmergencyRecall.quotaFulfilled) {
+          const existing = activeEmergencyRecall.agents[aId];
+          if (existing && existing.response === 'YES') {
+            res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+            res.end(JSON.stringify({
+              success: true,
+              agentId: aId,
+              response: 'YES',
+              status: 'ACCEPTED',
+              shiftTimings: existing.shiftTimings,
+              queueTarget: existing.queueTarget,
+              quotaFulfilled: true,
+              message: `Availability confirmed! Your shift timings are ${existing.shiftTimings}.`
+            }));
+            return;
+          }
+          res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+          res.end(JSON.stringify({
+            success: false,
+            quotaFulfilled: true,
+            closed: true,
+            message: 'Staffing quota has already been secured. The survey is closed.'
+          }));
+          return;
+        }
+
         if (!activeEmergencyRecall.active) {
           activeEmergencyRecall.active = true;
           activeEmergencyRecall.id = 'EMERG-' + Date.now();
@@ -1009,6 +1150,11 @@ const server = http.createServer((req, res) => {
         if (isQuotaMet) {
           activeEmergencyRecall.quotaFulfilled = true;
           activeEmergencyRecall.quotaFulfilledAt = activeEmergencyRecall.quotaFulfilledAt || new Date().toISOString();
+          Object.keys(activeEmergencyRecall.agents).forEach(id => {
+            if (activeEmergencyRecall.agents[id].status === 'PENDING') {
+              activeEmergencyRecall.agents[id].status = 'QUOTA_CLOSED';
+            }
+          });
         }
 
         // Broadcast updated response to supervisor portal
@@ -1551,6 +1697,106 @@ const AGENT_ROSTER_TELEMETRY = {
   'AGT-2219': { name: 'Liam O\'Connor', queue: 'General Customer Service', adherence: '76.5%', teaBreaks: '2 / 2', lunchVariance: '+12 mins', freq: '1 / 3', status: 'Care Trainee / Coaching' }
 };
 
+function extractServiceNowTicketId(query) {
+  if (!query) return null;
+  const q = query.trim();
+
+  // Pattern 1: Explicit prefixes INC, RITM, REQ, TASK, CHG
+  const prefixMatch = q.match(/\b(INC|RITM|REQ|TASK|CHG)[-_\s]?(\d{3,8})\b/i);
+  if (prefixMatch) {
+    return `${prefixMatch[1].toUpperCase()}-${prefixMatch[2]}`;
+  }
+
+  // Pattern 2: Contextual keywords like "ticket 12345" or "incident #88102"
+  const wordMatch = q.match(/\b(?:ticket|incident|case|issue|req|request)\s*#?\s*(\d{3,8})\b/i);
+  if (wordMatch) {
+    return `INC-${wordMatch[1]}`;
+  }
+
+  // Pattern 3: Hashtag like "#90421"
+  const hashMatch = q.match(/#(\d{4,8})\b/);
+  if (hashMatch) {
+    return `INC-${hashMatch[1]}`;
+  }
+
+  // Pattern 4: Bare number like "88102" or "55421"
+  const bareMatch = q.match(/^\s*(\d{4,8})\s*$/);
+  if (bareMatch) {
+    return `INC-${bareMatch[1]}`;
+  }
+
+  return null;
+}
+
+function getOrGenerateServiceNowTicket(ticketId, agentId = 'AGT-8842') {
+  if (!ticketId) return null;
+  const cleanId = ticketId.toUpperCase();
+
+  // 1. Check seeded tickets first
+  const existing = SERVICENOW_TICKETS.find(t => t.id === cleanId || t.id.replace('-', '') === cleanId.replace('-', ''));
+  if (existing) return existing;
+
+  // 2. Generate deterministic ticket data based on number
+  const numStr = cleanId.replace(/\D/g, '') || '88421';
+  const num = parseInt(numStr, 10);
+
+  const categories = [
+    { cat: 'CXone WebRTC Softphone: UDP Jitter & Voice Stream Latency', grp: 'Core Telephony Systems Ops', eng: 'David Kim (On-Call)', sev: 'P1 - Critical', prioBadge: '#ef4444' },
+    { cat: 'Cisco AnyConnect VPN: IPsec MTU Tunnel Fragmentation (Error 412)', grp: 'Network Infrastructure Tier-3', eng: 'Marcus Vance', sev: 'P2 - High', prioBadge: '#f59e0b' },
+    { cat: 'Okta SSO / Duo MFA: Security Token Clock Skew Desync', grp: 'Identity & Access Management (IAM)', eng: 'Sarah Lin', sev: 'P2 - High', prioBadge: '#f59e0b' },
+    { cat: 'Citrix Workspace VDI: Virtual GPU Display Driver Crash', grp: 'VDI & Desktop Virtualization Support', eng: 'Kevin Zhao', sev: 'P3 - Moderate', prioBadge: '#2563eb' },
+    { cat: 'Salesforce CRM CTI Connector: Screen-Pop Socket Disconnect', grp: 'Enterprise CRM Integrations', eng: 'Priya Sharma', sev: 'P2 - High', prioBadge: '#f59e0b' },
+    { cat: 'Hardware Logistics: Noise-Canceling USB-C Headset Replacement', grp: 'Hardware Depot & Field Dispatch', eng: 'Logistics Depot', sev: 'P4 - Low', prioBadge: '#10b981' },
+    { cat: 'Fiber Gateway Modem: Residential Bandwidth Provisioning Error', grp: 'Broadband NOC Engineering', eng: 'Tyler Brooks', sev: 'P3 - Moderate', prioBadge: '#2563eb' },
+    { cat: 'NICE WFM Adherence: Real-Time Telemetry Feed Synchronization', grp: 'Workforce Technology Services', eng: 'Elena Rostova', sev: 'P2 - High', prioBadge: '#f59e0b' }
+  ];
+
+  const statuses = [
+    { status: 'IN_PROGRESS', label: 'In Progress', color: '#f59e0b' },
+    { status: 'INVESTIGATING', label: 'Under Investigation', color: '#ef4444' },
+    { status: 'ASSIGNED', label: 'Assigned / Under Review', color: '#2563eb' },
+    { status: 'RESOLVED', label: 'Resolved / Fix Applied', color: '#10b981' },
+    { status: 'PENDING_VENDOR', label: 'Pending Hardware Dispatch', color: '#f59e0b' }
+  ];
+
+  const catObj = categories[num % categories.length];
+  const statObj = statuses[(num >> 2) % statuses.length];
+  const type = cleanId.startsWith('RITM') || cleanId.startsWith('REQ') ? 'Service Request' : 'Incident';
+
+  const minsRemaining = 15 + (num % 85);
+  const slaTarget = statObj.status === 'RESOLVED' ? 'Resolved within SLA (Met in 38m)' : `${minsRemaining}m remaining against 2h SLA`;
+
+  const workNotesList = [
+    `Diagnostics captured. Telephony QoS gateway prioritized. Network trace indicates 0% packet loss on regional node.`,
+    `Agent configuration updated. Registry MTU patch verified. System diagnostics operating normally.`,
+    `Session state purged and recreated on primary cluster. Awaiting agent confirmation.`,
+    `Telemetry logs reviewed. Carrier dispatch verified local fiber node online. Monitoring contact stability.`
+  ];
+  const workNotes = workNotesList[num % workNotesList.length];
+
+  const profile = (typeof AGENT_ROSTER_TELEMETRY !== 'undefined' && AGENT_ROSTER_TELEMETRY[agentId]) || 
+                  { name: 'Alex Morgan', queue: 'Tier-2 Tech Support' };
+
+  return {
+    id: cleanId,
+    type,
+    agentId,
+    agentName: profile.name,
+    queue: profile.queue,
+    category: catObj.cat,
+    severity: catObj.sev,
+    status: statObj.status,
+    statusLabel: statObj.label,
+    statusBadgeColor: statObj.color,
+    assignedTo: catObj.grp,
+    assignedEngineer: catObj.eng,
+    openedAt: 'Today 09:30 AM',
+    slaTarget,
+    description: `Reported issue: ${catObj.cat}. Automatically ingested from agent workstation telemetry.`,
+    workNotes
+  };
+}
+
 function evaluateCopilotQuery(payload) {
   const query = (payload.query || '').trim();
   const qLower = query.toLowerCase();
@@ -1566,7 +1812,7 @@ function evaluateCopilotQuery(payload) {
   const isRebalanced = wfmQueueBalanceState.isRebalanced;
 
   // ==========================================
-  // SUPERVISOR REQUIREMENT 1: SINGLE AGENT QUERIES
+  // 1. SINGLE AGENT 360° PROFILE DOSSIERS
   // ==========================================
   const agentKeys = Object.keys(AGENT_ROSTER_TELEMETRY);
   let matchedAgentKey = null;
@@ -1594,7 +1840,7 @@ function evaluateCopilotQuery(payload) {
     let actionRecommendation = '';
     if (qa.tone.includes('Rudely') || qa.tone.includes('Bad') || qa.qaScore < 60) {
       actionRecommendation = `<div style="background:#fef2f2; border:1px solid #fecaca; border-radius:6px; padding:8px 10px; margin-top:8px; color:#991b1b; font-size:11px;">
-        <strong>🚨 Supervisor Action Recommended:</strong> Immediate coaching required on tone & verification. Discretionary break requests should be throttled until shift adherence recovers &ge;85%.
+        <strong>🚨 Supervisor Action Recommended:</strong> Immediate coaching required on tone &amp; customer verification. Discretionary break requests should be throttled until shift adherence recovers &ge;85%.
       </div>`;
     } else if (ag.adherence.includes('7') || ag.lunchVariance.includes('+25')) {
       actionRecommendation = `<div style="background:#fffbeb; border:1px solid #fde68a; border-radius:6px; padding:8px 10px; margin-top:8px; color:#92400e; font-size:11px;">
@@ -1613,7 +1859,7 @@ function evaluateCopilotQuery(payload) {
       `• <strong>Schedule Adherence</strong>: <strong style="color:${adherenceColor};">${ag.adherence}</strong> (Target: &ge;${activeShiftPolicy.targetAdherence}%)<br/>` +
       `• <strong>Breaks Logged Today</strong>: <strong>${ag.teaBreaks} AUX Breaks</strong> | Lunch Variance: <strong>${ag.lunchVariance}</strong><br/>` +
       `• <strong>Interaction Speech Tone</strong>: <strong style="color:${toneColor};">${qa.tone}</strong><br/>` +
-      `• <strong>Customer CSAT & QA Score</strong>: <strong>★ ${qa.ivrStars.toFixed(1)} / 5.0</strong> | QA: <strong style="color:${qaColor};">${qa.qaScore}%</strong><br/>` +
+      `• <strong>Customer CSAT &amp; QA Score</strong>: <strong>★ ${qa.ivrStars.toFixed(1)} / 5.0</strong> | QA: <strong style="color:${qaColor};">${qa.qaScore}%</strong><br/>` +
       `• <strong>Open IT Incidents</strong>: ${itTicket ? `<span style="color:#ef4444; font-weight:700;">${itTicket.id} (${itTicket.category} - ${itTicket.status})</span>` : 'None (Hardware Normal)'}<br/>` +
       actionRecommendation;
 
@@ -1621,14 +1867,14 @@ function evaluateCopilotQuery(payload) {
   }
 
   // ==========================================
-  // SUPERVISOR REQUIREMENT 2: NON-DASHBOARD REPORTS & DEEP DATA
+  // 2. SUPERVISOR DEEP INSIGHT REPORTS
   // ==========================================
 
   // Report A: Tone vs CSAT Correlation Report
   if (qLower.includes('correlation') || qLower.includes('tone vs') || qLower.includes('csat report') || qLower.includes('sentiment vs') || qLower.includes('tone_csat_report')) {
     let text = `📈 <strong>Executive Insight: Speech Tone vs Customer CSAT Correlation Report</strong><br/>` +
-      `<p style="font-size:11px; color:#475569; margin:4px 0 8px 0;">Cross-correlation analysis across 140 post-call IVR survey responses and automated speech emotion detection.</p>` +
-      `<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px; font-size:11px; margin-bottom:8px;">` +
+      `<p style="font-size:11px; color:#1e3a8a; margin:4px 0 8px 0;">Cross-correlation analysis across 140 post-call IVR survey responses and automated speech emotion detection.</p>` +
+      `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin-bottom:8px; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
       `• <strong>Empathetic / Professional Tone (66.7% of agents)</strong>: Average CSAT <strong>★ 4.90 / 5.0</strong> | First Call Resolution: <strong>100%</strong> | Repeat Transfer Rate: <strong>2.1%</strong><br/>` +
       `• <strong>Neutral / Direct Tone (16.7% of agents)</strong>: Average CSAT <strong>★ 3.70 / 5.0</strong> | First Call Resolution: <strong>80%</strong> | Repeat Transfer Rate: <strong>8.4%</strong><br/>` +
       `• <strong>Rudely / Impatient / Confused Tone (16.6% of agents)</strong>: Average CSAT <strong>★ 1.83 / 5.0</strong> | First Call Resolution: <strong>0%</strong> | Repeat Transfer Rate: <strong>41.2%</strong>` +
@@ -1639,12 +1885,12 @@ function evaluateCopilotQuery(payload) {
 
   // Report B: Burnout & Fatigue Risk Analysis
   if (qLower.includes('burnout') || qLower.includes('fatigue') || qLower.includes('stress') || qLower.includes('overworked') || qLower.includes('burnout_report')) {
-    let text = `⚠️ <strong>Floor-Wide Agent Burnout & Fatigue Risk Report</strong><br/>` +
-      `<p style="font-size:11px; color:#475569; margin:4px 0 8px 0;">Algorithm evaluates consecutive call handling minutes, handle time variance, and missed discretionary break intervals.</p>` +
-      `<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px; font-size:11px; margin-bottom:8px;">` +
+    let text = `⚠️ <strong>Floor-Wide Agent Burnout &amp; Fatigue Risk Report</strong><br/>` +
+      `<p style="font-size:11px; color:#1e3a8a; margin:4px 0 8px 0;">Algorithm evaluates consecutive call handling minutes, handle time variance, and missed discretionary break intervals.</p>` +
+      `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin-bottom:8px; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
       `• <strong>High Fatigue Risk (Tier-1 Alert)</strong>: <strong>Samantha Vance (AGT-9102)</strong> — 4.2 consecutive hours on high-load billing queue, missed 15:00 aux break, ACW handle time expanding (+28s).<br/>` +
       `• <strong>Moderate Fatigue Risk</strong>: <strong>Carlos Mendez (AGT-4491)</strong> — Continuous VPN troubleshooting calls with zero AUX downtime today.<br/>` +
-      `• <strong>Optimal Energy Level</strong>: 10 of 12 agents operating with healthy break distribution and nominal occupancy (<82%).` +
+      `• <strong>Optimal Energy Level</strong>: 10 of 12 agents operating with healthy break distribution and nominal occupancy (&lt;82%).` +
       `</div>` +
       `<strong>Recommendation:</strong> Schedule an immediate 15-minute bio/aux break for Samantha Vance to prevent ACW degradation and customer escalation.`;
     return { success: true, answer: text, category: 'burnout_risk' };
@@ -1652,12 +1898,12 @@ function evaluateCopilotQuery(payload) {
 
   // Report C: Intraday Erlang-C Staffing Deficit Projection
   if (qLower.includes('erlang') || qLower.includes('deficit') || qLower.includes('projection') || qLower.includes('understaff') || qLower.includes('forecast') || qLower.includes('erlang_report')) {
-    let text = `🎯 <strong>Intraday Erlang-C Staffing Deficit & Capacity Projection</strong><br/>` +
-      `<p style="font-size:11px; color:#475569; margin:4px 0 8px 0;">Calculates projected call arrivals against required human FTEs in 15-minute intervals across all active skills.</p>` +
-      `<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px; font-size:11px; margin-bottom:8px;">` +
-      `• <strong>Customer Billing Peak (10:00 - 11:30)</strong>: Projected Volume: <strong>320 calls/hr</strong> | Required FTEs: <strong>7.2</strong> | Assigned: <strong>4</strong> &rarr; <span style="color:#ef4444; font-weight:700;">Deficit: -3.2 FTEs (SLA risk: <40%)</span><br/>` +
+    let text = `🎯 <strong>Intraday Erlang-C Staffing Deficit &amp; Capacity Projection</strong><br/>` +
+      `<p style="font-size:11px; color:#1e3a8a; margin:4px 0 8px 0;">Calculates projected call arrivals against required human FTEs in 15-minute intervals across all active skills.</p>` +
+      `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin-bottom:8px; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
+      `• <strong>Customer Billing Peak (10:00 - 11:30)</strong>: Projected Volume: <strong>320 calls/hr</strong> | Required FTEs: <strong>7.2</strong> | Assigned: <strong>4</strong> &rarr; <span style="color:#ef4444; font-weight:700;">Deficit: -3.2 FTEs (SLA risk: &lt;40%)</span><br/>` +
       `• <strong>General Customer Service (10:00 - 11:30)</strong>: Projected Volume: <strong>45 calls/hr</strong> | Required FTEs: <strong>2.0</strong> | Assigned: <strong>5</strong> &rarr; <span style="color:#10b981; font-weight:700;">Surplus: +3.0 FTEs (Occupancy: 28%)</span><br/>` +
-      `• <strong>Tech Support & Emergency Queues</strong>: Staffing matched to Erlang-C target (80% SLA in 20s).` +
+      `• <strong>Tech Support &amp; Emergency Queues</strong>: Staffing matched to Erlang-C target (80% SLA in 20s).` +
       `</div>` +
       `<strong>Resolution:</strong> Execute Intraday Skill Flex (3 CS agents to Billing) to completely neutralize the -3.2 FTE deficit without costly overtime.`;
     return { success: true, answer: text, category: 'erlang_deficit_projection' };
@@ -1666,8 +1912,8 @@ function evaluateCopilotQuery(payload) {
   // Report D: Chronic Adherence Outliers & Repeat Violators
   if (qLower.includes('outlier') || qLower.includes('violator') || qLower.includes('chronic') || qLower.includes('repeat overage') || qLower.includes('adherence_outliers')) {
     let text = `🚨 <strong>Chronic Schedule Adherence Outliers Audit (Past 14 Days)</strong><br/>` +
-      `<p style="font-size:11px; color:#475569; margin:4px 0 8px 0;">Identifies repeat behavioral anomalies across aux break quotas, lunch overages, and CTI login punctuality.</p>` +
-      `<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px; font-size:11px; margin-bottom:8px;">` +
+      `<p style="font-size:11px; color:#1e3a8a; margin:4px 0 8px 0;">Identifies repeat behavioral anomalies across aux break quotas, lunch overages, and CTI login punctuality.</p>` +
+      `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin-bottom:8px; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
       `1. <strong>Jordan Miller (AGT-4092)</strong>: <strong>78.5% Adherence</strong> | 4 AUX Breaks today (Limit: 2) | Pattern: 3rd occurrence this week.<br/>` +
       `2. <strong>Samantha Vance (AGT-9102)</strong>: <strong>71.2% Adherence</strong> | +25 mins Lunch Variance | Barred from self-service lunch grants.<br/>` +
       `3. <strong>David Chen (AGT-7740)</strong>: <strong>68.0% Adherence</strong> | Frequent mid-shift CTI disconnects (Throttle active).` +
@@ -1678,31 +1924,240 @@ function evaluateCopilotQuery(payload) {
 
   // Report E: Cross-Queue Multi-Skill Flex Readiness Matrix
   if (qLower.includes('matrix') || qLower.includes('multi-skill') || qLower.includes('readiness') || qLower.includes('cross-trained') || qLower.includes('multiskill_matrix')) {
-    let text = `⚡ <strong>Multi-Skill Cross-Training & Dynamic Flex Readiness Matrix</strong><br/>` +
-      `<p style="font-size:11px; color:#475569; margin:4px 0 8px 0;">Real-time inventory of agents cross-certified to handle secondary surge queues.</p>` +
-      `<div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px; font-size:11px; margin-bottom:8px;">` +
-      `• <strong>Samantha Vance (AGT-9102)</strong>: Base: Customer Service &bull; Certified Secondary: <strong>Billing & Payments (Level 2)</strong> &bull; Flex Ready: <strong style="color:#10b981;">YES</strong><br/>` +
-      `• <strong>Rachel Green (AGT-6512)</strong>: Base: Customer Service &bull; Certified Secondary: <strong>Billing & Payments (Level 3)</strong> &bull; Flex Ready: <strong style="color:#10b981;">YES</strong><br/>` +
-      `• <strong>Marcus Brody (AGT-8819)</strong>: Base: Customer Service &bull; Certified Secondary: <strong>Billing & Payments (Level 1)</strong> &bull; Flex Ready: <strong style="color:#10b981;">YES</strong><br/>` +
+    let text = `⚡ <strong>Multi-Skill Cross-Training &amp; Dynamic Flex Readiness Matrix</strong><br/>` +
+      `<p style="font-size:11px; color:#1e3a8a; margin:4px 0 8px 0;">Real-time inventory of agents cross-certified to handle secondary surge queues.</p>` +
+      `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin-bottom:8px; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
+      `• <strong>Samantha Vance (AGT-9102)</strong>: Base: Customer Service &bull; Certified Secondary: <strong>Billing &amp; Payments (Level 2)</strong> &bull; Flex Ready: <strong style="color:#10b981;">YES</strong><br/>` +
+      `• <strong>Rachel Green (AGT-6512)</strong>: Base: Customer Service &bull; Certified Secondary: <strong>Billing &amp; Payments (Level 3)</strong> &bull; Flex Ready: <strong style="color:#10b981;">YES</strong><br/>` +
+      `• <strong>Marcus Brody (AGT-8819)</strong>: Base: Customer Service &bull; Certified Secondary: <strong>Billing &amp; Payments (Level 1)</strong> &bull; Flex Ready: <strong style="color:#10b981;">YES</strong><br/>` +
       `• <strong>Carlos Mendez (AGT-4491)</strong>: Base: Tech Support &bull; Certified Secondary: <strong>Hardware Diagnostics</strong> &bull; Flex Ready: Standby` +
       `</div>` +
       `All 3 certified Billing agents can be flexed simultaneously in under 5 seconds with zero system restart required.`;
     return { success: true, answer: text, category: 'multiskill_matrix' };
   }
 
-  // 1. ACD Queue Volume, Wait Times & Traffic Queries
-  if (qLower.includes('volume') || qLower.includes('queue') || qLower.includes('calls waiting') || qLower.includes('billing calls') || qLower.includes('traffic') || qLower.includes('wait time') || qLower.includes('how many calls') || qLower.includes('surge')) {
+  // ==========================================
+  // 3. ENTERPRISE BILLING & ADJUSTMENT INTELLIGENCE
+  // ==========================================
+  if (qLower.includes('billing') || qLower.includes('credit') || qLower.includes('refund') || qLower.includes('waiver') || qLower.includes('waive') || qLower.includes('surcharge') || qLower.includes('fee') || qLower.includes('dispute') || qLower.includes('autopay') || qLower.includes('auto-pay') || qLower.includes('promo code') || qLower.includes('charge')) {
+    let text = `💳 <strong>Billing Governance &amp; Credit Adjustment Authority:</strong><br/>` +
+      `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin:6px 0; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
+      `• <strong>Frontline Agent Discretionary Limit</strong>: Authorized up to <strong>$50.00</strong> courtesy adjustment per rolling 12 months with disposition <code>RESOLVED_BILLING_CREDIT</code>.<br/>` +
+      `• <strong>Tier-2 Lead Sign-off</strong>: Required for credits between <strong>$50.01 &ndash; $150.00</strong>.<br/>` +
+      `• <strong>Supervisor Override (SUP-014)</strong>: Mandatory for credits &gt; <strong>$150.00</strong> or multi-month fee reversions.<br/>` +
+      `• <strong>Promotional Rate Continuity</strong>: If promotional rate expired, enter code <code>RET-PROMO-2026</code> to extend 12-month discount.<br/>` +
+      `• <strong>Paperless Auto-Pay Discount</strong>: $5/month recurring reduction upon valid checking account or debit enrollment.` +
+      `</div>` +
+      `<strong>Recommended Customer Script:</strong><br/>` +
+      `<div style="background:#eff6ff; border-left:3px solid #2563eb; padding:8px 10px; border-radius:4px; font-size:11px; color:#0f172a; font-style:italic; margin-top:4px;">` +
+      `"I apologize for the confusion regarding the surcharge on your statement. I have reviewed your billing history and applied a one-time courtesy adjustment credit of $25 to your balance today."` +
+      `</div>`;
+    return { success: true, answer: text, category: 'billing_governance' };
+  }
+
+    // ==========================================
+  // 4. SECURITY, PIN AUTH & FRAUD PREVENTION
+  // ==========================================
+  const isAuthSecurityQuery =
+    qLower.includes('athun') ||
+    qLower.includes('auth') ||
+    qLower.includes('authen') ||
+    qLower.includes('autent') ||
+    qLower.includes('pin') ||
+    qLower.includes('otp') ||
+    qLower.includes('verify') ||
+    qLower.includes('verif') ||
+    qLower.includes('password') ||
+    qLower.includes('security') ||
+    qLower.includes('identity') ||
+    qLower.includes('bypass') ||
+    qLower.includes('fraud') ||
+    qLower.includes('sim swap') ||
+    qLower.includes('login') ||
+    qLower.includes('sso') ||
+    qLower.includes('credential');
+
+  if (isAuthSecurityQuery) {
+    const isTroubleshooting =
+      qLower.includes('not working') ||
+      qLower.includes('fail') ||
+      qLower.includes('cant') ||
+      qLower.includes("can't") ||
+      qLower.includes('unable') ||
+      qLower.includes('error') ||
+      qLower.includes('stuck') ||
+      qLower.includes('trouble') ||
+      qLower.includes('issue') ||
+      qLower.includes('reset') ||
+      qLower.includes('bypass') ||
+      qLower.includes('forgot');
+
+    let text = '';
+    if (isTroubleshooting) {
+      text = `🛡️ <strong>Authentication Troubleshooting &amp; Bypass Protocols:</strong><br/>` +
+        `<p style="font-size:11px; color:#1e3a8a; margin:4px 0 6px 0;">Troubleshooting steps for customer caller authentication failures and agent portal SSO sessions:</p>` +
+        `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin:6px 0; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
+        `• <strong>Case 1: Customer Did Not Receive SMS OTP</strong><br/>` +
+        `&nbsp;&nbsp;1. Verify mobile phone number (ANI) matches record on file.<br/>` +
+        `&nbsp;&nbsp;2. Wait 30 seconds for carrier gateway buffer, then click <em>"Re-send OTP"</em>.<br/>` +
+        `&nbsp;&nbsp;3. If SMS fails twice, pivot immediately to Secondary PIN Bypass below.<br/>` +
+        `• <strong>Case 2: Forgotten Customer PIN &bull; Secondary Auth Protocol</strong><br/>` +
+        `&nbsp;&nbsp;Validate at least <strong>3 of 4</strong> secondary identity credentials:<br/>` +
+        `&nbsp;&nbsp;&nbsp;&nbsp;✓ 1. Billing ZIP code on account profile<br/>` +
+        `&nbsp;&nbsp;&nbsp;&nbsp;✓ 2. Last 4 digits of active payment card on file<br/>` +
+        `&nbsp;&nbsp;&nbsp;&nbsp;✓ 3. Exact service installation / billing street address<br/>` +
+        `&nbsp;&nbsp;&nbsp;&nbsp;✓ 4. Date and dollar amount of the last settled invoice<br/>` +
+        `• <strong>Case 3: Agent Portal SSO / LDAP Authentication</strong><br/>` +
+        `&nbsp;&nbsp;In the <a href="/portal.html" target="_blank" style="color:#2563eb; font-weight:700;">Break Portal</a>, your session is auto-authenticated via Enterprise SSO. Select your agent persona from the dropdown and click <em>"Authenticate &amp; Continue"</em> to refresh credentials.<br/>` +
+        `• <strong>High-Risk Security Warning</strong>: <span style="color:#ef4444; font-weight:700;">NEVER bypass authentication</span> for SIM swaps, password resets, or account ownership transfers. Warm transfer line directly to Fraud Ops (Ext. #4409).<br/>` +
+        `</div>` +
+        `<strong>Recommended Customer Script:</strong><br/>` +
+        `<div style="background:#eff6ff; border-left:3px solid #2563eb; padding:8px 10px; border-radius:4px; font-size:11px; color:#0f172a; font-style:italic; margin-top:4px;">` +
+        `"No worries if you haven't received the verification code or have forgotten your security PIN. To protect your account, I can quickly verify your identity using a few alternate security details, such as your billing zip code and recent invoice amount."` +
+        `</div>`;
+    } else {
+      text = `🛡️ <strong>Security Verification &amp; Authentication Protocols:</strong><br/>` +
+        `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin:6px 0; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
+        `• <strong>Standard Authentication</strong>: Send 6-digit SMS OTP to verified ANI or validate 4-digit Account Security PIN.<br/>` +
+        `• <strong>Forgotten PIN Bypass Protocol</strong>: Validate at least <strong>3 of 4</strong> secondary credentials:<br/>` +
+        `&nbsp;&nbsp;1. Billing ZIP code on file<br/>` +
+        `&nbsp;&nbsp;2. Last 4 digits of payment card on file<br/>` +
+        `&nbsp;&nbsp;3. Exact physical service installation address<br/>` +
+        `&nbsp;&nbsp;4. Date and amount of the last settled invoice<br/>` +
+        `• <strong>Agent SSO / Portal Auth</strong>: Enterprise SSO auto-authenticates agent sessions. Manual re-verification available in Step 1 of Break Portal.<br/>` +
+        `• <strong>High-Risk Restriction</strong>: <span style="color:#ef4444; font-weight:700;">NEVER bypass PIN</span> for SIM swaps, password resets, or authorized contact modifications. Warm transfer to Fraud Ops (Ext. #4409).<br/>` +
+        `</div>` +
+        `<strong>Recommended Customer Script:</strong><br/>` +
+        `<div style="background:#eff6ff; border-left:3px solid #2563eb; padding:8px 10px; border-radius:4px; font-size:11px; color:#0f172a; font-style:italic; margin-top:4px;">` +
+        `"To protect your privacy and account security, I have dispatched a one-time 6-digit verification code to the phone number on file. Please read that back to me whenever you are ready."` +
+        `</div>`;
+    }
+    return { success: true, answer: text, category: 'security_protocol' };
+  }
+
+  // ==========================================
+  // 5. DE-ESCALATION, RETENTION & EMPATHY
+  // ==========================================
+  if (qLower.includes('empathy') || qLower.includes('angry') || qLower.includes('de-escalat') || qLower.includes('frustrat') || qLower.includes('upset') || qLower.includes('yell') || qLower.includes('cancel') || qLower.includes('retention') || qLower.includes('churn') || qLower.includes('hear framework') || qLower.includes('rude')) {
+    let text = `🤝 <strong>Customer De-escalation &amp; Retention Playbook:</strong><br/>` +
+      `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin:6px 0; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
+      `• <strong>The H.E.A.R. Framework</strong>:<br/>` +
+      `&nbsp;&nbsp;<strong>H - Hear</strong>: Allow customer to vent without interruption (minimum 30 seconds).<br/>` +
+      `&nbsp;&nbsp;<strong>E - Empathize</strong>: Validate emotions ("I completely understand how disruptive this has been...").<br/>` +
+      `&nbsp;&nbsp;<strong>A - Acknowledge</strong>: Restate their exact issue with concrete terms.<br/>` +
+      `&nbsp;&nbsp;<strong>R - Resolve</strong>: State immediate corrective action with definite timeline.<br/>` +
+      `• <strong>Retention Loyalty Offer</strong>: Customers threatening disconnect are eligible for Tier-2 Retention Loyalty credit (<strong>$15/month discount for 12 months</strong>) before order cancellation.` +
+      `</div>` +
+      `<strong>Recommended Turnaround Script:</strong><br/>` +
+      `<div style="background:#eff6ff; border-left:3px solid #2563eb; padding:8px 10px; border-radius:4px; font-size:11px; color:#0f172a; font-style:italic; margin-top:4px;">` +
+      `"I completely understand your frustration with this service delay, and I sincerely appreciate your patience. You have reached the right specialist, and I am taking direct personal ownership of this inquiry until it is 100% resolved."` +
+      `</div>`;
+    return { success: true, answer: text, category: 'deescalation_playbook' };
+  }
+
+  // ==========================================
+  // 6. SUPERVISOR ESCALATION & WARM TRANSFER
+  // ==========================================
+  if (qLower.includes('supervisor') || qLower.includes('manager') || qLower.includes('escalat') || qLower.includes('transfer') || qLower.includes('sarah') || qLower.includes('floor leadership') || qLower.includes('on duty') || qLower.includes('lead')) {
+    let text = `🛡️ <strong>Floor Leadership &amp; Supervisor Escalation Workflow:</strong><br/>` +
+      `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin:6px 0; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
+      `• <strong>Active Floor Supervisor</strong>: <strong>Sarah Jenkins (SUP-014)</strong> &bull; Desk: Lead Pod B &bull; Status: Available<br/>` +
+      `• <strong>Warm Transfer Protocol</strong>:<br/>` +
+      `&nbsp;&nbsp;1. Inform the customer: <em>"I will be glad to connect you with my floor supervisor, Sarah Jenkins."</em><br/>` +
+      `&nbsp;&nbsp;2. Put customer on brief soft-hold (&lt;60s).<br/>` +
+      `&nbsp;&nbsp;3. Brief supervisor via CXone internal consult: provide Contact ID (#90421), customer name, reason for escalation, and your resolution attempt.<br/>` +
+      `&nbsp;&nbsp;4. Complete conference transfer; do not blind-drop.` +
+      `</div>` +
+      `<strong>Recommended Customer Bridging Script:</strong><br/>` +
+      `<div style="background:#eff6ff; border-left:3px solid #2563eb; padding:8px 10px; border-radius:4px; font-size:11px; color:#0f172a; font-style:italic; margin-top:4px;">` +
+      `"I will be glad to connect you with my supervisor, Sarah Jenkins. Before I transfer your line, may I take 60 seconds to review the case details so I can brief her directly on the exact resolution you are requesting?"` +
+      `</div>`;
+    return { success: true, answer: text, category: 'supervisor_escalation' };
+  }
+
+  // ==========================================
+  // SERVICENOW TICKET STATUS & CMDB LOOKUP
+  // ==========================================
+  const detectedTicketId = extractServiceNowTicketId(query);
+
+  if (detectedTicketId) {
+    const ticket = getOrGenerateServiceNowTicket(detectedTicketId, agentId);
+    let text = `🎫 <strong>ServiceNow Incident Record: ${ticket.id}</strong><br/>` +
+      `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:8px; padding:12px; margin:6px 0; box-shadow:0 1px 4px rgba(37,99,235,0.05);">` +
+      `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:4px;">` +
+      `<span style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; padding:2px 8px; border-radius:4px; font-weight:800; font-size:10px;">SERVICENOW CMDB &bull; ${ticket.severity}</span>` +
+      `<span style="background:#eff6ff; color:${ticket.statusBadgeColor}; border:1px solid #bfdbfe; padding:2px 8px; border-radius:12px; font-weight:800; font-size:10px;">● ${ticket.statusLabel.toUpperCase()}</span>` +
+      `</div>` +
+      `• <strong>Category / Issue</strong>: ${ticket.category}<br/>` +
+      `• <strong>Caller / Agent</strong>: <strong>${ticket.agentName} (${ticket.agentId})</strong> &bull; ${ticket.queue}<br/>` +
+      `• <strong>Assignment Group</strong>: <strong>${ticket.assignedTo}</strong> (${ticket.assignedEngineer})<br/>` +
+      `• <strong>SLA Performance</strong>: ${ticket.slaTarget}<br/>` +
+      `• <strong>Latest Work Note</strong>: <em style="color:#0f172a;">"${ticket.workNotes}"</em>` +
+      `</div>` +
+      `<small style="color:#1e3a8a; font-weight:600;">To append notes or request priority escalation, submit details via the Break Portal under AUX-5.</small>`;
+    return { success: true, answer: text, category: 'servicenow_ticket_detail' };
+  }
+
+  if (qLower.includes('servicenow') || qLower.includes('service now') || qLower.includes('ticket') || qLower.includes('snow') || qLower.includes('incident status') || qLower.includes('helpdesk')) {
+    let relevantTickets = SERVICENOW_TICKETS;
+    if (qLower.includes('my ticket') || qLower.includes('my incident')) {
+      const myTickets = SERVICENOW_TICKETS.filter(t => t.agentId === agentId);
+      if (myTickets.length > 0) relevantTickets = myTickets;
+    }
+
+    let ticketRows = relevantTickets.map(t => {
+      return `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:8px 10px; margin-bottom:6px; box-shadow:0 1px 3px rgba(37,99,235,0.04);">` +
+        `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">` +
+        `<strong><span style="color:#2563eb;">${t.id}</span> (${t.type})</strong>` +
+        `<span style="background:#eff6ff; color:${t.statusBadgeColor}; border:1px solid #bfdbfe; padding:1px 6px; border-radius:10px; font-size:9.5px; font-weight:800;">● ${t.statusLabel}</span>` +
+        `</div>` +
+        `<div style="font-size:11px; color:#0f172a; margin-bottom:2px;">• <strong>${t.category}</strong> [${t.severity}]</div>` +
+        `<div style="font-size:10.5px; color:#1e3a8a;">Caller: ${t.agentName} &bull; Assigned: ${t.assignedEngineer} &bull; SLA: ${t.slaTarget}</div>` +
+        `</div>`;
+    }).join('');
+
+    let text = `🎫 <strong>ServiceNow Enterprise IT Service Desk (Live Telemetry):</strong><br/>` +
+      `<p style="font-size:11px; color:#1e3a8a; margin:4px 0 6px 0;">Connected to ServiceNow Instance <strong>nice-cxone-wfm.service-now.com</strong> &bull; ${relevantTickets.length} active records:</p>` +
+      `<div style="margin:6px 0;">${ticketRows}</div>` +
+      `<small style="color:#1e3a8a; font-weight:600;">Type any ticket number (e.g. <em>"INC-88102"</em>, <em>"INC-55421"</em>, or <em>"ticket 99412"</em>) for instant live details.</small>`;
+    return { success: true, answer: text, category: 'servicenow_ticket_roster' };
+  }
+
+  // ==========================================
+  // 7. WEBRTC, SOFTPHONE & TECHNICAL KBA
+  // ==========================================
+  if (qLower.includes('webrtc') || qLower.includes('audio') || qLower.includes('mic') || qLower.includes('headset') || qLower.includes('one-way') || qLower.includes('one way') || qLower.includes('code 99') || qLower.includes('vpn') || qLower.includes('citrix') || qLower.includes('vdi') || qLower.includes('kba') || qLower.includes('troubleshoot') || qLower.includes('diagnostic')) {
+    let ticketList = itIncidents.slice(0, 3).map(t => `• <strong>${t.id} [${t.status}]</strong>: ${t.agentName} &ndash; ${t.category} (${t.severity})`).join('<br/>');
+    let text = `🎧 <strong>NICE CXone &amp; Workstation Technical Diagnostics:</strong><br/>` +
+      `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin:6px 0; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
+      `• <strong>WebRTC One-Way Audio</strong>: Occurs when UDP port range 10000-20000 is blocked or media stream drops. Toggle MAX softphone audio endpoint (USB headset &harr; Default), then refresh browser WebRTC ICE session.<br/>` +
+      `• <strong>Agent State Code 99 (Heartbeat Outage)</strong>: Session socket timed out. Perform browser hard refresh (Ctrl+F5) or re-authenticate via Okta SSO.<br/>` +
+      `• <strong>VPN Packet Loss (MTU 1350)</strong>: Cisco AnyConnect packet fragmentation on residential ISPs. Run <code>netsh interface ipv4 set subinterface "Cisco AnyConnect" mtu=1350 store=persistent</code>.<br/>` +
+      `• <strong>Active IT Incidents</strong>:<br/>${ticketList}` +
+      `</div>` +
+      `<small style="color:#1e3a8a; font-weight:600;">Need immediate hardware swap? Request AUX-5 System Issue in the Break Portal.</small>`;
+    return { success: true, answer: text, category: 'technical_troubleshooting' };
+  }
+
+  // ==========================================
+  // 8. ACD QUEUE TELEMETRY & TRAFFIC
+  // ==========================================
+  if (qLower.includes('volume') || qLower.includes('queue') || qLower.includes('calls waiting') || qLower.includes('billing calls') || qLower.includes('traffic') || qLower.includes('wait time') || qLower.includes('how many calls') || qLower.includes('surge') || qLower.includes('sla')) {
     let text = `📊 <strong>Real-Time ACD Queue Telemetry:</strong><br/>` +
-      `• <strong>Billing & Payments</strong>: <strong>${billingQ.callsWaiting} calls waiting</strong> | Avg Wait: <strong>${billingQ.avgWaitSeconds}s</strong> | SLA: <strong>${billingQ.currentSla}%</strong> (${billingQ.status})<br/>` +
+      `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin:6px 0; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
+      `• <strong>Billing &amp; Payments</strong>: <strong>${billingQ.callsWaiting} calls waiting</strong> | Avg Wait: <strong>${billingQ.avgWaitSeconds}s</strong> | SLA: <strong>${billingQ.currentSla}%</strong> (${billingQ.status})<br/>` +
       `• <strong>General Customer Service</strong>: <strong>${csQ.callsWaiting} calls waiting</strong> | Avg Wait: <strong>${csQ.avgWaitSeconds}s</strong> | SLA: <strong>${csQ.currentSla}%</strong> (${csQ.status})<br/>` +
       `• <strong>Tier-2 Tech Support</strong>: <strong>${techQ.callsWaiting} calls waiting</strong> | Avg Wait: <strong>${techQ.avgWaitSeconds}s</strong> | SLA: <strong>${techQ.currentSla}%</strong><br/>` +
-      `• <strong>Emergency Inbound</strong>: <strong>${emergQ.callsWaiting} calls waiting</strong> | Avg Wait: <strong>${emergQ.avgWaitSeconds}s</strong><br/>` +
-      `<small style="color:#94a3b8; display:block; margin-top:6px;">Current Total Traffic Rate: <strong>${ivrDeflectionState.callVolumeRatePerMin} calls/min</strong>. ${isRebalanced ? '🔄 Dynamic WFM Skill Rebalance Active (3 CS agents flexed to Billing).' : (isSurge ? '⚠️ High Call Volume Surge Active.' : '✓ Queues within nominal limits.')}</small>`;
+      `• <strong>Emergency Inbound</strong>: <strong>${emergQ.callsWaiting} calls waiting</strong> | Avg Wait: <strong>${emergQ.avgWaitSeconds}s</strong>` +
+      `</div>` +
+      `<small style="color:#1e3a8a; display:block; margin-top:4px;">Total Inbound Traffic: <strong>${ivrDeflectionState.callVolumeRatePerMin} calls/min</strong>. ${isRebalanced ? '🔄 Dynamic WFM Skill Rebalance Active (3 CS agents flexed to Billing).' : (isSurge ? '⚠️ High Call Volume Surge Active.' : '✓ Queues within nominal operating parameters.')}</small>`;
     return { success: true, answer: text, category: 'queue_volume' };
   }
 
-  // 2. Schedule Adherence & Breaks
-  if (qLower.includes('adherence') || qLower.includes('aux break') || qLower.includes('my break') || qLower.includes('lunch') || qLower.includes('can i take') || qLower.includes('breaks left') || qLower.includes('quota') || qLower.includes('policy')) {
+  // ==========================================
+  // 9. SCHEDULE ADHERENCE & BREAK POLICY
+  // ==========================================
+  if (qLower.includes('adherence') || qLower.includes('aux break') || qLower.includes('my break') || qLower.includes('lunch') || qLower.includes('can i take') || qLower.includes('breaks left') || qLower.includes('quota') || qLower.includes('policy') || qLower.includes('variance') || qLower.includes('frequency')) {
     let advice = '✓ Your adherence and break history are in good standing.';
     if (parseInt(agent.teaBreaks.split('/')[0]) > activeShiftPolicy.maxTeaBreaks) {
       advice = `⚠️ Behavioral Flag: You have logged ${agent.teaBreaks.split('/')[0]} aux breaks today (Shift limit set by supervisor: ${activeShiftPolicy.maxTeaBreaks}). Next requests require supervisor override.`;
@@ -1712,73 +2167,81 @@ function evaluateCopilotQuery(payload) {
 
     const windowLabel = activeShiftPolicy.frequencyWindow === '2_WEEKS' ? '2 Weeks (Bi-Weekly)' : '1 Week (Rolling)';
 
-    let text = `⏱️ <strong>Live Adherence & Schedule Parameters (${agent.name}):</strong><br/>` +
-      `• <strong>CXone Adherence</strong>: <strong style="color:${parseFloat(agent.adherence) >= activeShiftPolicy.targetAdherence ? '#34d399' : '#f87171'};">${agent.adherence}</strong> (Supervisor Target: &ge; ${activeShiftPolicy.targetAdherence}%)<br/>` +
+    let text = `⏱️ <strong>Live Adherence &amp; Schedule Parameters (${agent.name}):</strong><br/>` +
+      `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin:6px 0; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
+      `• <strong>CXone Adherence</strong>: <strong style="color:${parseFloat(agent.adherence) >= activeShiftPolicy.targetAdherence ? '#10b981' : '#ef4444'};">${agent.adherence}</strong> (Supervisor Target: &ge; ${activeShiftPolicy.targetAdherence}%)<br/>` +
       `• <strong>AUX Breaks Taken</strong>: <strong>${agent.teaBreaks.split('/')[0]} / ${activeShiftPolicy.maxTeaBreaks}</strong> (Policy Limit: Max ${activeShiftPolicy.maxTeaBreaks}/shift)<br/>` +
       `• <strong>Lunch Variance</strong>: <strong>${agent.lunchVariance}</strong> (Allowed Tolerance: &lt;${activeShiftPolicy.lunchVarianceThreshold}m)<br/>` +
-      `• <strong>Request Frequency Limit</strong>: <strong>${agent.freq.split('/')[0]} / ${activeShiftPolicy.maxFrequencyRequests}</strong> requests per ${windowLabel}<br/>` +
-      `<small style="color:#94a3b8; display:block; margin-top:4px;">*Shift policy limits administered in real-time by Floor Supervisor (${activeShiftPolicy.lastUpdatedBy}).</small>` +
-      `<p style="margin-top:6px; font-size:11px; color:#cbd5e1;">${advice}</p>`;
+      `• <strong>Request Frequency Limit</strong>: <strong>${agent.freq.split('/')[0]} / ${activeShiftPolicy.maxFrequencyRequests}</strong> requests per ${windowLabel}` +
+      `</div>` +
+      `<p style="margin:4px 0; font-size:11px; color:#1e3a8a; font-weight:600;">${advice}</p>` +
+      `<small style="color:#1e3a8a; display:block; margin-top:2px;">*Shift policy rules managed by Floor Supervisor (${activeShiftPolicy.lastUpdatedBy}).</small>`;
     return { success: true, answer: text, category: 'adherence_telemetry' };
   }
 
-  // 3. Storm & IVR Deflection Rate
-  if (qLower.includes('storm') || qLower.includes('weather') || qLower.includes('tornado') || qLower.includes('outage') || qLower.includes('deflection') || qLower.includes('1000') || qLower.includes('announcement') || qLower.includes('field workers')) {
+  // ==========================================
+  // 10. STORM & IVR DEFLECTION
+  // ==========================================
+  if (qLower.includes('storm') || qLower.includes('weather') || qLower.includes('tornado') || qLower.includes('hurricane') || qLower.includes('outage') || qLower.includes('deflection') || qLower.includes('1000') || qLower.includes('announcement') || qLower.includes('field workers')) {
     const isAct = ivrDeflectionState.isDeflectionActive;
-    let text = `🌪️ <strong>Real-Time Storm & Outage Deflection Telemetry:</strong><br/>` +
+    let text = `🌪️ <strong>Real-Time Storm &amp; Outage Deflection Telemetry:</strong><br/>` +
+      `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin:6px 0; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
       `• <strong>Live Inbound Rate</strong>: <strong>${ivrDeflectionState.callVolumeRatePerMin} calls/min</strong> (Safety Ceiling: ${ivrDeflectionState.thresholdLimitPerMin}/min)<br/>` +
-      `• <strong>Deflection Status</strong>: <strong style="color:${isAct ? '#f87171' : '#34d399'};">${isAct ? '🚨 ACTIVE (Automated Deflection Running)' : '● STANDBY (Volume below 1,000/min)'}</strong><br/>` +
+      `• <strong>Deflection Status</strong>: <strong style="color:${isAct ? '#ef4444' : '#10b981'};">${isAct ? '🚨 ACTIVE (Automated Deflection Running)' : '● STANDBY (Volume below 1,000/min)'}</strong><br/>` +
       `• <strong>Deflected Inquiries</strong>: <strong>${ivrDeflectionState.deflectedCallsCount} calls</strong> routed to field outage message.<br/>` +
-      `• <strong>Caller IVR Message</strong>: <em>"${ivrDeflectionState.announcementText}"</em>`;
+      `• <strong>Caller IVR Message</strong>: <em>"${ivrDeflectionState.announcementText}"</em>` +
+      `</div>` +
+      `<strong>Recommended Customer Script:</strong><br/>` +
+      `<div style="background:#eff6ff; border-left:3px solid #2563eb; padding:8px 10px; border-radius:4px; font-size:11px; color:#0f172a; font-style:italic; margin-top:4px;">` +
+      `"Our dispatch operations center confirms that utility field crews are actively on-site restoring service in your sector. Real-time updates are sent via automated SMS every 30 minutes."` +
+      `</div>`;
     return { success: true, answer: text, category: 'storm_deflection' };
   }
 
-  // 4. WFM Dynamic Skill Rebalance & Flex
+  // ==========================================
+  // 11. WFM DYNAMIC SKILL REBALANCE
+  // ==========================================
   if (qLower.includes('rebalance') || qLower.includes('flex') || qLower.includes('cross-skill') || qLower.includes('cross skill') || qLower.includes('why was i') || qLower.includes('schedule flex') || qLower.includes('flexed')) {
     let text = `🔄 <strong>Dynamic WFM Intraday Skill Rebalance:</strong><br/>` +
+      `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin:6px 0; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
       `• <strong>Billing Queue Surge</strong>: ${billingQ.callsWaiting} calls waiting (${billingQ.occupancyPct}% occupancy)<br/>` +
       `• <strong>Customer Service Surplus</strong>: ${csQ.callsWaiting} calls waiting (${csQ.occupancyPct}% occupancy)<br/>` +
-      `• <strong>WFM Flex Status</strong>: <strong style="color:${isRebalanced ? '#38bdf8' : '#f59e0b'};">${isRebalanced ? '✓ Active: 3 CS Agents Flexed to Billing' : 'Standby / Surge Monitoring'}</strong><br/>` +
-      `<small style="color:#94a3b8; display:block; margin-top:4px;">When Billing call arrival surges while General CS agents are idle, WFM automatically cross-skills CS agents to Billing to maintain SLA above 80% without overtime.</small>`;
+      `• <strong>WFM Flex Status</strong>: <strong style="color:${isRebalanced ? '#2563eb' : '#f59e0b'};">${isRebalanced ? '✓ Active: 3 CS Agents Flexed to Billing' : 'Standby / Surge Monitoring'}</strong>` +
+      `</div>` +
+      `<small style="color:#1e3a8a; display:block; margin-top:4px;">When Billing call arrivals surge while General CS agents are idle, WFM automatically cross-skills CS agents to Billing to maintain SLA above 80% without overtime.</small>`;
     return { success: true, answer: text, category: 'wfm_rebalance' };
   }
 
-  // 5. IT System Incidents (AUX-5)
-  if (qLower.includes('it') || qLower.includes('ticket') || qLower.includes('vpn') || qLower.includes('citrix') || qLower.includes('vdi') || qLower.includes('system issue') || qLower.includes('incident') || qLower.includes('technical issue') || qLower.includes('aux-5')) {
-    let ticketList = itIncidents.slice(0, 3).map(t => `• <strong>${t.id} [${t.status}]</strong>: ${t.agentName} - ${t.category} (${t.severity})`).join('<br/>');
-    let text = `💻 <strong>Active IT System Issue Incidents (${itIncidents.length} logged):</strong><br/>` +
-      ticketList + `<br/>` +
-      `<small style="color:#94a3b8; display:block; margin-top:6px;">If experiencing VPN/Citrix drops, switch to AUX-5 System Issue in the Break Portal to auto-dispatch an IT ticket.</small>`;
-    return { success: true, answer: text, category: 'it_incidents' };
+  // ==========================================
+  // 12. CALL CLOSING & FIRST-CALL RESOLUTION
+  // ==========================================
+  if (qLower.includes('closing') || qLower.includes('wrap-up') || qLower.includes('wrap up') || qLower.includes('end call') || qLower.includes('fcr') || qLower.includes('first call resolution') || qLower.includes('goodbye') || qLower.includes('survey')) {
+    let text = `📋 <strong>Call Closing &amp; First-Call Resolution Protocol:</strong><br/>` +
+      `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin:6px 0; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
+      `• <strong>Step 1 - Verbal Summary</strong>: Reiterate all actions executed (credit amounts, ticket numbers, service restoration times).<br/>` +
+      `• <strong>Step 2 - Satisfaction Check</strong>: Explicitly ask: <em>"Have I completely resolved the reason for your call today?"</em><br/>` +
+      `• <strong>Step 3 - Confirmation Dispatch</strong>: Confirm whether SMS or email receipt was queued.<br/>` +
+      `• <strong>Step 4 - Survey Introduction</strong>: Mention the 1-question IVR survey to maximize positive CSAT.` +
+      `</div>` +
+      `<strong>Recommended Standard Closing Script:</strong><br/>` +
+      `<div style="background:#eff6ff; border-left:3px solid #2563eb; padding:8px 10px; border-radius:4px; font-size:11px; color:#0f172a; font-style:italic; margin-top:4px;">` +
+      `"To recap: I have adjusted the $25 fee, restored your promotional rate for 12 months, and dispatched an email confirmation with reference #90421. Is there anything else I can assist you with today? Thank you for choosing ZEL!"` +
+      `</div>`;
+    return { success: true, answer: text, category: 'closing_protocol' };
   }
 
-  // 6. Supervisors On Duty & Floor Leadership
-  if (qLower.includes('supervisor') || qLower.includes('floor') || qLower.includes('leadership') || qLower.includes('on duty') || qLower.includes('sarah') || qLower.includes('who is')) {
-    let text = `🛡️ <strong>Floor Leadership & Shift Roster:</strong><br/>` +
-      `• <strong>Lead WFM Supervisor on Duty</strong>: SUP-014 Sarah Jenkins (Floor Ops Lead)<br/>` +
-      `• <strong>Floor Roster</strong>: 24 active agents logged in (12 personas active)<br/>` +
-      `• <strong>Current Distribution</strong>: ~14 In-Call, ~6 Available, ~4 AUX Break<br/>` +
-      `• <strong>Support Channels</strong>: Private 1-on-1 Supervisor Coach or floor broadcast.`;
-    return { success: true, answer: text, category: 'supervisor_info' };
-  }
-
-  // 7. Active Call, ACW & Disposition
-  if (qLower.includes('acw') || qLower.includes('summary') || qLower.includes('disposition') || qLower.includes('call') || qLower.includes('wrap') || qLower.includes('survey') || qLower.includes('rating') || qLower.includes('ivr')) {
-    let text = `✨ <strong>Live Interaction & ACW Intelligence:</strong><br/>` +
-      `• <strong>Active Call</strong>: Contact #90421 (Skill: Customer Billing & Retention)<br/>` +
-      `• <strong>Security PIN</strong>: Verified ✓<br/>` +
-      `• <strong>Customer Speech Sentiment</strong>: Empathetic / Constructive<br/>` +
-      `• <strong>Post-Call IVR Rating</strong>: ★★★★★ 5.0 / 5.0<br/>` +
-      `• <strong>Recommended Disposition</strong>: <code>RESOLVED_BILLING_CREDIT</code><br/>` +
-      `When the call concludes, click 'Generate AI Call Summary' to insert enriched notes into CRM.`;
-    return { success: true, answer: text, category: 'call_acw' };
-  }
-
-  // 8. General Telemetry Briefing (Default)
-  let text = `🤖 <strong>NICE CXone (Ask Shankar) Telemetry Briefing:</strong><br/>` +
-    `Telephony switch is healthy. ACD inbound rate is <strong>${ivrDeflectionState.callVolumeRatePerMin} calls/min</strong>. ` +
-    `Your adherence is <strong>${agent.adherence}</strong>. Billing queue has <strong>${billingQ.callsWaiting} calls waiting</strong> (SLA ${billingQ.currentSla}%). ` +
-    `Ask me about <em>queue volume</em>, <em>my adherence</em>, <em>storm deflection rate</em>, <em>WFM skill flex</em>, or <em>open IT tickets</em>!`;
+  // ==========================================
+  // 13. COMPREHENSIVE LOCAL LLM BRIEFING (DEFAULT / NLP REASONING)
+  // ==========================================
+  let text = `🤖 <strong>Ask Shankar AI &bull; Live Telemetry &amp; Intelligence Briefing:</strong><br/>` +
+    `<p style="font-size:11px; color:#1e3a8a; margin:4px 0 6px 0;">I have analyzed your inquiry: <em>"${query}"</em> against real-time ACD telemetry and enterprise guidelines.</p>` +
+    `<div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:10px; font-size:11px; margin:6px 0; box-shadow:0 1px 3px rgba(37,99,235,0.05);">` +
+    `• <strong>Active Telephony State</strong>: Switching cluster normal &bull; Inbound: <strong>${ivrDeflectionState.callVolumeRatePerMin} calls/min</strong><br/>` +
+    `• <strong>Your Status (${agent.name})</strong>: Adherence <strong>${agent.adherence}</strong> &bull; Breaks: <strong>${agent.teaBreaks}</strong><br/>` +
+    `• <strong>Queues Load</strong>: Billing (${billingQ.callsWaiting} calls, ${billingQ.avgWaitSeconds}s wait) &bull; CS (${csQ.callsWaiting} calls)<br/>` +
+    `• <strong>Quick Topics Available</strong>: Ask about <strong>credit limits</strong>, <strong>PIN bypass</strong>, <strong>storm deflection</strong>, <strong>de-escalation scripts</strong>, or <strong>supervisor escalation</strong>.` +
+    `</div>` +
+    `<small style="color:#1e3a8a; font-weight:600;">Click any quick prompt chip below or type a specific customer question to receive step-by-step guidance.</small>`;
   return { success: true, answer: text, category: 'general_brief' };
 }
 

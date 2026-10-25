@@ -2421,7 +2421,7 @@ function addSupBotMessage(sender, text, htmlContent = '') {
 
 // Initial Greeting
 if (supBotMessages) {
-  addSupBotMessage('bot', '👋 Welcome ' + currentSupervisor.name + '! I am REMI, your Autonomous Supervisor Assistant (Ask Shankar). I can run floor audits, detect queue surges, trigger cross-skilling rebalances, and recall overdue agents. How can I assist you?');
+  addSupBotMessage('bot', '👋 Welcome ' + currentSupervisor.name + '! I am Ask Shankar, your Autonomous Supervisor Assistant. I can run floor audits, detect queue surges, trigger cross-skilling rebalances, and recall overdue agents. How can I assist you?');
 }
 
 // Quick Chip Handlers
@@ -2930,6 +2930,10 @@ function renderEmergencyCampaign(campaign) {
       responseBadge = '<span class="status-tag overdue" style="background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; font-weight:800; font-size:11px; padding:4px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> NO (Declined)</span>';
       shiftDisplay = '<span style="color:#1e3a8a; font-size:11px;">-</span>';
       rowBg = 'background: rgba(239, 68, 68, 0.03);';
+    } else if (ag.status === 'QUOTA_CLOSED' || accepted >= reqQuota || campaign.quotaFulfilled) {
+      responseBadge = '<span class="status-tag" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-weight:700; font-size:11px; padding:4px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> Closed (Quota Met)</span>';
+      shiftDisplay = `<span style="color:#047857; font-size:11px; font-weight:700;">Survey Closed</span>`;
+      rowBg = 'background: rgba(37, 99, 235, 0.02);';
     } else {
       responseBadge = '<span class="status-tag" style="background:#fffbeb; color:#b45309; border:1px solid #fde68a; font-weight:700; font-size:11px; padding:4px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Awaiting Mobile Tap...</span>';
       shiftDisplay = `<span style="color:#1e3a8a; font-size:11px;">${ag.shiftTimings} (Pending)</span>`;
@@ -2952,12 +2956,14 @@ function renderEmergencyCampaign(campaign) {
         <td style="font-family:monospace; font-size:11px; color:#0f172a;">${timeFormatted}</td>
         <td>${shiftDisplay}</td>
         <td>
-          ${ag.status === 'PENDING' ? `
+          ${(ag.status === 'PENDING' && !(accepted >= reqQuota || campaign.quotaFulfilled)) ? `
             <button class="btn btn-xs btn-outline" style="border-color:#38bdf8; color:#0284c7; font-weight:700; padding:4px 8px;" onclick="rePingAgentMobile('${ag.agentId}', '${ag.agentName}')">
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> Re-Ping
             </button>
           ` : (ag.status === 'ACCEPTED' ? `
             <span style="font-size:11px; color:#15803d; font-weight:700;">✓ Confirmed</span>
+          ` : (ag.status === 'QUOTA_CLOSED' || accepted >= reqQuota || campaign.quotaFulfilled) ? `
+            <span style="font-size:11px; color:#1d4ed8; font-weight:700;">Closed</span>
           ` : `
             <span style="font-size:11px; color:#1e3a8a;">Unavailable</span>
           `)}

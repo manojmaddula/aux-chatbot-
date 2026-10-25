@@ -24,7 +24,7 @@ function createWindow() {
     y: Math.max(40, height - 780),
     resizable: true,
     alwaysOnTop: true, // Floats as desktop companion widget over any app!
-    title: "NICE CXone ZEL Ask Shankar & AUX Assistant",
+    title: "NICE CXone ZEL Call Center Assist",
     icon: iconPath,
     webPreferences: {
       nodeIntegration: false,
@@ -58,7 +58,7 @@ function createWindow() {
 function createTray() {
   const iconPath = path.join(__dirname, 'src', 'favicon.ico');
   tray = new Tray(iconPath);
-  tray.setToolTip('NICE CXone ZEL Ask Shankar & AUX Assistant');
+  tray.setToolTip('NICE CXone ZEL Call Center Assist');
 
   const contextMenu = Menu.buildFromTemplate([
     {

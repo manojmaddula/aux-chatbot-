@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "concurrently \"vite\" \"wait-on http://localhost:5173 && electron .\"",
     "build": "vite build && electron-builder",
-    "start": "electron ."
+    "start": "node server.js",
+    "electron": "electron ."
   },
   "author": "",
   "license": "MIT",

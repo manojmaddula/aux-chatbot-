@@ -1133,7 +1133,7 @@
     <div class="brand-wrap">
       <img src="/favicon.svg?v=panda2" alt="ZEL" class="brand-logo" />
       <div class="brand-title">
-        ZEL Copilot
+        Ask Shankar
         <span>Mobile Alert Companion</span>
       </div>
     </div>
@@ -1145,6 +1145,30 @@
 
   <!-- MAIN SCROLLABLE BODY -->
   <main class="mobile-container">
+
+    <!-- DOCKED ASSIGNED SURGE SHIFT CARD (Visible when agent confirms YES) -->
+    <div id="agent-surge-shift-banner" style="display:none; background:#eff6ff; border:1.5px solid #2563eb; border-radius:14px; padding:12px 14px; margin-bottom:12px; box-shadow:0 4px 12px rgba(37,99,235,0.12); animation:fadeIn 0.25s ease;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+        <span style="font-size:11px; font-weight:800; color:#047857; background:#ecfdf5; border:1px solid #a7f3d0; padding:2px 8px; border-radius:6px; display:inline-flex; align-items:center; gap:4px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          SURGE SHIFT CONFIRMED
+        </span>
+        <span style="font-size:11px; font-weight:700; color:#1d4ed8;">+1.5x Premium</span>
+      </div>
+      <strong id="docked-shift-timings" style="font-size:14px; color:#0f172a; display:block; font-family:monospace; margin-top:2px;">15:30 - 18:30 (Surge Shift)</strong>
+      <span id="docked-shift-queue" style="font-size:11px; color:#1e3a8a;">Queue: Emergency Inbound &amp; Tier-2 • Report to Workstation</span>
+    </div>
+
+    <!-- DOCKED QUOTA FULFILLED / SURVEY CLOSED NOTICE (Shown when supervisor has secured wanted agents) -->
+    <div id="quota-secured-banner" style="display:none; background:#ecfdf5; border:1.5px solid #10b981; border-radius:14px; padding:12px 14px; margin-bottom:12px; box-shadow:0 4px 12px rgba(16,185,129,0.12); animation:fadeIn 0.25s ease;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:22px; flex-shrink:0;">🎉</span>
+        <div>
+          <strong style="font-size:12.5px; color:#047857; display:block;">Sufficient Staffing Secured</strong>
+          <span style="font-size:11px; color:#065f46; line-height:1.4;">The supervisor has obtained the required number of agents. This emergency availability survey is now closed. Thank you!</span>
+        </div>
+      </div>
+    </div>
 
     <!-- AGENT IDENTIFIER -->
     <section class="m-card">
@@ -1986,9 +2010,32 @@
           } catch (err) {}
         });
 
+        es.addEventListener('EMERGENCY_QUOTA_FULFILLED', (e) => {
+          try {
+            const data = JSON.parse(e.data);
+            if (activeEmergencyCampaign) {
+              activeEmergencyCampaign.quotaFulfilled = true;
+            }
+            const targetAgent = activeEmergencyCampaign && activeEmergencyCampaign.agents ? activeEmergencyCampaign.agents[currentAgentId] : null;
+            // CLOSE SURVEY IMMEDIATELY FOR OTHER AGENTS!
+            if (!targetAgent || targetAgent.response !== 'YES') {
+              if (emOverlay) emOverlay.classList.add('hidden');
+              showQuotaSecuredNotice();
+            }
+          } catch (err) {}
+        });
+
         es.addEventListener('EMERGENCY_RECALL_RESET', () => {
           if (emOverlay) emOverlay.classList.add('hidden');
           activeEmergencyCampaign = null;
+          hideAgentSurgeShiftBanner();
+          hideQuotaSecuredNotice();
+          try {
+            for (let i = sessionStorage.length - 1; i >= 0; i--) {
+              const k = sessionStorage.key(i);
+              if (k && k.startsWith('emergency_ack_')) sessionStorage.removeItem(k);
+            }
+          } catch (e) {}
         });
 
         es.addEventListener('ALARM_TRIGGERED', (e) => {
@@ -2055,13 +2102,9 @@
     // ==========================================
     // EMERGENCY RECALL & AVAILABILITY RESPONSE LOGIC
     // ==========================================
-    // legacy-meta-purge
     document.querySelectorAll('.emergency-meta-box, .meta-row').forEach(el => el.remove());
     const emOverlay = document.getElementById('emergency-mobile-overlay');
     const emMsg = document.getElementById('emergency-modal-msg');
-    const emSup = document.getElementById('emergency-sup-name');
-    const emQueue = document.getElementById('emergency-target-queue');
-    const emShift = document.getElementById('emergency-proposed-shift');
     const emActions = document.getElementById('emergency-action-buttons');
     const emConfYes = document.getElementById('emergency-confirmed-yes');
     const emConfNo = document.getElementById('emergency-confirmed-no');
@@ -2071,8 +2114,32 @@
     const btnEmNo = document.getElementById('btn-emergency-no');
     const btnCloseEmYes = document.getElementById('btn-close-emergency-yes');
     const btnCloseEmNo = document.getElementById('btn-close-emergency-no');
+    const surgeShiftBanner = document.getElementById('agent-surge-shift-banner');
+    const quotaSecuredBanner = document.getElementById('quota-secured-banner');
+    const dockedShiftTimings = document.getElementById('docked-shift-timings');
+    const dockedShiftQueue = document.getElementById('docked-shift-queue');
 
     let activeEmergencyCampaign = null;
+
+    function showAgentSurgeShiftBanner(shift, queue) {
+      if (surgeShiftBanner) {
+        if (dockedShiftTimings) dockedShiftTimings.textContent = shift || '15:30 - 18:30 (Surge Shift)';
+        if (dockedShiftQueue) dockedShiftQueue.textContent = `Queue: ${queue || 'Emergency Inbound & Tier-2'} • Report to Workstation`;
+        surgeShiftBanner.style.display = 'block';
+      }
+    }
+
+    function hideAgentSurgeShiftBanner() {
+      if (surgeShiftBanner) surgeShiftBanner.style.display = 'none';
+    }
+
+    function showQuotaSecuredNotice() {
+      if (quotaSecuredBanner) quotaSecuredBanner.style.display = 'block';
+    }
+
+    function hideQuotaSecuredNotice() {
+      if (quotaSecuredBanner) quotaSecuredBanner.style.display = 'none';
+    }
 
     function setEmergencyModalState(mode, shift, queue) {
       if (mode === 'YES') {
@@ -2086,54 +2153,73 @@
         if (emConfYes) { emConfYes.classList.add('hidden'); emConfYes.style.setProperty('display', 'none', 'important'); emConfYes.hidden = true; }
         if (emConfNo) { emConfNo.classList.remove('hidden'); emConfNo.style.setProperty('display', 'block', 'important'); emConfNo.hidden = false; }
       } else {
-        // PENDING / INITIAL PROMPT: STRICTLY SHOW YES/NO BUTTONS ONLY!
-        // BOTH POST-RESPONSE CONFIRMATION SCREENS MUST REMAIN COMPLETELY HIDDEN!
         if (emActions) { emActions.classList.remove('hidden'); emActions.style.setProperty('display', 'flex', 'important'); emActions.hidden = false; }
         if (emConfYes) { emConfYes.classList.add('hidden'); emConfYes.style.setProperty('display', 'none', 'important'); emConfYes.hidden = true; }
         if (emConfNo) { emConfNo.classList.add('hidden'); emConfNo.style.setProperty('display', 'none', 'important'); emConfNo.hidden = true; }
       }
     }
-    // Initialize immediately to pending (hidden confirmed boxes)
     setEmergencyModalState('PENDING');
-
 
     function checkAndShowEmergencyRecall(campaign) {
       if (!campaign || !campaign.active) {
         if (emOverlay) emOverlay.classList.add('hidden');
+        hideAgentSurgeShiftBanner();
+        hideQuotaSecuredNotice();
         return;
       }
       activeEmergencyCampaign = campaign;
       const targetAgent = campaign.agents ? campaign.agents[currentAgentId] : null;
 
-      // Only show if targeted or campaign includes this agent
       if (campaign.agents && Object.keys(campaign.agents).length > 0 && !targetAgent) {
+        if (emOverlay) emOverlay.classList.add('hidden');
         return;
       }
 
-      if (emMsg) emMsg.textContent = campaign.message || 'There is an emergency situation. High call volume surge detected and your availability is requested to balance the queue. If you are available please join, or select NO.';
-      if (emSup) emSup.textContent = campaign.supervisorName || 'Floor Supervisor';
-      if (emQueue) emQueue.textContent = campaign.queueTarget || 'Emergency Inbound & Tier-2 Support';
-      if (emShift) emShift.textContent = campaign.shiftTimings || '15:30 - 18:30 (Surge Shift • 3 hrs)';
+      const isQuotaMet = campaign.quotaFulfilled === true;
+      const isAccepted = targetAgent && targetAgent.response === 'YES';
+      const ackKey = 'emergency_ack_' + (campaign.id || 'default') + '_' + currentAgentId;
+      const hasAcked = sessionStorage.getItem(ackKey) === 'true' || localStorage.getItem(ackKey) === 'true';
 
-      // Check current agent response state via strict state switcher
-      if (targetAgent && targetAgent.response === 'YES') {
+      // 1. If agent accepted YES:
+      if (isAccepted) {
+        showAgentSurgeShiftBanner(targetAgent.shiftTimings || campaign.shiftTimings, targetAgent.queueTarget || campaign.queueTarget);
+        // DO NOT POP UP AGAIN IF ALREADY CONFIRMED / ACKNOWLEDGED
+        if (hasAcked) {
+          if (emOverlay) emOverlay.classList.add('hidden');
+          return;
+        }
         setEmergencyModalState('YES', targetAgent.shiftTimings || campaign.shiftTimings, targetAgent.queueTarget || campaign.queueTarget);
-      } else if (targetAgent && targetAgent.response === 'NO') {
-        setEmergencyModalState('NO');
-      } else {
-        setEmergencyModalState('PENDING');
+        if (emOverlay) emOverlay.classList.remove('hidden');
+        return;
       }
 
+      // 2. If supervisor already obtained wanted number of agents (Quota Fulfilled):
+      // CLOSE THE SURVEY FOR ALL OTHER AGENTS!
+      if (isQuotaMet) {
+        if (emOverlay) emOverlay.classList.add('hidden');
+        showQuotaSecuredNotice();
+        return;
+      }
+
+      // 3. If agent declined NO:
+      if (targetAgent && targetAgent.response === 'NO') {
+        if (hasAcked) {
+          if (emOverlay) emOverlay.classList.add('hidden');
+          return;
+        }
+        setEmergencyModalState('NO');
+        if (emOverlay) emOverlay.classList.remove('hidden');
+        return;
+      }
+
+      // 4. Pending / initial prompt:
+      hideQuotaSecuredNotice();
+      setEmergencyModalState('PENDING');
+      if (emMsg) emMsg.textContent = campaign.message || 'There is an emergency situation. High call volume surge detected and your availability is requested to balance the queue. If you are available please join, or select NO.';
       if (emOverlay) emOverlay.classList.remove('hidden');
 
-      // Vibrate phone for attention
       try {
         if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 500]);
-      } catch (e) {}
-
-      // Play chime if audio initialized
-      try {
-        playTestTone(880, 0.3);
       } catch (e) {}
     }
 
@@ -2149,22 +2235,40 @@
           })
         });
         const data = await res.json();
+        const cid = (activeEmergencyCampaign && activeEmergencyCampaign.id) || 'default';
+        const ackKey = 'emergency_ack_' + cid + '_' + currentAgentId;
+
         if (data.success) {
           if (choice === 'YES') {
-            setEmergencyModalState('YES', data.shiftTimings || '15:30 - 18:30 (Surge Shift • 3 hrs)', data.queueTarget || 'Emergency Inbound & Tier-2');
+            const shift = data.shiftTimings || '15:30 - 18:30 (Surge Shift • 3 hrs)';
+            const queue = data.queueTarget || 'Emergency Inbound & Tier-2';
+            setEmergencyModalState('YES', shift, queue);
+            showAgentSurgeShiftBanner(shift, queue);
           } else {
             setEmergencyModalState('NO');
           }
+        } else if (data.quotaFulfilled) {
+          // Quota was reached before this response; close survey immediately!
+          if (emOverlay) emOverlay.classList.add('hidden');
+          showQuotaSecuredNotice();
         }
       } catch (e) {
         console.warn('Emergency response error:', e);
       }
     }
 
+    function dismissEmergencyModal() {
+      if (emOverlay) emOverlay.classList.add('hidden');
+      const cid = (activeEmergencyCampaign && activeEmergencyCampaign.id) || 'default';
+      const ackKey = 'emergency_ack_' + cid + '_' + currentAgentId;
+      sessionStorage.setItem(ackKey, 'true');
+      localStorage.setItem(ackKey, 'true');
+    }
+
     if (btnEmYes) btnEmYes.addEventListener('click', () => sendEmergencyResponse('YES'));
     if (btnEmNo) btnEmNo.addEventListener('click', () => sendEmergencyResponse('NO'));
-    if (btnCloseEmYes) btnCloseEmYes.addEventListener('click', () => emOverlay?.classList.add('hidden'));
-    if (btnCloseEmNo) btnCloseEmNo.addEventListener('click', () => emOverlay?.classList.add('hidden'));
+    if (btnCloseEmYes) btnCloseEmYes.addEventListener('click', dismissEmergencyModal);
+    if (btnCloseEmNo) btnCloseEmNo.addEventListener('click', dismissEmergencyModal);
 
     // Check emergency status on initial load & agent change
     async function fetchEmergencyStatus() {

@@ -135,9 +135,10 @@ const AGENT_PERSONAS = {
   }
 };
 
-let isAuthenticated = false;
+let isAuthenticated = true;
 let agentData = { ...AGENT_PERSONAS['AGT-8842'] };
 let selectedMinutes = 15;
+let selectedSeconds = 0;
 
 // DOM Elements
 const authSection = document.getElementById('auth-section');
@@ -150,6 +151,8 @@ const presetSelect = document.getElementById('preset-agent-select');
 
 const durationPills = document.querySelectorAll('.duration-pills .pill');
 const customMinutesInput = document.getElementById('custom-minutes');
+const customSecondsInput = document.getElementById('custom-seconds');
+const durationTotalBadge = document.getElementById('duration-total-badge');
 const btnSubmitBreak = document.getElementById('btn-submit-break');
 
 const decisionOverlay = document.getElementById('decision-overlay');
@@ -168,39 +171,63 @@ const AUX_DEFAULT_DURATIONS = {
   'AUX-6: Bio / Emergency': 10
 };
 
-function setDurationMinutes(minutes) {
-  selectedMinutes = parseInt(minutes, 10) || 15;
+function setDuration(minutes, seconds = 0) {
+  selectedMinutes = Math.max(0, parseInt(minutes, 10) || 0);
+  selectedSeconds = Math.max(0, Math.min(59, parseInt(seconds, 10) || 0));
+
+  if (selectedMinutes === 0 && selectedSeconds === 0) {
+    selectedSeconds = 30; // fallback to 30s minimum if both 0
+  }
+
+  if (customMinutesInput) customMinutesInput.value = selectedMinutes;
+  if (customSecondsInput) customSecondsInput.value = selectedSeconds;
+
+  if (durationTotalBadge) {
+    if (selectedMinutes > 0 && selectedSeconds > 0) {
+      durationTotalBadge.textContent = `Total: ${selectedMinutes}m ${selectedSeconds}s`;
+    } else if (selectedMinutes > 0) {
+      durationTotalBadge.textContent = `Total: ${selectedMinutes}m 00s`;
+    } else {
+      durationTotalBadge.textContent = `Total: ${selectedSeconds}s`;
+    }
+  }
+
   let matchedPill = false;
   durationPills.forEach(pill => {
-    if (parseInt(pill.getAttribute('data-minutes'), 10) === selectedMinutes) {
+    const pMin = parseInt(pill.getAttribute('data-minutes') ?? '-1', 10);
+    const pSec = parseInt(pill.getAttribute('data-seconds') ?? '0', 10);
+    if (pMin === selectedMinutes && pSec === selectedSeconds) {
       pill.classList.add('active');
       matchedPill = true;
     } else {
       pill.classList.remove('active');
     }
   });
+}
 
-  if (!matchedPill) {
-    if (customMinutesInput) customMinutesInput.value = selectedMinutes;
-  } else {
-    if (customMinutesInput) customMinutesInput.value = '';
-  }
+function setDurationMinutes(minutes) {
+  setDuration(minutes, 0);
 }
 
 function selectDurationForAux(auxCode) {
   const defaultMinutes = AUX_DEFAULT_DURATIONS[auxCode] || 15;
-  setDurationMinutes(defaultMinutes);
+  setDuration(defaultMinutes, 0);
 }
 
 // Apply agent persona selection
-function applyAgentPersona(agentKey) {
+function applyAgentPersona(agentKey, autoAuthenticate = true) {
   const profile = AGENT_PERSONAS[agentKey] || AGENT_PERSONAS['AGT-8842'];
   agentData = { ...profile };
 
-  document.getElementById('agent-id').value = profile.id;
-  document.getElementById('agent-name').value = profile.name;
-  document.getElementById('agent-queue').value = profile.queue;
-  document.getElementById('urgency-level').value = profile.urgency;
+  const idInput = document.getElementById('agent-id');
+  const nameInput = document.getElementById('agent-name');
+  const queueInput = document.getElementById('agent-queue');
+  const urgencyInput = document.getElementById('urgency-level');
+
+  if (idInput) idInput.value = profile.id;
+  if (nameInput) nameInput.value = profile.name;
+  if (queueInput) queueInput.value = profile.queue;
+  if (urgencyInput) urgencyInput.value = profile.urgency;
 
   // Auto select default AUX radio if present
   const radio = document.querySelector(`input[name="aux-code"][value="${profile.auxDefault}"]`);
@@ -218,24 +245,48 @@ function applyAgentPersona(agentKey) {
     localStorage.removeItem('wfm_request_history');
   }
 
-  authMsg.style.color = '#38bdf8';
-  authMsg.textContent = `Selected: ${profile.name} - ${profile.note}`;
+  if (autoAuthenticate) {
+    isAuthenticated = true;
+    if (authBadge) {
+      authBadge.classList.remove('guest');
+      authBadge.classList.add('authenticated');
+    }
+    if (authStatusText) {
+      authStatusText.textContent = `Authenticated: ${profile.name} (${profile.id})`;
+    }
+    if (authMsg) {
+      authMsg.style.color = '#10b981';
+      authMsg.textContent = `✓ SSO Verified: ${profile.name} (${profile.queue})`;
+    }
+    if (breakSection) {
+      breakSection.classList.remove('disabled');
+    }
+    if (btnAuthenticate) {
+      btnAuthenticate.textContent = 'Re-authenticate';
+      btnAuthenticate.disabled = false;
+    }
+  } else {
+    if (authMsg) {
+      authMsg.style.color = '#38bdf8';
+      authMsg.textContent = `Selected: ${profile.name} - ${profile.note}`;
+    }
+  }
 }
 
 if (presetSelect) {
   presetSelect.addEventListener('change', (e) => {
-    applyAgentPersona(e.target.value);
+    applyAgentPersona(e.target.value, true);
   });
 }
 
 // Check URL query parameters for pre-selected agent
 const urlParams = new URLSearchParams(window.location.search);
-const queryAgent = urlParams.get('agent');
+const queryAgent = urlParams.get('agent') || urlParams.get('agentId') || urlParams.get('id');
 if (queryAgent && AGENT_PERSONAS[queryAgent]) {
   if (presetSelect) presetSelect.value = queryAgent;
-  applyAgentPersona(queryAgent);
+  applyAgentPersona(queryAgent, true);
 } else {
-  applyAgentPersona('AGT-8842');
+  applyAgentPersona('AGT-8842', true);
 }
 
 // Live gauges update simulation
@@ -262,8 +313,10 @@ btnAuthenticate.addEventListener('click', () => {
   const queue = document.getElementById('agent-queue').value;
 
   if (!id || !name) {
-    authMsg.style.color = '#ef4444';
-    authMsg.textContent = 'Please enter valid Agent ID & Name.';
+    if (authMsg) {
+      authMsg.style.color = '#ef4444';
+      authMsg.textContent = 'Please enter valid Agent ID & Name.';
+    }
     return;
   }
 
@@ -276,36 +329,54 @@ btnAuthenticate.addEventListener('click', () => {
     agentData.name = name;
     agentData.queue = queue;
 
-    authBadge.classList.remove('guest');
-    authBadge.classList.add('authenticated');
-    authStatusText.textContent = `Authenticated: ${agentData.name} (${agentData.id})`;
+    if (authBadge) {
+      authBadge.classList.remove('guest');
+      authBadge.classList.add('authenticated');
+    }
+    if (authStatusText) {
+      authStatusText.textContent = `Authenticated: ${agentData.name} (${agentData.id})`;
+    }
 
-    authMsg.style.color = '#10b981';
-    authMsg.textContent = `✓ SSO Verified: ${agentData.name} (${agentData.queue})`;
+    if (authMsg) {
+      authMsg.style.color = '#10b981';
+      authMsg.textContent = `✓ SSO Verified: ${agentData.name} (${agentData.queue})`;
+    }
 
-    breakSection.classList.remove('disabled');
-    btnAuthenticate.textContent = 'Re-authenticate';
-    btnAuthenticate.disabled = false;
-  }, 600);
+    if (breakSection) {
+      breakSection.classList.remove('disabled');
+    }
+    btnAuthenticate.textContent = '✓ Authenticated';
+    setTimeout(() => {
+      btnAuthenticate.textContent = 'Re-authenticate';
+      btnAuthenticate.disabled = false;
+    }, 1000);
+  }, 400);
 });
 
-// Duration selection
+// Duration selection (Minutes & Seconds)
 durationPills.forEach(pill => {
   pill.addEventListener('click', () => {
-    durationPills.forEach(p => p.classList.remove('active'));
-    pill.classList.add('active');
-    selectedMinutes = parseInt(pill.getAttribute('data-minutes'), 10);
-    customMinutesInput.value = '';
+    const m = parseInt(pill.getAttribute('data-minutes') ?? '15', 10);
+    const s = parseInt(pill.getAttribute('data-seconds') ?? '0', 10);
+    setDuration(m, s);
   });
 });
 
-customMinutesInput.addEventListener('input', (e) => {
-  const val = parseInt(e.target.value, 10);
-  if (val && val > 0) {
-    durationPills.forEach(p => p.classList.remove('active'));
-    selectedMinutes = val;
-  }
-});
+if (customMinutesInput) {
+  customMinutesInput.addEventListener('input', () => {
+    const m = parseInt(customMinutesInput.value, 10) || 0;
+    const s = parseInt(customSecondsInput ? customSecondsInput.value : 0, 10) || 0;
+    setDuration(m, s);
+  });
+}
+
+if (customSecondsInput) {
+  customSecondsInput.addEventListener('input', () => {
+    const m = parseInt(customMinutesInput ? customMinutesInput.value : 0, 10) || 0;
+    const s = parseInt(customSecondsInput.value, 10) || 0;
+    setDuration(m, s);
+  });
+}
 
 // Evaluate Break Request (ACD forecast + Behavioral Patterns + Frequency Limiter)
 async function evaluateBreakRequest(requestPayload) {
@@ -425,8 +496,27 @@ function runClientSideDecisionEngine(payload) {
 // Submit Break Request
 btnSubmitBreak.addEventListener('click', async () => {
   if (!isAuthenticated) {
-    alert('Please authenticate first in Step 1.');
-    return;
+    const currentId = document.getElementById('agent-id')?.value.trim();
+    const currentName = document.getElementById('agent-name')?.value.trim();
+    if (currentId && currentName) {
+      isAuthenticated = true;
+      agentData.id = currentId;
+      agentData.name = currentName;
+      agentData.queue = document.getElementById('agent-queue')?.value || 'Tier-2 Tech Support';
+      if (authBadge) {
+        authBadge.classList.remove('guest');
+        authBadge.classList.add('authenticated');
+      }
+      if (authStatusText) {
+        authStatusText.textContent = `Authenticated: ${agentData.name} (${agentData.id})`;
+      }
+      if (breakSection) {
+        breakSection.classList.remove('disabled');
+      }
+    } else {
+      alert('Please enter valid Agent ID & Name in Step 1 to authenticate.');
+      return;
+    }
   }
 
   const selectedRadio = document.querySelector('input[name="aux-code"]:checked');
@@ -435,12 +525,17 @@ btnSubmitBreak.addEventListener('click', async () => {
   const urgency = document.getElementById('urgency-level').value;
   const notes = document.getElementById('break-notes').value.trim();
 
+  const totalSeconds = (selectedMinutes * 60) + selectedSeconds;
+  const durFormatted = selectedMinutes > 0 ? (selectedSeconds > 0 ? `${selectedMinutes}m ${selectedSeconds}s` : `${selectedMinutes}m`) : `${selectedSeconds}s`;
   const payload = {
     id: 'REQ-' + Math.floor(100000 + Math.random() * 900000),
     timestamp: new Date().toISOString(),
     agent: agentData,
     auxCode,
     durationMinutes: selectedMinutes,
+    durationSeconds: selectedSeconds,
+    durationTotalSeconds: totalSeconds,
+    durationFormatted: durFormatted,
     backupAgent,
     urgency,
     notes
@@ -499,11 +594,14 @@ btnSubmitBreak.addEventListener('click', async () => {
           agent: agentData,
           auxCode: payload.auxCode,
           durationMinutes: payload.durationMinutes,
+          durationSeconds: payload.durationSeconds,
+          durationTotalSeconds: totalSeconds,
+          durationFormatted: durFormatted,
           thresholdMins: selectedThresh,
           alertDevice: selectedDevice,
           device: selectedDevice,
           approvedAt: Date.now(),
-          expiresAt: Date.now() + (payload.durationMinutes * 60 * 1000)
+          expiresAt: Date.now() + (totalSeconds * 1000)
         }
       };
 
@@ -622,3 +720,18 @@ document.querySelectorAll('.aux-option').forEach(opt => {
     }, 50);
   });
 });
+
+
+// Auto-sync agent persona from URL param (?agentId=...) or localStorage
+(function initAgentFromHome() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const targetId = params.get('agentId') || localStorage.getItem('activeAgentId');
+    if (targetId && presetSelect && AGENT_PERSONAS[targetId]) {
+      presetSelect.value = targetId;
+      applyAgentPersona(targetId);
+    }
+  } catch (e) {
+    console.warn('Agent auto-sync error:', e);
+  }
+})();
