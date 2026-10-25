@@ -521,9 +521,9 @@ btnSubmitBreak.addEventListener('click', async () => {
 
   const selectedRadio = document.querySelector('input[name="aux-code"]:checked');
   const auxCode = selectedRadio ? selectedRadio.value : 'AUX-1: Scheduled Lunch';
-  const backupAgent = document.getElementById('backup-agent').value.trim();
-  const urgency = document.getElementById('urgency-level').value;
-  const notes = document.getElementById('break-notes').value.trim();
+  const backupAgent = document.getElementById('backup-agent')?.value?.trim() || '';
+  const urgency = document.getElementById('urgency-level')?.value || 'Normal';
+  const notes = document.getElementById('break-notes')?.value?.trim() || '';
 
   const totalSeconds = (selectedMinutes * 60) + selectedSeconds;
   const durFormatted = selectedMinutes > 0 ? (selectedSeconds > 0 ? `${selectedMinutes}m ${selectedSeconds}s` : `${selectedMinutes}m`) : `${selectedSeconds}s`;
@@ -570,7 +570,7 @@ btnSubmitBreak.addEventListener('click', async () => {
       decisionDesc.textContent = decision.description;
 
       // Read selected device and threshold preferences
-      const selectedDevice = document.getElementById('portal-alert-device')?.value || 'both';
+      const selectedDevice = document.getElementById('portal-alert-device')?.value || 'mobile';
       const selectedThresh = parseInt(document.getElementById('portal-alert-threshold')?.value || '2', 10);
       const alertPrefs = {
         agentId: agentData.id,

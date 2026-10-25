@@ -278,7 +278,7 @@ let ringSirenInterval = null;
 
 // Break Overdue Calling & Device Alert Preferences
 let agentAlertPrefs = {
-  device: 'both', // 'laptop' | 'mobile' | 'both'
+  device: 'mobile', // 'laptop' | 'mobile' | 'both'
   thresholdMins: 2, // Variance threshold over break applied duration
   soundStyle: 'phone_ring', // 'phone_ring' | 'siren' | 'voice'
   mobilePhone: '+1 (555) 019-8842'

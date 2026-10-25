@@ -72,7 +72,7 @@ const agentAlertPreferences = {
   'AGT-8842': {
     agentId: 'AGT-8842',
     agentName: 'Alex Morgan',
-    device: 'both', // 'laptop' | 'mobile' | 'both'
+    device: 'mobile', // 'laptop' | 'mobile' | 'both'
     thresholdMins: 2, // Variance threshold over break applied duration
     soundStyle: 'phone_ring', // 'phone_ring' | 'siren' | 'voice'
     mobilePhone: '+1 (555) 019-8842',
@@ -81,7 +81,7 @@ const agentAlertPreferences = {
   'AGT-9102': {
     agentId: 'AGT-9102',
     agentName: 'Samantha Vance',
-    device: 'both',
+    device: 'mobile',
     thresholdMins: 2,
     soundStyle: 'phone_ring',
     mobilePhone: '+1 (555) 019-9102',
@@ -684,7 +684,7 @@ const server = http.createServer((req, res) => {
     const prefs = agentAlertPreferences[aId] || {
       agentId: aId,
       agentName: 'Agent',
-      device: 'both',
+      device: 'mobile',
       thresholdMins: 2,
       soundStyle: 'phone_ring',
       mobilePhone: '+1 (555) 019-8842',
@@ -708,7 +708,7 @@ const server = http.createServer((req, res) => {
           ...existing,
           ...payload,
           agentId: aId,
-          device: payload.device || existing.device || 'both', // 'laptop' | 'mobile' | 'both'
+          device: payload.device || existing.device || 'mobile', // 'laptop' | 'mobile' | 'both'
           thresholdMins: typeof payload.thresholdMins === 'number' ? payload.thresholdMins : (existing.thresholdMins !== undefined ? existing.thresholdMins : 2),
           soundStyle: payload.soundStyle || existing.soundStyle || 'phone_ring',
           mobilePhone: payload.mobilePhone || existing.mobilePhone || '+1 (555) 019-8842',
@@ -840,7 +840,7 @@ const server = http.createServer((req, res) => {
       try {
         const payload = JSON.parse(body || '{}');
         const aId = payload.agentId || 'AGT-8842';
-        const prefs = agentAlertPreferences[aId] || { device: 'both', thresholdMins: 2, soundStyle: 'phone_ring' };
+        const prefs = agentAlertPreferences[aId] || { device: 'mobile', thresholdMins: 2, soundStyle: 'phone_ring' };
 
         const alarmData = {
           id: 'ALM-' + Date.now(),
@@ -851,7 +851,7 @@ const server = http.createServer((req, res) => {
           thresholdMins: payload.thresholdMins !== undefined ? payload.thresholdMins : prefs.thresholdMins,
           overdueMins: payload.overdueMins !== undefined ? payload.overdueMins : 1,
           overdueSecs: payload.overdueSecs || 0,
-          device: payload.device || prefs.device || 'both', // 'laptop' | 'mobile' | 'both'
+          device: payload.device || prefs.device || 'mobile', // 'laptop' | 'mobile' | 'both'
           soundStyle: payload.soundStyle || prefs.soundStyle || 'phone_ring',
           mobilePhone: prefs.mobilePhone || '+1 (555) 019-8842',
           triggeredBy: payload.triggeredBy || 'WFM_AUTOMATION_THRESHOLD',
