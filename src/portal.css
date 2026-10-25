@@ -103,7 +103,7 @@ body {
   overflow: hidden;
   transition: all 0.25s ease;
   backdrop-filter: blur(16px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 10px 25px -5px rgba(0, 0, 0, 0.04);
 }
 
 .card.disabled {
@@ -160,7 +160,7 @@ body {
 .form-group label {
   font-size: 12px;
   font-weight: 600;
-  color: #cbd5e1;
+  color: #334155;
 }
 
 .section-label {
@@ -168,13 +168,13 @@ body {
   font-size: 13px;
   font-weight: 700;
   margin-bottom: 12px;
-  color: #ffffff;
+  color: #0f172a;
 }
 
 input, select, textarea {
-  background: rgba(15, 23, 42, 0.85);
+  background: #ffffff;
   border: 1px solid var(--border);
-  color: #f8fafc;
+  color: #0f172a;
   padding: 10px 14px;
   border-radius: 8px;
   font-size: 13px;
@@ -190,8 +190,8 @@ input:focus, select:focus, textarea:focus {
 .wfm-gauge-banner {
   display: flex;
   justify-content: space-around;
-  background: rgba(30, 58, 138, 0.18);
-  border: 1px dashed rgba(59, 130, 246, 0.35);
+  background: #eff6ff;
+  border: 1px dashed #bfdbfe;
   padding: 14px;
   border-radius: 12px;
   margin-bottom: 24px;
@@ -214,7 +214,7 @@ input:focus, select:focus, textarea:focus {
 .gauge-val {
   font-size: 15px;
   font-weight: 800;
-  color: #ffffff;
+  color: #0f172a;
   font-family: monospace;
 }
 
@@ -303,7 +303,7 @@ input:focus, select:focus, textarea:focus {
 .pill:hover {
   background: rgba(59, 130, 246, 0.15);
   border-color: rgba(59, 130, 246, 0.35);
-  color: #ffffff;
+  color: #1d4ed8;
 }
 
 .pill.active {
@@ -337,7 +337,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 .more-options-box {
-  background: rgba(15, 23, 42, 0.7);
+  background: #f8fafc;
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 14px;
@@ -347,7 +347,7 @@ input:focus, select:focus, textarea:focus {
 .more-options-box h4 {
   font-size: 13px;
   margin-bottom: 12px;
-  color: #93c5fd;
+  color: #0f172a;
 }
 
 .btn {
@@ -410,7 +410,7 @@ input:focus, select:focus, textarea:focus {
 .decision-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.85);
+  background: rgba(15, 23, 42, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -434,7 +434,7 @@ input:focus, select:focus, textarea:focus {
   max-width: 500px;
   padding: 32px 24px;
   text-align: center;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
 }
 
 .status-big-icon {
@@ -455,7 +455,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 .decision-metrics {
-  background: rgba(15, 23, 42, 0.7);
+  background: #f8fafc;
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 18px;
@@ -470,9 +470,9 @@ input:focus, select:focus, textarea:focus {
 .metric-row {
   display: flex;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid #e2e8f0;
   padding-bottom: 6px;
-  color: #cbd5e1;
+  color: #334155;
 }
 
 .metric-row:last-child {
@@ -490,7 +490,7 @@ input:focus, select:focus, textarea:focus {
   justify-content: center;
   background: rgba(59, 130, 246, 0.12);
   border: 1px solid rgba(59, 130, 246, 0.25);
-  color: #60a5fa;
+  color: #2563eb;
   margin-bottom: 8px;
   transition: all 0.2s ease;
 }
@@ -548,7 +548,7 @@ input:focus, select:focus, textarea:focus {
   flex-direction: column;
   gap: 12px;
   backdrop-filter: blur(16px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
 .sidebar-section-title {
@@ -557,7 +557,7 @@ input:focus, select:focus, textarea:focus {
   color: #64748b;
   letter-spacing: 0.8px;
   text-transform: uppercase;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid #e2e8f0;
   padding-bottom: 6px;
 }
 

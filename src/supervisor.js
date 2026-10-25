@@ -597,7 +597,7 @@ function renderQueue(queue) {
           <div style="font-weight:600; color:#0f172a;">${item.agentName || 'Agent'}</div>
           <small style="color:#64748b;">${item.agentId || 'AGT'}</small>
           <div style="margin-top:2px;">
-            <span class="status-tag" style="background:#1e293b; color:#93c5fd; border:1px solid #334155; font-size:9px;">
+            <span class="status-tag" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:9px;">
               ${item.supervisorName}
             </span>
           </div>
@@ -605,7 +605,7 @@ function renderQueue(queue) {
         <td>${item.auxCode || 'Break'}</td>
         <td>${item.durationMinutes ? item.durationMinutes + ' mins' : '-'}</td>
         <td><span class="status-tag ${tagClass}">${item.status}</span></td>
-        <td style="max-width: 320px; line-height: 1.4; color: #d1d5db;">
+        <td style="max-width: 320px; line-height: 1.4; color: #334155;">
           ${item.reason || 'Normal schedule interval.'}
         </td>
         <td>
@@ -656,7 +656,7 @@ function dispatchSupervisorBroadcast(severity, title, message) {
   }
 
   const statusMsg = document.getElementById('bc-status-msg');
-  statusMsg.style.color = '#34d399';
+  statusMsg.style.color = '#047857';
   statusMsg.textContent = `✓ Dispatched "${title}" to all agent widgets!`;
   setTimeout(() => { statusMsg.textContent = ''; }, 4000);
 }
@@ -1081,7 +1081,7 @@ function renderTrendSvgChart(dataSlice, multiplier) {
 
     const isTodayCol = (idx === chronological.length - 1);
     const barColor = isTodayCol ? '#2563eb' : '#94a3b8';
-    const handledColor = isTodayCol ? '#10b981' : '#cbd5e1';
+    const handledColor = isTodayCol ? '#10b981' : '#94a3b8';
 
     const shortDate = d.date.split('-').slice(1).join('/');
 
@@ -1678,7 +1678,7 @@ document.getElementById('btn-save-policies')?.addEventListener('click', async ()
   renderWallboard();
 
   const msg = document.getElementById('policy-save-msg');
-  msg.style.color = '#34d399';
+  msg.style.color = '#047857';
   msg.textContent = '✓ Operational shift adherence policy limits deployed and synchronized across all agent widgets and bots!';
   updateSupervisorHomePolicies(policyLimits);
   setTimeout(() => { msg.textContent = ''; }, 4500);
@@ -2538,7 +2538,7 @@ function executeSupBotCommand(cmd) {
       html += '<span style="color:#b91c1c; font-weight:700;">⚠️ Surge Detected! WFM recommends cross-skilling 3 CS agents to Billing.</span><br/>' +
         '<button class="btn btn-xs btn-primary" onclick="postQueueBalance(\'TRIGGER_REBALANCE\'); addSupBotMessage(\'bot\', \'Executed WFM Rebalance: 3 CS agents flexed to Billing!\');" style="margin-top:6px;">🔄 Execute Rebalance Now</button>';
     } else if (wfmRebalanceData.isRebalanced) {
-      html += '<span style="color:#38bdf8; font-weight:700;">✓ Dynamic Flex Active: 3 CS Agents flexed to Billing.</span>';
+      html += '<span style="color:#0284c7; font-weight:700;">✓ Dynamic Flex Active: 3 CS Agents flexed to Billing.</span>';
     } else {
       html += '<span style="color:#047857; font-weight:700;">✓ Queues Balanced: Normal operating levels.</span>';
     }
@@ -2673,12 +2673,12 @@ function renderItIncidents(tickets) {
     if (t.status === 'RESOLVED') tagClass = 'approved';
 
     return '<tr>' +
-      '<td style="font-family:monospace; color:#38bdf8; font-weight:700;">' + t.id + '</td>' +
+      '<td style="font-family:monospace; color:#2563eb; font-weight:700;">' + t.id + '</td>' +
       '<td style="font-family:monospace; color:#64748b;">' + timeStr + '</td>' +
       '<td><strong style="color:#0f172a;">' + t.agentName + '</strong><div style="font-family:monospace; font-size:11px; color:#64748b;">' + t.agentId + ' (' + t.queue + ')</div></td>' +
       '<td><span class="status-tag ' + tagClass + '">' + t.category + '</span></td>' +
       '<td style="color:#475569; max-width:320px; line-height:1.4;">' + t.description + '</td>' +
-      '<td><small style="color:#a78bfa; font-weight:700;">' + t.assignedTo + '</small></td>' +
+      '<td><small style="color:#6d28d9; font-weight:700;">' + t.assignedTo + '</small></td>' +
       '<td><span class="status-tag ' + tagClass + '">' + t.status + '</span></td>' +
     '</tr>';
   }).join('');
@@ -2903,14 +2903,14 @@ function renderEmergencyCampaign(campaign) {
     if (qPill) {
       qPill.textContent = `✓ SUFFICIENT STAFFING SECURED (${accepted}/${reqQuota})`;
       qPill.style.background = 'rgba(16,185,129,0.2)'; qPill.style.border = '1px solid rgba(16,185,129,0.4)';
-      qPill.style.color = '#34d399';
+      qPill.style.color = '#047857'; qPill.style.background = '#ecfdf5'; qPill.style.border = '1px solid #a7f3d0';
     }
     if (qFill) qFill.style.background = '#10b981';
   } else {
     if (qPill) {
       qPill.textContent = `● AWAITING AVAILABILITY (${accepted}/${reqQuota})`;
       qPill.style.background = 'rgba(245,158,11,0.2)'; qPill.style.border = '1px solid rgba(245,158,11,0.4)';
-      qPill.style.color = '#fbbf24';
+      qPill.style.color = '#b45309'; qPill.style.background = '#fffbeb'; qPill.style.border = '1px solid #fde68a';
     }
     if (qFill) qFill.style.background = 'linear-gradient(90deg, #3b82f6, #10b981)';
   }

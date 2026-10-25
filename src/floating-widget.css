@@ -5,7 +5,7 @@
   --fp-primary-hover: #1d4ed8;
   --fp-success: #10b981;
   --fp-dark: #0f172a;
-  --fp-header-bg: #0f172a;
+  --fp-header-bg: #ffffff;
   --fp-border: #e2e8f0;
   --fp-shadow: 0 12px 36px rgba(37, 99, 235, 0.32), 0 4px 12px rgba(15, 23, 42, 0.15);
 }
@@ -23,7 +23,7 @@
   border-radius: 50%;
   background: #ffffff;
   border: 2px solid #3b82f6;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5), 0 0 20px rgba(59, 130, 246, 0.35);
+  box-shadow: 0 10px 25px -3px rgba(37, 99, 235, 0.35), 0 4px 6px -2px rgba(15, 23, 42, 0.05);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -179,13 +179,13 @@
 /* PANEL HEADER BAR */
 .floating-panda-panel-header {
   background: var(--fp-header-bg);
-  color: #ffffff;
+  color: #0f172a;
   padding: 10px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   user-select: none;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid #e2e8f0;
   flex-shrink: 0;
 }
 
@@ -199,7 +199,8 @@
   width: 28px;
   height: 28px;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.1);
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -219,7 +220,7 @@
 .fp-header-title {
   font-size: 13px;
   font-weight: 800;
-  color: #ffffff;
+  color: #0f172a;
   letter-spacing: -0.2px;
   line-height: 1.2;
 }
@@ -249,9 +250,9 @@
 }
 
 .fp-action-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: #e2e8f0;
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
   width: 28px;
   height: 28px;
   border-radius: 6px;
@@ -265,8 +266,8 @@
 }
 
 .fp-action-btn:hover {
-  background: rgba(255, 255, 255, 0.22);
-  color: #ffffff;
+  background: #e2e8f0;
+  color: #0f172a;
   transform: scale(1.05);
 }
 
@@ -275,9 +276,9 @@
 }
 
 .fp-action-btn.btn-close:hover {
-  background: #dc2626;
-  border-color: #ef4444;
-  color: #ffffff;
+  background: #fef2f2;
+  border-color: #fecaca;
+  color: #b91c1c;
 }
 
 /* PANEL IFRAME BODY */

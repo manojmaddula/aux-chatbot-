@@ -187,21 +187,21 @@
       letter-spacing: 0.5px;
       padding: 4px 10px;
       border-radius: 6px;
-      background: rgba(59, 130, 246, 0.2);
-      color: #60a5fa;
-      border: 1px solid rgba(59, 130, 246, 0.4);
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
     }
 
     .status-tag.on-break {
-      background: rgba(245, 158, 11, 0.2);
-      color: #fbbf24;
-      border-color: rgba(245, 158, 11, 0.4);
+      background: #fffbeb;
+      color: #b45309;
+      border-color: #fde68a;
     }
 
     .status-tag.overdue {
-      background: rgba(239, 68, 68, 0.25);
-      color: #f87171;
-      border-color: rgba(239, 68, 68, 0.5);
+      background: #fef2f2;
+      color: #b91c1c;
+      border-color: #fecaca;
       animation: pulse 1.2s infinite;
     }
 
@@ -440,7 +440,7 @@
       font-weight: 700;
       letter-spacing: 1.5px;
       text-transform: uppercase;
-      color: #f87171;
+      color: #b91c1c;
       margin-bottom: 8px;
       display: flex;
       align-items: center;
@@ -642,7 +642,7 @@
     .emergency-mobile-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: radial-gradient(circle at 50% 20%, rgba(30, 20, 35, 0.94) 0%, rgba(8, 10, 18, 0.97) 100%);
+      background: rgba(15, 23, 42, 0.55);
       backdrop-filter: blur(24px) saturate(160%);
       -webkit-backdrop-filter: blur(24px) saturate(160%);
       z-index: 10000;
@@ -670,13 +670,11 @@
     }
 
     .emergency-modal-content {
-      background: linear-gradient(180deg, #141a29 0%, #0b0f19 100%);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
       box-shadow: 
-        0 25px 60px -12px rgba(0, 0, 0, 0.85),
-        0 0 0 1px rgba(244, 63, 94, 0.28),
-        0 0 45px -8px rgba(244, 63, 94, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+        0 20px 50px -12px rgba(0, 0, 0, 0.15),
+        0 0 0 1px rgba(220, 38, 38, 0.15);
       border-radius: 26px;
       padding: 22px 20px;
       width: 100%;
@@ -785,7 +783,7 @@
       font-size: 21px;
       font-weight: 800;
       letter-spacing: -0.4px;
-      color: #ffffff;
+      color: #0f172a;
       margin: 0;
       line-height: 1.25;
     }
@@ -803,9 +801,9 @@
     .em-message-card {
       position: relative;
       z-index: 1;
-      background: rgba(255, 255, 255, 0.035);
-      border: 1px solid rgba(255, 255, 255, 0.07);
-      border-left: 3.5px solid #f43f5e;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-left: 3.5px solid #dc2626;
       border-radius: 12px;
       padding: 13px 15px;
       display: flex;
@@ -817,7 +815,7 @@
       display: flex;
       align-items: center;
       gap: 6px;
-      color: #fda4af;
+      color: #b91c1c;
       font-size: 11px;
       font-weight: 800;
       text-transform: uppercase;
@@ -929,8 +927,8 @@
 
     /* CONFIRMED SCREENS */
     .emergency-confirmed-box {
-      background: rgba(15, 23, 42, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.09);
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
       border-radius: 18px;
       padding: 18px 16px;
       display: flex;
@@ -970,7 +968,7 @@
     .em-confirmed-heading {
       font-size: 18px;
       font-weight: 800;
-      color: #34d399;
+      color: #047857;
       margin: 0;
       letter-spacing: -0.3px;
     }
@@ -978,14 +976,14 @@
     .em-declined-heading {
       font-size: 17px;
       font-weight: 800;
-      color: #f87171;
+      color: #b91c1c;
       margin: 0;
       letter-spacing: -0.3px;
     }
 
     .em-status-note {
       font-size: 12px;
-      color: #cbd5e1;
+      color: #475569;
       line-height: 1.45;
       margin: 0;
     }
@@ -993,8 +991,8 @@
     /* Shift Details iOS Widget Card */
     .shift-details-card {
       width: 100%;
-      background: rgba(10, 15, 29, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
       border-radius: 14px;
       padding: 12px 14px;
       display: flex;
@@ -1020,9 +1018,9 @@
     }
 
     .shift-badge-cyan {
-      background: rgba(14, 165, 233, 0.16);
-      border: 1px solid rgba(14, 165, 233, 0.4);
-      color: #38bdf8;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #0284c7;
       font-weight: 800;
       font-size: 13px;
       font-family: ui-monospace, SFMono-Regular, monospace;
@@ -1032,15 +1030,15 @@
     }
 
     .shift-val-white {
-      color: #f8fafc;
+      color: #0f172a;
       font-weight: 700;
       font-size: 12px;
     }
 
     .shift-badge-emerald {
-      background: rgba(16, 185, 129, 0.16);
-      border: 1px solid rgba(16, 185, 129, 0.4);
-      color: #34d399;
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      color: #047857;
       font-weight: 800;
       font-size: 11px;
       padding: 3px 8px;
@@ -1049,8 +1047,8 @@
 
     .workstation-action-box {
       width: 100%;
-      background: rgba(59, 130, 246, 0.1);
-      border: 1px solid rgba(59, 130, 246, 0.25);
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
       border-radius: 12px;
       padding: 12px 14px;
       display: flex;
@@ -1063,11 +1061,11 @@
       width: 36px;
       height: 36px;
       border-radius: 10px;
-      background: rgba(59, 130, 246, 0.2);
+      background: #dbeafe;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #60a5fa;
+      color: #1d4ed8;
       flex-shrink: 0;
       font-size: 18px;
     }
@@ -1075,7 +1073,7 @@
     .ws-text-body strong {
       display: block;
       font-size: 12px;
-      color: #93c5fd;
+      color: #1d4ed8;
       margin-bottom: 2px;
     }
 
@@ -1197,10 +1195,10 @@
         </div>
       </div>
 
-      <div id="workstation-notice-card" style="display:none; margin-top:14px; background:rgba(30, 41, 59, 0.7); border:1px solid rgba(59, 130, 246, 0.3); border-radius:12px; padding:12px; text-align:center;">
+      <div id="workstation-notice-card" style="display:none; margin-top:14px; background:#eff6ff; border:1px solid #bfdbfe; border-radius:12px; padding:12px; text-align:center;">
         <span style="font-size:22px;">💻</span>
-        <strong style="display:block; font-size:12px; color:#93c5fd; margin:4px 0 2px;">Laptop Resumption Required</strong>
-        <p style="font-size:11px; color:#94a3b8; line-height:1.4;">Workstation policy requires ending break from your laptop desk to resume AVAILABLE status.</p>
+        <strong style="display:block; font-size:12px; color:#1d4ed8; margin:4px 0 2px;">Laptop Resumption Required</strong>
+        <p style="font-size:11px; color:#475569; line-height:1.4;">Workstation policy requires ending break from your laptop desk to resume AVAILABLE status.</p>
       </div>
     </section>
 
@@ -1415,7 +1413,7 @@
       <!-- Post-response Declined Screen (ONLY shown if NO) -->
       <div id="emergency-confirmed-no" class="emergency-confirmed-box hidden" hidden style="display: none !important;">
         <div class="em-declined-avatar">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b91c1c" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"></circle>
             <line x1="12" y1="8" x2="12" y2="12"></line>
             <line x1="12" y1="16" x2="12.01" y2="16"></line>
