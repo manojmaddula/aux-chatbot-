@@ -589,7 +589,8 @@ const server = http.createServer((req, res) => {
 
     // 1. Auto-detect live tunnel from request headers (if accessed via cloudflare tunnel)
     const reqHost = req.headers['x-forwarded-host'] || req.headers.host || '';
-    if (reqHost.includes('.trycloudflare.com')) {
+    const isPublicHost = reqHost && !reqHost.includes('localhost') && !reqHost.includes('127.0.0.1') && !reqHost.startsWith('10.') && !reqHost.startsWith('192.168.');
+    if (isPublicHost) {
       const proto = req.headers['x-forwarded-proto'] || 'https';
       tunnelUrl = `${proto}://${reqHost}`;
       try {
