@@ -457,10 +457,10 @@ btnSubmitBreak.addEventListener('click', async () => {
   if (checkBackCard) checkBackCard.classList.add('hidden');
 
   decisionIcon.textContent = '⏳';
-  decisionTitle.style.color = '#f8fafc';
+  decisionTitle.style.color = '#0f172a';
   decisionTitle.textContent = 'Evaluating ACD & Behavioral Forecast...';
   decisionDesc.textContent = 'Communicating with WFM Telephony Switch & analyzing agent adherence records...';
-  decisionMetrics.innerHTML = '<div style="text-align:center; padding:10px; color:#94a3b8;">Processing Erlang-C staffing matrix...</div>';
+  decisionMetrics.innerHTML = '<div style="text-align:center; padding:10px; color:#1e3a8a;">Processing Erlang-C staffing matrix...</div>';
 
   const decision = await evaluateBreakRequest(payload);
 
@@ -566,7 +566,7 @@ btnSubmitBreak.addEventListener('click', async () => {
     for (const [key, val] of Object.entries(decision.metrics || {})) {
       metricsHtml += `
         <div class="metric-row">
-          <span style="color:#475569; font-weight:600;">${key}</span>
+          <span style="color:#0f172a; font-weight:600;">${key}</span>
           <strong style="color:#0f172a;">${val}</strong>
         </div>
       `;

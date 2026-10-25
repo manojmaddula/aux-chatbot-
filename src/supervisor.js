@@ -184,14 +184,14 @@ window.setTeamFilter = function(mode) {
       btnMy.style.color = '#fff';
       btnMy.style.background = '#2563eb';
       btnAll.className = 'btn btn-xs btn-outline';
-      btnAll.style.color = '#64748b';
-      btnAll.style.background = '#ffffff';
+      btnAll.style.color = '#1e3a8a';
+      btnAll.style.background = '#ffffff'; btnAll.style.borderColor = '#bfdbfe'; btnAll.style.color = '#2563eb';
     } else {
       btnAll.className = 'btn btn-xs btn-primary';
       btnAll.style.color = '#fff';
       btnAll.style.background = '#2563eb';
       btnMy.className = 'btn btn-xs btn-outline';
-      btnMy.style.color = '#64748b';
+      btnMy.style.color = '#1e3a8a';
       btnMy.style.background = '#ffffff';
     }
   }
@@ -210,14 +210,14 @@ window.setQueueFilter = function(mode) {
       btnMy.style.color = '#fff';
       btnMy.style.background = '#2563eb';
       btnAll.className = 'btn btn-xs btn-outline';
-      btnAll.style.color = '#64748b';
-      btnAll.style.background = '#ffffff';
+      btnAll.style.color = '#1e3a8a';
+      btnAll.style.background = '#ffffff'; btnAll.style.borderColor = '#bfdbfe'; btnAll.style.color = '#2563eb';
     } else {
       btnAll.className = 'btn btn-xs btn-primary';
       btnAll.style.color = '#fff';
       btnAll.style.background = '#2563eb';
       btnMy.className = 'btn btn-xs btn-outline';
-      btnMy.style.color = '#64748b';
+      btnMy.style.color = '#1e3a8a';
       btnMy.style.background = '#ffffff';
     }
   }
@@ -234,14 +234,14 @@ window.setQATeamFilter = function(mode) {
       btnMy.style.color = '#fff';
       btnMy.style.background = '#2563eb';
       btnAll.className = 'btn btn-xs btn-outline';
-      btnAll.style.color = '#64748b';
-      btnAll.style.background = '#ffffff';
+      btnAll.style.color = '#1e3a8a';
+      btnAll.style.background = '#ffffff'; btnAll.style.borderColor = '#bfdbfe'; btnAll.style.color = '#2563eb';
     } else {
       btnAll.className = 'btn btn-xs btn-primary';
       btnAll.style.color = '#fff';
       btnAll.style.background = '#2563eb';
       btnMy.className = 'btn btn-xs btn-outline';
-      btnMy.style.color = '#64748b';
+      btnMy.style.color = '#1e3a8a';
       btnMy.style.background = '#ffffff';
     }
   }
@@ -306,7 +306,7 @@ function renderWallboard() {
   }
 
   if (filteredAgents.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:24px; color:#64748b;">
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding:24px; color:#1e3a8a;">
       No agents found in ${teamViewMode === 'my_team' ? currentSupervisor.name + "'s assigned team" : 'the contact center floor'} matching "${agentSearchQuery}".
     </td></tr>`;
     return;
@@ -325,9 +325,9 @@ function renderWallboard() {
 
     return `
       <tr style="${isMine ? 'background: rgba(37, 99, 235, 0.02);' : ''}">
-        <td style="font-family:monospace; color:#64748b;">${ag.id}</td>
+        <td style="font-family:monospace; color:#1e3a8a;">${ag.id}</td>
         <td><strong style="color:#0f172a;">${ag.name}</strong></td>
-        <td style="color:#475569;">${ag.queue}</td>
+        <td style="color:#0f172a;">${ag.queue}</td>
         <td>
           <span class="status-tag" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:10px; font-weight:700;">
             ${ag.supervisorName}
@@ -339,7 +339,7 @@ function renderWallboard() {
         <td>${ag.teaCount} / ${policyLimits.maxTeaBreaks}</td>
         <td>${ag.lunchVar}</td>
         <td>
-          <span style="display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; color:#1e293b; background:#f8fafc; padding:3px 8px; border-radius:6px; border:1px solid #cbd5e1;">
+          <span style="display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; color:#1e293b; background:#ffffff; padding:3px 8px; border-radius:6px; border:1px solid #bfdbfe;">
             ${(ag.alertDevice || (ag.id === 'AGT-4491' ? 'mobile' : 'both')) === 'both' ? '💻+📱 Both' : ((ag.alertDevice || (ag.id === 'AGT-4491' ? 'mobile' : 'both')) === 'mobile' ? '📱 Mobile' : '💻 Laptop')}
             <span style="color:#d97706;">(+${ag.thresholdMins || 2}m)</span>
           </span>
@@ -409,7 +409,7 @@ function showSupervisorToast(msg, isSuccess = true) {
   toast.style.display = 'flex';
   toast.style.borderLeftColor = isSuccess ? '#10b981' : '#ef4444';
   const icon = (msg.includes('Voice') || msg.includes('Recall') || msg.includes('Bot')) ? '📞' : '🚨';
-  toast.innerHTML = `<div style="font-size:26px;">${icon}</div><div><strong style="display:block; font-size:12px; color:#94a3b8; text-transform:uppercase; letter-spacing:0.5px;">Floor Adherence Action</strong><div style="font-weight:600;">${msg}</div></div>`;
+  toast.innerHTML = `<div style="font-size:26px;">${icon}</div><div><strong style="display:block; font-size:12px; color:#1e3a8a; text-transform:uppercase; letter-spacing:0.5px;">Floor Adherence Action</strong><div style="font-weight:600;">${msg}</div></div>`;
   toast.style.opacity = '1';
   toast.style.transform = 'translateY(0)';
   
@@ -578,7 +578,7 @@ function renderQueue(queue) {
   if (badgeEl) badgeEl.textContent = displayQueue.length;
 
   if (!displayQueue || displayQueue.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:#64748b; padding:20px;">
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:#1e3a8a; padding:20px;">
       No break requests in ${queueViewMode === 'my_team' ? currentSupervisor.name + "'s queue" : 'all floor queues'}.
     </td></tr>`;
     return;
@@ -591,11 +591,11 @@ function renderQueue(queue) {
     
     return `
       <tr>
-        <td style="color:#64748b; font-family:monospace;">${timeStr}</td>
+        <td style="color:#1e3a8a; font-family:monospace;">${timeStr}</td>
         <td><strong>${item.id || 'REQ-AUTO'}</strong></td>
         <td>
           <div style="font-weight:600; color:#0f172a;">${item.agentName || 'Agent'}</div>
-          <small style="color:#64748b;">${item.agentId || 'AGT'}</small>
+          <small style="color:#1e3a8a;">${item.agentId || 'AGT'}</small>
           <div style="margin-top:2px;">
             <span class="status-tag" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:9px;">
               ${item.supervisorName}
@@ -605,7 +605,7 @@ function renderQueue(queue) {
         <td>${item.auxCode || 'Break'}</td>
         <td>${item.durationMinutes ? item.durationMinutes + ' mins' : '-'}</td>
         <td><span class="status-tag ${tagClass}">${item.status}</span></td>
-        <td style="max-width: 320px; line-height: 1.4; color: #334155;">
+        <td style="max-width: 320px; line-height: 1.4; color: #0f172a;">
           ${item.reason || 'Normal schedule interval.'}
         </td>
         <td>
@@ -683,7 +683,7 @@ function renderActiveBroadcasts() {
           <span class="adv-time">${timeStr}</span>
         </div>
         <strong style="color:#0f172a; font-size:12px; margin:4px 0; display:block;">${b.title}</strong>
-        <p style="font-size:11px; color:#475569; line-height:1.4;">${b.message}</p>
+        <p style="font-size:11px; color:#0f172a; line-height:1.4;">${b.message}</p>
         <div style="display:flex; justify-content:flex-end; margin-top:6px;">
           <button class="btn btn-sm btn-outline" onclick="retractBroadcast('${b.id}')">Retract Broadcast</button>
         </div>
@@ -829,7 +829,7 @@ function renderBirthdayCalendar() {
   }
 
   if (list.length === 0) {
-    container.innerHTML = '<div style="grid-column: 1 / -1; text-align:center; padding:30px; color:#64748b;">No birthdays match your selected filter or search criteria.</div>';
+    container.innerHTML = '<div style="grid-column: 1 / -1; text-align:center; padding:30px; color:#1e3a8a;">No birthdays match your selected filter or search criteria.</div>';
     return;
   }
 
@@ -848,7 +848,7 @@ function renderBirthdayCalendar() {
       countdownText = '<span style="color:#d97706; font-weight:700;">In 1 day</span>';
     } else {
       badgeHtml = '<span class="bday-badge-upcoming">🎈 ' + item.birthDateStr + '</span>';
-      countdownText = '<span style="color:#64748b;">In ' + item.daysUntil + ' days</span>';
+      countdownText = '<span style="color:#1e3a8a;">In ' + item.daysUntil + ' days</span>';
     }
 
     const isPublished = publishedBirthdaysSet.has(item.id);
@@ -864,14 +864,14 @@ function renderBirthdayCalendar() {
               '<strong style="color:#0f172a; font-size:13px;">' + item.name + '</strong>' +
               '<span class="status-tag ' + (item.isSupervisor ? 'approved' : 'aux') + '" style="font-size:9px; padding:2px 6px;">' + (item.isSupervisor ? 'Supervisor' : 'Agent') + '</span>' +
             '</div>' +
-            '<div style="font-family:monospace; font-size:11px; color:#64748b;">' + item.id + ' • ' + item.queue + '</div>' +
+            '<div style="font-family:monospace; font-size:11px; color:#1e3a8a;">' + item.id + ' • ' + item.queue + '</div>' +
           '</div>' +
         '</div>' +
         badgeHtml +
       '</div>' +
 
-      '<div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; padding:6px 10px; background:#f8fafc; border-radius:6px; margin-bottom:12px; border:1px solid #f1f5f9;">' +
-        '<div><span style="color:#64748b;">Birthday:</span> <strong style="color:#0f172a;">' + item.birthDateStr + '</strong></div>' +
+      '<div style="display:flex; justify-content:space-between; align-items:center; font-size:11px; padding:6px 10px; background:#ffffff; border-radius:6px; margin-bottom:12px; border:1px solid #dbeafe;">' +
+        '<div><span style="color:#1e3a8a;">Birthday:</span> <strong style="color:#0f172a;">' + item.birthDateStr + '</strong></div>' +
         '<div>' + countdownText + '</div>' +
       '</div>' +
 
@@ -1080,8 +1080,8 @@ function renderTrendSvgChart(dataSlice, multiplier) {
     linePoints.push((x + colW / 2) + ',' + slaY);
 
     const isTodayCol = (idx === chronological.length - 1);
-    const barColor = isTodayCol ? '#2563eb' : '#94a3b8';
-    const handledColor = isTodayCol ? '#10b981' : '#94a3b8';
+    const barColor = isTodayCol ? '#2563eb' : '#bfdbfe';
+    const handledColor = isTodayCol ? '#10b981' : '#a7f3d0';
 
     const shortDate = d.date.split('-').slice(1).join('/');
 
@@ -1093,7 +1093,7 @@ function renderTrendSvgChart(dataSlice, multiplier) {
       // Handled bar (nested or overlay)
       '<rect x="' + (x + 2) + '" y="' + yHandled + '" width="' + (colW - 4) + '" height="' + handledH + '" rx="2" fill="' + handledColor + '" opacity="0.9" />' +
       // Date label
-      '<text x="' + (x + colW / 2) + '" y="' + (h - 8) + '" font-size="10" fill="#64748b" text-anchor="middle" font-weight="' + (isTodayCol ? '700' : '400') + '">' + shortDate + '</text>' +
+      '<text x="' + (x + colW / 2) + '" y="' + (h - 8) + '" font-size="10" fill="#1e3a8a" text-anchor="middle" font-weight="' + (isTodayCol ? '700' : '400') + '">' + shortDate + '</text>' +
     '</g>';
   });
 
@@ -1108,9 +1108,9 @@ function renderTrendSvgChart(dataSlice, multiplier) {
 
   container.innerHTML = '<svg viewBox="0 0 ' + w + ' ' + h + '" style="width:100%; height:100%; overflow:visible;">' +
     // Grid lines
-    '<line x1="' + padL + '" y1="' + padT + '" x2="' + (w - padR) + '" y2="' + padT + '" stroke="#f1f5f9" />' +
-    '<line x1="' + padL + '" y1="' + (padT + chartH / 2) + '" x2="' + (w - padR) + '" y2="' + (padT + chartH / 2) + '" stroke="#f1f5f9" />' +
-    '<line x1="' + padL + '" y1="' + (padT + chartH) + '" x2="' + (w - padR) + '" y2="' + (padT + chartH) + '" stroke="#e2e8f0" />' +
+    '<line x1="' + padL + '" y1="' + padT + '" x2="' + (w - padR) + '" y2="' + padT + '" stroke="#dbeafe" />' +
+    '<line x1="' + padL + '" y1="' + (padT + chartH / 2) + '" x2="' + (w - padR) + '" y2="' + (padT + chartH / 2) + '" stroke="#dbeafe" />' +
+    '<line x1="' + padL + '" y1="' + (padT + chartH) + '" x2="' + (w - padR) + '" y2="' + (padT + chartH) + '" stroke="#dbeafe" />' +
     benchmarkLine +
     barsSvg +
     slaPath +
@@ -1137,8 +1137,8 @@ function renderTrendHourlyBars() {
 
     return '<div class="trend-hourly-row">' +
       '<div style="display:flex; justify-content:space-between; font-size:11px;">' +
-        '<span><strong style="color:#0f172a;">' + h.hour + '</strong> <small style="color:#64748b;">(' + h.peakNote + ')</small></span>' +
-        '<span><span style="color:#64748b;">Base: ' + h.prevDaysAvg + '</span> vs <strong style="color:' + (isSurgeHour ? '#ef4444' : '#2563eb') + ';">' + h.todayActual + ' Today</strong></span>' +
+        '<span><strong style="color:#0f172a;">' + h.hour + '</strong> <small style="color:#1e3a8a;">(' + h.peakNote + ')</small></span>' +
+        '<span><span style="color:#1e3a8a;">Base: ' + h.prevDaysAvg + '</span> vs <strong style="color:' + (isSurgeHour ? '#ef4444' : '#2563eb') + ';">' + h.todayActual + ' Today</strong></span>' +
       '</div>' +
       '<div class="trend-bar-track">' +
         '<div class="trend-bar-baseline" style="width:' + basePct + '%;" title="Prev Days Baseline: ' + h.prevDaysAvg + '"></div>' +
@@ -1288,7 +1288,7 @@ function loadReport(key) {
   const tbody = document.getElementById('report-table-body');
   if (tbody) {
     if (displayRows.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="${rep.headers.length}" style="text-align:center; padding:24px; color:#64748b;">
+      tbody.innerHTML = `<tr><td colspan="${rep.headers.length}" style="text-align:center; padding:24px; color:#1e3a8a;">
         No entries in this audit report for ${currentSupervisor.name}'s assigned agents. Toggle 'All Floor' to inspect organization-wide metrics.
       </td></tr>`;
     } else {
@@ -1385,7 +1385,7 @@ function renderQAScorecard() {
   });
 
   if (filteredData.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:#64748b;">No interaction records found matching current filter/search.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:#1e3a8a;">No interaction records found matching current filter/search.</td></tr>`;
     return;
   }
 
@@ -1426,7 +1426,7 @@ function renderQAScorecard() {
       <tr style="${isRudeOrBad ? 'background: rgba(239, 68, 68, 0.05);' : ''}">
         <td>
           <div style="font-weight:600; color:#0f172a;">${item.name}</div>
-          <small style="color:#64748b; font-family:monospace;">${item.agentId}</small>
+          <small style="color:#1e3a8a; font-family:monospace;">${item.agentId}</small>
         </td>
         <td style="font-family:monospace; color:#2563eb;">${item.contactId}</td>
         <td><span class="status-tag ${toneBadgeClass}">${item.tone}</span></td>
@@ -1971,7 +1971,7 @@ function renderQueueBalanceUI() {
           reqEl.style.color = '#10b981';
         } else {
           reqEl.textContent = 'Required: 4';
-          reqEl.style.color = '#64748b';
+          reqEl.style.color = '#1e3a8a';
         }
       } else if (key === 'customerService') {
         if (q.status === 'FLEXED_DONOR') {
@@ -1979,7 +1979,7 @@ function renderQueueBalanceUI() {
           reqEl.style.color = '#f59e0b';
         } else {
           reqEl.textContent = '3 Idle / Underutilized';
-          reqEl.style.color = '#64748b';
+          reqEl.style.color = '#1e3a8a';
         }
       }
     }
@@ -2000,11 +2000,11 @@ function renderQueueBalanceUI() {
       } else if (q.status === 'IDLE_SURPLUS') {
         tagEl.className = 'status-tag approved';
         tagEl.textContent = 'IDLE SURPLUS';
-        if (cardEl) { cardEl.style.borderColor = '#e2e8f0'; cardEl.style.boxShadow = 'none'; }
+        if (cardEl) { cardEl.style.borderColor = '#dbeafe'; cardEl.style.boxShadow = 'none'; }
       } else {
         tagEl.className = 'status-tag approved';
         tagEl.textContent = 'NORMAL (SLA OK)';
-        if (cardEl) { cardEl.style.borderColor = '#e2e8f0'; cardEl.style.boxShadow = 'none'; }
+        if (cardEl) { cardEl.style.borderColor = '#dbeafe'; cardEl.style.boxShadow = 'none'; }
       }
     }
   }
@@ -2121,15 +2121,15 @@ function renderQueueBalanceUI() {
 
   if (rosterBody) {
     if (!wfmRebalanceData.reallocatedAgents || wfmRebalanceData.reallocatedAgents.length === 0) {
-      rosterBody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#64748b; padding:20px;">No agents currently flexed. All personnel operating on base WFM shift schedules.</td></tr>';
+      rosterBody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#1e3a8a; padding:20px;">No agents currently flexed. All personnel operating on base WFM shift schedules.</td></tr>';
     } else {
       rosterBody.innerHTML = wfmRebalanceData.reallocatedAgents.map(ag => {
         return '<tr>' +
-          '<td><strong style="color:#0f172a;">' + ag.name + '</strong><div style="font-family:monospace; color:#64748b; font-size:11px;">' + ag.id + '</div></td>' +
+          '<td><strong style="color:#0f172a;">' + ag.name + '</strong><div style="font-family:monospace; color:#1e3a8a; font-size:11px;">' + ag.id + '</div></td>' +
           '<td><span class="status-tag approved">' + ag.baseSkill + '</span></td>' +
           '<td><strong style="color:#2563eb;">' + (ag.flexSchedule || '10:00 - 11:30 (Intraday Skill Flex)') + '</strong></td>' +
           '<td><span class="status-tag aux">' + ag.flexSkill + '</span></td>' +
-          '<td><small style="color:#475569; font-family:monospace;">' + ag.priorityRouting + '</small></td>' +
+          '<td><small style="color:#0f172a; font-family:monospace;">' + ag.priorityRouting + '</small></td>' +
           '<td><span class="status-tag approved">ACTIVE FLEX</span></td>' +
           '<td><button class="btn btn-xs btn-outline" onclick="restoreSingleAgent(\'' + ag.id + '\')">Restore Base</button></td>' +
         '</tr>';
@@ -2662,7 +2662,7 @@ function renderItIncidents(tickets) {
   if (!tbody) return;
 
   if (!tickets || tickets.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#64748b; padding:16px;">No active IT system incidents reported. All systems operational.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; color:#1e3a8a; padding:16px;">No active IT system incidents reported. All systems operational.</td></tr>';
     return;
   }
 
@@ -2674,10 +2674,10 @@ function renderItIncidents(tickets) {
 
     return '<tr>' +
       '<td style="font-family:monospace; color:#2563eb; font-weight:700;">' + t.id + '</td>' +
-      '<td style="font-family:monospace; color:#64748b;">' + timeStr + '</td>' +
-      '<td><strong style="color:#0f172a;">' + t.agentName + '</strong><div style="font-family:monospace; font-size:11px; color:#64748b;">' + t.agentId + ' (' + t.queue + ')</div></td>' +
+      '<td style="font-family:monospace; color:#1e3a8a;">' + timeStr + '</td>' +
+      '<td><strong style="color:#0f172a;">' + t.agentName + '</strong><div style="font-family:monospace; font-size:11px; color:#1e3a8a;">' + t.agentId + ' (' + t.queue + ')</div></td>' +
       '<td><span class="status-tag ' + tagClass + '">' + t.category + '</span></td>' +
-      '<td style="color:#475569; max-width:320px; line-height:1.4;">' + t.description + '</td>' +
+      '<td style="color:#0f172a; max-width:320px; line-height:1.4;">' + t.description + '</td>' +
       '<td><small style="color:#6d28d9; font-weight:700;">' + t.assignedTo + '</small></td>' +
       '<td><span class="status-tag ' + tagClass + '">' + t.status + '</span></td>' +
     '</tr>';
@@ -2853,7 +2853,7 @@ function renderEmptyEmergencyTable() {
   if (bar) bar.style.display = 'none';
 
   if (tbody) {
-    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:#64748b;">
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:24px; color:#1e3a8a;">
       No active emergency mobile recall campaign running. Click <strong>"Notify All Unavailable"</strong> to alert agents on mobile.
     </td></tr>`;
   }
@@ -2928,20 +2928,20 @@ function renderEmergencyCampaign(campaign) {
       rowBg = 'background: rgba(16, 185, 129, 0.04);';
     } else if (ag.status === 'DECLINED') {
       responseBadge = '<span class="status-tag overdue" style="background:#fef2f2; color:#b91c1c; border:1px solid #fecaca; font-weight:800; font-size:11px; padding:4px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> NO (Declined)</span>';
-      shiftDisplay = '<span style="color:#94a3b8; font-size:11px;">-</span>';
+      shiftDisplay = '<span style="color:#1e3a8a; font-size:11px;">-</span>';
       rowBg = 'background: rgba(239, 68, 68, 0.03);';
     } else {
       responseBadge = '<span class="status-tag" style="background:#fffbeb; color:#b45309; border:1px solid #fde68a; font-weight:700; font-size:11px; padding:4px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Awaiting Mobile Tap...</span>';
-      shiftDisplay = `<span style="color:#64748b; font-size:11px;">${ag.shiftTimings} (Pending)</span>`;
+      shiftDisplay = `<span style="color:#1e3a8a; font-size:11px;">${ag.shiftTimings} (Pending)</span>`;
     }
 
-    const timeFormatted = ag.responseTime ? new Date(ag.responseTime).toLocaleTimeString() : '<span style="color:#94a3b8;">-</span>';
+    const timeFormatted = ag.responseTime ? new Date(ag.responseTime).toLocaleTimeString() : '<span style="color:#1e3a8a;">-</span>';
 
     return `
       <tr style="${rowBg}">
-        <td style="font-family:monospace; color:#64748b; font-weight:700;">${ag.agentId}</td>
+        <td style="font-family:monospace; color:#1e3a8a; font-weight:700;">${ag.agentId}</td>
         <td><strong style="color:#0f172a;">${ag.agentName}</strong></td>
-        <td style="color:#475569; font-size:12px;">${ag.queue || 'General Support'}</td>
+        <td style="color:#0f172a; font-size:12px;">${ag.queue || 'General Support'}</td>
         <td><span class="status-tag aux" style="font-size:10px;">${ag.currentState || 'AUX Break'}</span></td>
         <td>
           <span style="display:inline-flex; align-items:center; gap:5px; font-size:11px; color:#0284c7; font-weight:700; background:#f0f9ff; padding:3px 8px; border-radius:6px; border:1px solid #bae6fd;">
@@ -2949,7 +2949,7 @@ function renderEmergencyCampaign(campaign) {
           </span>
         </td>
         <td>${responseBadge}</td>
-        <td style="font-family:monospace; font-size:11px; color:#475569;">${timeFormatted}</td>
+        <td style="font-family:monospace; font-size:11px; color:#0f172a;">${timeFormatted}</td>
         <td>${shiftDisplay}</td>
         <td>
           ${ag.status === 'PENDING' ? `
@@ -2959,7 +2959,7 @@ function renderEmergencyCampaign(campaign) {
           ` : (ag.status === 'ACCEPTED' ? `
             <span style="font-size:11px; color:#15803d; font-weight:700;">✓ Confirmed</span>
           ` : `
-            <span style="font-size:11px; color:#94a3b8;">Unavailable</span>
+            <span style="font-size:11px; color:#1e3a8a;">Unavailable</span>
           `)}
         </td>
       </tr>
@@ -3064,12 +3064,12 @@ window.showQuotaFulfilledAlert = function(data) {
 
   if (listEl && data.acceptedAgents) {
     listEl.innerHTML = data.acceptedAgents.map(a => `
-      <div style="display:flex; justify-content:space-between; align-items:center; background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:9px 12px; font-size:12px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; background:#ffffff; border:1px solid #dbeafe; border-radius:10px; padding:9px 12px; font-size:12px;">
         <div style="display:flex; align-items:center; gap:9px;">
           <span style="width:26px; height:26px; border-radius:50%; background:#ecfdf5; border:1px solid #a7f3d0; color:#047857; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; flex-shrink:0;">✓</span>
           <div>
             <strong style="color:#0f172a; font-size:12px; display:block;">${a.agentName}</strong>
-            <span style="color:#64748b; font-size:11px; font-family:ui-monospace,monospace;">${a.agentId} · ${a.queue || 'Support'}</span>
+            <span style="color:#1e3a8a; font-size:11px; font-family:ui-monospace,monospace;">${a.agentId} · ${a.queue || 'Support'}</span>
           </div>
         </div>
         <span style="background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; font-weight:800; font-size:10px; padding:3px 8px; border-radius:6px; text-transform:uppercase; flex-shrink:0;">Confirmed</span>

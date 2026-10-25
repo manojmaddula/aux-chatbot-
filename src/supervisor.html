@@ -194,12 +194,12 @@
             <p>Live status synchronized with NICE CXone MAX CTI state engine. Supervisors can remotely recall or reassign agents.</p>
           </div>
           <div class="header-actions" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-            <div style="display:flex; align-items:center; border:1px solid #cbd5e1; border-radius:8px; overflow:hidden;">
+            <div style="display:flex; align-items:center; border:1px solid #bfdbfe; border-radius:8px; overflow:hidden;">
               <button id="btn-team-filter-my" class="btn btn-xs btn-primary" style="padding:6px 12px; font-weight:700; cursor:pointer;" onclick="setTeamFilter('my_team')"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> My Team (<span id="my-team-count">4</span>)</button>
-              <button id="btn-team-filter-all" class="btn btn-xs btn-outline" style="padding:6px 12px; border:none; background:#f8fafc; color:#94a3b8; cursor:pointer;" onclick="setTeamFilter('all_floor')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> All Floor (12)</button>
+              <button id="btn-team-filter-all" class="btn btn-xs btn-outline" style="padding:6px 12px; border:none; background:#ffffff; color:#1e3a8a; cursor:pointer;" onclick="setTeamFilter('all_floor')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> All Floor (12)</button>
             </div>
             <div style="display:flex; align-items:center; gap:6px;">
-              <input type="text" id="agent-search-input" placeholder="Search agent name, ID or skill..." style="padding:6px 10px; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a; font-size:12px; width:190px;" />
+              <input type="text" id="agent-search-input" placeholder="Search agent name, ID or skill..." style="padding:6px 10px; border-radius:6px; border:1px solid #bfdbfe; background:#ffffff; color:#0f172a; font-size:12px; width:190px;" />
               <button id="btn-search-agents" class="btn btn-sm btn-primary"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Search</button>
               <button id="btn-clear-agent-search" class="btn btn-sm btn-outline">Clear</button>
             </div>
@@ -240,9 +240,9 @@
             <p>Evaluates incoming Erlang-C staffing requirements against agent requests. Supervisors can grant manual overrides.</p>
           </div>
           <div class="header-actions" style="display:flex; align-items:center; gap:8px;">
-            <div style="display:flex; align-items:center; border:1px solid #cbd5e1; border-radius:6px; overflow:hidden;">
+            <div style="display:flex; align-items:center; border:1px solid #bfdbfe; border-radius:6px; overflow:hidden;">
               <button id="btn-queue-team-my" class="btn btn-xs btn-primary" style="padding:6px 10px; font-weight:700; cursor:pointer;" onclick="setQueueFilter('my_team')">★ My Team (<span id="queue-team-count">0</span>)</button>
-              <button id="btn-queue-team-all" class="btn btn-xs btn-outline" style="padding:6px 10px; border:none; background:#ffffff; color:#64748b; cursor:pointer;" onclick="setQueueFilter('all')">🌐 All Requests</button>
+              <button id="btn-queue-team-all" class="btn btn-xs btn-outline" style="padding:6px 10px; border:none; background:#ffffff; color:#1e3a8a; cursor:pointer;" onclick="setQueueFilter('all')">🌐 All Requests</button>
             </div>
             <button id="btn-refresh-queue" class="btn btn-sm btn-secondary">🔄 Refresh</button>
           </div>
@@ -334,7 +334,7 @@
 
           <!-- Real-time Deflection History Event Log -->
           <div style="margin-top:14px;">
-            <strong style="color:#475569; font-size:11px; text-transform:uppercase;">IVR Deflection System Event Log:</strong>
+            <strong style="color:#0f172a; font-size:11px; text-transform:uppercase;">IVR Deflection System Event Log:</strong>
             <div id="deflection-log-list" class="deflection-log-list">
               <!-- Dynamically populated -->
             </div>
@@ -351,22 +351,22 @@
               <div style="width:40px; height:40px; border-radius:12px; background:#fef2f2; border:1px solid #fecaca; display:flex; align-items:center; justify-content:center; color:#b91c1c;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18h12M12 2v4M20 7l-3 3M4 7l3 3M12 6a6 6 0 0 0-6 6v6h12v-6a6 6 0 0 0-6-6z"/></svg></div>
               <div>
                 <h3 style="margin:0; color:#0f172a;">Emergency Staffing & Mobile Recall Engine (Storm Surge Alert)</h3>
-                <p style="margin-top:2px; color:#64748b; font-size:12px;">
+                <p style="margin-top:2px; color:#1e3a8a; font-size:12px;">
                   During storm/disaster traffic surges, alert all unavailable agents (in AUX, break, training, or off-shift) directly on their mobile phones to join and balance volume. Live responses & shift timings are tracked in real-time below.
                 </p>
               </div>
             </div>
           </div>
           <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-            <div style="display:flex; align-items:center; gap:6px; background:#ffffff; border:1px solid #cbd5e1; border-radius:8px; padding:5px 10px; font-size:12px;">
-              <span style="color:#64748b; font-weight:600;">Wanting:</span>
+            <div style="display:flex; align-items:center; gap:6px; background:#ffffff; border:1px solid #bfdbfe; border-radius:8px; padding:5px 10px; font-size:12px;">
+              <span style="color:#1e3a8a; font-weight:600;">Wanting:</span>
               <input type="number" id="input-emergency-quota" min="1" max="12" value="5" style="width:44px; padding:2px 4px; font-weight:800; border:1px solid rgba(59,130,246,0.4); background:#ffffff; border-radius:6px; font-size:12px; text-align:center; color:#0f172a;" title="Target number of extra agents wanted for outage" />
-              <span style="color:#64748b; font-weight:600;">Extra Agents</span>
+              <span style="color:#1e3a8a; font-weight:600;">Extra Agents</span>
             </div>
             <button id="btn-notify-all-emergency" class="btn btn-emergency" style="background:#dc2626; color:#ffffff; font-weight:800; padding:8px 16px; border-radius:8px; border:none; box-shadow:0 4px 12px rgba(220,38,38,0.35); cursor:pointer; display:flex; align-items:center; gap:8px;" onclick="triggerEmergencyBroadcast('unavailable')">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg> Notify All Unavailable (<span id="unavailable-count-pill">5</span> Agents)
             </button>
-            <button id="btn-notify-all-fleet" class="btn btn-outline" style="border:1px solid #cbd5e1; background:#f8fafc; color:#475569; font-size:12px; font-weight:700; padding:8px 14px; cursor:pointer;" onclick="triggerEmergencyBroadcast('all')">
+            <button id="btn-notify-all-fleet" class="btn btn-outline" style="border:1px solid #bfdbfe; background:#ffffff; color:#0f172a; font-size:12px; font-weight:700; padding:8px 14px; cursor:pointer;" onclick="triggerEmergencyBroadcast('all')">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg> Notify All Fleet (12)
             </button>
             <button id="btn-demo-quota" class="btn btn-xs btn-outline" style="border:1px solid rgba(16,185,129,0.4); color:#047857; font-weight:700; padding:7px 12px; cursor:pointer; background:#ecfdf5; border-radius:8px;" onclick="simulateFiveAccepted()" title="Simulate 5 agents accepting availability to trigger quota achieved system alert">
@@ -380,7 +380,7 @@
 
         <div class="card-body">
           <!-- Outage Staffing Availability Quota Progress Bar -->
-          <div id="em-quota-container" style="background:#ffffff; border:1px solid #cbd5e1; border-radius:12px; padding:12px 16px; margin-bottom:14px; backdrop-filter:blur(12px);">
+          <div id="em-quota-container" style="background:#ffffff; border:1px solid #bfdbfe; border-radius:12px; padding:12px 16px; margin-bottom:14px; backdrop-filter:blur(12px);">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
               <div style="display:flex; align-items:center; gap:8px;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
@@ -391,7 +391,7 @@
                 ● AWAITING AVAILABILITY
               </span>
             </div>
-            <div style="width:100%; height:10px; background:#e2e8f0; border:1px solid #cbd5e1; border-radius:5px; overflow:hidden;">
+            <div style="width:100%; height:10px; background:#dbeafe; border:1px solid #bfdbfe; border-radius:5px; overflow:hidden;">
               <div id="em-quota-fill" style="width:0%; height:100%; background:linear-gradient(90deg, #3b82f6, #10b981); border-radius:5px; transition:width 0.4s ease;"></div>
             </div>
           </div>
@@ -402,14 +402,14 @@
               <div style="width:36px; height:36px; border-radius:10px; background:#fef2f2; color:#b91c1c; display:flex; align-items:center; justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
               <div>
                 <strong style="color:#b91c1c; font-size:13px; font-weight:800; display:block;">Active Mobile Alert Dispatch:</strong>
-                <span id="em-campaign-msg-text" style="color:#475569; font-size:12px;">
+                <span id="em-campaign-msg-text" style="color:#0f172a; font-size:12px;">
                   "There is an emergency situation. High call volume surge detected and your availability is requested to balance the queue. If you are available please join, or decline."
                 </span>
               </div>
             </div>
             <div style="display:flex; align-items:center; gap:12px;">
               <div style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:#b91c1c; border-radius:6px; padding:4px 10px; font-size:11px;">
-                <span style="color:#64748b;">Assigned Shift Window:</span>
+                <span style="color:#1e3a8a;">Assigned Shift Window:</span>
                 <strong id="em-campaign-shift-label" style="color:#0284c7; margin-left:4px;">15:30 - 18:30 (Surge Shift • 3 hrs)</strong>
               </div>
               <span id="em-campaign-status-badge" style="background:#dc2626; color:#ffffff; font-size:11px; font-weight:800; padding:4px 10px; border-radius:12px;">
@@ -420,10 +420,10 @@
 
           <!-- 4 Metrics Telemetry Row -->
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-bottom:16px;">
-            <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:10px; padding:12px 14px;">
-              <span style="font-size:11px; color:#94a3b8; font-weight:700; text-transform:uppercase; display:flex; align-items:center; gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></svg> Mobile Alerts Sent</span>
+            <div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:10px; padding:12px 14px;">
+              <span style="font-size:11px; color:#1e3a8a; font-weight:700; text-transform:uppercase; display:flex; align-items:center; gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></svg> Mobile Alerts Sent</span>
               <div id="em-stat-total" style="font-size:24px; font-weight:800; color:#0f172a; margin-top:2px;">0</div>
-              <span style="font-size:10px; color:#64748b;">Delivered to agent phones</span>
+              <span style="font-size:10px; color:#1e3a8a;">Delivered to agent phones</span>
             </div>
             <div style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); border-radius:12px; padding:14px 16px;">
               <span style="font-size:11px; color:#047857; font-weight:700; text-transform:uppercase; display:flex; align-items:center; gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Accepted &amp; Joining (YES)</span>
@@ -443,7 +443,7 @@
           </div>
 
           <!-- Real-Time Agent Response Table -->
-          <div class="table-responsive" style="border:1px solid #cbd5e1; border-radius:12px; overflow:hidden;">
+          <div class="table-responsive" style="border:1px solid #bfdbfe; border-radius:12px; overflow:hidden;">
             <table class="data-table">
               <thead>
                 <tr>
@@ -474,7 +474,7 @@
               <span style="font-size:24px;">🎂</span>
               <div>
                 <h3 style="margin:0; color:#0f172a;">Contact Center Birthday Calendar & Celebrations Hub</h3>
-                <p style="margin-top:2px; color:#64748b; font-size:12px;">
+                <p style="margin-top:2px; color:#1e3a8a; font-size:12px;">
                   All 12 agents and 5 supervisors. Track upcoming milestones and publish official floor-wide birthday broadcast greetings with 1-click.
                 </p>
               </div>
@@ -491,7 +491,7 @@
         </div>
         <div class="card-body">
           <!-- Filter Tabs & Search -->
-          <div class="birthday-filter-bar" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #f1f5f9;">
+          <div class="birthday-filter-bar" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid #dbeafe;">
             <div style="display:flex; gap:6px; flex-wrap:wrap;" id="birthday-filter-buttons">
               <button class="btn btn-xs bday-tab-btn active" data-filter="upcoming" onclick="setBirthdayFilter('upcoming')">🌟 Upcoming & Today</button>
               <button class="btn btn-xs bday-tab-btn" data-filter="today" onclick="setBirthdayFilter('today')">🎂 Today (Oct 21)</button>
@@ -500,7 +500,7 @@
               <button class="btn btn-xs bday-tab-btn" data-filter="all" onclick="setBirthdayFilter('all')">📅 All 12 Months</button>
             </div>
             <div style="display:flex; align-items:center; gap:8px;">
-              <input type="text" id="birthday-search-input" placeholder="Search person, ID, or skill..." onkeyup="handleBirthdaySearch(this.value)" style="padding:6px 12px; font-size:12px; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a; border-radius:8px; width:210px; outline:none;" />
+              <input type="text" id="birthday-search-input" placeholder="Search person, ID, or skill..." onkeyup="handleBirthdaySearch(this.value)" style="padding:6px 12px; font-size:12px; border:1px solid #bfdbfe; background:#ffffff; color:#0f172a; border-radius:8px; width:210px; outline:none;" />
             </div>
           </div>
 
@@ -605,18 +605,18 @@
               <span style="font-size:24px;">📈</span>
               <div>
                 <h3 style="margin:0; color:#0f172a;">Call Volume, AHT & Service Level Trend Analysis</h3>
-                <p style="margin-top:2px; color:#64748b; font-size:12px;">
+                <p style="margin-top:2px; color:#1e3a8a; font-size:12px;">
                   Multi-day telemetry based on previous days' calls (Offered, Handled, IVR Deflected, Abandonment, ASA, and AHT).
                 </p>
               </div>
             </div>
           </div>
           <div class="trend-controls-bar" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
-            <div style="display:flex; border:1px solid #cbd5e1; border-radius:6px; overflow:hidden;">
+            <div style="display:flex; border:1px solid #bfdbfe; border-radius:6px; overflow:hidden;">
               <button class="btn btn-xs trend-range-btn active" data-range="7d" onclick="setTrendRange('7d')" style="padding:6px 10px; font-weight:700;">Last 7 Days (DoD)</button>
               <button class="btn btn-xs trend-range-btn" data-range="14d" onclick="setTrendRange('14d')" style="padding:6px 10px;">Last 14 Days</button>
             </div>
-            <select id="trend-skill-select" onchange="handleTrendSkillChange(this.value)" style="padding:6px 10px; font-size:12px; border:1px solid #cbd5e1; border-radius:6px; background:#fff; font-weight:600;">
+            <select id="trend-skill-select" onchange="handleTrendSkillChange(this.value)" style="padding:6px 10px; font-size:12px; border:1px solid #bfdbfe; border-radius:6px; background:#fff; font-weight:600;">
               <option value="all">🌐 All ACD Skills Fleet</option>
               <option value="billing">💳 Customer Billing & Retention</option>
               <option value="cs">🎧 General Customer Service</option>
@@ -629,65 +629,65 @@
         <div class="card-body">
           <!-- 6 KEY DELTA KPI CARDS (TODAY VS PREVIOUS DAYS BASELINE) -->
           <div class="trend-kpi-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-bottom:20px;">
-            <div class="trend-kpi-card" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px;">
-              <span style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:700; display:block;">Total Calls Offered</span>
+            <div class="trend-kpi-card" style="background:#ffffff; border:1px solid #dbeafe; border-radius:8px; padding:12px 14px;">
+              <span style="font-size:11px; color:#1e3a8a; text-transform:uppercase; font-weight:700; display:block;">Total Calls Offered</span>
               <div style="display:flex; align-items:baseline; gap:6px; margin-top:4px;">
                 <span id="trend-kpi-offered" style="font-size:22px; font-weight:800; color:#0f172a;">4,820</span>
                 <span id="trend-kpi-offered-delta" style="font-size:11px; font-weight:700; color:#2563eb; background:#eff6ff; padding:2px 6px; border-radius:4px;">▲ +11.8% DoD</span>
               </div>
-              <small id="trend-kpi-offered-sub" style="color:#64748b; font-size:10px; display:block; margin-top:2px;">vs Yesterday (4,310) | Avg: 4,288</small>
+              <small id="trend-kpi-offered-sub" style="color:#1e3a8a; font-size:10px; display:block; margin-top:2px;">vs Yesterday (4,310) | Avg: 4,288</small>
             </div>
 
-            <div class="trend-kpi-card" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px;">
-              <span style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:700; display:block;">Handled & Deflected</span>
+            <div class="trend-kpi-card" style="background:#ffffff; border:1px solid #dbeafe; border-radius:8px; padding:12px 14px;">
+              <span style="font-size:11px; color:#1e3a8a; text-transform:uppercase; font-weight:700; display:block;">Handled & Deflected</span>
               <div style="display:flex; align-items:baseline; gap:6px; margin-top:4px;">
                 <span id="trend-kpi-handled" style="font-size:22px; font-weight:800; color:#10b981;">4,492</span>
                 <span id="trend-kpi-deflected-badge" style="font-size:11px; font-weight:700; color:#0284c7; background:#e0f2fe; padding:2px 6px; border-radius:4px;">+328 Deflected</span>
               </div>
-              <small style="color:#64748b; font-size:10px; display:block; margin-top:2px;">93.2% Handled rate | 0 Overload Drops</small>
+              <small style="color:#1e3a8a; font-size:10px; display:block; margin-top:2px;">93.2% Handled rate | 0 Overload Drops</small>
             </div>
 
-            <div class="trend-kpi-card" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px;">
-              <span style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:700; display:block;">Avg Handle Time (AHT)</span>
+            <div class="trend-kpi-card" style="background:#ffffff; border:1px solid #dbeafe; border-radius:8px; padding:12px 14px;">
+              <span style="font-size:11px; color:#1e3a8a; text-transform:uppercase; font-weight:700; display:block;">Avg Handle Time (AHT)</span>
               <div style="display:flex; align-items:baseline; gap:6px; margin-top:4px;">
                 <span id="trend-kpi-aht" style="font-size:22px; font-weight:800; color:#0f172a;">4m 12s</span>
                 <span id="trend-kpi-aht-delta" style="font-size:11px; font-weight:700; color:#10b981; background:#ecfdf5; padding:2px 6px; border-radius:4px;">▼ -18s DoD</span>
               </div>
-              <small style="color:#64748b; font-size:10px; display:block; margin-top:2px;">Faster wrap-up vs Yesterday (4m 30s)</small>
+              <small style="color:#1e3a8a; font-size:10px; display:block; margin-top:2px;">Faster wrap-up vs Yesterday (4m 30s)</small>
             </div>
 
-            <div class="trend-kpi-card" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px;">
-              <span style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:700; display:block;">Speed of Answer (ASA)</span>
+            <div class="trend-kpi-card" style="background:#ffffff; border:1px solid #dbeafe; border-radius:8px; padding:12px 14px;">
+              <span style="font-size:11px; color:#1e3a8a; text-transform:uppercase; font-weight:700; display:block;">Speed of Answer (ASA)</span>
               <div style="display:flex; align-items:baseline; gap:6px; margin-top:4px;">
                 <span id="trend-kpi-asa" style="font-size:22px; font-weight:800; color:#0f172a;">24 sec</span>
                 <span id="trend-kpi-asa-delta" style="font-size:11px; font-weight:700; color:#10b981; background:#ecfdf5; padding:2px 6px; border-radius:4px;">▲ 7s Faster</span>
               </div>
-              <small style="color:#64748b; font-size:10px; display:block; margin-top:2px;">Target &le; 30s | Yesterday: 31s</small>
+              <small style="color:#1e3a8a; font-size:10px; display:block; margin-top:2px;">Target &le; 30s | Yesterday: 31s</small>
             </div>
 
-            <div class="trend-kpi-card" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px;">
-              <span style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:700; display:block;">Service Level (SLA %)</span>
+            <div class="trend-kpi-card" style="background:#ffffff; border:1px solid #dbeafe; border-radius:8px; padding:12px 14px;">
+              <span style="font-size:11px; color:#1e3a8a; text-transform:uppercase; font-weight:700; display:block;">Service Level (SLA %)</span>
               <div style="display:flex; align-items:baseline; gap:6px; margin-top:4px;">
                 <span id="trend-kpi-sla" style="font-size:22px; font-weight:800; color:#10b981;">88.6%</span>
                 <span id="trend-kpi-sla-delta" style="font-size:11px; font-weight:700; color:#10b981; background:#ecfdf5; padding:2px 6px; border-radius:4px;">▲ +2.4%</span>
               </div>
-              <small style="color:#64748b; font-size:10px; display:block; margin-top:2px;">Target &ge; 80% | Yesterday: 86.2%</small>
+              <small style="color:#1e3a8a; font-size:10px; display:block; margin-top:2px;">Target &ge; 80% | Yesterday: 86.2%</small>
             </div>
 
-            <div class="trend-kpi-card" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:12px 14px;">
-              <span style="font-size:11px; color:#64748b; text-transform:uppercase; font-weight:700; display:block;">Abandonment Rate</span>
+            <div class="trend-kpi-card" style="background:#ffffff; border:1px solid #dbeafe; border-radius:8px; padding:12px 14px;">
+              <span style="font-size:11px; color:#1e3a8a; text-transform:uppercase; font-weight:700; display:block;">Abandonment Rate</span>
               <div style="display:flex; align-items:baseline; gap:6px; margin-top:4px;">
                 <span id="trend-kpi-abandon" style="font-size:22px; font-weight:800; color:#0f172a;">2.1%</span>
                 <span id="trend-kpi-abandon-delta" style="font-size:11px; font-weight:700; color:#10b981; background:#ecfdf5; padding:2px 6px; border-radius:4px;">▼ -2.4%</span>
               </div>
-              <small style="color:#64748b; font-size:10px; display:block; margin-top:2px;">Target &le; 5.0% | 102 abandoned calls</small>
+              <small style="color:#1e3a8a; font-size:10px; display:block; margin-top:2px;">Target &le; 5.0% | 102 abandoned calls</small>
             </div>
           </div>
 
           <!-- TREND VISUALS: MULTI-DAY SVG CHART & HOURLY SURGE DISTRIBUTION -->
           <div style="display:grid; grid-template-columns: 2fr 1.3fr; gap:16px;">
             <!-- SVG Multi-Day Volume & SLA Chart -->
-            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:16px;">
+            <div style="background:#ffffff; border:1px solid #dbeafe; border-radius:10px; padding:16px;">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                 <strong style="color:#0f172a; font-size:13px;">📊 Multi-Day Call Arrival vs SLA Trajectory (Previous Days Trend)</strong>
                 <div style="display:flex; gap:12px; font-size:11px;">
@@ -699,13 +699,13 @@
               <div id="trend-svg-container" style="width:100%; height:220px; position:relative;">
                 <!-- SVG dynamically rendered -->
               </div>
-              <div id="trend-day-details-pill" style="margin-top:10px; font-size:11px; color:#475569; background:#f8fafc; padding:8px 12px; border-radius:6px; border:1px solid #e2e8f0;">
+              <div id="trend-day-details-pill" style="margin-top:10px; font-size:11px; color:#0f172a; background:#ffffff; padding:8px 12px; border-radius:6px; border:1px solid #dbeafe;">
                 💡 <em>Hover over any daily column above to inspect granular day-over-day statistics.</em>
               </div>
             </div>
 
             <!-- Peak Hours Arrival Comparison (Previous Days Baseline vs Today) -->
-            <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:16px;">
+            <div style="background:#ffffff; border:1px solid #dbeafe; border-radius:10px; padding:16px;">
               <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                 <strong style="color:#0f172a; font-size:13px;">⚡ Peak Hourly Distribution: Today vs Previous Days</strong>
               </div>
@@ -794,7 +794,7 @@
         <div class="card-header" style="background: rgba(37,99,235,0.06);">
           <div>
             <h4 style="color:#1d4ed8; font-size:13px;">📐 Automated Evaluation Formulas & Compliance Matrix</h4>
-            <p style="font-size:11px; color:#475569; margin-top:2px;">
+            <p style="font-size:11px; color:#0f172a; margin-top:2px;">
               Overall QA Score = <strong>(25% &times; Security Verification)</strong> + <strong>(20% &times; Customer Account Discovery)</strong> + <strong>(25% &times; Empathy & Tone Index)</strong> + <strong>(30% &times; Query Resolution Outcome)</strong>
             </p>
           </div>
@@ -811,19 +811,19 @@
           </div>
           <div class="header-actions" style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
             <div style="display:flex; align-items:center; gap:6px;">
-              <input type="text" id="qa-search-input" placeholder="Search QA by agent, ID, or tone..." style="padding:6px 10px; border-radius:6px; border:1px solid #cbd5e1; font-size:12px; width:220px;" />
+              <input type="text" id="qa-search-input" placeholder="Search QA by agent, ID, or tone..." style="padding:6px 10px; border-radius:6px; border:1px solid #bfdbfe; font-size:12px; width:220px;" />
               <button id="btn-qa-search" class="btn btn-sm btn-primary">🔍 Search</button>
               <button id="btn-qa-clear" class="btn btn-sm btn-outline">Clear</button>
             </div>
             <button id="btn-refresh-qa" class="btn btn-sm btn-secondary">🔄 Refresh QA</button>
           </div>
         </div>
-        <div class="qa-filter-bar" style="padding:10px 20px; background:#f8fafc; border-bottom:1px solid #e2e8f0; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
-          <div style="display:flex; align-items:center; border:1px solid #cbd5e1; border-radius:6px; overflow:hidden; margin-right:8px;">
+        <div class="qa-filter-bar" style="padding:10px 20px; background:#ffffff; border-bottom:1px solid #dbeafe; display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+          <div style="display:flex; align-items:center; border:1px solid #bfdbfe; border-radius:6px; overflow:hidden; margin-right:8px;">
             <button id="btn-qa-team-my" class="btn btn-xs btn-primary" style="padding:4px 10px; font-weight:700; cursor:pointer;" onclick="setQATeamFilter('my_team')">★ My Team</button>
-            <button id="btn-qa-team-all" class="btn btn-xs btn-outline" style="padding:4px 10px; border:none; background:#ffffff; color:#64748b; cursor:pointer;" onclick="setQATeamFilter('all')">🌐 All Agents</button>
+            <button id="btn-qa-team-all" class="btn btn-xs btn-outline" style="padding:4px 10px; border:none; background:#ffffff; color:#1e3a8a; cursor:pointer;" onclick="setQATeamFilter('all')">🌐 All Agents</button>
           </div>
-          <span style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Quick Filters:</span>
+          <span style="font-size:11px; font-weight:700; color:#1e3a8a; text-transform:uppercase;">Quick Filters:</span>
           <button class="btn btn-xs btn-primary qa-filter-btn active" data-filter="all">All Interactions</button>
           <button class="btn btn-xs btn-outline qa-filter-btn" data-filter="flagged">⚠️ Flagged / Rude Tone</button>
           <button class="btn btn-xs btn-outline qa-filter-btn" data-filter="low_score">📉 Low Score (&lt;70%)</button>
@@ -859,7 +859,7 @@
             <h3 style="color:#1d4ed8; font-size:16px;">🎓 Assign Extra Training & Coaching Module</h3>
             <button id="btn-close-training-modal" class="btn-xs btn-outline" style="font-size:14px;">✕</button>
           </div>
-          <p style="font-size:11px; color:#94a3b8; margin-bottom:14px;">
+          <p style="font-size:11px; color:#1e3a8a; margin-bottom:14px;">
             Assign mandatory coaching to correct tone infractions, failed verification, or unresolved customer queries. This updates the agent's WFM calendar to <strong>AUX-4: Training / Coaching</strong>.
           </p>
 
@@ -932,7 +932,7 @@
               </div>
               <div class="form-group">
                 <label>Discretionary Break Frequency Policy Window:</label>
-                <select id="limit-freq-window" style="background:#ffffff; color:#0f172a; border:1px solid #cbd5e1; padding:8px; border-radius:6px; margin-bottom:8px;">
+                <select id="limit-freq-window" style="background:#ffffff; color:#0f172a; border:1px solid #bfdbfe; padding:8px; border-radius:6px; margin-bottom:8px;">
                   <option value="1_WEEK" selected>1 Week (Rolling 7-Day Window)</option>
                   <option value="2_WEEKS">2 Weeks (Bi-Weekly 14-Day Window)</option>
                 </select>
@@ -980,7 +980,7 @@
           <span id="rebalance-banner-icon" style="font-size:26px;">🟢</span>
           <div>
             <h4 id="rebalance-banner-title" style="color:#10b981; font-size:14px; margin-bottom:2px;">ACD Queue Volumes Balanced across All Skills</h4>
-            <p id="rebalance-banner-desc" style="color:#64748b; font-size:12px;">Customer Billing, Customer Service, Tech Support, Emergency, Spanish, and Collections queues operating normally.</p>
+            <p id="rebalance-banner-desc" style="color:#1e3a8a; font-size:12px;">Customer Billing, Customer Service, Tech Support, Emergency, Spanish, and Collections queues operating normally.</p>
           </div>
         </div>
         <div style="display:flex; gap:8px;">
@@ -992,12 +992,12 @@
       <div class="queue-telemetry-grid" id="dynamic-queues-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap:16px; margin-top:16px;">
         
         <!-- QUEUE 1: BILLING & RETENTION (SURGE / TARGET QUEUE) -->
-        <div class="card queue-card" id="qcard-billing" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
-          <div class="card-header" style="border-left: 4px solid #2563eb; background:#f8fafc; padding:12px 16px; border-bottom:1px solid #e2e8f0;">
+        <div class="card queue-card" id="qcard-billing" style="background:#ffffff; border:1px solid #dbeafe; border-radius:10px; overflow:hidden;">
+          <div class="card-header" style="border-left: 4px solid #2563eb; background:#ffffff; padding:12px 16px; border-bottom:1px solid #dbeafe;">
             <div>
               <div style="display:flex; align-items:center; gap:8px;">
                 <span class="status-tag approved" id="qtag-billing">NORMAL (SLA OK)</span>
-                <span style="color:#64748b; font-size:11px;">SKILL-101</span>
+                <span style="color:#1e3a8a; font-size:11px;">SKILL-101</span>
               </div>
               <h3 style="margin-top:4px; font-size:14px; color:#0f172a;">💳 Customer Billing & Retention</h3>
             </div>
@@ -1005,36 +1005,36 @@
           <div class="card-body" style="padding:16px;">
             <div class="q-stats-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
               <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Calls Waiting:</span>
+                <span class="q-label" style="font-size:11px; color:#1e3a8a; text-transform:uppercase;">Calls Waiting:</span>
                 <div class="q-val" id="q-billing-waiting" style="font-size:22px; font-weight:800; color:#0f172a;">42</div>
-                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 15</small>
+                <small class="text-muted" style="font-size:10px; color:#1e3a8a;">Target &le; 15</small>
               </div>
               <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Avg Speed Answer:</span>
+                <span class="q-label" style="font-size:11px; color:#1e3a8a; text-transform:uppercase;">Avg Speed Answer:</span>
                 <div class="q-val" id="q-billing-asa" style="font-size:22px; font-weight:800; color:#0f172a;">00:35</div>
-                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 30s</small>
+                <small class="text-muted" style="font-size:10px; color:#1e3a8a;">Target &le; 30s</small>
               </div>
               <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Projected SLA %:</span>
+                <span class="q-label" style="font-size:11px; color:#1e3a8a; text-transform:uppercase;">Projected SLA %:</span>
                 <div class="q-val" id="q-billing-sla" style="font-size:22px; font-weight:800; color:#10b981;">86.4%</div>
-                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &ge; 80%</small>
+                <small class="text-muted" style="font-size:10px; color:#1e3a8a;">Target &ge; 80%</small>
               </div>
               <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Assigned Staff:</span>
+                <span class="q-label" style="font-size:11px; color:#1e3a8a; text-transform:uppercase;">Assigned Staff:</span>
                 <div class="q-val" id="q-billing-agents" style="font-size:22px; font-weight:800; color:#2563eb;">4 Logged-in</div>
-                <small class="text-muted" id="q-billing-req" style="font-size:10px; color:#64748b;">Required: 4</small>
+                <small class="text-muted" id="q-billing-req" style="font-size:10px; color:#1e3a8a;">Required: 4</small>
               </div>
             </div>
           </div>
         </div>
 
         <!-- QUEUE 2: GENERAL CUSTOMER SERVICE (DONOR QUEUE) -->
-        <div class="card queue-card" id="qcard-cs" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
-          <div class="card-header" style="border-left: 4px solid #10b981; background:#f8fafc; padding:12px 16px; border-bottom:1px solid #e2e8f0;">
+        <div class="card queue-card" id="qcard-cs" style="background:#ffffff; border:1px solid #dbeafe; border-radius:10px; overflow:hidden;">
+          <div class="card-header" style="border-left: 4px solid #10b981; background:#ffffff; padding:12px 16px; border-bottom:1px solid #dbeafe;">
             <div>
               <div style="display:flex; align-items:center; gap:8px;">
                 <span class="status-tag approved" id="qtag-cs">IDLE SURPLUS</span>
-                <span style="color:#64748b; font-size:11px;">SKILL-102</span>
+                <span style="color:#1e3a8a; font-size:11px;">SKILL-102</span>
               </div>
               <h3 style="margin-top:4px; font-size:14px; color:#0f172a;">🎧 General Customer Service</h3>
             </div>
@@ -1042,36 +1042,36 @@
           <div class="card-body" style="padding:16px;">
             <div class="q-stats-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
               <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Calls Waiting:</span>
+                <span class="q-label" style="font-size:11px; color:#1e3a8a; text-transform:uppercase;">Calls Waiting:</span>
                 <div class="q-val" id="q-cs-waiting" style="font-size:22px; font-weight:800; color:#0f172a;">8</div>
-                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 15</small>
+                <small class="text-muted" style="font-size:10px; color:#1e3a8a;">Target &le; 15</small>
               </div>
               <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Avg Speed Answer:</span>
+                <span class="q-label" style="font-size:11px; color:#1e3a8a; text-transform:uppercase;">Avg Speed Answer:</span>
                 <div class="q-val" id="q-cs-asa" style="font-size:22px; font-weight:800; color:#0f172a;">00:14</div>
-                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 30s</small>
+                <small class="text-muted" style="font-size:10px; color:#1e3a8a;">Target &le; 30s</small>
               </div>
               <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Projected SLA %:</span>
+                <span class="q-label" style="font-size:11px; color:#1e3a8a; text-transform:uppercase;">Projected SLA %:</span>
                 <div class="q-val" id="q-cs-sla" style="font-size:22px; font-weight:800; color:#10b981;">97.2%</div>
-                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &ge; 80%</small>
+                <small class="text-muted" style="font-size:10px; color:#1e3a8a;">Target &ge; 80%</small>
               </div>
               <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Assigned Staff:</span>
+                <span class="q-label" style="font-size:11px; color:#1e3a8a; text-transform:uppercase;">Assigned Staff:</span>
                 <div class="q-val" id="q-cs-agents" style="font-size:22px; font-weight:800; color:#2563eb;">5 Logged-in</div>
-                <small class="text-muted" id="q-cs-req" style="font-size:10px; color:#64748b;">3 Idle / Underutilized</small>
+                <small class="text-muted" id="q-cs-req" style="font-size:10px; color:#1e3a8a;">3 Idle / Underutilized</small>
               </div>
             </div>
           </div>
         </div>
 
         <!-- QUEUE 3: TIER-2 TECH SUPPORT -->
-        <div class="card queue-card" id="qcard-techSupport" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
-          <div class="card-header" style="border-left: 4px solid #3b82f6; background:#f8fafc; padding:12px 16px; border-bottom:1px solid #e2e8f0;">
+        <div class="card queue-card" id="qcard-techSupport" style="background:#ffffff; border:1px solid #dbeafe; border-radius:10px; overflow:hidden;">
+          <div class="card-header" style="border-left: 4px solid #3b82f6; background:#ffffff; padding:12px 16px; border-bottom:1px solid #dbeafe;">
             <div>
               <div style="display:flex; align-items:center; gap:8px;">
                 <span class="status-tag approved" id="qtag-techSupport">NORMAL (SLA OK)</span>
-                <span style="color:#64748b; font-size:11px;">SKILL-103</span>
+                <span style="color:#1e3a8a; font-size:11px;">SKILL-103</span>
               </div>
               <h3 style="margin-top:4px; font-size:14px; color:#0f172a;">💻 Tier-2 Tech Support</h3>
             </div>
@@ -1079,36 +1079,36 @@
           <div class="card-body" style="padding:16px;">
             <div class="q-stats-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
               <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Calls Waiting:</span>
+                <span class="q-label" style="font-size:11px; color:#1e3a8a; text-transform:uppercase;">Calls Waiting:</span>
                 <div class="q-val" id="q-techSupport-waiting" style="font-size:22px; font-weight:800; color:#0f172a;">15</div>
-                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 15</small>
+                <small class="text-muted" style="font-size:10px; color:#1e3a8a;">Target &le; 15</small>
               </div>
               <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Avg Speed Answer:</span>
+                <span class="q-label" style="font-size:11px; color:#1e3a8a; text-transform:uppercase;">Avg Speed Answer:</span>
                 <div class="q-val" id="q-techSupport-asa" style="font-size:22px; font-weight:800; color:#0f172a;">00:32</div>
-                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 30s</small>
+                <small class="text-muted" style="font-size:10px; color:#1e3a8a;">Target &le; 30s</small>
               </div>
               <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Projected SLA %:</span>
+                <span class="q-label" style="font-size:11px; color:#1e3a8a; text-transform:uppercase;">Projected SLA %:</span>
                 <div class="q-val" id="q-techSupport-sla" style="font-size:22px; font-weight:800; color:#10b981;">88.0%</div>
-                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &ge; 80%</small>
+                <small class="text-muted" style="font-size:10px; color:#1e3a8a;">Target &ge; 80%</small>
               </div>
               <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Assigned Staff:</span>
+                <span class="q-label" style="font-size:11px; color:#1e3a8a; text-transform:uppercase;">Assigned Staff:</span>
                 <div class="q-val" id="q-techSupport-agents" style="font-size:22px; font-weight:800; color:#2563eb;">3 Logged-in</div>
-                <small class="text-muted" style="font-size:10px; color:#64748b;">Required: 3</small>
+                <small class="text-muted" style="font-size:10px; color:#1e3a8a;">Required: 3</small>
               </div>
             </div>
           </div>
         </div>
 
         <!-- QUEUE 4: EMERGENCY INBOUND -->
-        <div class="card queue-card" id="qcard-emergency" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
-          <div class="card-header" style="border-left: 4px solid #ef4444; background:#f8fafc; padding:12px 16px; border-bottom:1px solid #e2e8f0;">
+        <div class="card queue-card" id="qcard-emergency" style="background:#ffffff; border:1px solid #dbeafe; border-radius:10px; overflow:hidden;">
+          <div class="card-header" style="border-left: 4px solid #ef4444; background:#ffffff; padding:12px 16px; border-bottom:1px solid #dbeafe;">
             <div>
               <div style="display:flex; align-items:center; gap:8px;">
                 <span class="status-tag approved" id="qtag-emergency">NORMAL (SLA OK)</span>
-                <span style="color:#64748b; font-size:11px;">SKILL-104</span>
+                <span style="color:#1e3a8a; font-size:11px;">SKILL-104</span>
               </div>
               <h3 style="margin-top:4px; font-size:14px; color:#0f172a;">🚨 Emergency Inbound Care</h3>
             </div>
@@ -1116,36 +1116,36 @@
           <div class="card-body" style="padding:16px;">
             <div class="q-stats-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
               <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Calls Waiting:</span>
+                <span class="q-label" style="font-size:11px; color:#1e3a8a; text-transform:uppercase;">Calls Waiting:</span>
                 <div class="q-val" id="q-emergency-waiting" style="font-size:22px; font-weight:800; color:#0f172a;">3</div>
-                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 5</small>
+                <small class="text-muted" style="font-size:10px; color:#1e3a8a;">Target &le; 5</small>
               </div>
               <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Avg Speed Answer:</span>
+                <span class="q-label" style="font-size:11px; color:#1e3a8a; text-transform:uppercase;">Avg Speed Answer:</span>
                 <div class="q-val" id="q-emergency-asa" style="font-size:22px; font-weight:800; color:#0f172a;">00:09</div>
-                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 10s</small>
+                <small class="text-muted" style="font-size:10px; color:#1e3a8a;">Target &le; 10s</small>
               </div>
               <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Projected SLA %:</span>
+                <span class="q-label" style="font-size:11px; color:#1e3a8a; text-transform:uppercase;">Projected SLA %:</span>
                 <div class="q-val" id="q-emergency-sla" style="font-size:22px; font-weight:800; color:#10b981;">98.0%</div>
-                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &ge; 95%</small>
+                <small class="text-muted" style="font-size:10px; color:#1e3a8a;">Target &ge; 95%</small>
               </div>
               <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Assigned Staff:</span>
+                <span class="q-label" style="font-size:11px; color:#1e3a8a; text-transform:uppercase;">Assigned Staff:</span>
                 <div class="q-val" id="q-emergency-agents" style="font-size:22px; font-weight:800; color:#2563eb;">2 Logged-in</div>
-                <small class="text-muted" style="font-size:10px; color:#64748b;">Required: 2</small>
+                <small class="text-muted" style="font-size:10px; color:#1e3a8a;">Required: 2</small>
               </div>
             </div>
           </div>
         </div>
 
         <!-- QUEUE 5: BILINGUAL / SPANISH INBOUND -->
-        <div class="card queue-card" id="qcard-spanishSupport" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
-          <div class="card-header" style="border-left: 4px solid #8b5cf6; background:#f8fafc; padding:12px 16px; border-bottom:1px solid #e2e8f0;">
+        <div class="card queue-card" id="qcard-spanishSupport" style="background:#ffffff; border:1px solid #dbeafe; border-radius:10px; overflow:hidden;">
+          <div class="card-header" style="border-left: 4px solid #8b5cf6; background:#ffffff; padding:12px 16px; border-bottom:1px solid #dbeafe;">
             <div>
               <div style="display:flex; align-items:center; gap:8px;">
                 <span class="status-tag approved" id="qtag-spanishSupport">NORMAL (SLA OK)</span>
-                <span style="color:#64748b; font-size:11px;">SKILL-105</span>
+                <span style="color:#1e3a8a; font-size:11px;">SKILL-105</span>
               </div>
               <h3 style="margin-top:4px; font-size:14px; color:#0f172a;">🌐 Bilingual / Spanish Support</h3>
             </div>
@@ -1153,36 +1153,36 @@
           <div class="card-body" style="padding:16px;">
             <div class="q-stats-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
               <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Calls Waiting:</span>
+                <span class="q-label" style="font-size:11px; color:#1e3a8a; text-transform:uppercase;">Calls Waiting:</span>
                 <div class="q-val" id="q-spanishSupport-waiting" style="font-size:22px; font-weight:800; color:#0f172a;">6</div>
-                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 15</small>
+                <small class="text-muted" style="font-size:10px; color:#1e3a8a;">Target &le; 15</small>
               </div>
               <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Avg Speed Answer:</span>
+                <span class="q-label" style="font-size:11px; color:#1e3a8a; text-transform:uppercase;">Avg Speed Answer:</span>
                 <div class="q-val" id="q-spanishSupport-asa" style="font-size:22px; font-weight:800; color:#0f172a;">00:19</div>
-                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 30s</small>
+                <small class="text-muted" style="font-size:10px; color:#1e3a8a;">Target &le; 30s</small>
               </div>
               <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Projected SLA %:</span>
+                <span class="q-label" style="font-size:11px; color:#1e3a8a; text-transform:uppercase;">Projected SLA %:</span>
                 <div class="q-val" id="q-spanishSupport-sla" style="font-size:22px; font-weight:800; color:#10b981;">94.5%</div>
-                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &ge; 80%</small>
+                <small class="text-muted" style="font-size:10px; color:#1e3a8a;">Target &ge; 80%</small>
               </div>
               <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Assigned Staff:</span>
+                <span class="q-label" style="font-size:11px; color:#1e3a8a; text-transform:uppercase;">Assigned Staff:</span>
                 <div class="q-val" id="q-spanishSupport-agents" style="font-size:22px; font-weight:800; color:#2563eb;">2 Logged-in</div>
-                <small class="text-muted" style="font-size:10px; color:#64748b;">Required: 2</small>
+                <small class="text-muted" style="font-size:10px; color:#1e3a8a;">Required: 2</small>
               </div>
             </div>
           </div>
         </div>
 
         <!-- QUEUE 6: OUTBOUND & COLLECTIONS -->
-        <div class="card queue-card" id="qcard-collections" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
-          <div class="card-header" style="border-left: 4px solid #f59e0b; background:#f8fafc; padding:12px 16px; border-bottom:1px solid #e2e8f0;">
+        <div class="card queue-card" id="qcard-collections" style="background:#ffffff; border:1px solid #dbeafe; border-radius:10px; overflow:hidden;">
+          <div class="card-header" style="border-left: 4px solid #f59e0b; background:#ffffff; padding:12px 16px; border-bottom:1px solid #dbeafe;">
             <div>
               <div style="display:flex; align-items:center; gap:8px;">
                 <span class="status-tag approved" id="qtag-collections">NORMAL (SLA OK)</span>
-                <span style="color:#64748b; font-size:11px;">SKILL-106</span>
+                <span style="color:#1e3a8a; font-size:11px;">SKILL-106</span>
               </div>
               <h3 style="margin-top:4px; font-size:14px; color:#0f172a;">📞 Outbound & Collections</h3>
             </div>
@@ -1190,24 +1190,24 @@
           <div class="card-body" style="padding:16px;">
             <div class="q-stats-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
               <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Calls Waiting:</span>
+                <span class="q-label" style="font-size:11px; color:#1e3a8a; text-transform:uppercase;">Calls Waiting:</span>
                 <div class="q-val" id="q-collections-waiting" style="font-size:22px; font-weight:800; color:#0f172a;">12</div>
-                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 15</small>
+                <small class="text-muted" style="font-size:10px; color:#1e3a8a;">Target &le; 15</small>
               </div>
               <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Avg Speed Answer:</span>
+                <span class="q-label" style="font-size:11px; color:#1e3a8a; text-transform:uppercase;">Avg Speed Answer:</span>
                 <div class="q-val" id="q-collections-asa" style="font-size:22px; font-weight:800; color:#0f172a;">00:28</div>
-                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &le; 30s</small>
+                <small class="text-muted" style="font-size:10px; color:#1e3a8a;">Target &le; 30s</small>
               </div>
               <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Projected SLA %:</span>
+                <span class="q-label" style="font-size:11px; color:#1e3a8a; text-transform:uppercase;">Projected SLA %:</span>
                 <div class="q-val" id="q-collections-sla" style="font-size:22px; font-weight:800; color:#10b981;">89.2%</div>
-                <small class="text-muted" style="font-size:10px; color:#64748b;">Target &ge; 80%</small>
+                <small class="text-muted" style="font-size:10px; color:#1e3a8a;">Target &ge; 80%</small>
               </div>
               <div class="q-stat">
-                <span class="q-label" style="font-size:11px; color:#64748b; text-transform:uppercase;">Assigned Staff:</span>
+                <span class="q-label" style="font-size:11px; color:#1e3a8a; text-transform:uppercase;">Assigned Staff:</span>
                 <div class="q-val" id="q-collections-agents" style="font-size:22px; font-weight:800; color:#2563eb;">3 Logged-in</div>
-                <small class="text-muted" style="font-size:10px; color:#64748b;">Required: 3</small>
+                <small class="text-muted" style="font-size:10px; color:#1e3a8a;">Required: 3</small>
               </div>
             </div>
           </div>
@@ -1240,7 +1240,7 @@
           <!-- WFM ALGORITHM EXPLANATION BANNER -->
           <div class="rebalance-explainer-banner">
             <strong style="color:#1d4ed8; font-size:12px;">📐 How WFM Dynamic Cross-Skilling Works:</strong>
-            <ul style="color:#334155; font-size:11px; margin-top:6px; line-height:1.6; padding-left:18px;">
+            <ul style="color:#0f172a; font-size:11px; margin-top:6px; line-height:1.6; padding-left:18px;">
               <li><strong>Intraday Surge Detection</strong>: When Billing calls exceed 150+ and ASA &gt; 3m while Customer Service agents have &lt;35% occupancy, the engine calculates the Erlang-C staffing deficit (+4 required).</li>
               <li><strong>Eligible Agent Selection</strong>: Evaluates cross-trained agents in Customer Service (Samantha Vance, Rachel Green, Marcus Brody) with Billing certification.</li>
               <li><strong>WFM Schedule Injection</strong>: Automatically inserts a temporary <code>10:00 - 11:30 Intraday Skill Flex</code> interval into their shift.</li>
@@ -1310,7 +1310,7 @@
         <span style="font-size:22px;">🤖</span>
         <div>
           <strong style="color:#1d4ed8; font-size:14px; display:block;">REMI for Supervisors</strong>
-          <small style="color:#475569; font-size:10px;">Autonomous Floor Operations & WFM Intelligence Assistant (Ask Shankar)</small>
+          <small style="color:#0f172a; font-size:10px;">Autonomous Floor Operations & WFM Intelligence Assistant (Ask Shankar)</small>
         </div>
       </div>
       <div style="display:flex; align-items:center; gap:8px;">
@@ -1355,7 +1355,7 @@
       <div style="position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,transparent,#10b981,#34d399,#10b981,transparent);"></div>
 
       <!-- Header -->
-      <div style="padding:20px 22px 16px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0;">
+      <div style="padding:20px 22px 16px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #dbeafe;">
         <div style="display:flex; align-items:center; gap:14px;">
           <div style="width:48px; height:48px; border-radius:14px; background:#ecfdf5; border:1px solid #a7f3d0; display:flex; align-items:center; justify-content:center; box-shadow:0 0 20px rgba(16,185,129,0.2);">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#047857" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
@@ -1368,7 +1368,7 @@
             </span>
           </div>
         </div>
-        <button id="btn-close-quota-modal" type="button" onclick="event.stopPropagation(); closeQuotaModal();" title="Close Alert" style="background:rgba(255,255,255,0.06); border:1px solid #cbd5e1; border-radius:8px; color:#94a3b8; cursor:pointer; width:34px; height:34px; display:flex; align-items:center; justify-content:center; transition:all 0.15s; flex-shrink:0;">
+        <button id="btn-close-quota-modal" type="button" onclick="event.stopPropagation(); closeQuotaModal();" title="Close Alert" style="background:rgba(255,255,255,0.06); border:1px solid #bfdbfe; border-radius:8px; color:#1e3a8a; cursor:pointer; width:34px; height:34px; display:flex; align-items:center; justify-content:center; transition:all 0.15s; flex-shrink:0;">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         </button>
       </div>
@@ -1381,7 +1381,7 @@
           <div style="position:absolute; top:-30px; left:50%; transform:translateX(-50%); width:120px; height:80px; background:radial-gradient(ellipse,rgba(16,185,129,0.25) 0%,transparent 70%); pointer-events:none;"></div>
           <div style="font-size:32px; font-weight:900; color:#047857; margin-bottom:4px; letter-spacing:-1px; font-family:ui-monospace,monospace;"><span id="modal-quota-number">5 / 5</span></div>
           <div style="font-size:12px; font-weight:700; color:#047857; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px;">Confirmed Agents</div>
-          <p style="margin:0; font-size:13px; color:#475569; line-height:1.6;">
+          <p style="margin:0; font-size:13px; color:#0f172a; line-height:1.6;">
             We have obtained a sufficient number of agents for the outage. All confirmed agents have been assigned surge shift timings
             <strong id="modal-quota-shift" style="color:#047857; font-family:ui-monospace,monospace; background:#ecfdf5; padding:2px 8px; border-radius:5px; margin:0 2px;">15:30 – 18:30</strong>
             and instructed to log in to workstation softphones to balance the queue.
@@ -1389,9 +1389,9 @@
         </div>
 
         <!-- Confirmed Agents Roster -->
-        <div style="background:#f8fafc; border:1px solid #cbd5e1; border-radius:14px; padding:14px;">
+        <div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:14px; padding:14px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-            <span style="font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:0.8px;">Outage Surge Roster</span>
+            <span style="font-size:11px; font-weight:800; color:#1e3a8a; text-transform:uppercase; letter-spacing:0.8px;">Outage Surge Roster</span>
             <span style="font-size:10px; font-weight:700; color:#047857; background:#ecfdf5; border:1px solid #a7f3d0; padding:3px 10px; border-radius:999px;">Ready for Dispatch</span>
           </div>
           <div id="modal-quota-agents-list" style="display:flex; flex-direction:column; gap:7px; max-height:160px; overflow-y:auto; padding-right:2px;">
@@ -1405,7 +1405,7 @@
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
             Acknowledge &amp; Monitor Floor
           </button>
-          <button type="button" onclick="event.stopPropagation(); closeQuotaModal();" style="padding:13px 18px; font-size:13px; font-weight:700; color:#94a3b8; background:#f8fafc; border:1px solid #cbd5e1; border-radius:12px; cursor:pointer; transition:all 0.15s;">
+          <button type="button" onclick="event.stopPropagation(); closeQuotaModal();" style="padding:13px 18px; font-size:13px; font-weight:700; color:#1e3a8a; background:#ffffff; border:1px solid #bfdbfe; border-radius:12px; cursor:pointer; transition:all 0.15s;">
             Close
           </button>
         </div>

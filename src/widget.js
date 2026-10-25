@@ -714,7 +714,7 @@ function renderBreakHistory(agentId, filter) {
   }
 
   if (filtered.length === 0) {
-    container.innerHTML = '<div style="text-align:center; padding:24px 10px; color:#94a3b8; font-size:11px;"><span style="font-size:24px; display:block; margin-bottom:6px;">☕</span>No breaks match the selected filter in the past 30 days.</div>';
+    container.innerHTML = '<div style="text-align:center; padding:24px 10px; color:#1e3a8a; font-size:11px;"><span style="font-size:24px; display:block; margin-bottom:6px;">☕</span>No breaks match the selected filter in the past 30 days.</div>';
     return;
   }
 
@@ -1732,7 +1732,7 @@ async function handleUserChat() {
       `• <strong>Billing & Payments</strong>: 42 calls waiting | Avg Wait: 35s | SLA: 86.4%<br/>` +
       `• <strong>General Customer Service</strong>: 8 calls waiting | Avg Wait: 14s | SLA: 97.2%<br/>` +
       `• <strong>Tier-2 Tech Support</strong>: 15 calls waiting | Avg Wait: 32s | SLA: 88.0%<br/>` +
-      `<small style="color:#94a3b8; display:block; margin-top:4px;">Inbound Rate: 420 calls/min. All skill queues operating normally.</small>`;
+      `<small style="color:#1e3a8a; display:block; margin-top:4px;">Inbound Rate: 420 calls/min. All skill queues operating normally.</small>`;
   } else if (qLower.includes('adherence') || qLower.includes('aux break') || qLower.includes('my break') || qLower.includes('lunch') || qLower.includes('quota')) {
     response = `⏱️ <strong>Live Schedule Adherence for ${profile.name}:</strong><br/>` +
       `• <strong>CXone Adherence</strong>: <strong>${profile.adherence}</strong> (Target: &ge; 90%)<br/>` +
@@ -2253,14 +2253,14 @@ function initAlertSettingsModal() {
     }
 
     if (tabCloud) {
-      tabCloud.style.border = activeQrMode === 'cloud' ? '1.5px solid #3b82f6' : '1.5px solid #cbd5e1';
+      tabCloud.style.border = activeQrMode === 'cloud' ? '1.5px solid #3b82f6' : '1.5px solid #bfdbfe';
       tabCloud.style.background = activeQrMode === 'cloud' ? '#eff6ff' : '#ffffff';
-      tabCloud.style.color = activeQrMode === 'cloud' ? '#1d4ed8' : '#64748b';
+      tabCloud.style.color = activeQrMode === 'cloud' ? '#1d4ed8' : '#1e3a8a';
     }
     if (tabLocal) {
-      tabLocal.style.border = activeQrMode === 'local' ? '1.5px solid #3b82f6' : '1.5px solid #cbd5e1';
+      tabLocal.style.border = activeQrMode === 'local' ? '1.5px solid #3b82f6' : '1.5px solid #bfdbfe';
       tabLocal.style.background = activeQrMode === 'local' ? '#eff6ff' : '#ffffff';
-      tabLocal.style.color = activeQrMode === 'local' ? '#1d4ed8' : '#64748b';
+      tabLocal.style.color = activeQrMode === 'local' ? '#1d4ed8' : '#1e3a8a';
     }
 
     if (urlText) urlText.textContent = targetUrl;

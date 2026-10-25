@@ -68,7 +68,7 @@
       <span style="font-size:18px;">🎓</span>
       <div>
         <strong id="training-banner-title" style="color:#1d4ed8; display:block;">Mandatory Coaching Assigned by Supervisor</strong>
-        <p id="training-banner-desc" style="color:#e2e8f0; font-size:10px; margin-top:2px;">Module 101: De-escalation & Tone Mastery scheduled for immediate AUX-4 interval.</p>
+        <p id="training-banner-desc" style="color:#0f172a; font-size:10px; margin-top:2px;">Module 101: De-escalation & Tone Mastery scheduled for immediate AUX-4 interval.</p>
       </div>
       <button id="btn-ack-training" class="btn-xs btn-outline" style="white-space:nowrap; margin-left:6px;">Acknowledge</button>
     </div>
@@ -119,7 +119,7 @@
         <div id="break-progress-bar" class="progress-bar-fill"></div>
       </div>
       
-      <div class="break-alert-meta" style="display:flex; justify-content:space-between; align-items:center; font-size:11px; margin-top:8px; margin-bottom:6px; color:#475569; background:rgba(0,0,0,0.03); padding:6px 10px; border-radius:6px; border:1px solid #e2e8f0;">
+      <div class="break-alert-meta" style="display:flex; justify-content:space-between; align-items:center; font-size:11px; margin-top:8px; margin-bottom:6px; color:#0f172a; background:rgba(0,0,0,0.03); padding:6px 10px; border-radius:6px; border:1px solid #dbeafe;">
         <span>🚨 Alert: <strong id="widget-alert-device-label" style="color:#2563eb;">💻+📱 Both</strong></span>
         <span>Threshold: <strong id="widget-alert-thresh-label" style="color:#d97706;">2m</strong></span>
         <button id="btn-open-alert-settings" class="btn-xs btn-outline" style="font-size:10px; padding:1px 6px;">⚙️ Settings</button>
@@ -269,10 +269,10 @@
         <!-- Post-Call IVR Customer Rating Box -->
         <div class="ivr-rating-box">
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:10px; font-weight:700; color:#94a3b8; text-transform:uppercase;">Post-Call IVR Survey Rating:</span>
+            <span style="font-size:10px; font-weight:700; color:#1e3a8a; text-transform:uppercase;">Post-Call IVR Survey Rating:</span>
             <span id="acw-ivr-stars" style="font-size:13px; font-weight:800; color:#d97706;">★★★★★ 5.0 / 5.0</span>
           </div>
-          <small id="acw-ivr-feedback" style="color:#cbd5e1; font-size:10px; display:block; margin-top:2px;">
+          <small id="acw-ivr-feedback" style="color:#1e3a8a; font-size:10px; display:block; margin-top:2px;">
             Customer Response: "Agent Alex was empathetic, restored my promotional discount and resolved inquiry immediately."
           </small>
         </div>
@@ -303,12 +303,12 @@
           <div id="summary-content-block">
             <!-- Structured summary filled dynamically -->
           </div>
-          <div class="acw-agent-edit-box" style="margin-top:10px; border-top:1px dashed #cbd5e1; padding-top:8px;">
+          <div class="acw-agent-edit-box" style="margin-top:10px; border-top:1px dashed #bfdbfe; padding-top:8px;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-              <label style="font-size:11px; font-weight:700; color:#334155;">✏️ Agent Wrap-Up Notes & Edits (Appended to CRM):</label>
+              <label style="font-size:11px; font-weight:700; color:#0f172a;">✏️ Agent Wrap-Up Notes & Edits (Appended to CRM):</label>
               <button id="btn-add-quick-note" class="btn-xs btn-outline" style="font-size:10px; padding:2px 6px;">＋ Append Note</button>
             </div>
-            <textarea id="acw-edit-summary" rows="3" style="width:100%; border-radius:6px; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a; font-size:11px; padding:8px; resize:vertical; font-family:inherit; box-sizing:border-box;" placeholder="Add agent wrap notes, customer details, or modifications here..."></textarea>
+            <textarea id="acw-edit-summary" rows="3" style="width:100%; border-radius:6px; border:1px solid #bfdbfe; background:#ffffff; color:#0f172a; font-size:11px; padding:8px; resize:vertical; font-family:inherit; box-sizing:border-box;" placeholder="Add agent wrap notes, customer details, or modifications here..."></textarea>
           </div>
         </div>
       </div>
@@ -454,7 +454,7 @@
             <button type="button" class="thresh-choice-btn selected" data-threshold="2">2 mins</button>
             <button type="button" class="thresh-choice-btn" data-threshold="5">5 mins</button>
           </div>
-          <p style="font-size:10px; color:#64748b; margin-top:4px;">Alarm &amp; bot call will fire once break elapsed time exceeds duration + threshold.</p>
+          <p style="font-size:10px; color:#1e3a8a; margin-top:4px;">Alarm &amp; bot call will fire once break elapsed time exceeds duration + threshold.</p>
         </div>
 
         <div>
@@ -466,13 +466,13 @@
           </div>
         </div>
 
-                <div class="qr-pair-card" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:10px;">
+                <div class="qr-pair-card" style="background:#ffffff; border:1px solid #dbeafe; border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:10px;">
           <div style="display:flex; align-items:center; justify-content:space-between;">
             <div style="display:flex; align-items:center; gap:8px;">
               <span style="font-size:20px;">📱</span>
               <div>
                 <h4 style="margin:0; font-size:12px; font-weight:800; color:#0f172a;">Scan with Phone Camera</h4>
-                <p style="margin:0; font-size:10px; color:#64748b;">Pairs your phone for break overdue alarms</p>
+                <p style="margin:0; font-size:10px; color:#1e3a8a;">Pairs your phone for break overdue alarms</p>
               </div>
             </div>
             <span id="qr-status-pill" style="font-size:10px; font-weight:700; padding:2px 8px; border-radius:12px; background:#dcfce7; color:#15803d;">🌐 Ready</span>
@@ -483,15 +483,15 @@
             <button type="button" id="qr-tab-cloud" class="qr-mode-tab active" style="flex:1; padding:5px 8px; font-size:11px; font-weight:700; border-radius:6px; border:1.5px solid #3b82f6; background:#eff6ff; color:#1d4ed8; cursor:pointer;">
               🌐 Cloud (4G/5G/Wi-Fi)
             </button>
-            <button type="button" id="qr-tab-local" class="qr-mode-tab" style="flex:1; padding:5px 8px; font-size:11px; font-weight:700; border-radius:6px; border:1.5px solid #cbd5e1; background:#ffffff; color:#64748b; cursor:pointer;">
+            <button type="button" id="qr-tab-local" class="qr-mode-tab" style="flex:1; padding:5px 8px; font-size:11px; font-weight:700; border-radius:6px; border:1.5px solid #bfdbfe; background:#ffffff; color:#1e3a8a; cursor:pointer;">
               📶 Local Wi-Fi
             </button>
           </div>
 
           <!-- Crisp Scannable QR Code -->
-          <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:12px; background:#ffffff; border-radius:10px; border:1px solid #e2e8f0; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
+          <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; padding:12px; background:#ffffff; border-radius:10px; border:1px solid #dbeafe; box-shadow:0 1px 3px rgba(0,0,0,0.05);">
             <div id="qr-code-container" style="width:164px; height:164px; display:flex; align-items:center; justify-content:center; background:#ffffff;">
-              <span style="color:#94a3b8; font-size:11px;">Generating QR Code...</span>
+              <span style="color:#1e3a8a; font-size:11px;">Generating QR Code...</span>
             </div>
             <div id="qr-scan-guide" style="margin-top:8px; font-size:10px; color:#059669; font-weight:700; display:flex; align-items:center; gap:4px;">
               <span>📸</span> Open Camera App & point at code
@@ -500,15 +500,15 @@
 
           <!-- Quick URL & Action Bar -->
           <div style="display:flex; flex-direction:column; gap:4px;">
-            <div style="background:#ffffff; border:1px solid #cbd5e1; border-radius:6px; padding:4px 8px; display:flex; align-items:center; justify-content:space-between; gap:6px;">
-              <span id="qr-url-text" style="font-family:monospace; font-size:10px; color:#334155; word-break:break-all; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:240px;">loading...</span>
+            <div style="background:#ffffff; border:1px solid #bfdbfe; border-radius:6px; padding:4px 8px; display:flex; align-items:center; justify-content:space-between; gap:6px;">
+              <span id="qr-url-text" style="font-family:monospace; font-size:10px; color:#0f172a; word-break:break-all; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:240px;">loading...</span>
               <button type="button" id="btn-copy-qr-url" style="padding:3px 8px; font-size:10px; font-weight:700; background:#2563eb; color:#ffffff; border:none; border-radius:4px; cursor:pointer; flex-shrink:0;">📋 Copy</button>
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <a id="mobile-companion-link" href="/mobile-alert.html" target="_blank" style="font-size:10px; font-weight:700; color:#2563eb; text-decoration:underline;">
                 Open Mobile Companion on this PC ↗
               </a>
-              <span id="qr-network-desc" style="font-size:9px; color:#64748b;">Works anywhere worldwide</span>
+              <span id="qr-network-desc" style="font-size:9px; color:#1e3a8a;">Works anywhere worldwide</span>
             </div>
           </div>
         </div>
@@ -527,7 +527,7 @@
     <!-- INTERACTIVE INCOMING BOT CALL OVERLAY (WHEN BREAK EXCEEDED) -->
     <div id="bot-call-overlay" class="bot-call-overlay hidden">
       <div class="call-dialog" style="position:relative;">
-        <button id="btn-close-bot-call" style="position:absolute; top:12px; right:14px; background:transparent; border:none; color:#94a3b8; font-size:22px; line-height:1; cursor:pointer;" title="Dismiss">&times;</button>
+        <button id="btn-close-bot-call" style="position:absolute; top:12px; right:14px; background:transparent; border:none; color:#1e3a8a; font-size:22px; line-height:1; cursor:pointer;" title="Dismiss">&times;</button>
         <div class="call-pulse-animation">
           <div class="call-icon-holder">📞</div>
         </div>
