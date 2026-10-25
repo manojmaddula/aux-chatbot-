@@ -1455,7 +1455,7 @@ function endBreakEarly(fromRemote = false) {
 
     agentState.status = 'READY';
     agentState.activeBreak = null;
-    try { localStorage.removeItem('wfm_active_break'); } catch (e) {}
+    try { localStorage.removeItem('wfm_active_break'); fetch('/api/breaks/end', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ agentId: agentState.id }) }); } catch (e) {}
 
     // Reset UI indicators
     if (agentStatusDot) agentStatusDot.className = 'status-indicator ready';

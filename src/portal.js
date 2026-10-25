@@ -614,6 +614,7 @@ btnSubmitBreak.addEventListener('click', async () => {
         });
       } catch (e) {}
       localStorage.setItem('wfm_active_break', JSON.stringify(breakEvent.payload));
+      try { fetch('/api/breaks/start', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...breakEvent.payload, agentId: agentData.id }) }); } catch (e) {}
       
       // Dispatch via BroadcastChannel for real-time cross-tab/window sync
       try {

@@ -99,6 +99,7 @@ const agentAlertPreferences = {
 };
 
 const activeBreakAlarms = {};
+const activeAgentBreaks = {};
 const sseAlertClients = [];
 
 function broadcastAlertEvent(eventType, payload) {
@@ -723,6 +724,58 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+
+  // API ROUTE: Start / Sync Active Break across Laptop & Mobile
+  if (pathname === '/api/breaks/start' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const breakData = JSON.parse(body || '{}');
+        const aId = breakData.agentId || (breakData.agent && breakData.agent.id) || 'AGT-8842';
+        activeAgentBreaks[aId] = breakData;
+        broadcastAlertEvent('BREAK_APPROVED', breakData);
+        if (!req.headers['x-relayed-from']) relayToCloud('/api/breaks/start', breakData);
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify({ success: true, activeBreak: breakData }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: e.message }));
+      }
+    });
+    return;
+  }
+
+  // API ROUTE: Get Active Break for Agent
+  if (pathname === '/api/breaks/active' && req.method === 'GET') {
+    const aId = parsedUrl.query.agentId || 'AGT-8842';
+    const brk = activeAgentBreaks[aId] || null;
+    res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+    res.end(JSON.stringify({ success: true, activeBreak: brk }));
+    return;
+  }
+
+  // API ROUTE: End Active Break
+  if (pathname === '/api/breaks/end' && req.method === 'POST') {
+    let body = '';
+    req.on('data', chunk => { body += chunk; });
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const aId = payload.agentId || 'AGT-8842';
+        delete activeAgentBreaks[aId];
+        broadcastAlertEvent('BREAK_ENDED', { agentId: aId });
+        if (!req.headers['x-relayed-from']) relayToCloud('/api/breaks/end', payload);
+        res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+        res.end(JSON.stringify({ success: true, message: 'Break ended.' }));
+      } catch (e) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: e.message }));
+      }
+    });
+    return;
+  }
+
   // Trigger Automated Calling / Alarm (From Widget Countdown or Supervisor Wallboard)
   if (pathname === '/api/alerts/trigger-alarm' && req.method === 'POST') {
     let body = '';
@@ -1080,6 +1133,7 @@ const server = http.createServer((req, res) => {
 
         // Broadcast to mobile companions via SSE
         broadcastAlertEvent('EMERGENCY_RECALL_DISPATCH', activeEmergencyRecall);
+        if (!req.headers['x-relayed-from']) relayToCloud('/api/emergency/notify-all', payload);
 
         // Audit in supervisor queue
         supervisorQueue.unshift({
@@ -1184,6 +1238,7 @@ const server = http.createServer((req, res) => {
         }
 
         // Broadcast updated response to supervisor portal
+        if (!req.headers['x-relayed-from']) relayToCloud('/api/emergency/respond', payload);
         broadcastAlertEvent('EMERGENCY_RESPONSE_UPDATE', {
           campaignId: activeEmergencyRecall.id,
           agentId: aId,
@@ -1323,6 +1378,7 @@ const server = http.createServer((req, res) => {
       agents: {}
     };
     broadcastAlertEvent('EMERGENCY_RECALL_RESET', { reset: true });
+    if (!req.headers['x-relayed-from']) relayToCloud('/api/emergency/reset', {});
     res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
     res.end(JSON.stringify({ success: true, message: 'Emergency recall campaign reset.' }));
     return;

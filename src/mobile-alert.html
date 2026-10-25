@@ -2174,6 +2174,8 @@
       }
     }
     setEmergencyModalState('PENDING');
+      startAlarmSound('siren'); // Play siren sound for emergency
+      if (navigator.vibrate) try { navigator.vibrate([400, 200, 400, 200, 800]); } catch (e) {}
 
     function checkAndShowEmergencyRecall(campaign) {
       if (!campaign || !campaign.active) {
@@ -2183,12 +2185,7 @@
         return;
       }
       activeEmergencyCampaign = campaign;
-      const targetAgent = campaign.agents ? campaign.agents[currentAgentId] : null;
-
-      if (campaign.agents && Object.keys(campaign.agents).length > 0 && !targetAgent) {
-        if (emOverlay) emOverlay.classList.add('hidden');
-        return;
-      }
+      const targetAgent = (campaign.agents && campaign.agents[currentAgentId]) ? campaign.agents[currentAgentId] : { agentId: currentAgentId, status: 'PENDING', response: null };
 
       const isQuotaMet = campaign.quotaFulfilled === true;
       const isAccepted = targetAgent && targetAgent.response === 'YES';
@@ -2239,6 +2236,7 @@
     }
 
     async function sendEmergencyResponse(choice) {
+      stopAlarmSound(); // Stop emergency sound
       try {
         if (navigator.vibrate) navigator.vibrate([100, 50, 150]);
         const res = await fetch('/api/emergency/respond', {
@@ -2273,6 +2271,7 @@
     }
 
     function dismissEmergencyModal() {
+      stopAlarmSound(); // Stop emergency sound
       if (emOverlay) emOverlay.classList.add('hidden');
       const cid = (activeEmergencyCampaign && activeEmergencyCampaign.id) || 'default';
       const ackKey = 'emergency_ack_' + cid + '_' + currentAgentId;
