@@ -279,7 +279,7 @@ let ringSirenInterval = null;
 // Break Overdue Calling & Device Alert Preferences
 let agentAlertPrefs = {
   device: 'mobile', // 'laptop' | 'mobile' | 'both'
-  thresholdMins: 2, // Variance threshold over break applied duration
+  thresholdMins: 0, // Variance threshold over break applied duration
   soundStyle: 'phone_ring', // 'phone_ring' | 'siren' | 'voice'
   mobilePhone: '+1 (555) 019-8842'
 };
@@ -1238,7 +1238,7 @@ function updateBreakCountdown() {
   const seconds = Math.floor((absDiff % (1000 * 60)) / 1000);
   const formatted = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
-  const thresholdMins = agentAlertPrefs.thresholdMins !== undefined ? agentAlertPrefs.thresholdMins : 2;
+  const thresholdMins = typeof agentAlertPrefs.thresholdMins === 'number' ? agentAlertPrefs.thresholdMins : 0;
   const thresholdMs = thresholdMins * 60 * 1000;
   const overdueMs = now - agentState.activeBreak.expiresAt;
 
@@ -1316,7 +1316,7 @@ async function dispatchMobileThresholdAlarm(overMins = 1, overSecs = 0) {
     agentName: agentState.name || 'Alex Morgan',
     auxCode: agentState.activeBreak ? agentState.activeBreak.auxCode : 'AUX-2: Short Break / AUX',
     durationMinutes: agentState.activeBreak ? agentState.activeBreak.durationMinutes : 15,
-    thresholdMins: agentAlertPrefs.thresholdMins !== undefined ? agentAlertPrefs.thresholdMins : 2,
+    thresholdMins: typeof agentAlertPrefs.thresholdMins === 'number' ? agentAlertPrefs.thresholdMins : 0,
     overdueMins: overMins,
     overdueSecs: overSecs,
     device: agentAlertPrefs.device || 'both',

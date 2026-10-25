@@ -572,7 +572,7 @@ btnSubmitBreak.addEventListener('click', async () => {
 
       // Read selected device and threshold preferences
       const selectedDevice = document.getElementById('portal-alert-device')?.value || 'mobile';
-      const selectedThresh = parseInt(document.getElementById('portal-alert-threshold')?.value || '2', 10);
+      const selectedThresh = parseInt(document.getElementById('portal-alert-threshold')?.value || '0', 10);
       const alertPrefs = {
         agentId: agentData.id,
         agentName: agentData.name,

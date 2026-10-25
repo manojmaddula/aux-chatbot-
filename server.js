@@ -73,7 +73,7 @@ const agentAlertPreferences = {
     agentId: 'AGT-8842',
     agentName: 'Alex Morgan',
     device: 'mobile', // 'laptop' | 'mobile' | 'both'
-    thresholdMins: 2, // Variance threshold over break applied duration
+    thresholdMins: 0, // Variance threshold over break applied duration
     soundStyle: 'phone_ring', // 'phone_ring' | 'siren' | 'voice'
     mobilePhone: '+1 (555) 019-8842',
     updatedAt: new Date().toISOString()
@@ -82,7 +82,7 @@ const agentAlertPreferences = {
     agentId: 'AGT-9102',
     agentName: 'Samantha Vance',
     device: 'mobile',
-    thresholdMins: 2,
+    thresholdMins: 0,
     soundStyle: 'phone_ring',
     mobilePhone: '+1 (555) 019-9102',
     updatedAt: new Date().toISOString()
@@ -685,7 +685,7 @@ const server = http.createServer((req, res) => {
       agentId: aId,
       agentName: 'Agent',
       device: 'mobile',
-      thresholdMins: 2,
+      thresholdMins: 0,
       soundStyle: 'phone_ring',
       mobilePhone: '+1 (555) 019-8842',
       updatedAt: new Date().toISOString()
@@ -840,7 +840,7 @@ const server = http.createServer((req, res) => {
       try {
         const payload = JSON.parse(body || '{}');
         const aId = payload.agentId || 'AGT-8842';
-        const prefs = agentAlertPreferences[aId] || { device: 'mobile', thresholdMins: 2, soundStyle: 'phone_ring' };
+        const prefs = agentAlertPreferences[aId] || { device: 'mobile', thresholdMins: 0, soundStyle: 'phone_ring' };
 
         const alarmData = {
           id: 'ALM-' + Date.now(),

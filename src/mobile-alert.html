@@ -1209,7 +1209,7 @@
             <div class="metric-lbl">Applied Break</div>
           </div>
           <div class="metric-box">
-            <div id="metric-threshold" class="metric-val">2m</div>
+            <div id="metric-threshold" class="metric-val">0s (Inst.)</div>
             <div class="metric-lbl">Variance Buffer</div>
           </div>
           <div class="metric-box">
@@ -1251,9 +1251,9 @@
         <span>⏱️</span> Variance Threshold (Grace Limit)
       </div>
       <div class="threshold-pills">
-        <button type="button" class="thresh-btn" data-threshold="0">0m (Inst.)</button>
+        <button type="button" class="thresh-btn active" data-threshold="0">0m (Inst.)</button>
         <button type="button" class="thresh-btn" data-threshold="1">1 min</button>
-        <button type="button" class="thresh-btn active" data-threshold="2">2 mins</button>
+        <button type="button" class="thresh-btn" data-threshold="2">2 mins</button>
         <button type="button" class="thresh-btn" data-threshold="5">5 mins</button>
       </div>
 
@@ -1301,7 +1301,7 @@
           <span>Break Applied</span>
         </div>
         <div class="call-stat-item">
-          <strong id="call-stat-threshold">2m</strong>
+          <strong id="call-stat-threshold">0s (Inst.)</strong>
           <span>Threshold Limit</span>
         </div>
         <div class="call-stat-item">
@@ -1487,8 +1487,8 @@
     }
 
     let alertPrefs = {
-      device: 'both',
-      thresholdMins: 2,
+      device: 'mobile',
+      thresholdMins: 0,
       soundStyle: 'phone_ring'
     };
 
@@ -1557,7 +1557,7 @@
         document.querySelectorAll('.thresh-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         alertPrefs.thresholdMins = parseInt(btn.dataset.threshold, 10);
-        metricThreshold.textContent = `+${alertPrefs.thresholdMins}m`;
+        metricThreshold.textContent = alertPrefs.thresholdMins === 0 ? '0s (Inst.)' : `+${alertPrefs.thresholdMins}m`;
         saveAlertPreferences();
       });
     });
@@ -1755,7 +1755,7 @@
       const overSecs = alarmData.overdueSecs || 0;
 
       callStatApplied.textContent = `${appliedMins}m`;
-      callStatThreshold.textContent = `+${threshMins}m`;
+      callStatThreshold.textContent = threshMins === 0 ? '0s (Inst.)' : `+${threshMins}m`;
       callStatOverdue.textContent = `+${String(overMins).padStart(2, '0')}:${String(overSecs).padStart(2, '0')}`;
 
       const callerSub = document.querySelector('.caller-sub');
@@ -1900,7 +1900,7 @@
       const secs = Math.floor((absDiff % 60000) / 1000);
       const timeStr = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
 
-      const thresholdMs = (alertPrefs.thresholdMins || 2) * 60 * 1000;
+      const thresholdMs = (typeof alertPrefs.thresholdMins === "number" ? alertPrefs.thresholdMins : 0) * 60 * 1000;
       const overdueMs = now - activeBreak.expiresAt;
 
       if (!isOverdue) {
