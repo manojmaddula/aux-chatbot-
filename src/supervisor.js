@@ -318,8 +318,8 @@ function renderWallboard() {
     return `
       <tr style="${isMine ? 'background: rgba(37, 99, 235, 0.02);' : ''}">
         <td style="font-family:monospace; color:#64748b;">${ag.id}</td>
-        <td><strong style="color:#0f172a;">${ag.name}</strong></td>
-        <td style="color:#334155;">${ag.queue}</td>
+        <td><strong style="color:#ffffff;">${ag.name}</strong></td>
+        <td style="color:#cbd5e1;">${ag.queue}</td>
         <td>
           <span class="status-tag" style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; font-size:10px; font-weight:700;">
             ${ag.supervisorName}
@@ -339,10 +339,10 @@ function renderWallboard() {
         <td>
           <div style="display:flex; gap:6px;">
             <button class="btn btn-sm btn-outline" onclick="recallAgent('${ag.id}', '${ag.name}')" title="Place Automated Bot Voice Call">
-              📞 Bot Recall
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg> Bot Recall
             </button>
             <button class="btn btn-sm btn-outline" style="border-color:#ef4444; color:#ef4444;" onclick="ringAgentAlarm('${ag.id}', '${ag.name}')" title="Trigger Calling Alarm &amp; Vibration to Mobile Phone Only">
-              📱 Ring Mobile
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></svg> Ring Mobile
             </button>
           </div>
         </td>
@@ -2894,15 +2894,15 @@ function renderEmergencyCampaign(campaign) {
   if (accepted >= reqQuota) {
     if (qPill) {
       qPill.textContent = `✓ SUFFICIENT STAFFING SECURED (${accepted}/${reqQuota})`;
-      qPill.style.background = '#dcfce7';
-      qPill.style.color = '#15803d';
+      qPill.style.background = 'rgba(16,185,129,0.2)'; qPill.style.border = '1px solid rgba(16,185,129,0.4)';
+      qPill.style.color = '#34d399';
     }
     if (qFill) qFill.style.background = '#10b981';
   } else {
     if (qPill) {
       qPill.textContent = `● AWAITING AVAILABILITY (${accepted}/${reqQuota})`;
-      qPill.style.background = '#fef3c7';
-      qPill.style.color = '#b45309';
+      qPill.style.background = 'rgba(245,158,11,0.2)'; qPill.style.border = '1px solid rgba(245,158,11,0.4)';
+      qPill.style.color = '#fbbf24';
     }
     if (qFill) qFill.style.background = 'linear-gradient(90deg, #3b82f6, #10b981)';
   }
@@ -2915,15 +2915,15 @@ function renderEmergencyCampaign(campaign) {
     let rowBg = '';
 
     if (ag.status === 'ACCEPTED') {
-      responseBadge = '<span class="status-tag approved" style="background:#dcfce7; color:#15803d; font-weight:800; font-size:11px; padding:4px 10px; border-radius:6px;">✅ YES (Will Join)</span>';
+      responseBadge = '<span class="status-tag approved" style="background:rgba(16,185,129,0.18); color:#34d399; border:1px solid rgba(16,185,129,0.35); font-weight:800; font-size:11px; padding:4px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> YES (Will Join)</span>';
       shiftDisplay = `<strong style="color:#0284c7; font-size:12px; font-family:monospace;">${ag.shiftTimings}</strong>`;
       rowBg = 'background: rgba(16, 185, 129, 0.04);';
     } else if (ag.status === 'DECLINED') {
-      responseBadge = '<span class="status-tag overdue" style="background:#fee2e2; color:#dc2626; font-weight:800; font-size:11px; padding:4px 10px; border-radius:6px;">❌ NO (Declined)</span>';
+      responseBadge = '<span class="status-tag overdue" style="background:rgba(239,68,68,0.18); color:#f87171; border:1px solid rgba(239,68,68,0.35); font-weight:800; font-size:11px; padding:4px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> NO (Declined)</span>';
       shiftDisplay = '<span style="color:#94a3b8; font-size:11px;">-</span>';
       rowBg = 'background: rgba(239, 68, 68, 0.03);';
     } else {
-      responseBadge = '<span class="status-tag" style="background:#fef3c7; color:#b45309; font-weight:700; font-size:11px; padding:4px 10px; border-radius:6px; animation: pulse 1.5s infinite;">⏳ Awaiting Mobile Tap...</span>';
+      responseBadge = '<span class="status-tag" style="background:rgba(245,158,11,0.18); color:#fbbf24; border:1px solid rgba(245,158,11,0.35); font-weight:700; font-size:11px; padding:4px 10px; border-radius:6px; display:inline-flex; align-items:center; gap:5px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Awaiting Mobile Tap...</span>';
       shiftDisplay = `<span style="color:#64748b; font-size:11px;">${ag.shiftTimings} (Pending)</span>`;
     }
 
@@ -2932,12 +2932,12 @@ function renderEmergencyCampaign(campaign) {
     return `
       <tr style="${rowBg}">
         <td style="font-family:monospace; color:#64748b; font-weight:700;">${ag.agentId}</td>
-        <td><strong style="color:#0f172a;">${ag.agentName}</strong></td>
-        <td style="color:#334155; font-size:12px;">${ag.queue || 'General Support'}</td>
+        <td><strong style="color:#ffffff;">${ag.agentName}</strong></td>
+        <td style="color:#cbd5e1; font-size:12px;">${ag.queue || 'General Support'}</td>
         <td><span class="status-tag aux" style="font-size:10px;">${ag.currentState || 'AUX Break'}</span></td>
         <td>
           <span style="display:inline-flex; align-items:center; gap:5px; font-size:11px; color:#0284c7; font-weight:700; background:#f0f9ff; padding:3px 8px; border-radius:6px; border:1px solid #bae6fd;">
-            📱 Mobile Alert Delivered
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></svg> Mobile Alert Delivered
           </span>
         </td>
         <td>${responseBadge}</td>
@@ -2946,7 +2946,7 @@ function renderEmergencyCampaign(campaign) {
         <td>
           ${ag.status === 'PENDING' ? `
             <button class="btn btn-xs btn-outline" style="border-color:#38bdf8; color:#0284c7; font-weight:700; padding:4px 8px;" onclick="rePingAgentMobile('${ag.agentId}', '${ag.agentName}')">
-              📱 Re-Ping
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> Re-Ping
             </button>
           ` : (ag.status === 'ACCEPTED' ? `
             <span style="font-size:11px; color:#15803d; font-weight:700;">✓ Confirmed</span>

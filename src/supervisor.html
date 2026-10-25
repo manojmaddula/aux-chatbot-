@@ -21,7 +21,7 @@
       </div>
       <div class="header-right">
         <div class="sup-profile">
-          <span class="sup-avatar" id="sup-avatar-icon">👩‍💼</span>
+          <span class="sup-avatar" id="sup-avatar-icon" style="display:flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:rgba(59,130,246,0.2); color:#60a5fa;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
           <div>
             <select id="supervisor-select" class="supervisor-dropdown" title="Switch active supervisor account">
               <option value="SUP-014">Sarah Jenkins</option>
@@ -36,10 +36,10 @@
           <img src="/favicon.svg?v=panda2" style="width:14px; height:14px;" /> Home
         </a>
         <button id="btn-header-emergency-notify" class="btn btn-sm" style="background:#dc2626; color:#ffffff; font-weight:800; border:none; display:flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(220,38,38,0.3); cursor:pointer;" onclick="triggerEmergencyBroadcast('unavailable')">
-          <span style="animation: pulse 1.5s infinite;">🚨</span> Notify Unavailable (<span id="header-unavailable-pill">5</span>)
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:pulse 1.5s infinite;"><path d="M6 18h12M12 2v4M20 7l-3 3M4 7l3 3M12 6a6 6 0 0 0-6 6v6h12v-6a6 6 0 0 0-6-6z"/></svg> Notify Unavailable (<span id="header-unavailable-pill">5</span>)
         </button>
         <button id="btn-open-sup-bot-header" class="btn btn-sm btn-accent" onclick="window.openSupBot && window.openSupBot()" style="display:flex; align-items:center; gap:6px;">
-          <span>🤖</span> Ask Supervisor Bot
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="12" x="3" y="6" rx="2"/><path d="M9 18v3M15 18v3M12 2v4M2 12h2M20 12h2"/></svg> Ask Remi Copilot
         </button>
       </div>
     </header>
@@ -76,25 +76,25 @@
     <!-- SUPERVISOR MAIN NAVIGATION TABS -->
     <nav class="sup-tabs">
       <button class="sup-tab-btn active" data-tab="stab-wallboard">
-        <span>👥</span> Floor Wallboard & Telemetry
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg> Floor Wallboard &amp; Telemetry
       </button>
       <button class="sup-tab-btn" data-tab="stab-queue">
-        <span>📋</span> Break Requests Queue (<span id="sup-queue-badge">0</span>)
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> Break Requests Queue (<span id="sup-queue-badge">0</span>)
       </button>
       <button class="sup-tab-btn" data-tab="stab-alerts">
-        <span>📢</span> Alert & Broadcast Setup
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg> Alert &amp; Broadcast Engine
       </button>
       <button class="sup-tab-btn" data-tab="stab-reports">
-        <span>📊</span> Agent Reports & Analytics
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> Reports &amp; Analytics
       </button>
       <button class="sup-tab-btn" data-tab="stab-qa">
-        <span>🎓</span> QA, Customer Tone & Coaching (<span id="sup-qa-badge" style="color:#f87171; font-weight:800;">2 Flagged</span>)
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg> QA, Tone &amp; Coaching (<span id="sup-qa-badge" style="color:#f87171; font-weight:800;">2 Flagged</span>)
       </button>
             <button class="sup-tab-btn" data-tab="stab-rebalance">
-        <span>⚡</span> Dynamic WFM Rebalance (<span id="rebalance-status-tag" style="color:#34d399; font-weight:700;">Normal</span>)
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Dynamic WFM Rebalance (<span id="rebalance-status-tag" style="color:#34d399; font-weight:700;">Normal</span>)
       </button>
       <button class="sup-tab-btn" data-tab="stab-limits">
-        <span>⚙️</span> Agent Limits & Policy Setup
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Limits &amp; Policies
       </button>
       </nav>
 
@@ -108,15 +108,15 @@
           </div>
           <div class="header-actions" style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
             <div style="display:flex; align-items:center; border:1px solid rgba(255,255,255,0.1); border-radius:8px; overflow:hidden;">
-              <button id="btn-team-filter-my" class="btn btn-xs btn-primary" style="padding:6px 12px; font-weight:700; cursor:pointer;" onclick="setTeamFilter('my_team')">★ My Assigned Team (<span id="my-team-count">4</span>)</button>
-              <button id="btn-team-filter-all" class="btn btn-xs btn-outline" style="padding:6px 12px; border:none; background:rgba(255,255,255,0.03); color:#94a3b8; cursor:pointer;" onclick="setTeamFilter('all_floor')">🌐 All Floor (12)</button>
+              <button id="btn-team-filter-my" class="btn btn-xs btn-primary" style="padding:6px 12px; font-weight:700; cursor:pointer;" onclick="setTeamFilter('my_team')"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> My Team (<span id="my-team-count">4</span>)</button>
+              <button id="btn-team-filter-all" class="btn btn-xs btn-outline" style="padding:6px 12px; border:none; background:rgba(255,255,255,0.03); color:#94a3b8; cursor:pointer;" onclick="setTeamFilter('all_floor')"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg> All Floor (12)</button>
             </div>
             <div style="display:flex; align-items:center; gap:6px;">
               <input type="text" id="agent-search-input" placeholder="Search agent name, ID or skill..." style="padding:6px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.12); background:rgba(15,23,42,0.85); color:#ffffff; font-size:12px; width:190px;" />
-              <button id="btn-search-agents" class="btn btn-sm btn-primary">🔍 Search</button>
+              <button id="btn-search-agents" class="btn btn-sm btn-primary"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Search</button>
               <button id="btn-clear-agent-search" class="btn btn-sm btn-outline">Clear</button>
             </div>
-            <button id="btn-refresh-wallboard" class="btn btn-sm btn-secondary">🔄 Refresh</button>
+            <button id="btn-refresh-wallboard" class="btn btn-sm btn-secondary"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg> Refresh</button>
           </div>
         </div>
         <div class="table-responsive">
@@ -261,7 +261,7 @@
         <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
           <div>
             <div style="display:flex; align-items:center; gap:10px;">
-              <span style="font-size:26px;">🚨</span>
+              <div style="width:40px; height:40px; border-radius:12px; background:rgba(239,68,68,0.15); border:1.5px solid rgba(239,68,68,0.4); display:flex; align-items:center; justify-content:center; color:#f87171;"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18h12M12 2v4M20 7l-3 3M4 7l3 3M12 6a6 6 0 0 0-6 6v6h12v-6a6 6 0 0 0-6-6z"/></svg></div>
               <div>
                 <h3 style="margin:0; color:#ffffff;">Emergency Staffing & Mobile Recall Engine (Storm Surge Alert)</h3>
                 <p style="margin-top:2px; color:#64748b; font-size:12px;">
@@ -277,16 +277,16 @@
               <span style="color:#64748b; font-weight:600;">Extra Agents</span>
             </div>
             <button id="btn-notify-all-emergency" class="btn btn-emergency" style="background:#dc2626; color:#ffffff; font-weight:800; padding:8px 16px; border-radius:8px; border:none; box-shadow:0 4px 12px rgba(220,38,38,0.35); cursor:pointer; display:flex; align-items:center; gap:8px;" onclick="triggerEmergencyBroadcast('unavailable')">
-              <span>📢</span> Notify All Unavailable (<span id="unavailable-count-pill">5</span> Agents)
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg> Notify All Unavailable (<span id="unavailable-count-pill">5</span> Agents)
             </button>
             <button id="btn-notify-all-fleet" class="btn btn-outline" style="border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.04); color:#cbd5e1; font-size:12px; font-weight:700; padding:8px 14px; cursor:pointer;" onclick="triggerEmergencyBroadcast('all')">
-              🌐 Notify All Fleet (12)
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg> Notify All Fleet (12)
             </button>
-            <button id="btn-demo-quota" class="btn btn-xs btn-outline" style="border-color:#10b981; color:#059669; font-weight:700; padding:7px 10px; cursor:pointer; background:#f0fdf4;" onclick="simulateFiveAccepted()" title="Simulate 5 agents accepting availability to trigger quota achieved system alert">
-              ⚡ Demo 5 Accepted
+            <button id="btn-demo-quota" class="btn btn-xs btn-outline" style="border:1px solid rgba(16,185,129,0.4); color:#34d399; font-weight:700; padding:7px 12px; cursor:pointer; background:rgba(16,185,129,0.12); border-radius:8px;" onclick="simulateFiveAccepted()" title="Simulate 5 agents accepting availability to trigger quota achieved system alert">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Demo 5 Accepted
             </button>
             <button id="btn-reset-emergency-campaign" class="btn btn-outline" style="border-color:#ef4444; color:#ef4444; font-size:11px; padding:8px 10px; cursor:pointer;" onclick="resetEmergencyCampaign()" title="Reset active campaign">
-              ⏹️ Reset Campaign
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/></svg> Reset Campaign
             </button>
           </div>
         </div>
@@ -296,7 +296,7 @@
           <div id="em-quota-container" style="background:rgba(15,23,42,0.65); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:12px 16px; margin-bottom:14px; backdrop-filter:blur(12px);">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
               <div style="display:flex; align-items:center; gap:8px;">
-                <span style="font-size:16px;">🎯</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
                 <strong style="font-size:12px; color:#ffffff;">Outage Staffing Availability Target:</strong>
                 <span id="em-quota-label" style="font-size:12px; color:#2563eb; font-weight:700;">0 / 5 Agents Confirmed (Wanting 5 Extra Agents)</span>
               </div>
@@ -304,18 +304,18 @@
                 ● AWAITING AVAILABILITY
               </span>
             </div>
-            <div style="width:100%; height:10px; background:#f1f5f9; border-radius:5px; overflow:hidden;">
+            <div style="width:100%; height:10px; background:rgba(255,255,255,0.06); border-radius:5px; overflow:hidden;">
               <div id="em-quota-fill" style="width:0%; height:100%; background:linear-gradient(90deg, #3b82f6, #10b981); border-radius:5px; transition:width 0.4s ease;"></div>
             </div>
           </div>
 
           <!-- Active Emergency Campaign Alert Bar -->
-          <div id="em-campaign-active-bar" style="background:linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border:1.5px solid #f87171; border-radius:10px; padding:12px 16px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div id="em-campaign-active-bar" style="background:rgba(239,68,68,0.1); border:1.5px solid rgba(239,68,68,0.35); border-radius:12px; padding:14px 18px; margin-bottom:16px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; backdrop-filter:blur(12px);">
             <div style="display:flex; align-items:center; gap:10px;">
-              <span style="font-size:22px;">⚡</span>
+              <div style="width:36px; height:36px; border-radius:10px; background:rgba(239,68,68,0.2); color:#f87171; display:flex; align-items:center; justify-content:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
               <div>
-                <strong style="color:#b91c1c; font-size:13px; display:block;">Active Mobile Alert Dispatch:</strong>
-                <span id="em-campaign-msg-text" style="color:#475569; font-size:12px;">
+                <strong style="color:#f87171; font-size:13px; font-weight:800; display:block;">Active Mobile Alert Dispatch:</strong>
+                <span id="em-campaign-msg-text" style="color:#cbd5e1; font-size:12px;">
                   "There is an emergency situation. High call volume surge detected and your availability is requested to balance the queue. If you are available please join, or decline."
                 </span>
               </div>
@@ -334,29 +334,29 @@
           <!-- 4 Metrics Telemetry Row -->
           <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-bottom:16px;">
             <div style="background:rgba(15,23,42,0.6); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:12px 14px;">
-              <span style="font-size:11px; color:#64748b; font-weight:700; text-transform:uppercase;">📱 Mobile Alerts Sent</span>
+              <span style="font-size:11px; color:#94a3b8; font-weight:700; text-transform:uppercase; display:flex; align-items:center; gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></svg> Mobile Alerts Sent</span>
               <div id="em-stat-total" style="font-size:24px; font-weight:800; color:#ffffff; margin-top:2px;">0</div>
               <span style="font-size:10px; color:#64748b;">Delivered to agent phones</span>
             </div>
-            <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:10px; padding:12px 14px;">
-              <span style="font-size:11px; color:#15803d; font-weight:700; text-transform:uppercase;">✅ Accepted &amp; Joining (YES)</span>
-              <div id="em-stat-accepted" style="font-size:24px; font-weight:800; color:#15803d; margin-top:2px;">0</div>
-              <span style="font-size:10px; color:#15803d;">Shift schedule displayed on mobile</span>
+            <div style="background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); border-radius:12px; padding:14px 16px;">
+              <span style="font-size:11px; color:#34d399; font-weight:700; text-transform:uppercase; display:flex; align-items:center; gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> Accepted &amp; Joining (YES)</span>
+              <div id="em-stat-accepted" style="font-size:24px; font-weight:800; color:#34d399; margin-top:2px;">0</div>
+              <span style="font-size:10px; color:#a7f3d0;">Shift schedule displayed on mobile</span>
             </div>
-            <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:10px; padding:12px 14px;">
-              <span style="font-size:11px; color:#b91c1c; font-weight:700; text-transform:uppercase;">❌ Declined (NO)</span>
-              <div id="em-stat-declined" style="font-size:24px; font-weight:800; color:#b91c1c; margin-top:2px;">0</div>
-              <span style="font-size:10px; color:#b91c1c;">Currently unavailable for shift</span>
+            <div style="background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); border-radius:12px; padding:14px 16px;">
+              <span style="font-size:11px; color:#f87171; font-weight:700; text-transform:uppercase; display:flex; align-items:center; gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Declined (NO)</span>
+              <div id="em-stat-declined" style="font-size:24px; font-weight:800; color:#f87171; margin-top:2px;">0</div>
+              <span style="font-size:10px; color:#fca5a5;">Currently unavailable for shift</span>
             </div>
-            <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:12px 14px;">
-              <span style="font-size:11px; color:#b45309; font-weight:700; text-transform:uppercase;">⏳ Awaiting Response</span>
-              <div id="em-stat-pending" style="font-size:24px; font-weight:800; color:#b45309; margin-top:2px;">0</div>
-              <span style="font-size:10px; color:#b45309;">Mobile notification pending action</span>
+            <div style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); border-radius:12px; padding:14px 16px;">
+              <span style="font-size:11px; color:#fbbf24; font-weight:700; text-transform:uppercase; display:flex; align-items:center; gap:6px;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Awaiting Response</span>
+              <div id="em-stat-pending" style="font-size:24px; font-weight:800; color:#fbbf24; margin-top:2px;">0</div>
+              <span style="font-size:10px; color:#fde68a;">Mobile notification pending action</span>
             </div>
           </div>
 
           <!-- Real-Time Agent Response Table -->
-          <div class="table-responsive" style="border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
+          <div class="table-responsive" style="border:1px solid rgba(255,255,255,0.08); border-radius:12px; overflow:hidden;">
             <table class="data-table">
               <thead>
                 <tr>
