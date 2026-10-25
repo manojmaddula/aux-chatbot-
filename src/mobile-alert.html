@@ -639,20 +639,22 @@
       color: #64748b;
       margin-top: 16px;
     }
-    /* EMERGENCY SURGE RECALL MODAL STYLES */
+    /* EMERGENCY SURGE RECALL MODAL STYLES (PREMIUM NATIVE GLASS UI) */
     .emergency-mobile-overlay {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(10, 15, 29, 0.95);
-      backdrop-filter: blur(16px);
-      z-index: 1000;
+      background: radial-gradient(circle at 50% 20%, rgba(30, 20, 35, 0.94) 0%, rgba(8, 10, 18, 0.97) 100%);
+      backdrop-filter: blur(24px) saturate(160%);
+      -webkit-backdrop-filter: blur(24px) saturate(160%);
+      z-index: 10000;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
-      animation: fadeIn 0.25s ease;
+      padding: 18px;
+      animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    /* Universal Hidden Display Overrides */
+
+    /* Strict Universal Hidden Rules */
     .hidden, [hidden] {
       display: none !important;
     }
@@ -664,148 +666,344 @@
     .emergency-btn-row[hidden] {
       display: none !important;
     }
-    .emergency-confirmed-box {
-      text-align: center;
-      background: rgba(30, 41, 59, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 14px;
-      padding: 16px;
-      animation: scaleUp 0.2s ease;
-    }
     .emergency-mobile-overlay.hidden {
       display: none !important;
     }
+
     .emergency-modal-content {
-      background: #111827;
-      border: 1.5px solid rgba(239, 68, 68, 0.5);
-      box-shadow: 0 0 35px rgba(239, 68, 68, 0.35);
-      border-radius: 20px;
-      padding: 22px 18px;
+      background: linear-gradient(180deg, #141a29 0%, #0b0f19 100%);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 
+        0 25px 60px -12px rgba(0, 0, 0, 0.85),
+        0 0 0 1px rgba(244, 63, 94, 0.28),
+        0 0 45px -8px rgba(244, 63, 94, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      border-radius: 26px;
+      padding: 22px 20px;
       width: 100%;
-      max-width: 390px;
+      max-width: 410px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
-      animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      gap: 14px;
+      animation: scaleUp 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
     }
+
+    /* Ambient top glow */
+    .emergency-modal-content::before {
+      content: '';
+      position: absolute;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 180px;
+      height: 120px;
+      background: radial-gradient(ellipse, rgba(239, 68, 68, 0.35) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
     @keyframes scaleUp {
-      from { transform: scale(0.92); opacity: 0; }
-      to { transform: scale(1); opacity: 1; }
+      from { transform: scale(0.92) translateY(8px); opacity: 0; }
+      to { transform: scale(1) translateY(0); opacity: 1; }
     }
-    .emergency-pulse-badge {
+
+    /* Header Pill / Beacon */
+    .em-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 1;
+    }
+
+    .em-incident-pill {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: rgba(239, 68, 68, 0.2);
-      color: #f87171;
-      border: 1px solid rgba(239, 68, 68, 0.4);
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.35);
       padding: 5px 12px;
-      border-radius: 999px;
+      border-radius: 9999px;
       font-size: 11px;
       font-weight: 800;
-      letter-spacing: 0.5px;
-      align-self: flex-start;
+      color: #fca5a5;
+      letter-spacing: 0.6px;
+      box-shadow: 0 0 14px rgba(239, 68, 68, 0.2);
     }
-    .emergency-badge-dot {
+
+    .em-live-beacon {
+      position: relative;
+      width: 10px;
+      height: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .beacon-core {
       width: 8px;
       height: 8px;
       border-radius: 50%;
       background: #ef4444;
       box-shadow: 0 0 8px #ef4444;
-      animation: emergencyPulse 1.2s infinite;
     }
-    @keyframes emergencyPulse {
-      0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.4); opacity: 0.5; }
-      100% { transform: scale(1); opacity: 1; }
+
+    .beacon-wave {
+      position: absolute;
+      inset: -3px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(239, 68, 68, 0.8);
+      animation: beaconRipple 1.6s infinite ease-out;
     }
+
+    @keyframes beaconRipple {
+      0% { transform: scale(0.7); opacity: 1; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    .em-time-chip {
+      font-size: 11px;
+      font-weight: 700;
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      border-radius: 6px;
+      padding: 3px 8px;
+    }
+
+    /* Title Group */
+    .em-title-wrap {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
     .emergency-title {
-      font-size: 18px;
+      font-size: 21px;
       font-weight: 800;
+      letter-spacing: -0.4px;
       color: #ffffff;
       margin: 0;
       line-height: 1.25;
     }
+
+    .em-subheadline {
+      font-size: 12px;
+      font-weight: 600;
+      color: #94a3b8;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin: 0;
+    }
+
+    /* Message Callout */
+    .em-message-card {
+      position: relative;
+      z-index: 1;
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-left: 3.5px solid #f43f5e;
+      border-radius: 12px;
+      padding: 13px 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .em-msg-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #fda4af;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
     .emergency-desc {
       font-size: 13px;
+      color: #e2e8f0;
+      line-height: 1.5;
+      margin: 0;
+      font-weight: 450;
+    }
+
+    /* ACTION BUTTONS ROW */
+    .emergency-btn-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 4px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn-emerald-join {
+      flex: 1.2;
+      min-height: 54px;
+      border-radius: 14px;
+      border: 1px solid rgba(52, 211, 153, 0.45);
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      box-shadow: 
+        0 10px 22px -5px rgba(16, 185, 129, 0.48),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: left;
+    }
+
+    .btn-emerald-join:active {
+      transform: scale(0.97);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-slate-decline {
+      flex: 1;
+      min-height: 54px;
+      border-radius: 14px;
+      border: 1.5px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.05);
+      color: #e2e8f0;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: left;
+    }
+
+    .btn-slate-decline:active {
+      transform: scale(0.97);
+      background: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.35);
+    }
+
+    .btn-icon-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .btn-icon-circle.emerald {
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-icon-circle.rose {
+      background: rgba(244, 63, 94, 0.15);
+      color: #fca5a5;
+    }
+
+    .btn-label-group {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .btn-title-main {
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.2px;
+    }
+
+    .btn-title-sub {
+      font-size: 10px;
+      font-weight: 600;
+      opacity: 0.85;
+      letter-spacing: 0.2px;
+    }
+
+    /* CONFIRMED SCREENS */
+    .emergency-confirmed-box {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 18px;
+      padding: 18px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 12px;
+      animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      z-index: 1;
+    }
+
+    .em-success-avatar {
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: rgba(16, 185, 129, 0.15);
+      border: 2px solid rgba(16, 185, 129, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 24px rgba(16, 185, 129, 0.35);
+    }
+
+    .em-declined-avatar {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: rgba(239, 68, 68, 0.14);
+      border: 2px solid rgba(239, 68, 68, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.25);
+    }
+
+    .em-confirmed-heading {
+      font-size: 18px;
+      font-weight: 800;
+      color: #34d399;
+      margin: 0;
+      letter-spacing: -0.3px;
+    }
+
+    .em-declined-heading {
+      font-size: 17px;
+      font-weight: 800;
+      color: #f87171;
+      margin: 0;
+      letter-spacing: -0.3px;
+    }
+
+    .em-status-note {
+      font-size: 12px;
       color: #cbd5e1;
       line-height: 1.45;
       margin: 0;
     }
-    .emergency-meta-box {
-      background: rgba(30, 41, 59, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 12px;
-      padding: 12px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .meta-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
-    }
-    .meta-label {
-      color: #94a3b8;
-    }
-    .meta-val {
-      color: #f8fafc;
-    }
-    .emergency-btn-row {
-      display: flex;
-      gap: 10px;
-      margin-top: 6px;
-    }
-    .btn-emergency-accept {
-      flex: 1.2;
-      padding: 14px 10px;
-      border-radius: 12px;
-      border: none;
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      color: #ffffff;
-      font-size: 14px;
-      font-weight: 800;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(16, 185, 129, 0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-    .btn-emergency-accept:active {
-      transform: scale(0.97);
-    }
-    .btn-emergency-decline {
-      flex: 1;
-      padding: 14px 10px;
-      border-radius: 12px;
-      border: 1.5px solid rgba(239, 68, 68, 0.4);
-      background: rgba(239, 68, 68, 0.12);
-      color: #fca5a5;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-    .btn-emergency-decline:active {
-      transform: scale(0.97);
-    }
+
+    /* Shift Details iOS Widget Card */
     .shift-details-card {
-      background: #0a0f1d;
-      border-radius: 10px;
-      padding: 12px 14px;
+      width: 100%;
+      background: rgba(10, 15, 29, 0.7);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      margin-bottom: 12px;
-      text-align: left;
+      border-radius: 14px;
+      padding: 12px 14px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 10px;
+      text-align: left;
     }
+
     .shift-detail-row {
       display: flex;
       justify-content: space-between;
@@ -813,55 +1011,122 @@
       font-size: 12px;
       color: #94a3b8;
     }
-    .workstation-action-box {
-      background: rgba(59, 130, 246, 0.15);
-      border: 1px solid rgba(59, 130, 246, 0.3);
-      border-radius: 10px;
-      padding: 10px 12px;
+
+    .shift-row-lead {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
+      font-weight: 600;
+      color: #94a3b8;
+    }
+
+    .shift-badge-cyan {
+      background: rgba(14, 165, 233, 0.16);
+      border: 1px solid rgba(14, 165, 233, 0.4);
+      color: #38bdf8;
+      font-weight: 800;
+      font-size: 13px;
+      font-family: ui-monospace, SFMono-Regular, monospace;
+      padding: 4px 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(14, 165, 233, 0.2);
+    }
+
+    .shift-val-white {
+      color: #f8fafc;
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .shift-badge-emerald {
+      background: rgba(16, 185, 129, 0.16);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #34d399;
+      font-weight: 800;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+
+    .workstation-action-box {
+      width: 100%;
+      background: rgba(59, 130, 246, 0.1);
+      border: 1px solid rgba(59, 130, 246, 0.25);
+      border-radius: 12px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
       text-align: left;
-      margin-bottom: 14px;
     }
-    .workstation-action-box span {
-      font-size: 24px;
+
+    .ws-icon-wrap {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      background: rgba(59, 130, 246, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #60a5fa;
+      flex-shrink: 0;
+      font-size: 18px;
     }
-    .workstation-action-box strong {
+
+    .ws-text-body strong {
       display: block;
       font-size: 12px;
       color: #93c5fd;
       margin-bottom: 2px;
     }
-    .workstation-action-box p {
+
+    .ws-text-body p {
       font-size: 11px;
       color: #cbd5e1;
       line-height: 1.35;
       margin: 0;
     }
-    .btn-emergency-ack {
+
+    .btn-action-primary {
       width: 100%;
-      padding: 12px;
-      border-radius: 10px;
+      min-height: 46px;
+      border-radius: 12px;
       border: none;
-      background: #10b981;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       color: #ffffff;
       font-size: 13px;
       font-weight: 800;
       cursor: pointer;
+      box-shadow: 0 6px 18px rgba(16, 185, 129, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.15s;
     }
-    .btn-emergency-dim {
+
+    .btn-action-primary:active {
+      transform: scale(0.98);
+    }
+
+    .btn-action-secondary {
       width: 100%;
-      padding: 10px;
-      border-radius: 10px;
-      border: none;
-      background: #334155;
+      min-height: 44px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.06);
       color: #f8fafc;
       font-size: 12px;
       font-weight: 700;
       cursor: pointer;
+      transition: all 0.15s;
     }
 
+    .btn-action-secondary:active {
+      transform: scale(0.98);
+      background: rgba(255, 255, 255, 0.1);
+    }
+  
   </style>
 </head>
 <body>
@@ -1046,70 +1311,126 @@
   <!-- EMERGENCY SURGE AVAILABILITY REQUEST MODAL (STORM / DISASTER RECALL) -->
   <div id="emergency-mobile-overlay" class="emergency-mobile-overlay hidden">
     <div class="emergency-modal-content">
-      <div class="emergency-pulse-badge">
-        <span class="emergency-badge-dot"></span>
-        🚨 CRITICAL FLOOR EMERGENCY
+      
+      <!-- Top Beacon Row -->
+      <div class="em-top-row">
+        <div class="em-incident-pill">
+          <span class="em-live-beacon">
+            <span class="beacon-wave"></span>
+            <span class="beacon-core"></span>
+          </span>
+          <span>CRITICAL SURGE DISPATCH</span>
+        </div>
+        <span class="em-time-chip">NOW</span>
       </div>
-      <h2 class="emergency-title">Call Volume Surge Detected</h2>
-      <p class="emergency-desc" id="emergency-modal-msg">
-        There is an emergency situation. High call volume surge detected and your availability is requested to balance the queue. If you are available please join, or select NO.
-      </p>
 
-      <!-- Action Choice Buttons (Shown initially until agent responds) -->
+      <!-- Title & Context -->
+      <div class="em-title-wrap">
+        <h2 class="emergency-title">Call Volume Surge Detected</h2>
+        <p class="em-subheadline">Emergency Floor Rebalance Request</p>
+      </div>
+
+      <!-- Message Callout Box -->
+      <div class="em-message-card">
+        <div class="em-msg-header">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span>Floor Inbound Spike</span>
+        </div>
+        <p class="emergency-desc" id="emergency-modal-msg">
+          There is an emergency situation. High call volume surge detected and your availability is requested to balance the queue. If you are available please join, or select NO.
+        </p>
+      </div>
+
+      <!-- Action Choice Buttons (Visible initially until agent responds) -->
       <div id="emergency-action-buttons" class="emergency-btn-row" style="display: flex;">
-        <button type="button" id="btn-emergency-yes" class="btn-emergency-accept">
-          <span>✅</span> YES, I Can Join
+        <button type="button" id="btn-emergency-yes" class="btn-emerald-join">
+          <div class="btn-icon-circle emerald">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="btn-label-group">
+            <span class="btn-title-main">YES, I Can Join</span>
+            <span class="btn-title-sub">Confirm Availability</span>
+          </div>
         </button>
-        <button type="button" id="btn-emergency-no" class="btn-emergency-decline">
-          <span>❌</span> NO, Unavailable
+
+        <button type="button" id="btn-emergency-no" class="btn-slate-decline">
+          <div class="btn-icon-circle rose">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </div>
+          <div class="btn-label-group">
+            <span class="btn-title-main">NO, Unavailable</span>
+            <span class="btn-title-sub">Decline Request</span>
+          </div>
         </button>
       </div>
 
       <!-- Post-response Confirmed Screen (ONLY shown if YES) -->
       <div id="emergency-confirmed-yes" class="emergency-confirmed-box hidden" hidden style="display: none !important;">
-        <div style="font-size:36px; margin-bottom:6px;">🎉</div>
-        <h3 style="color:#34d399; font-size:17px; font-weight:800; margin-bottom:4px;">Availability Confirmed!</h3>
-        <p style="font-size:12px; color:#cbd5e1; margin-bottom:12px;">Your acceptance has been transmitted to the floor supervisor. Your assigned shift timings:</p>
-        
+        <div class="em-success-avatar">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+          </svg>
+        </div>
+
+        <h3 class="em-confirmed-heading">Availability Confirmed!</h3>
+        <p class="em-status-note">Your acceptance has been transmitted to the floor supervisor. Your assigned surge shift parameters:</p>
+
         <div class="shift-details-card">
           <div class="shift-detail-row">
-            <span>🕒 Assigned Shift Timings:</span>
-            <strong id="confirmed-shift-timings" style="color:#38bdf8; font-size:14px;">15:30 - 18:30 (Surge Window)</strong>
+            <div class="shift-row-lead">
+              <span>🕒</span>
+              <span>Assigned Shift Window:</span>
+            </div>
+            <span id="confirmed-shift-timings" class="shift-badge-cyan">15:30 - 18:30 (Surge Window)</span>
           </div>
           <div class="shift-detail-row">
-            <span>🎯 Primary ACD Queue:</span>
-            <strong id="confirmed-shift-queue" style="color:#f8fafc;">Emergency Inbound & Tier-2</strong>
+            <div class="shift-row-lead">
+              <span>🎯</span>
+              <span>Primary ACD Queue:</span>
+            </div>
+            <strong id="confirmed-shift-queue" class="shift-val-white">Emergency Inbound &amp; Tier-2</strong>
           </div>
           <div class="shift-detail-row">
-            <span>💰 Overtime Incentive:</span>
-            <strong style="color:#34d399;">+1.5x Hourly Premium</strong>
+            <div class="shift-row-lead">
+              <span>💰</span>
+              <span>Overtime Premium:</span>
+            </div>
+            <span class="shift-badge-emerald">+1.5x Hourly Premium</span>
           </div>
         </div>
 
         <div class="workstation-action-box">
-          <span>💻</span>
-          <div>
-            <strong>Report to Workstation</strong>
+          <div class="ws-icon-wrap">💻</div>
+          <div class="ws-text-body">
+            <strong>Report to Workstation Softphone</strong>
             <p>Please log in to your workstation softphone immediately to start handling live customer calls.</p>
           </div>
         </div>
 
-        <button type="button" id="btn-close-emergency-yes" class="btn-emergency-ack">
-          ✓ Acknowledged & Opening Workstation
+        <button type="button" id="btn-close-emergency-yes" class="btn-action-primary">
+          ✓ Acknowledged &amp; Opening Workstation
         </button>
       </div>
 
-      <!-- Post-response Declined Screen (If NO) -->
+      <!-- Post-response Declined Screen (ONLY shown if NO) -->
       <div id="emergency-confirmed-no" class="emergency-confirmed-box hidden" hidden style="display: none !important;">
-        <div style="font-size:32px; margin-bottom:6px;">ℹ️</div>
-        <h3 style="color:#f87171; font-size:16px; font-weight:800; margin-bottom:4px;">Response Logged: Unavailable</h3>
-        <p style="font-size:12px; color:#cbd5e1; margin-bottom:14px;">
+        <div class="em-declined-avatar">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+        </div>
+        <h3 class="em-declined-heading">Response Logged: Unavailable</h3>
+        <p class="em-status-note">
           Thank you for letting us know. Your supervisor has been informed that you cannot take calls for this surge shift. Enjoy your break.
         </p>
-        <button type="button" id="btn-close-emergency-no" class="btn-emergency-dim">
+        <button type="button" id="btn-close-emergency-no" class="btn-action-secondary">
           Close Notice
         </button>
       </div>
+
     </div>
   </div>
 
