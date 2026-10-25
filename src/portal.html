@@ -31,61 +31,97 @@
       </div>
     </header>
 
-    <!-- SECTION 1: AUTHENTICATION -->
-    <section id="auth-section" class="card">
-      <div class="card-header">
-        <span class="step-num">1</span>
-        <h3>Agent Authentication (SSO / LDAP)</h3>
-      </div>
-      <div class="card-body">
-        <p class="subtitle">Enter your enterprise agent credentials to access AUX authorization.</p>
-        <div class="form-grid">
-          <div class="form-group" style="grid-column: span 2; background: rgba(37, 99, 235, 0.1); padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(37, 99, 235, 0.3);">
-            <label style="color: #93c5fd; font-weight: 700; font-size: 12px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline; vertical-align:middle; margin-right:4px;"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Switch Agent User Persona (Pre-Configured Scenarios):</label>
-            <select id="preset-agent-select" style="margin-top: 6px; background: rgba(15, 23, 42, 0.9); font-weight: 600; color: #f8fafc; border: 1px solid rgba(59, 130, 246, 0.5);">
-              <option value="AGT-8842">Alex Morgan (AGT-8842) • Tier-2 Tech • Clean Adherence 96% (Auto-Approve)</option>
-              <option value="AGT-4092">Jordan Miller (AGT-4092) • Billing • 4 AUX Breaks Taken (Triggers AUX Pattern Reject)</option>
-              <option value="AGT-9102">Samantha Vance (AGT-9102) • Customer Care • +25m Lunch Overage (Triggers Lunch Reject)</option>
-              <option value="AGT-7740">David Chen (AGT-7740) • Inbound • Rate Limit Spammer (Triggers Frequency Reject)</option>
-              <option value="AGT-6512">Rachel Green (AGT-6512) • Retention • Medical Exemption (Urgent Override)</option>
-              <option value="AGT-8819">Marcus Brody (AGT-8819) • Trainee • Coaching / QA Review</option>
-              <option value="AGT-3310">Chloe Bennett (AGT-3310) • General Care • Senior Lead (94.2% Adherence)</option>
-              <option value="AGT-5521">Lucas Wright (AGT-5521) • Billing Specialist • Fast ACW (88.5% Adherence)</option>
-              <option value="AGT-7703">Maya Patel (AGT-7703) • General Care • VIP Onboarding 5.0★ (97.0% Adherence)</option>
-              <option value="AGT-4491">Carlos Mendez (AGT-4491) • Tier-2 Tech • Hardware Specialist (85.0% Adherence)</option>
-              <option value="AGT-6628">Olivia Taylor (AGT-6628) • Emergency Inbound • Disaster Routing (99.5% Adherence)</option>
-              <option value="AGT-2219">Liam O'Connor (AGT-2219) • General Care • Trainee Coaching (76.5% Adherence)</option>
-            </select>
+        <div class="portal-split-layout">
+      
+      <!-- LEFT SIDEBAR: AGENT IDENTITY & CTI TELEMETRY -->
+      <aside class="portal-sidebar-col">
+        <!-- SECTION 1: AUTHENTICATION -->
+        <section id="auth-section" class="card">
+          <div class="card-header">
+            <span class="step-num">1</span>
+            <h3>Agent Authentication (SSO / LDAP)</h3>
           </div>
-          <div class="form-group">
-            <label>Agent ID / Employee Code</label>
-            <input type="text" id="agent-id" value="AGT-8842" placeholder="e.g. AGT-8842" />
+          <div class="card-body">
+            <p class="subtitle">Select your active agent persona scenario or enter credentials.</p>
+            <div class="form-grid">
+              <div class="form-group" style="grid-column: span 2; background: rgba(37, 99, 235, 0.1); padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(37, 99, 235, 0.3);">
+                <label style="color: #93c5fd; font-weight: 700; font-size: 11.5px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline; vertical-align:middle; margin-right:4px;"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> Active Agent Persona Scenario:</label>
+                <select id="preset-agent-select" style="margin-top: 6px; background: rgba(15, 23, 42, 0.9); font-weight: 600; color: #f8fafc; border: 1px solid rgba(59, 130, 246, 0.5); width: 100%;">
+                  <option value="AGT-8842">Alex Morgan (AGT-8842) • Tier-2 Tech • Clean Adherence 96% (Auto-Approve)</option>
+                  <option value="AGT-4092">Jordan Miller (AGT-4092) • Billing • 4 AUX Breaks Taken (Triggers AUX Pattern Reject)</option>
+                  <option value="AGT-9102">Samantha Vance (AGT-9102) • Customer Care • +25m Lunch Overage (Triggers Lunch Reject)</option>
+                  <option value="AGT-7740">David Chen (AGT-7740) • Inbound • Rate Limit Spammer (Triggers Frequency Reject)</option>
+                  <option value="AGT-6512">Rachel Green (AGT-6512) • Retention • Medical Exemption (Urgent Override)</option>
+                  <option value="AGT-8819">Marcus Brody (AGT-8819) • Trainee • Coaching / QA Review</option>
+                  <option value="AGT-3310">Chloe Bennett (AGT-3310) • General Care • Senior Lead (94.2% Adherence)</option>
+                  <option value="AGT-5521">Lucas Wright (AGT-5521) • Billing Specialist • Fast ACW (88.5% Adherence)</option>
+                  <option value="AGT-7703">Maya Patel (AGT-7703) • General Care • VIP Onboarding 5.0★ (97.0% Adherence)</option>
+                  <option value="AGT-4491">Carlos Mendez (AGT-4491) • Tier-2 Tech • Hardware Specialist (85.0% Adherence)</option>
+                  <option value="AGT-6628">Olivia Taylor (AGT-6628) • Emergency Inbound • Disaster Routing (99.5% Adherence)</option>
+                  <option value="AGT-2219">Liam O'Connor (AGT-2219) • General Care • Trainee Coaching (76.5% Adherence)</option>
+                </select>
+              </div>
+              <div class="form-group" style="grid-column: span 2;">
+                <label>Agent ID / Employee Code</label>
+                <input type="text" id="agent-id" value="AGT-8842" placeholder="e.g. AGT-8842" />
+              </div>
+              <div class="form-group" style="grid-column: span 2;">
+                <label>Full Name</label>
+                <input type="text" id="agent-name" value="Alex Morgan" placeholder="e.g. Alex Morgan" />
+              </div>
+              <div class="form-group" style="grid-column: span 2;">
+                <label>Campaign / Queue</label>
+                <select id="agent-queue" style="width:100%;">
+                  <option value="Tier-2 Tech Support">Tier-2 Tech Support (ACD-04)</option>
+                  <option value="Customer Billing & Retention">Customer Billing & Retention (ACD-02)</option>
+                  <option value="Emergency Inbound">Emergency Inbound (ACD-01)</option>
+                </select>
+              </div>
+              <div class="form-group" style="grid-column: span 2;">
+                <label>SSO Security Token</label>
+                <input type="password" id="agent-token" value="••••••••••••" placeholder="Enter secure token" />
+              </div>
+            </div>
+            <div class="auth-actions" style="margin-top:14px;">
+              <button id="btn-authenticate" class="btn btn-primary" style="width:100%; padding:10px; font-weight:700;">Authenticate &amp; Continue</button>
+              <span id="auth-msg" class="inline-msg" style="display:block; text-align:center; margin-top:6px;"></span>
+            </div>
           </div>
-          <div class="form-group">
-            <label>Full Name</label>
-            <input type="text" id="agent-name" value="Alex Morgan" placeholder="e.g. Alex Morgan" />
-          </div>
-          <div class="form-group">
-            <label>Campaign / Queue</label>
-            <select id="agent-queue">
-              <option value="Tier-2 Tech Support">Tier-2 Tech Support (ACD-04)</option>
-              <option value="Customer Billing & Retention">Customer Billing & Retention (ACD-02)</option>
-              <option value="Emergency Inbound">Emergency Inbound (ACD-01)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>SSO Security Token / Passcode</label>
-            <input type="password" id="agent-token" value="••••••••••••" placeholder="Enter secure token" />
-          </div>
-        </div>
-        <div class="auth-actions">
-          <button id="btn-authenticate" class="btn btn-primary">Authenticate & Continue</button>
-          <span id="auth-msg" class="inline-msg"></span>
-        </div>
-      </div>
-    </section>
+        </section>
 
-    <!-- SECTION 2: AUX CODE & DURATION SELECTION -->
+        <!-- LIVE CTI FLOOR TELEMETRY GAUGE -->
+        <div class="wfm-gauge-banner-side">
+          <div class="sidebar-section-title">LIVE CTI FLOOR TELEMETRY</div>
+          <div class="gauge-grid-side">
+            <div class="gauge-item">
+              <span class="gauge-label">Live ACD Queue:</span>
+              <span class="gauge-val" id="portal-live-calls" style="color:#fbbf24;">18 Waiting</span>
+            </div>
+            <div class="gauge-item">
+              <span class="gauge-label">Logged-in Staff:</span>
+              <span class="gauge-val" id="portal-live-staff">24 / 30 Agents</span>
+            </div>
+            <div class="gauge-item">
+              <span class="gauge-label">WFM Forecast SLA:</span>
+              <span class="gauge-val highlight" id="portal-live-sla" style="color:#34d399;">84.2% (Target: 80%)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- BCP CONTINGENCY CARD -->
+        <div class="card" style="padding:14px 16px; background:rgba(15, 23, 42, 0.6);">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:6px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <span style="font-size:11px; font-weight:800; color:#cbd5e1; text-transform:uppercase;">BCP Protocol Active</span>
+          </div>
+          <p style="font-size:11px; color:#64748b; line-height:1.4; margin:0 0 10px;">In case of core CTI outage, manual radio dispatch with supervisor is mandated.</p>
+          <button id="btn-open-bcp-modal" class="btn btn-xs btn-outline" style="width:100%;" onclick="alert('📋 BCP Contingency Protocol Active:\n\nIn the event of network disruption or core CTI switch outage:\n1. Manually notify Floor Supervisor via radio or landline extension 4401.\n2. Log break start and end times in local offline clipboard.\n3. WFM will retroactively reconcile payroll variance upon link restoration.')">View BCP Protocol</button>
+        </div>
+      </aside>
+
+      <!-- RIGHT MAIN: AUX CODE & PARAMETERS -->
+      <main class="portal-main-col">
+        <!-- SECTION 2: AUX CODE & DURATION SELECTION -->
     <section id="break-section" class="card disabled">
       <div class="card-header">
         <span class="step-num">2</span>
@@ -93,20 +129,7 @@
       </div>
       <div class="card-body">
         <!-- Live ACD & Staffing Live Gauge inside Portal -->
-        <div class="wfm-gauge-banner">
-          <div class="gauge-item">
-            <span class="gauge-label">Live ACD Queue:</span>
-            <span class="gauge-val" id="portal-live-calls">18 Waiting</span>
-          </div>
-          <div class="gauge-item">
-            <span class="gauge-label">Logged-in Staff:</span>
-            <span class="gauge-val" id="portal-live-staff">24 / 30 Agents</span>
-          </div>
-          <div class="gauge-item">
-            <span class="gauge-label">WFM Forecast SLA:</span>
-            <span class="gauge-val highlight" id="portal-live-sla">84.2% (Target: 80%)</span>
-          </div>
-        </div>
+        
 
         <div class="form-group">
           <label class="section-label">Select AUX Code Category</label>
@@ -284,8 +307,10 @@
         </div>
       </div>
     </section>
+      </main>
 
-    <!-- SECTION 3: DECISION RESULT MODAL / OVERLAY -->
+    </div>
+<!-- SECTION 3: DECISION RESULT MODAL / OVERLAY -->
     <div id="decision-overlay" class="decision-overlay hidden">
       <div class="decision-box">
         <div id="decision-icon" class="status-big-icon" style="color:#60a5fa;"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>

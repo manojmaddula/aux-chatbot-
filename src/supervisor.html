@@ -12,17 +12,76 @@
   <link rel="stylesheet" href="floating-widget.css?v=2.5" />
 </head>
 <body>
-  <div class="sup-container">
+  <!-- MODERN ENTERPRISE APP SHELL -->
+  <div class="app-shell">
     
-    <!-- TOP HEADER -->
-    <header class="sup-header">
-      <div class="header-left">
-        <h2 style="font-size: 20px; font-weight: 800; color: #ffffff; margin: 0; letter-spacing: -0.4px;">Supervisor Dashboard</h2>
+    <!-- LEFT COMMAND SIDEBAR -->
+    <aside class="app-sidebar">
+      <!-- App Brand -->
+      <div class="sidebar-brand">
+        <div class="brand-logo-glow">
+          <img src="/favicon.svg?v=panda2" class="brand-icon" alt="CXone" />
+        </div>
+        <div class="brand-info">
+          <span class="brand-title">NICE CXone</span>
+          <span class="brand-sub">WFM COMMAND OS</span>
+        </div>
       </div>
-      <div class="header-right">
-        <div class="sup-profile">
-          <span class="sup-avatar" id="sup-avatar-icon" style="display:flex; align-items:center; justify-content:center; width:28px; height:28px; border-radius:50%; background:rgba(59,130,246,0.2); color:#60a5fa;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
-          <div>
+
+      <!-- Live Telemetry Status Pill -->
+      <div class="sidebar-telemetry">
+        <span class="live-dot pulse"></span>
+        <span class="telemetry-text">MAX CTI ENGINE • ACTIVE</span>
+      </div>
+
+      <!-- Hierarchical Sidebar Navigation (Preserving .sup-tabs and .sup-tab-btn) -->
+      <nav class="sidebar-nav-scroller sup-tabs">
+        <div class="nav-section-label">OPERATIONS &amp; FLOOR</div>
+        <button class="sidebar-nav-item sup-tab-btn active" data-tab="stab-wallboard">
+          <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg></span>
+          <span class="nav-label">Floor Wallboard</span>
+          <span class="nav-badge text-ok">Live</span>
+        </button>
+        <button class="sidebar-nav-item sup-tab-btn" data-tab="stab-rebalance">
+          <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
+          <span class="nav-label">Dynamic Rebalance</span>
+          <span class="nav-badge text-ok" id="rebalance-status-tag">Normal</span>
+        </button>
+
+        <div class="nav-section-label">CAPACITY &amp; DISPATCH</div>
+        <button class="sidebar-nav-item sup-tab-btn" data-tab="stab-queue">
+          <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></span>
+          <span class="nav-label">Break Approvals</span>
+          <span class="nav-badge" id="sup-queue-badge">0</span>
+        </button>
+        <button class="sidebar-nav-item sup-tab-btn" data-tab="stab-alerts">
+          <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg></span>
+          <span class="nav-label">Outage &amp; Broadcast</span>
+          <span class="nav-badge alert-chip">Surge</span>
+        </button>
+
+        <div class="nav-section-label">INTELLIGENCE &amp; AUDIT</div>
+        <button class="sidebar-nav-item sup-tab-btn" data-tab="stab-reports">
+          <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></span>
+          <span class="nav-label">Reports &amp; SLA</span>
+        </button>
+        <button class="sidebar-nav-item sup-tab-btn" data-tab="stab-qa">
+          <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg></span>
+          <span class="nav-label">QA Coaching</span>
+          <span class="nav-badge text-danger" id="sup-qa-badge">2 Flagged</span>
+        </button>
+        <button class="sidebar-nav-item sup-tab-btn" data-tab="stab-limits">
+          <span class="nav-icon"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+          <span class="nav-label">Limits &amp; Policies</span>
+        </button>
+      </nav>
+
+      <!-- Sidebar Bottom: Supervisor Profile Switcher & Gateway -->
+      <div class="sidebar-footer">
+        <div class="sidebar-profile-card">
+          <span class="sup-avatar" id="sup-avatar-icon" style="display:flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:50%; background:rgba(59,130,246,0.2); color:#60a5fa;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+          <div class="profile-details">
+            <span class="profile-caption">SUPERVISOR STATION</span>
             <select id="supervisor-select" class="supervisor-dropdown" title="Switch active supervisor account">
               <option value="SUP-014">Sarah Jenkins</option>
               <option value="SUP-021">Michael Chang</option>
@@ -32,71 +91,99 @@
             </select>
           </div>
         </div>
-        <a href="/index.html" class="btn btn-sm btn-outline" style="text-decoration:none; display:flex; align-items:center; gap:6px; color:#60a5fa; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.04);">
-          <img src="/favicon.svg?v=panda2" style="width:14px; height:14px;" /> Home
+        <a href="/index.html" class="sidebar-back-link">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          <span>Operations Gateway</span>
         </a>
-        <button id="btn-header-emergency-notify" class="btn btn-sm" style="background:#dc2626; color:#ffffff; font-weight:800; border:none; display:flex; align-items:center; gap:6px; box-shadow:0 2px 8px rgba(220,38,38,0.3); cursor:pointer;" onclick="triggerEmergencyBroadcast('unavailable')">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:pulse 1.5s infinite;"><path d="M6 18h12M12 2v4M20 7l-3 3M4 7l3 3M12 6a6 6 0 0 0-6 6v6h12v-6a6 6 0 0 0-6-6z"/></svg> Notify Unavailable (<span id="header-unavailable-pill">5</span>)
-        </button>
-        <button id="btn-open-sup-bot-header" class="btn btn-sm btn-accent" onclick="window.openSupBot && window.openSupBot()" style="display:flex; align-items:center; gap:6px;">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="12" x="3" y="6" rx="2"/><path d="M9 18v3M15 18v3M12 2v4M2 12h2M20 12h2"/></svg> Ask Remi Copilot
-        </button>
       </div>
-    </header>
+    </aside>
 
-    <!-- LIVE METRICS KPI ROW -->
-    <section class="kpi-grid">
-      <div class="kpi-card">
-        <span class="kpi-title">Active Staffing</span>
-        <div class="kpi-val" id="kpi-staff">24 / 30</div>
-        <span class="kpi-sub text-ok">✓ Erlang-C surplus (+4)</span>
-      </div>
-      <div class="kpi-card">
-        <span class="kpi-title">Live ACD Queue</span>
-        <div class="kpi-val" id="kpi-queue">18 Calls</div>
-        <span class="kpi-sub text-muted">Avg wait: 34s</span>
-      </div>
-      <div class="kpi-card">
-        <span class="kpi-title">Projected SLA</span>
-        <div class="kpi-val highlight" id="kpi-sla">85.4%</div>
-        <span class="kpi-sub text-ok">Target SLA: 80.0%</span>
-      </div>
-      <div class="kpi-card">
-        <span class="kpi-title">Agents in AUX</span>
-        <div class="kpi-val" id="kpi-aux">4 Agents</div>
-        <span class="kpi-sub text-muted">2 Tea, 1 Lunch, 1 Training</span>
-      </div>
-      <div class="kpi-card alert-card">
-        <span class="kpi-title">Adherence Overdue</span>
-        <div class="kpi-val text-danger" id="kpi-overdue">0</div>
-        <span class="kpi-sub text-danger" id="kpi-overdue-sub">No active overages</span>
-      </div>
-    </section>
+    <!-- MAIN APPLICATION VIEWPORT -->
+    <main class="app-main-viewport">
+      <!-- TOP WORKSTATION APP BAR -->
+      <header class="workstation-topbar">
+        <div class="topbar-left">
+          <div class="topbar-breadcrumbs">
+            <span class="crumb-app">NICE CXone</span>
+            <span class="crumb-divider">/</span>
+            <span class="crumb-section">Command Center</span>
+            <span class="crumb-divider">/</span>
+            <span class="crumb-active" id="topbar-active-title">Floor Wallboard &amp; Telemetry</span>
+          </div>
+          <div class="topbar-hud-tag">
+            <span class="pulse-beacon"></span>
+            <span>REAL-TIME INTRADAY</span>
+          </div>
+        </div>
 
-    <!-- SUPERVISOR MAIN NAVIGATION TABS -->
-    <nav class="sup-tabs">
-      <button class="sup-tab-btn active" data-tab="stab-wallboard">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg> Floor Wallboard &amp; Telemetry
-      </button>
-      <button class="sup-tab-btn" data-tab="stab-queue">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg> Break Requests Queue (<span id="sup-queue-badge">0</span>)
-      </button>
-      <button class="sup-tab-btn" data-tab="stab-alerts">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg> Alert &amp; Broadcast Engine
-      </button>
-      <button class="sup-tab-btn" data-tab="stab-reports">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg> Reports &amp; Analytics
-      </button>
-      <button class="sup-tab-btn" data-tab="stab-qa">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg> QA, Tone &amp; Coaching (<span id="sup-qa-badge" style="color:#f87171; font-weight:800;">2 Flagged</span>)
-      </button>
-            <button class="sup-tab-btn" data-tab="stab-rebalance">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Dynamic WFM Rebalance (<span id="rebalance-status-tag" style="color:#34d399; font-weight:700;">Normal</span>)
-      </button>
-      <button class="sup-tab-btn" data-tab="stab-limits">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Limits &amp; Policies
-      </button>
-      </nav>
+        <div class="topbar-right">
+          <!-- Emergency Broadcast Button -->
+          <button id="btn-header-emergency-notify" class="topbar-btn-emergency" onclick="triggerEmergencyBroadcast('unavailable')">
+            <svg class="pulse-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 18h12M12 2v4M20 7l-3 3M4 7l3 3M12 6a6 6 0 0 0-6 6v6h12v-6a6 6 0 0 0-6-6z"/></svg>
+            <span>Emergency Recall (<span id="header-unavailable-pill">5</span>)</span>
+          </button>
+
+          <!-- AI Copilot Button -->
+          <button id="btn-open-sup-bot-header" class="topbar-btn-copilot" onclick="window.openSupBot && window.openSupBot()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="12" x="3" y="6" rx="2"/><path d="M9 18v3M15 18v3M12 2v4M2 12h2M20 12h2"/></svg>
+            <span>Remi Copilot</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- WORKSPACE SCROLL AREA -->
+      <div class="workstation-content-scroll">
+        
+        <!-- TACTICAL TELEMETRY KPI HUD MATRIX -->
+        <section class="kpi-grid">
+          <div class="kpi-card kpi-staff-card">
+            <div class="kpi-card-header">
+              <span class="kpi-title">Active Staffing</span>
+              <span class="kpi-pill kpi-pill-blue">Floor Live</span>
+            </div>
+            <div class="kpi-val" id="kpi-staff">24 / 30</div>
+            <span class="kpi-sub text-ok">✓ Erlang-C surplus (+4)</span>
+          </div>
+
+          <div class="kpi-card kpi-queue-card">
+            <div class="kpi-card-header">
+              <span class="kpi-title">Live ACD Queue</span>
+              <span class="kpi-pill kpi-pill-purple">ACD CTI</span>
+            </div>
+            <div class="kpi-val" id="kpi-queue">18 Calls</div>
+            <span class="kpi-sub text-muted">Avg wait: 34s</span>
+          </div>
+
+          <div class="kpi-card kpi-sla-card">
+            <div class="kpi-card-header">
+              <span class="kpi-title">Projected SLA</span>
+              <span class="kpi-pill kpi-pill-emerald">Target 80%</span>
+            </div>
+            <div class="kpi-val highlight" id="kpi-sla">85.4%</div>
+            <span class="kpi-sub text-ok">Target SLA: 80.0%</span>
+          </div>
+
+          <div class="kpi-card kpi-aux-card">
+            <div class="kpi-card-header">
+              <span class="kpi-title">Agents in AUX</span>
+              <span class="kpi-pill kpi-pill-amber">Thresholds On</span>
+            </div>
+            <div class="kpi-val" id="kpi-aux">4 Agents</div>
+            <span class="kpi-sub text-muted">2 Tea, 1 Lunch, 1 Training</span>
+          </div>
+
+          <div class="kpi-card alert-card kpi-overdue-card">
+            <div class="kpi-card-header">
+              <span class="kpi-title">Adherence Overdue</span>
+              <span class="kpi-pill kpi-pill-danger">Breach Alarm</span>
+            </div>
+            <div class="kpi-val text-danger" id="kpi-overdue">0</div>
+            <span class="kpi-sub text-danger" id="kpi-overdue-sub">No active overages</span>
+          </div>
+        </section>
+
+        <!-- ACTIVE TAB PANES CONTAINER -->
+        <div class="tab-panes-wrapper">
 
     <!-- TAB 1: FLOOR WALLBOARD & TELEMETRY -->
     <section id="stab-wallboard" class="sup-tab-pane active">
@@ -1210,7 +1297,10 @@
 
     </section>
 
-  </div>
+        </div> <!-- End .tab-panes-wrapper -->
+      </div> <!-- End .workstation-content-scroll -->
+    </main> <!-- End .app-main-viewport -->
+  </div> <!-- End .app-shell -->
 
 
   <!-- SUPERVISOR AI COPILOT DRAWER / MODAL -->

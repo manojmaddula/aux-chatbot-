@@ -139,7 +139,15 @@ supTabBtns.forEach(btn => {
     supTabPanes.forEach(p => p.classList.remove('active'));
     btn.classList.add('active');
     const target = btn.getAttribute('data-tab');
-    document.getElementById(target).classList.add('active');
+    const targetPane = document.getElementById(target);
+    if (targetPane) targetPane.classList.add('active');
+
+    // Update topbar breadcrumb active title
+    const labelEl = btn.querySelector('.nav-label');
+    const topTitleEl = document.getElementById('topbar-active-title');
+    if (topTitleEl && labelEl) {
+      topTitleEl.textContent = labelEl.textContent.trim();
+    }
 
     if (target === 'stab-alerts') {
       renderBirthdayCalendar();

@@ -503,3 +503,63 @@ input:focus, select:focus, textarea:focus {
   color: #ffffff;
   box-shadow: 0 0 16px rgba(59, 130, 246, 0.5);
 }
+
+
+/* 2-COLUMN SPLIT CONSOLE ARCHITECTURE */
+.portal-container {
+  width: 100%;
+  max-width: 1240px;
+}
+
+.portal-split-layout {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .portal-split-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.portal-sidebar-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.portal-main-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.wfm-gauge-banner-side {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.sidebar-section-title {
+  font-size: 10px;
+  font-weight: 800;
+  color: #64748b;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding-bottom: 6px;
+}
+
+.gauge-grid-side {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

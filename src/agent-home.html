@@ -694,6 +694,126 @@
       justify-content: flex-end;
       background: rgba(15, 23, 42, 0.6);
     }
+  
+    /* WORKSTATION SPLIT GRID ARCHITECTURE */
+    .workstation-split-grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+    @media (max-width: 1040px) {
+      .workstation-split-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .agent-cockpit-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .agent-command-main {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .agent-id-card {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+    }
+
+    .agent-avatar-pod {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.25) 0%, rgba(139, 92, 246, 0.25) 100%);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #60a5fa;
+      flex-shrink: 0;
+      box-shadow: 0 0 16px rgba(59, 130, 246, 0.25);
+    }
+
+    .agent-identity-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .agent-metrics-deck, .agent-policy-deck {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      backdrop-filter: blur(20px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.25);
+    }
+
+    .sidebar-section-title {
+      font-size: 10px;
+      font-weight: 800;
+      color: #64748b;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      padding-bottom: 8px;
+    }
+
+    .deck-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .bento-card-hero {
+      position: relative;
+      overflow: hidden;
+      border-color: rgba(59, 130, 246, 0.3);
+      background: linear-gradient(160deg, rgba(15, 23, 42, 0.85) 0%, rgba(20, 30, 55, 0.85) 100%);
+    }
+
+    .card-hero-glow {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .card-icon-pod.aux-pod {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: rgba(245, 158, 11, 0.35);
+      color: #fbbf24;
+    }
+
+    .agent-sub-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 768px) {
+      .agent-sub-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -752,138 +872,82 @@
         <strong style="color:#ffffff; margin-right:6px;">Active Operational Advisory:</strong>
         <span id="active-advisory-text">All systems nominal. Agent softphone connected. Emergency IVR deflection standing by.</span>
       </div>
+      <div style="display:flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:#34d399; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); padding:3px 10px; border-radius:999px;">
+        <span style="width:6px; height:6px; border-radius:50%; background:#10b981;"></span>
+        <span>CTI MAX SYNCED</span>
+      </div>
     </div>
 
-    <!-- AGENT SHIFT COCKPIT & STATUS BANNER -->
-    <section class="shift-banner">
-      <div class="shift-info-left">
-        <div class="agent-status-row">
-          <span class="status-tag approved" id="agent-state-tag">
-            <span style="width:6px; height:6px; border-radius:50%; background:#10b981; box-shadow:0 0 6px #10b981;"></span>
-            <span>AVAILABLE</span>
-          </span>
-          <span class="agent-id-badge" id="agent-id-label">AGT-8842</span>
-        </div>
-        <h2 class="agent-welcome-title" id="agent-welcome-name">Welcome back, Alex Morgan</h2>
-        <p class="agent-skill-desc" id="agent-shift-desc">
-          Assigned Skill: <strong>Tier-2 Tech Support</strong> • Base Shift: <strong>08:00 - 16:30</strong> (Interval 15m)
-        </p>
-      </div>
-
-      <div class="shift-stats">
-        <div class="s-stat-pod">
-          <span class="s-stat-label">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-            Schedule Adherence
-          </span>
-          <span class="s-stat-num" id="agent-adh-stat" style="color:#34d399;">96.4%</span>
-        </div>
-
-        <div class="s-stat-pod">
-          <span class="s-stat-label">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v2M14 2v2M6 2v2M18 8a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-1v2a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8h15z"/></svg>
-            AUX Breaks Taken
-          </span>
-          <span class="s-stat-num" id="agent-tea-stat">1 / 2</span>
-        </div>
-
-        <div class="s-stat-pod">
-          <span class="s-stat-label">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            Lunch Variance
-          </span>
-          <span class="s-stat-num" id="agent-lunch-stat" style="color:#34d399;">0m</span>
-        </div>
-
-        <div class="s-stat-pod">
-          <span class="s-stat-label">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-            Next Open Window
-          </span>
-          <span class="s-stat-num" style="color:#60a5fa;">15:00</span>
-        </div>
-      </div>
-    </section>
-
-    <!-- CORE ACTION CARDS BENTO GRID -->
-    <div class="cards-grid" id="home-cards-grid">
-
-      <!-- CARD 1: COPILOT & ACW ASSISTANT -->
-      <div class="bento-card">
-        <div>
-          <div class="card-top">
-            <div class="card-icon-pod">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="12" x="3" y="6" rx="2"/><path d="M9 18v3M15 18v3M12 2v4M2 12h2M20 12h2"/></svg>
-            </div>
-            <div class="card-title">
-              <h3>Ask Shankar &amp; ACW Assistant</h3>
-              <p>Autonomous real-time assistant for live ACD queue volume, schedule adherence, and ACW wrap-up telemetry.</p>
-            </div>
+    <!-- WORKSTATION SPLIT VIEW LAYOUT -->
+    <div class="workstation-split-grid">
+      
+      <!-- LEFT PANEL: AGENT COCKPIT & PERFORMANCE HUD -->
+      <aside class="agent-cockpit-sidebar">
+        
+        <!-- Agent Identity Pod -->
+        <div class="agent-id-card">
+          <div class="agent-avatar-pod">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </div>
-          <div class="card-details-box">
-            <div>• <strong>Live Speech Suggestions</strong>: Fast customer objection handling</div>
-            <div>• <strong>Instant CRM Summarizer</strong>: Auto-generates structured ACW notes</div>
-            <div>• <strong>Disposition Sync</strong>: Directly logs call results to telephony &amp; CRM</div>
+          <div class="agent-identity-meta">
+            <div class="agent-status-row">
+              <span class="status-tag approved" id="agent-state-tag">
+                <span style="width:6px; height:6px; border-radius:50%; background:#10b981; box-shadow:0 0 6px #10b981;"></span>
+                <span>AVAILABLE</span>
+              </span>
+              <span class="agent-id-badge" id="agent-id-label">AGT-8842</span>
+            </div>
+            <h2 class="agent-welcome-title" id="agent-welcome-name">Welcome back, Alex Morgan</h2>
+            <p class="agent-skill-desc" id="agent-shift-desc">
+              Assigned Skill: <strong>Tier-2 Tech Support</strong> • Base Shift: <strong>08:00 - 16:30</strong> (Interval 15m)
+            </p>
           </div>
         </div>
 
-        <div style="display:flex; flex-direction:column; gap:10px;">
-          <button type="button" onclick="if(window.openFullApp) window.openFullApp(); else if(window.openFloatingWidget) window.openFloatingWidget(true);" class="btn-card-action primary">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-            <span>Open App Full Screen</span>
-          </button>
-          <button type="button" onclick="if(window.openFloatingWidget) window.openFloatingWidget(); else window.open('/widget.html', 'ZELWidget', 'width=460,height=780');" class="btn-card-action secondary">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
-            <span>Launch Floating Widget</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- CARD 2: QA INTERACTION SCORECARD -->
-      <div class="bento-card">
-        <div>
-          <div class="card-top">
-            <div class="card-icon-pod mic">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-            </div>
-            <div class="card-title">
-              <h3>Interaction Quality &amp; Tone</h3>
-              <p>Speech sentiment ratings, post-call customer CSAT stars, and supervisor coaching feedback.</p>
-            </div>
+        <!-- Intraday Adherence & Capacity Metrics Deck -->
+        <div class="agent-metrics-deck">
+          <div class="sidebar-section-title">
+            <span>INTRADAY CAPACITY &amp; ADHERENCE</span>
           </div>
-          <div class="card-details-box">
-            <div class="policy-row">
-              <span style="color:#94a3b8;">Customer Tone Sentiment:</span>
-              <strong id="agent-qa-tone" style="color:#34d399;">Good / Empathetic</strong>
+          <div class="deck-grid">
+            <div class="s-stat-pod">
+              <span class="s-stat-label">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Adherence
+              </span>
+              <span class="s-stat-num" id="agent-adh-stat" style="color:#34d399;">96.4%</span>
             </div>
-            <div class="policy-row">
-              <span style="color:#94a3b8;">Post-Call IVR CSAT Rating:</span>
-              <strong id="agent-qa-csat" style="color:#fbbf24;">★ 5.0 / 5.0</strong>
+
+            <div class="s-stat-pod">
+              <span class="s-stat-label">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v2M14 2v2M6 2v2M18 8a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-1v2a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8h15z"/></svg>
+                AUX Breaks
+              </span>
+              <span class="s-stat-num" id="agent-tea-stat">1 / 2</span>
             </div>
-            <div class="policy-row">
-              <span style="color:#94a3b8;">Weighted QA Score:</span>
-              <strong id="agent-qa-score" style="color:#60a5fa;">96% (Top Tier)</strong>
+
+            <div class="s-stat-pod">
+              <span class="s-stat-label">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Lunch Var
+              </span>
+              <span class="s-stat-num" id="agent-lunch-stat" style="color:#34d399;">0m</span>
+            </div>
+
+            <div class="s-stat-pod">
+              <span class="s-stat-label">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                Next Window
+              </span>
+              <span class="s-stat-num" style="color:#60a5fa;">15:00</span>
             </div>
           </div>
         </div>
 
-        <button type="button" id="btn-open-qa-modal" class="btn-card-action secondary">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-          <span>View Detailed QA Scorecard</span>
-        </button>
-      </div>
-
-      <!-- CARD 3: ASSIGNED SHIFT POLICIES -->
-      <div class="bento-card">
-        <div>
-          <div class="card-top">
-            <div class="card-icon-pod shield">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </div>
-            <div class="card-title">
-              <h3>Shift Adherence Policies</h3>
-              <p>Operational schedule limits and break allowances enforced by WFM Operations Supervisor.</p>
-            </div>
+        <!-- Shift Adherence Governance Policies -->
+        <div class="agent-policy-deck">
+          <div class="sidebar-section-title">
+            <span>SHIFT GOVERNANCE LIMITS</span>
           </div>
           <div class="card-details-box">
             <div class="policy-row">
@@ -905,11 +969,108 @@
           </div>
         </div>
 
-        <div style="font-size:11px; color:#64748b; border-top:1px solid rgba(255,255,255,0.06); padding-top:10px; display:flex; align-items:center; gap:6px;">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-          <span>Shift limits governed live by Floor Supervisor.</span>
+      </aside>
+
+      <!-- RIGHT PANEL: PRIMARY OPERATIONS LAUNCHPADS -->
+      <section class="agent-command-main">
+
+        <!-- HERO TILE 1: BREAK & AUX PORTAL DIRECT LAUNCHER -->
+        <div class="bento-card bento-card-hero">
+          <div class="card-hero-glow"></div>
+          <div>
+            <div class="card-top">
+              <div class="card-icon-pod aux-pod">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v2M14 2v2M6 2v2M18 8a3 3 0 0 1 3 3v2a3 3 0 0 1-3 3h-1v2a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8h15z"/></svg>
+              </div>
+              <div class="card-title">
+                <h3>Auxiliary Mode &amp; Break Governance</h3>
+                <p>Real-time break request approval engine evaluated against live intraday Erlang-C staffing requirements.</p>
+              </div>
+            </div>
+            <div class="card-details-box">
+              <div>• <strong>Instant Erlang-C Evaluation</strong>: Automatic decisioning prevents floor understaffing</div>
+              <div>• <strong>Threshold Alarm Integration</strong>: Alerts your phone or desktop before break expiration</div>
+              <div>• <strong>Full Outage Recall Support</strong>: Instant notification if an intraday storm surge occurs</div>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:12px; margin-top:16px;">
+            <a href="/portal.html" class="btn-card-action primary" style="flex:1; text-decoration:none; justify-content:center;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <span>Launch AUX Break Request Portal</span>
+            </a>
+            <button type="button" onclick="if(window.openMobilePairingModal) window.openMobilePairingModal(); else document.getElementById('mobile-pairing-modal').classList.remove('hidden');" class="btn-card-action secondary">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></svg>
+              <span>Pair Mobile Companion</span>
+            </button>
+          </div>
         </div>
-      </div>
+
+        <!-- 2-COLUMN ACTION GRID FOR COPILOT AND QA -->
+        <div class="agent-sub-grid">
+          
+          <!-- CARD: COPILOT & ACW ASSISTANT -->
+          <div class="bento-card">
+            <div>
+              <div class="card-top">
+                <div class="card-icon-pod">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="12" x="3" y="6" rx="2"/><path d="M9 18v3M15 18v3M12 2v4M2 12h2M20 12h2"/></svg>
+                </div>
+                <div class="card-title">
+                  <h3>Ask Shankar Copilot</h3>
+                  <p>Autonomous AI assistant for live speech recommendations, ACW notes summarizer, and disposition sync.</p>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:10px; margin-top:14px;">
+              <button type="button" onclick="if(window.openFullApp) window.openFullApp(); else if(window.openFloatingWidget) window.openFloatingWidget(true);" class="btn-card-action primary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                <span>Open App Full Screen</span>
+              </button>
+              <button type="button" onclick="if(window.openFloatingWidget) window.openFloatingWidget(); else window.open('/widget.html', 'ZELWidget', 'width=460,height=780');" class="btn-card-action secondary">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>
+                <span>Launch Floating Widget</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- CARD: QA INTERACTION SCORECARD -->
+          <div class="bento-card">
+            <div>
+              <div class="card-top">
+                <div class="card-icon-pod mic">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                </div>
+                <div class="card-title">
+                  <h3>Quality &amp; Tone</h3>
+                  <p>Speech sentiment ratings, post-call customer CSAT stars, and coaching feedback.</p>
+                </div>
+              </div>
+              <div class="card-details-box" style="margin-top:12px;">
+                <div class="policy-row">
+                  <span style="color:#94a3b8;">Tone Sentiment:</span>
+                  <strong id="agent-qa-tone" style="color:#34d399;">Good / Empathetic</strong>
+                </div>
+                <div class="policy-row">
+                  <span style="color:#94a3b8;">CSAT Rating:</span>
+                  <strong id="agent-qa-csat" style="color:#fbbf24;">★ 5.0 / 5.0</strong>
+                </div>
+                <div class="policy-row">
+                  <span style="color:#94a3b8;">QA Score:</span>
+                  <strong id="agent-qa-score" style="color:#60a5fa;">96% (Top Tier)</strong>
+                </div>
+              </div>
+            </div>
+
+            <button type="button" id="btn-open-qa-modal" class="btn-card-action secondary" style="margin-top:14px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              <span>View Detailed QA Scorecard</span>
+            </button>
+          </div>
+
+        </div>
+      </section>
 
     </div>
   </main>
