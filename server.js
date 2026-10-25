@@ -1772,14 +1772,14 @@ function evaluateBreak(payload) {
   const currentAvailableStaff = 22;
   const requiredStaffForSla = 26;
 
-  if (isMondayPeak && payload.urgency !== 'Urgent-Medical') {
+  if ((agent.forceHighVolumeSurge || isMondayPeak) && payload.urgency !== 'Urgent-Medical') {
     return {
       status: 'REJECTED',
       code: 'WFM_ACD_STAFFING_LIMITED',
       checkBackLater: true,
       nextOpenInterval: '11:45 AM (After Morning Rush)',
-      title: 'Auto-Rejected: Monday Peak Call Volume Active',
-      description: 'ACD arrival surge detected (Monday Morning Rush). Queue depth exceeds normal thresholds; non-critical AUX requests temporarily restricted.',
+      title: 'Auto-Rejected: High Call Volume Surge Active',
+      description: 'ACD arrival surge detected (+48 calls in queue). Queue depth exceeds SLA safety threshold; discretionary AUX break requests are temporarily held to protect floor service levels.',
       metrics: {
         'Queue Condition': 'Monday High Call Volume Mode Active',
         'Projected SLA Impact': '72% (Requires 26 agents, only 22 available)',

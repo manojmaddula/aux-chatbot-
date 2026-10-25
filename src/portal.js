@@ -106,10 +106,11 @@ const AGENT_PERSONAS = {
     queue: 'Tier-2 Tech Support',
     adherenceScore: 85.0,
     recentBreaksToday: 2,
-    lunchOverageHistoryMinutes: 6,
-    auxDefault: 'AUX-5: Technical / VPN Issue',
-    urgency: 'High-Queue',
-    note: 'Hardware & VPN infrastructure diagnostic specialist.'
+    lunchOverageHistoryMinutes: 0,
+    forceHighVolumeSurge: true,
+    auxDefault: 'AUX-2: Short Break / AUX',
+    urgency: 'Normal',
+    note: 'Inbound queue surge active (+48 calls). Triggers ACD High Call Volume Rejection.'
   },
   'AGT-6628': {
     id: 'AGT-6628',
@@ -456,7 +457,7 @@ function runClientSideDecisionEngine(payload) {
 
   // 3. ACD & WFM Forecasting Engine
   const liveStaffing = 23; // available agents
-  const projectedCallSurge = (payload.urgency === 'Urgent-Medical') ? false : (Math.random() < 0.25); // 25% chance of simulated peak queue
+  const projectedCallSurge = (payload.urgency === 'Urgent-Medical') ? false : (Boolean(payload.agent && payload.agent.forceHighVolumeSurge) || Math.random() < 0.25); // 25% chance of simulated peak queue
   const isMondayRush = new Date().getDay() === 1 && new Date().getHours() < 12;
 
   if (projectedCallSurge || isMondayRush) {
@@ -465,7 +466,7 @@ function runClientSideDecisionEngine(payload) {
       code: 'WFM_ACD_STAFFING_LIMITED',
       checkBackLater: true,
       nextOpenInterval: '11:45 AM (Queue Recovery)',
-      title: 'Auto-Rejected: ACD Call Volume Peak / Insufficient Staffing',
+      title: 'Auto-Rejected: High Call Volume Surge Active',
       description: 'WFM Forecast predicts an ACD call arrival spike of 45 calls in the next 15-minute interval. Current active agent staffing is below the SLA safety threshold (projected SLA: 71.4% vs 80.0% target).',
       metrics: {
         'ACD Forecast Arrival': '45 calls / 15m (High Traffic Mode)',
