@@ -3030,7 +3030,12 @@ window.closeQuotaModal = function() {
   const m = document.getElementById('modal-quota-achieved');
   if (m) {
     m.classList.add('hidden');
+    m.style.removeProperty('display');
     m.style.setProperty('display', 'none', 'important');
+  }
+  const bd = document.getElementById('quota-modal-backdrop');
+  if (bd) {
+    bd.style.setProperty('display', 'none', 'important');
   }
 };
 
@@ -3051,22 +3056,28 @@ window.showQuotaFulfilledAlert = function(data) {
 
   if (listEl && data.acceptedAgents) {
     listEl.innerHTML = data.acceptedAgents.map(a => `
-      <div style="display:flex; justify-content:space-between; align-items:center; background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:8px 12px; font-size:12px; box-shadow:0 1px 3px rgba(0,0,0,0.04);">
-        <div style="display:flex; align-items:center; gap:8px;">
-          <span style="width:24px; height:24px; border-radius:50%; background:#dcfce7; color:#15803d; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:11px;">✓</span>
+      <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:9px 12px; font-size:12px;">
+        <div style="display:flex; align-items:center; gap:9px;">
+          <span style="width:26px; height:26px; border-radius:50%; background:rgba(16,185,129,0.2); border:1px solid rgba(16,185,129,0.4); color:#34d399; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:13px; flex-shrink:0;">✓</span>
           <div>
-            <strong style="color:#0f172a; font-size:12px; display:block;">${a.agentName}</strong>
-            <span style="color:#64748b; font-size:11px; font-family:monospace;">${a.agentId} • ${a.queue || 'Support'}</span>
+            <strong style="color:#f1f5f9; font-size:12px; display:block;">${a.agentName}</strong>
+            <span style="color:#64748b; font-size:11px; font-family:ui-monospace,monospace;">${a.agentId} · ${a.queue || 'Support'}</span>
           </div>
         </div>
-        <span style="background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; font-weight:800; font-size:10px; padding:3px 8px; border-radius:6px; text-transform:uppercase;">Confirmed</span>
+        <span style="background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.3); font-weight:800; font-size:10px; padding:3px 8px; border-radius:6px; text-transform:uppercase; flex-shrink:0;">Confirmed</span>
       </div>
     `).join('');
   }
 
   if (modal) {
     modal.classList.remove('hidden');
+    modal.style.removeProperty('display');
     modal.style.setProperty('display', 'flex', 'important');
+  }
+  const bd = document.getElementById('quota-modal-backdrop');
+  if (bd) {
+    bd.style.removeProperty('display');
+    bd.style.setProperty('display', 'block', 'important');
   }
 
   // Trigger vocal announcement

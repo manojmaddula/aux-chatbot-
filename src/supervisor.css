@@ -1186,7 +1186,7 @@ textarea:focus, select:focus {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  padding: 20px;
 }
 
 .quota-alert-modal.hidden {
@@ -1196,16 +1196,17 @@ textarea:focus, select:focus {
 #quota-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.75);
-  backdrop-filter: blur(4px);
-  z-index: 10000000;
+  background: rgba(5, 10, 25, 0.82);
+  backdrop-filter: blur(6px);
+  z-index: 9999990;
   cursor: pointer;
+  display: none;
 }
 
 #btn-close-quota-modal:hover {
-  background: #fee2e2 !important;
-  border-color: #f87171 !important;
-  color: #dc2626 !important;
+  background: rgba(239, 68, 68, 0.12) !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+  color: #f87171 !important;
 }
 
 #btn-ack-quota-modal:hover {
@@ -1214,4 +1215,10 @@ textarea:focus, select:focus {
 }
 #btn-ack-quota-modal:active {
   transform: translateY(0);
+}
+
+
+@keyframes modal-pop {
+  from { transform: scale(0.92) translateY(10px); opacity: 0; }
+  to   { transform: scale(1) translateY(0); opacity: 1; }
 }

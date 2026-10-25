@@ -8,7 +8,7 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png?v=panda2" />
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png?v=panda2" />
   <link rel="shortcut icon" href="/favicon.ico?v=panda2" />
-  <link rel="stylesheet" href="supervisor.css?v=2.1" />
+  <link rel="stylesheet" href="supervisor.css?v=2.2" />
   <link rel="stylesheet" href="floating-widget.css?v=2.5" />
 </head>
 <body>
@@ -1254,55 +1254,76 @@
   </div>
 
   <!-- SYSTEM ALERT: SUFFICIENT STAFFING SECURED FOR OUTAGE MODAL -->
-  <div id="modal-quota-achieved" class="quota-alert-modal hidden" role="dialog" aria-modal="true" style="display:none; position:fixed; inset:0; z-index:9999999; align-items:center; justify-content:center; padding:16px;">
-    <!-- Backdrop -->
-    <div id="quota-modal-backdrop" onclick="closeQuotaModal()" style="position:fixed; inset:0; background:rgba(15, 23, 42, 0.75); backdrop-filter:blur(4px); z-index:10000000; cursor:pointer;"></div>
-    
+  <!-- Backdrop (separate from modal box to avoid z-index stacking issues) -->
+  <div id="quota-modal-backdrop" onclick="closeQuotaModal()" style="display:none; position:fixed; inset:0; background:rgba(5,10,25,0.82); backdrop-filter:blur(6px); z-index:9999990; cursor:pointer;"></div>
+
+  <div id="modal-quota-achieved" class="quota-alert-modal hidden" role="dialog" aria-modal="true" style="display:none; position:fixed; inset:0; z-index:9999999; align-items:center; justify-content:center; padding:20px; pointer-events:none;">
     <!-- Modal Content Window -->
-    <div class="qa-modal-content" style="position:relative; z-index:10000001; width:100%; max-width:520px; background:#ffffff; border-radius:20px; border-top:6px solid #10b981; box-shadow:0 25px 60px rgba(0,0,0,0.35); overflow:hidden; animation:modal-pop 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
-      <div class="qa-modal-header" style="background:linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%); border-bottom:1px solid #a7f3d0; padding:18px 22px; display:flex; justify-content:space-between; align-items:center;">
-        <div style="display:flex; align-items:center; gap:12px;">
-          <div style="width:44px; height:44px; border-radius:12px; background:#dcfce7; border:1px solid #86efac; display:flex; align-items:center; justify-content:center; font-size:22px; box-shadow:0 2px 8px rgba(16,185,129,0.2);">
-            🎉
+    <div onclick="event.stopPropagation()" style="pointer-events:all; position:relative; width:100%; max-width:540px; background:linear-gradient(160deg,#0d1929 0%,#091420 100%); border:1px solid rgba(16,185,129,0.35); border-top:3px solid #10b981; border-radius:22px; box-shadow:0 0 0 1px rgba(16,185,129,0.15), 0 30px 70px rgba(0,0,0,0.7), 0 0 60px rgba(16,185,129,0.1); overflow:hidden; animation:modal-pop 0.28s cubic-bezier(0.16,1,0.3,1);">
+
+      <!-- Ambient glow bar -->
+      <div style="position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,transparent,#10b981,#34d399,#10b981,transparent);"></div>
+
+      <!-- Header -->
+      <div style="padding:20px 22px 16px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid rgba(255,255,255,0.07);">
+        <div style="display:flex; align-items:center; gap:14px;">
+          <div style="width:48px; height:48px; border-radius:14px; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); display:flex; align-items:center; justify-content:center; box-shadow:0 0 20px rgba(16,185,129,0.2);">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
           </div>
           <div>
-            <h3 style="margin:0; color:#065f46; font-size:18px; font-weight:800; letter-spacing:-0.3px;">System Alert: Sufficient Staffing Secured!</h3>
-            <span style="color:#059669; font-size:12px; font-weight:600;">Outage Call Volume Deficit Resolved</span>
+            <h3 style="margin:0 0 3px; color:#ffffff; font-size:17px; font-weight:800; letter-spacing:-0.3px;">System Alert: Sufficient Staffing Secured!</h3>
+            <span style="display:flex; align-items:center; gap:5px; color:#34d399; font-size:12px; font-weight:600;">
+              <span style="width:6px;height:6px;border-radius:50%;background:#10b981;display:inline-block;box-shadow:0 0 8px #10b981;"></span>
+              Outage Call Volume Deficit Resolved
+            </span>
           </div>
         </div>
-        <button id="btn-close-quota-modal" type="button" onclick="closeQuotaModal()" title="Close Alert" style="background:#ffffff; border:1.5px solid #cbd5e1; border-radius:8px; color:#64748b; cursor:pointer; font-size:18px; width:34px; height:34px; display:flex; align-items:center; justify-content:center; transition:all 0.15s; font-weight:700;">✕</button>
+        <button id="btn-close-quota-modal" type="button" onclick="event.stopPropagation(); closeQuotaModal();" title="Close Alert" style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); border-radius:8px; color:#94a3b8; cursor:pointer; width:34px; height:34px; display:flex; align-items:center; justify-content:center; transition:all 0.15s; flex-shrink:0;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
       </div>
-      <div class="qa-modal-body" style="padding:22px; display:flex; flex-direction:column; gap:16px;">
-        <div style="background:linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%); border:1.5px solid #86efac; border-radius:14px; padding:18px; text-align:center; box-shadow:inset 0 1px 0 #ffffff;">
-          <div style="font-size:20px; font-weight:800; color:#15803d; margin-bottom:6px; letter-spacing:-0.2px;">
-            ✓ Staffing Quota Reached (<span id="modal-quota-number">5 / 5</span> Confirmed)
-          </div>
-          <p style="margin:0; font-size:13px; color:#166534; line-height:1.55;">
-            We have obtained a sufficient number of agents for the outage! All confirmed agents have been assigned their surge shift timings (<strong id="modal-quota-shift" style="background:#dcfce7; padding:2px 6px; border-radius:4px; font-family:monospace; color:#047857;">15:30 - 18:30</strong>) and have been instructed to log in to workstation softphones to balance the queue.
+
+      <!-- Body -->
+      <div style="padding:20px 22px; display:flex; flex-direction:column; gap:16px;">
+
+        <!-- Quota Summary Card -->
+        <div style="background:rgba(16,185,129,0.08); border:1px solid rgba(16,185,129,0.25); border-radius:16px; padding:18px; text-align:center; position:relative; overflow:hidden;">
+          <div style="position:absolute; top:-30px; left:50%; transform:translateX(-50%); width:120px; height:80px; background:radial-gradient(ellipse,rgba(16,185,129,0.25) 0%,transparent 70%); pointer-events:none;"></div>
+          <div style="font-size:32px; font-weight:900; color:#34d399; margin-bottom:4px; letter-spacing:-1px; font-family:ui-monospace,monospace;"><span id="modal-quota-number">5 / 5</span></div>
+          <div style="font-size:12px; font-weight:700; color:#6ee7b7; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px;">Confirmed Agents</div>
+          <p style="margin:0; font-size:13px; color:#94a3b8; line-height:1.6;">
+            We have obtained a sufficient number of agents for the outage. All confirmed agents have been assigned surge shift timings
+            <strong id="modal-quota-shift" style="color:#34d399; font-family:ui-monospace,monospace; background:rgba(16,185,129,0.12); padding:2px 8px; border-radius:5px; margin:0 2px;">15:30 – 18:30</strong>
+            and instructed to log in to workstation softphones to balance the queue.
           </p>
         </div>
 
-        <!-- Confirmed Agents List -->
-        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:14px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <span style="font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:0.5px;">Confirmed Outage Surge Roster</span>
-            <span style="font-size:11px; font-weight:700; color:#10b981; background:#dcfce7; padding:2px 8px; border-radius:999px;">Ready for Dispatch</span>
+        <!-- Confirmed Agents Roster -->
+        <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.07); border-radius:14px; padding:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <span style="font-size:11px; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:0.8px;">Outage Surge Roster</span>
+            <span style="font-size:10px; font-weight:700; color:#34d399; background:rgba(16,185,129,0.15); border:1px solid rgba(16,185,129,0.3); padding:3px 10px; border-radius:999px;">Ready for Dispatch</span>
           </div>
-          <div id="modal-quota-agents-list" style="display:flex; flex-direction:column; gap:8px; max-height:170px; overflow-y:auto; padding-right:2px;">
+          <div id="modal-quota-agents-list" style="display:flex; flex-direction:column; gap:7px; max-height:160px; overflow-y:auto; padding-right:2px;">
             <!-- Populated dynamically -->
           </div>
         </div>
 
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:4px;">
-          <button id="btn-ack-quota-modal" type="button" onclick="closeQuotaModal()" style="flex:1; padding:13px; font-size:14px; font-weight:800; color:#ffffff; background:linear-gradient(135deg, #10b981 0%, #059669 100%); border:none; border-radius:12px; cursor:pointer; box-shadow:0 4px 16px rgba(16,185,129,0.4); transition:all 0.15s; letter-spacing:0.2px;">
-            ✓ Acknowledge &amp; Monitor Floor
+        <!-- Action Buttons -->
+        <div style="display:flex; gap:10px; margin-top:2px;">
+          <button id="btn-ack-quota-modal" type="button" onclick="event.stopPropagation(); closeQuotaModal();" style="flex:1; padding:13px; font-size:14px; font-weight:800; color:#ffffff; background:linear-gradient(135deg,#10b981 0%,#059669 100%); border:none; border-radius:12px; cursor:pointer; box-shadow:0 4px 20px rgba(16,185,129,0.35); transition:all 0.15s; display:flex; align-items:center; justify-content:center; gap:8px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Acknowledge &amp; Monitor Floor
+          </button>
+          <button type="button" onclick="event.stopPropagation(); closeQuotaModal();" style="padding:13px 18px; font-size:13px; font-weight:700; color:#94a3b8; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; cursor:pointer; transition:all 0.15s;">
+            Close
           </button>
         </div>
       </div>
     </div>
   </div>
 
-  <script src="supervisor.js?v=2.2"></script>
+  <script src="supervisor.js?v=2.3"></script>
   <script src="floating-widget.js?v=2.5"></script>
 
 </body>
