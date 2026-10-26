@@ -485,7 +485,9 @@ const MIME_TYPES = {
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.svg': 'image/svg+xml',
-  '.ico': 'image/x-icon'
+  '.ico': 'image/x-icon',
+  '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  '.ppt': 'application/vnd.ms-powerpoint'
 };
 
 const server = http.createServer((req, res) => {
@@ -499,6 +501,13 @@ const server = http.createServer((req, res) => {
 
   if (req.method === 'OPTIONS') {
     res.writeHead(200);
+    res.end();
+    return;
+  }
+
+  // Quick aliases for presentation / PPT
+  if (pathname === '/ppt' || pathname === '/presentation' || pathname === '/slides') {
+    res.writeHead(302, { 'Location': '/presentation.html' });
     res.end();
     return;
   }

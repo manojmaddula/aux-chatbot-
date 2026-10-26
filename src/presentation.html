@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ZEL — Call Center Assist (Web Presentation)</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=panda2" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" />
+  <style>
+    :root {
+      --bg-color: #0b1120;
+      --slide-bg: #0f172a;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --accent: #10b981;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --purple: #8b5cf6;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-sub: #cbd5e1;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-color);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      user-select: none;
+    }
+
+    /* TOP PRESENTATION BAR */
+    .pres-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(51, 65, 85, 0.6);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .brand-section {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: #1e293b;
+      padding: 4px;
+      border: 1px solid #475569;
+    }
+
+    .brand-text h1 {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-tagline {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-action {
+      background: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-action:hover {
+      background: #334155;
+      color: #fff;
+      border-color: #475569;
+      transform: translateY(-1px);
+    }
+
+    .btn-action.primary {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary-hover);
+    }
+
+    .btn-action.primary:hover {
+      background: var(--primary-hover);
+    }
+
+    /* PROGRESS BAR */
+    .progress-bar-wrap {
+      width: 100%;
+      height: 3px;
+      background: #1e293b;
+      position: relative;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #10b981);
+      width: 20%;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* SLIDE STAGE */
+    .pres-stage {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+    }
+
+    .slide-wrapper {
+      width: 100%;
+      max-width: 1140px;
+      aspect-ratio: 16 / 9;
+      background: var(--slide-bg);
+      border-radius: 16px;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 40px rgba(59, 130, 246, 0.1);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: 40px 48px;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(40px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    }
+
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateX(0);
+    }
+
+    /* SLIDE HEADER */
+    .slide-eyebrow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .eyebrow-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--primary);
+      background: rgba(59, 130, 246, 0.12);
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
+
+    .slide-counter-badge {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      background: rgba(30, 41, 59, 0.8);
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid #334155;
+    }
+
+    .slide-heading {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+
+    .slide-subheading {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    /* SLIDE 1 (TITLE SLIDE) */
+    .slide-1-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .hero-panda-avatar {
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border: 2px solid var(--primary);
+      border-radius: 50%;
+      padding: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 35px rgba(59, 130, 246, 0.35);
+      animation: floatPanda 4s ease-in-out infinite;
+    }
+
+    @keyframes floatPanda {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .slide-1-title {
+      font-size: 44px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, #ffffff 40%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+    }
+
+    .slide-1-tagline {
+      font-size: 20px;
+      font-weight: 500;
+      color: #38bdf8;
+      font-style: italic;
+      margin-bottom: 28px;
+      text-shadow: 0 2px 10px rgba(56, 189, 248, 0.25);
+    }
+
+    .pill-features-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .pill-feature {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid #334155;
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #cbd5e1;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* SLIDE 2: PROBLEM STATEMENT */
+    .problem-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 20px;
+      flex: 1;
+    }
+
+    .card {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card.highlight {
+      border-color: rgba(239, 68, 68, 0.4);
+      background: linear-gradient(180deg, rgba(239, 68, 68, 0.08) 0%, rgba(30, 41, 59, 0.6) 100%);
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-desc {
+      font-size: 12.5px;
+      color: var(--text-sub);
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+
+    .impact-user-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .impact-user-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid #334155;
+      padding: 10px 14px;
+      border-radius: 8px;
+    }
+
+    .impact-num {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--primary);
+      background: rgba(59, 130, 246, 0.15);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .impact-text strong {
+      font-size: 12px;
+      color: #f1f5f9;
+      display: block;
+    }
+
+    .impact-text small {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .callout-box {
+      margin-top: auto;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      color: #fca5a5;
+      font-weight: 500;
+    }
+
+    /* SLIDE 3: PROPOSED SOLUTION */
+    .solution-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      flex: 1;
+    }
+
+    .sol-card {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.2s ease;
+    }
+
+    .sol-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .sol-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .sol-icon {
+      font-size: 24px;
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: rgba(59, 130, 246, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sol-card h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .sol-card p {
+      font-size: 12px;
+      color: var(--text-sub);
+      line-height: 1.5;
+    }
+
+    /* SLIDE 4: BENEFITS MATRIX */
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      flex: 1;
+    }
+
+    .benefit-card {
+      background: rgba(30, 41, 59, 0.7);
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .benefit-card.agents { border-top: 3px solid #38bdf8; }
+    .benefit-card.supervisors { border-top: 3px solid #10b981; }
+    .benefit-card.customers { border-top: 3px solid #f59e0b; }
+
+    .benefit-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .benefit-header h3 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .benefit-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .benefit-list li {
+      font-size: 12px;
+      color: var(--text-sub);
+      line-height: 1.5;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    .benefit-list li::before {
+      content: "✓";
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    /* SLIDE 5: BUSINESS VALUE & THANK YOU */
+    .roi-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 20px;
+      flex: 1;
+    }
+
+    .roi-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .roi-list li {
+      font-size: 12px;
+      color: var(--text-sub);
+      line-height: 1.4;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(15, 23, 42, 0.4);
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+    }
+
+    .roi-list li::before {
+      content: "📈";
+      font-size: 12px;
+    }
+
+    .thankyou-card {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9));
+      border: 1px solid #38bdf8;
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.15);
+    }
+
+    .thankyou-title {
+      font-size: 32px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .thankyou-tagline {
+      font-size: 14px;
+      font-weight: 600;
+      color: #38bdf8;
+      font-style: italic;
+      margin-bottom: 20px;
+    }
+
+    .demo-links-box {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .demo-link-btn {
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid #475569;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 11.5px;
+      font-weight: 600;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+    }
+
+    .demo-link-btn:hover {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    /* BOTTOM CONTROLS */
+    .pres-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+      background: rgba(15, 23, 42, 0.9);
+      border-top: 1px solid rgba(51, 65, 85, 0.6);
+      position: sticky;
+      bottom: 0;
+      z-index: 50;
+    }
+
+    .slide-dots {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .dot-pill {
+      height: 8px;
+      width: 24px;
+      background: #334155;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .dot-pill.active {
+      background: var(--primary);
+      width: 38px;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-nav {
+      background: #1e293b;
+      color: #fff;
+      border: 1px solid #475569;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-nav:hover:not(:disabled) {
+      background: #334155;
+      border-color: #64748b;
+    }
+
+    .btn-nav:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* FULLSCREEN ADAPTATION */
+    :fullscreen .slide-wrapper {
+      max-width: 95vw;
+      height: 88vh;
+    }
+
+    :-webkit-full-screen .slide-wrapper {
+      max-width: 95vw;
+      height: 88vh;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP HEADER -->
+  <header class="pres-header">
+    <div class="brand-section">
+      <img src="/favicon.svg?v=panda2" alt="ZEL Logo" class="brand-logo" />
+      <div class="brand-text">
+        <h1>ZEL <span>•</span> Call Center Assist</h1>
+        <div class="brand-tagline">"Zero wait to pause, Zero lag to serve"</div>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button id="btn-fullscreen" class="btn-action" title="Toggle Fullscreen Mode (F)">
+        <span>⤢</span> Fullscreen
+      </button>
+      <a href="/AUX_Break_Management.pptx" download class="btn-action primary" title="Download PowerPoint (.pptx) file">
+        <span>📥</span> Download .PPTX
+      </a>
+      <a href="/agent-home.html" class="btn-action" title="Return to Agent Home">
+        <span>🏠</span> Agent Home
+      </a>
+    </div>
+  </header>
+
+  <!-- PROGRESS BAR -->
+  <div class="progress-bar-wrap">
+    <div id="pres-progress" class="progress-bar-fill"></div>
+  </div>
+
+  <!-- PRESENTATION STAGE -->
+  <main class="pres-stage">
+    <div class="slide-wrapper" id="slide-stage">
+
+      <!-- SLIDE 1: COVER -->
+      <section class="slide active" id="slide-1" data-index="1">
+        <div class="slide-1-content">
+          <img src="/favicon.svg?v=panda2" alt="Panda Mascot" class="hero-panda-avatar" />
+          <span class="eyebrow-badge" style="margin-bottom:12px;">EXECUTIVE PITCH DECK</span>
+          <h2 class="slide-1-title">ZEL — Call Center Assist</h2>
+          <p class="slide-1-tagline">"Zero wait to pause, Zero lag to serve"</p>
+          <div class="pill-features-row">
+            <span class="pill-feature"><span>⚡</span> Autonomous AUX Governance</span>
+            <span class="pill-feature"><span>🧠</span> Ask Shankar AI Copilot</span>
+            <span class="pill-feature"><span>🔄</span> Dynamic Intraday Rebalancing</span>
+            <span class="pill-feature"><span>🌪️</span> Storm Auto-Deflection</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 2: PROBLEM STATEMENT -->
+      <section class="slide" id="slide-2" data-index="2">
+        <div class="slide-eyebrow">
+          <span class="eyebrow-badge">01 · PROBLEM STATEMENT</span>
+          <span class="slide-counter-badge">Slide 2 / 5</span>
+        </div>
+        <h2 class="slide-heading">Manual AUX Management</h2>
+        <p class="slide-subheading">Operational challenges, delays, and coordination drag across legacy contact centers</p>
+
+        <div class="problem-grid">
+          <div class="card highlight">
+            <div class="card-title">
+              <span>⚠️</span> The Operational Challenge
+            </div>
+            <p class="card-desc">
+              Manual AUX requests and approvals through emails and group chats cause delays and make it difficult to track agent availability. During storms or outages, supervisors must manually contact agents to arrange additional staffing, which slows down response times. Agents and supervisors also need quick access to information and guidance, but without an AI assistant like Ask Shankar, finding the right support can take extra time.
+            </p>
+            <div class="callout-box">
+              🚨 <strong>Impact:</strong> Slower coordination, reduced visibility, and increased manual effort.
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">
+              <span>👥</span> Impacted Users & Personas
+            </div>
+            <div class="impact-user-list">
+              <div class="impact-user-item">
+                <span class="impact-num">01</span>
+                <div class="impact-text">
+                  <strong>Call Center Agents</strong>
+                  <small>Break requests, schedule adherence, and real-time status clarity.</small>
+                </div>
+              </div>
+              <div class="impact-user-item">
+                <span class="impact-num">02</span>
+                <div class="impact-text">
+                  <strong>Team Leaders & Supervisors</strong>
+                  <small>Approvals backlog, staffing coordination, and intraday coverage.</small>
+                </div>
+              </div>
+              <div class="impact-user-item">
+                <span class="impact-num">03</span>
+                <div class="impact-text">
+                  <strong>Customers</strong>
+                  <small>Queue wait times, service continuity, and interaction consistency.</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 3: PROPOSED SOLUTION -->
+      <section class="slide" id="slide-3" data-index="3">
+        <div class="slide-eyebrow">
+          <span class="eyebrow-badge">02 · PROPOSED SOLUTION</span>
+          <span class="slide-counter-badge">Slide 3 / 5</span>
+        </div>
+        <h2 class="slide-heading">Core Pillars of Automated Governance 📊</h2>
+        <p class="slide-subheading">Erlang-C automated decisioning paired with frontline AI assistance</p>
+
+        <div class="solution-grid">
+          <div class="sol-card">
+            <div class="sol-card-header">
+              <div class="sol-icon">📊</div>
+              <h3>AUX Management Portal</h3>
+            </div>
+            <p>Auto-approvals of centralized break requests using Erlang-C staffing capacity gating and real-time countdown alerts.</p>
+          </div>
+
+          <div class="sol-card">
+            <div class="sol-card-header">
+              <div class="sol-icon">🔔</div>
+              <h3>Automated Staffing Alerts</h3>
+            </div>
+            <p>Proactive availability alerts and bot voice calls for unavailable agents during sudden storm surges and regional outages.</p>
+          </div>
+
+          <div class="sol-card">
+            <div class="sol-card-header">
+              <div class="sol-icon">📢</div>
+              <h3>Operational Advisories</h3>
+            </div>
+            <p>Timely broadcast communication of critical operational updates, severe weather advisories, and policy thresholds.</p>
+          </div>
+
+          <div class="sol-card">
+            <div class="sol-card-header">
+              <div class="sol-icon">🧠</div>
+              <h3>Ask Shankar & AI Coaching</h3>
+            </div>
+            <p>Ask Shankar provides instant AI answers and CRM wrap-up notes; speech-tone analysis supports targeted coaching.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 4: BENEFITS -->
+      <section class="slide" id="slide-4" data-index="4">
+        <div class="slide-eyebrow">
+          <span class="eyebrow-badge">03 · BENEFITS</span>
+          <span class="slide-counter-badge">Slide 4 / 5</span>
+        </div>
+        <h2 class="slide-heading">Benefits Across the Contact Center</h2>
+        <p class="slide-subheading">Measurable stakeholder value & operational impact across all tiers</p>
+
+        <div class="benefits-grid">
+          <div class="benefit-card agents">
+            <div class="benefit-header">
+              <span style="font-size:20px;">🎧</span>
+              <h3>Agents</h3>
+            </div>
+            <ul class="benefit-list">
+              <li>Improved break adherence without manual supervisor chasing.</li>
+              <li>Lower Average Handling Time (AHT) with 1-click ACW summaries.</li>
+              <li>Instant self-troubleshooting and quick-replies via Ask Shankar.</li>
+            </ul>
+          </div>
+
+          <div class="benefit-card supervisors">
+            <div class="benefit-header">
+              <span style="font-size:20px;">👥</span>
+              <h3>Supervisors</h3>
+            </div>
+            <ul class="benefit-list">
+              <li>Reduced administrative break approval workload.</li>
+              <li>Faster staffing coordination via 1-click intraday skill flex.</li>
+              <li>Proactive performance management and tone analytics.</li>
+            </ul>
+          </div>
+
+          <div class="benefit-card customers">
+            <div class="benefit-header">
+              <span style="font-size:20px;">😊</span>
+              <h3>Customers</h3>
+            </div>
+            <ul class="benefit-list">
+              <li>Shorter queue wait times and consistent service.</li>
+              <li>Stronger service continuity during regional emergency outages.</li>
+              <li>Improved call interaction quality and higher CSAT scores.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 5: BUSINESS VALUE & THANK YOU -->
+      <section class="slide" id="slide-5" data-index="5">
+        <div class="slide-eyebrow">
+          <span class="eyebrow-badge">04 · BUSINESS VALUE & ROI</span>
+          <span class="slide-counter-badge">Slide 5 / 5</span>
+        </div>
+        <h2 class="slide-heading">Strategic ROI & Operational Excellence 📈</h2>
+        <p class="slide-subheading">Measurable outcomes and live enterprise demonstration</p>
+
+        <div class="roi-grid">
+          <div class="card">
+            <div class="card-title">
+              <span>🎯</span> Value & ROI Outcomes
+            </div>
+            <ul class="roi-list">
+              <li>Lower overtime and manual staffing management costs.</li>
+              <li>Reduced call backlog during Monday rush & peak hours.</li>
+              <li>Elimination of supervisor administrative bottlenecks.</li>
+              <li>Improved SLA recovery from 34% back to 88.5%.</li>
+              <li>Optimized agent availability and higher workforce utilization.</li>
+              <li>Consistent customer service & higher CSAT rating (4.8+).</li>
+            </ul>
+          </div>
+
+          <div class="thankyou-card">
+            <h3 class="thankyou-title">Thank You!</h3>
+            <p class="thankyou-tagline">"Zero wait to pause, Zero lag to serve"</p>
+
+            <div class="demo-links-box">
+              <a href="/widget.html" target="_blank" class="demo-link-btn">
+                <span>💬 Desktop Chatbot (Ask Shankar)</span>
+                <span>Launch →</span>
+              </a>
+              <a href="/portal.html" target="_blank" class="demo-link-btn">
+                <span>☕ Break Request Portal</span>
+                <span>Launch →</span>
+              </a>
+              <a href="/supervisor.html" target="_blank" class="demo-link-btn">
+                <span>🛡️ Supervisor Command Center</span>
+                <span>Launch →</span>
+              </a>
+              <a href="/mobile-alert.html" target="_blank" class="demo-link-btn">
+                <span>📱 Mobile Break Alert</span>
+                <span>Launch →</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- BOTTOM NAVIGATION CONTROLS -->
+  <footer class="pres-controls">
+    <div class="slide-dots" id="slide-dots">
+      <div class="dot-pill active" data-goto="1" title="Slide 1: Cover"></div>
+      <div class="dot-pill" data-goto="2" title="Slide 2: Problem Statement"></div>
+      <div class="dot-pill" data-goto="3" title="Slide 3: Proposed Solution"></div>
+      <div class="dot-pill" data-goto="4" title="Slide 4: Benefits Across Contact Center"></div>
+      <div class="dot-pill" data-goto="5" title="Slide 5: Business ROI & Thank You"></div>
+    </div>
+
+    <div style="font-size:12px; color:var(--text-muted); font-weight:600;" id="pres-status">
+      Slide 1 of 5
+    </div>
+
+    <div class="nav-buttons">
+      <button id="btn-prev" class="btn-nav" disabled>
+        <span>◀</span> Previous
+      </button>
+      <button id="btn-next" class="btn-nav">
+        Next <span>▶</span>
+      </button>
+    </div>
+  </footer>
+
+  <script>
+    const totalSlides = 5;
+    let currentSlide = 1;
+
+    const slides = document.querySelectorAll('.slide');
+    const dots = document.querySelectorAll('.dot-pill');
+    const progressBar = document.getElementById('pres-progress');
+    const btnPrev = document.getElementById('btn-prev');
+    const btnNext = document.getElementById('btn-next');
+    const presStatus = document.getElementById('pres-status');
+    const btnFullscreen = document.getElementById('btn-fullscreen');
+
+    function goToSlide(index) {
+      if (index < 1 || index > totalSlides) return;
+      currentSlide = index;
+
+      slides.forEach((s, idx) => {
+        if (idx + 1 === currentSlide) {
+          s.classList.add('active');
+        } else {
+          s.classList.remove('active');
+        }
+      });
+
+      dots.forEach((d, idx) => {
+        if (idx + 1 === currentSlide) {
+          d.classList.add('active');
+        } else {
+          d.classList.remove('active');
+        }
+      });
+
+      // Update progress bar
+      const pct = (currentSlide / totalSlides) * 100;
+      progressBar.style.width = pct + '%';
+
+      // Update counter
+      presStatus.textContent = `Slide ${currentSlide} of ${totalSlides}`;
+
+      // Update button disabled state
+      btnPrev.disabled = (currentSlide === 1);
+      btnNext.disabled = (currentSlide === totalSlides);
+      if (currentSlide === totalSlides) {
+        btnNext.textContent = 'Completed ✓';
+      } else {
+        btnNext.innerHTML = 'Next <span>▶</span>';
+      }
+    }
+
+    btnPrev.addEventListener('click', () => goToSlide(currentSlide - 1));
+    btnNext.addEventListener('click', () => goToSlide(currentSlide + 1));
+
+    dots.forEach(d => {
+      d.addEventListener('click', () => {
+        const target = parseInt(d.getAttribute('data-goto'), 10);
+        goToSlide(target);
+      });
+    });
+
+    // Keyboard navigation
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        goToSlide(currentSlide + 1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp' || e.key === 'Backspace') {
+        e.preventDefault();
+        goToSlide(currentSlide - 1);
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFullscreen();
+      } else if (e.key === 'Home') {
+        goToSlide(1);
+      } else if (e.key === 'End') {
+        goToSlide(totalSlides);
+      }
+    });
+
+    // Fullscreen toggle
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        }
+      }
+    }
+    btnFullscreen.addEventListener('click', toggleFullscreen);
+
+    // Initial load
+    goToSlide(1);
+  </script>
+</body>
+</html>
